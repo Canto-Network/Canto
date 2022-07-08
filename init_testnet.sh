@@ -1,7 +1,6 @@
 KEY="mykey"
 KEY2="mykey2"
-KEY3="mykey3"
-CHAINID="canto_7722-1"
+CHAINID="canto_2277-1"
 MONIKER="plex-validator"
 KEYRING="test"
 KEYALGO="eth_secp256k1"
@@ -24,7 +23,6 @@ cantod config chain-id $CHAINID
 # if $KEY exists it should be deleted
 cantod keys add $KEY --keyring-backend $KEYRING --algo $KEYALGO
 cantod keys add $KEY2 --keyring-backend $KEYRING --algo $KEYALGO
-cantod keys add $KEY3 --keyring-backend $KEYRING --algo $KEYALGO
 
 # Set moniker and chain-id for Canto (Moniker can be anything, chain-id must be an integer)
 cantod init $MONIKER --chain-id $CHAINID
@@ -35,24 +33,10 @@ cat $HOME/.cantod/config/genesis.json | jq '.app_state["crisis"]["constant_fee"]
 cat $HOME/.cantod/config/genesis.json | jq '.app_state["gov"]["deposit_params"]["min_deposit"][0]["denom"]="acanto"' > $HOME/.cantod/config/tmp_genesis.json && mv $HOME/.cantod/config/tmp_genesis.json $HOME/.cantod/config/genesis.json
 cat $HOME/.cantod/config/genesis.json | jq '.app_state["evm"]["params"]["evm_denom"]="acanto"' > $HOME/.cantod/config/tmp_genesis.json && mv $HOME/.cantod/config/tmp_genesis.json $HOME/.cantod/config/genesis.json
 cat $HOME/.cantod/config/genesis.json | jq '.app_state["inflation"]["params"]["mint_denom"]="acanto"' > $HOME/.cantod/config/tmp_genesis.json && mv $HOME/.cantod/config/tmp_genesis.json $HOME/.cantod/config/genesis.json
-cat $HOME/.cantod/config/genesis.json | jq '.app_state["inflation"]["params"]["enable_inflation"]=false' > $HOME/.cantod/config/tmp_genesis.json && mv $HOME/.cantod/config/tmp_genesis.json $HOME/.cantod/config/genesis.json
-
 
 # Change voting params so that submitted proposals pass immediately for testing
-cat $HOME/.cantod/config/genesis.json| jq '.app_state.gov.voting_params.voting_period="120s"' > $HOME/.cantod/config/tmp_genesis.json && mv $HOME/.cantod/config/tmp_genesis.json $HOME/.cantod/config/genesis.json
+cat $HOME/.cantod/config/genesis.json| jq '.app_state.gov.voting_params.voting_period="600s"' > $HOME/.cantod/config/tmp_genesis.json && mv $HOME/.cantod/config/tmp_genesis.json $HOME/.cantod/config/genesis.json
 
-cat $HOME/.cantod/config/genesis.json| jq '.app_state.gov.tally_params.threshold="0.000000000000000000"' > $HOME/.cantod/config/tmp_genesis.json && mv $HOME/.cantod/config/tmp_genesis.json $HOME/.cantod/config/genesis.json
-
-cat $HOME/.cantod/config/genesis.json | jq '.app_state["gov"]["deposit_params"]["min_deposit"][0]["amount"]="1"' > $HOME/.cantod/config/tmp_genesis.json && mv $HOME/.cantod/config/tmp_genesis.json $HOME/.cantod/config/genesis.json
-
-
-cat $HOME/.cantod/config/genesis.json| jq '.app_state.gov.tally_params.veto_threshold="0.000000000000000000"' > $HOME/.cantod/config/tmp_genesis.json && mv $HOME/.cantod/config/tmp_genesis.json $HOME/.cantod/config/genesis.json
-
-
-cat $HOME/.cantod/config/genesis.json| jq '.app_state.gov.tally_params.quorum="0.000000000000000000"' > $HOME/.cantod/config/tmp_genesis.json && mv $HOME/.cantod/config/tmp_genesis.json $HOME/.cantod/config/genesis.json
-
-# Set gas limit in genesis
-cat $HOME/.cantod/config/genesis.json | jq '.consensus_params["block"]["max_gas"]="10000000"' > $HOME/.cantod/config/tmp_genesis.json && mv $HOME/.cantod/config/tmp_genesis.json $HOME/.cantod/config/genesis.json
 
 # disable produce empty block
 if [[ "$OSTYPE" == "darwin"* ]]; then
