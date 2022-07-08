@@ -87,7 +87,7 @@ fi
 
 # Allocate genesis accounts (cosmos formatted addresses)
 cantod add-genesis-account $KEY 964723926400000000000000000acanto --keyring-backend $KEYRING
-cantod add-genesis-account $KEY2 35276073620000000000000000acanto --keyring-backend $KEYRING
+cantod add-genesis-account $KEY2 35276073600000000000000000acanto --keyring-backend $KEYRING
                                  
 # Update total supply with claim values
 #validators_supply=$(cat $HOME/.cantod/config/genesis.json | jq -r '.app_state["bank"]["supply"][0]["amount"]')
