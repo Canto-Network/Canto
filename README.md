@@ -82,7 +82,7 @@
 
 git clone https://github.com/Canto-Network/Canto.git
 
-cd Canto-Testnet-v2
+cd Canto
 
 cd cmd/cantod
 
