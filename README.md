@@ -1,16 +1,16 @@
 # Becoming A Validator
 
-**How to validate on the Canto Testnet**
+**How to validate on the Canto Mainnet**
 
-*This is the Canto Testnet-1 (canto_7722-1)*
-
-  
-
-> Genesis [Published](https://github.com/Canto-Network/Canto-Testnet/raw/main/Networks/Testnet/genesis.json)
+*(canto_7744-1)*
 
   
 
-> Peers [Published](https://github.com/Canto-Network/Canto-Testnet/blob/main/Networks/Testnet/peers.txt)
+> Genesis [Published](https://github.com/Canto-Network/Canto/raw/main/Mainnet/genesis.json)
+
+  
+
+> Peers [Published](https://github.com/Canto-Network/Canto/blob/main/Mainnet/peers.txt)
 
   
 
