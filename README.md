@@ -80,7 +80,7 @@
 
 ```bash
 
-git clone https://github.com/Canto-Network/Canto
+git clone https://github.com/Canto-Network/Canto.git
 
 cd Canto-Testnet-v2
 
@@ -190,7 +190,7 @@ cantod tx staking create-validator \
 
 --from {{KEY_NAME}} \
 
---chain-id canto_7722-1 \
+--chain-id canto_7744-1 \
 
 --moniker="<VALIDATOR_NAME>" \
 
@@ -212,6 +212,8 @@ cantod tx staking create-validator \
 
 --amount <token delegation>acanto \
 
---node http://164.90.134.106:26657
+--node http://164.90.134.106:26657 \
+
+--fees 20acanto
 
 ```
