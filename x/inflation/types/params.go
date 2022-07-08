@@ -43,10 +43,10 @@ func DefaultParams() Params {
 	return Params{
 		MintDenom: DefaultInflationDenom,
 		ExponentialCalculation: ExponentialCalculation{
-			MinInflation:  sdk.NewDecWithPrec(5, 2),
-			MaxInflation:  sdk.NewDecWithPrec(500, 2), // 50%
+			MinInflation:  sdk.NewDecWithPrec(2999, 5),
+			MaxInflation:  sdk.NewDecWithPrec(3001, 5), // 50%
 			AdjustSpeed:   sdk.NewDec(1),
-			BondingTarget: sdk.NewDecWithPrec(67, 2), // 66%
+			BondingTarget: sdk.NewDecWithPrec(30, 2), // 66%
 		},
 		InflationDistribution: InflationDistribution{
 			StakingRewards: sdk.NewDecWithPrec(100, 2), // 80% / (1 - 25%)
