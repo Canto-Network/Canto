@@ -1,7 +1,6 @@
 package keeper
 
 import (
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/inflation/types"
@@ -98,13 +97,17 @@ func (k Keeper) GetProportions(
 
 // BondedRatio the fraction of the staking tokens which are currently bonded
 func (k Keeper) BondedRatio(ctx sdk.Context) sdk.Dec {
-	stakeSupply := k.stakingKeeper.StakingTokenSupply(ctx)
+	stakeSupply := sdk.Dec(k.stakingKeeper.StakingTokenSupply(ctx))
+
+	denomMint := k.GetParams(ctx).MintDenom
+	feePool := k.distrKeeper.GetFeePool(ctx)
+	inflSupply := stakeSupply.Sub(feePool.CommunityPool.AmountOf(denomMint))
 
 	if !stakeSupply.IsPositive() {
 		return sdk.ZeroDec()
 	}
 
-	return k.stakingKeeper.TotalBondedTokens(ctx).ToDec().QuoInt(stakeSupply)
+	return k.stakingKeeper.TotalBondedTokens(ctx).ToDec().Quo(inflSupply)
 }
 
 // GetCirculatingSupply returns the bank supply of the total inflation
@@ -149,7 +152,7 @@ func (k Keeper) GetInflationRate(ctx sdk.Context) (sdk.Dec, error) {
 	if epp == 0 {
 		return sdk.ZeroDec(), nil
 	}
-	
+
 	params := k.GetParams(ctx)
 	//parameters for inflation calculation
 	minInflation := params.ExponentialCalculation.MinInflation
@@ -179,23 +182,23 @@ func (k Keeper) GetInflationRate(ctx sdk.Context) (sdk.Dec, error) {
 	if err := k.SetCurInflation(ctx, inflation); err != nil {
 		return sdk.Dec{}, err
 	}
-	//periodized inflation 
+	//periodized inflation
 	return inflation.Quo(sdk.NewDec(epp)), nil
 }
 
 //requires that inflation has already been calculated
 func (k Keeper) CalculateEpochMintProvision(ctx sdk.Context) (sdk.Dec, error) {
-	if epp := k.GetEpochsPerPeriod(ctx);  epp == 0 {
+	if epp := k.GetEpochsPerPeriod(ctx); epp == 0 {
 		return sdk.ZeroDec(), nil
 	}
-	
+
 	denomMint := k.GetParams(ctx).MintDenom
 	//get the current circulatingSupply
 	totalCirculatingSupply := k.GetCirculatingSupply(ctx)
 	//distrKeeper supply of acanto is not counted
 	feePool := k.distrKeeper.GetFeePool(ctx)
 	circulatingSupply := totalCirculatingSupply.Sub(feePool.CommunityPool.AmountOf(denomMint))
-	
+
 	curInfl, err := k.GetCurInflation(ctx)
 	if err != nil {
 		return sdk.Dec{}, err

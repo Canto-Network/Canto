@@ -129,6 +129,21 @@ func (suite *KeeperTestSuite) TestGetCirculatingSupplyAndProvision() {
 			periodProvision, err := s.app.InflationKeeper.CalculateEpochMintProvision(suite.ctx)
 			suite.Require().NoError(err)
 			suite.Require().Equal(tc.expProvision, periodProvision)
+
+			prevBondingRatio := suite.app.InflationKeeper.BondedRatio(suite.ctx)
+
+			err = suite.app.InflationKeeper.MintCoins(suite.ctx, coin)
+			suite.Require().NoError(err)
+			//send to communityPool
+			moduleAddr := suite.app.AccountKeeper.GetModuleAddress(types.ModuleName)
+			suite.app.DistrKeeper.FundCommunityPool(
+				suite.ctx,
+				sdk.NewCoins(coin),
+				moduleAddr,
+			)
+			newBondingRatio := suite.app.InflationKeeper.BondedRatio(suite.ctx)
+			suite.Require().Equal(prevBondingRatio, newBondingRatio)
+
 		})
 	}
 }
