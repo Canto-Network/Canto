@@ -1,6 +1,6 @@
 {
-  "genesis_time": "2022-07-08T22:04:31.733910246Z",
-  "chain_id": "canto_2277-1",
+  "genesis_time": "2022-07-08T22:15:05.546476314Z",
+  "chain_id": "canto_7744-1",
   "initial_height": "1",
   "consensus_params": {
     "block": {
@@ -34,7 +34,7 @@
         {
           "@type": "/ethermint.types.v1.EthAccount",
           "base_account": {
-            "address": "canto1glhkwxh8c5p4tp2z0ufwuufm7ng3j0xqa3mcxf",
+            "address": "canto1f40cdx548txcm00hmj85ps55c5k4urjk0vehap",
             "pub_key": null,
             "account_number": "0",
             "sequence": "0"
@@ -44,7 +44,7 @@
         {
           "@type": "/ethermint.types.v1.EthAccount",
           "base_account": {
-            "address": "canto1hus6t4thtdnmj437p5zr0yud6tenwhsp2h4snc",
+            "address": "canto1pjkpxyu650wtyvw89tc64qk6zjjctg5lv54kf2",
             "pub_key": null,
             "account_number": "0",
             "sequence": "0"
@@ -63,20 +63,20 @@
       },
       "balances": [
         {
-          "address": "canto1glhkwxh8c5p4tp2z0ufwuufm7ng3j0xqa3mcxf",
-          "coins": [
-            {
-              "denom": "acanto",
-              "amount": "964723926400000000000000000"
-            }
-          ]
-        },
-        {
-          "address": "canto1hus6t4thtdnmj437p5zr0yud6tenwhsp2h4snc",
+          "address": "canto1pjkpxyu650wtyvw89tc64qk6zjjctg5lv54kf2",
           "coins": [
             {
               "denom": "acanto",
               "amount": "35276073600000000000000000"
+            }
+          ]
+        },
+        {
+          "address": "canto1f40cdx548txcm00hmj85ps55c5k4urjk0vehap",
+          "coins": [
+            {
+              "denom": "acanto",
+              "amount": "964723926400000000000000000"
             }
           ]
         }
@@ -221,11 +221,11 @@
                   "max_change_rate": "0.010000000000000000"
                 },
                 "min_self_delegation": "1",
-                "delegator_address": "canto1hus6t4thtdnmj437p5zr0yud6tenwhsp2h4snc",
-                "validator_address": "cantovaloper1hus6t4thtdnmj437p5zr0yud6tenwhspgfj5za",
+                "delegator_address": "canto1pjkpxyu650wtyvw89tc64qk6zjjctg5lv54kf2",
+                "validator_address": "cantovaloper1pjkpxyu650wtyvw89tc64qk6zjjctg5lw2jjc0",
                 "pubkey": {
                   "@type": "/cosmos.crypto.ed25519.PubKey",
-                  "key": "eJj+HiQ6L9LMUENR8S2AZjTXYU2TS5cPzB20rNNE9KU="
+                  "key": "devbVkKeG/rDHb1UCwWSOhJdGzfe3S960I0mjQVSyFI="
                 },
                 "value": {
                   "denom": "acanto",
@@ -233,7 +233,7 @@
                 }
               }
             ],
-            "memo": "590dd76d79a1afc565f06aadd14bbe8b113e0172@64.225.31.87:26656",
+            "memo": "a9b66b30dd19ff57d6af9a55dea185e20e97e749@64.225.31.87:26656",
             "timeout_height": "0",
             "extension_options": [],
             "non_critical_extension_options": []
@@ -243,7 +243,7 @@
               {
                 "public_key": {
                   "@type": "/ethermint.crypto.v1.ethsecp256k1.PubKey",
-                  "key": "AgPtaVwyPi6dB1E8PpU4Rtr6ex2yeNDTOEj0vNGMkISK"
+                  "key": "AqZFY1MEK11ROR9BrOIs8UeBQOZqSQNYBci5Em1Dkm/d"
                 },
                 "mode_info": {
                   "single": {
@@ -261,7 +261,7 @@
             }
           },
           "signatures": [
-            "IOd3VGPmGCRNY3ojtpQGk3BXF8ezWvkRBvWCpKhvlQNkYB7rRtVJS2k8F+tSoNacEJm5860PEHggWv5u35obpQE="
+            "0cpAjXhq4yYCCh3QcIGKCnrnVMhV5jU7KcSggq2C7fYbDvH38WfNlL/ZBPM0ZoNVFYk7TbZB3LklGXR60CieuAA="
           ]
         }
       ]
