@@ -1,0 +1,15 @@
+syntax = "proto3";
+package canto.unigov.v1;
+
+import "gogoproto/gogo.proto";
+import "canto/unigov/v1/unigov.proto";
+// this line is used by starport scaffolding # genesis/proto/import
+
+option go_package = "github.com/Canto-Network/Canto-Testnet-v2/v1/x/unigov/types";
+
+// GenesisState defines the unigov module's genesis state.
+message GenesisState {
+  Params params = 1 [(gogoproto.nullable) = false];
+  // this line is used by starport scaffolding # genesis/proto/state
+}
+

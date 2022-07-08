@@ -1,0 +1,18 @@
+{
+	"description": "The native staking and governance token of the Osmosis chain",
+	"denom_units": [
+		{
+				"denom": "ibc/89C86CB386E60356436998AC46C1F4ED5265245913B61694B324D90AF8BAF149",
+				"exponent": 0,
+				"aliases": ["ibcusdc"]
+		},
+		{
+				"denom": "USDC",
+				"exponent": 6
+		}
+	],
+	"base": "ibc/89C86CB386E60356436998AC46C1F4ED5265245913B61694B324D90AF8BAF149",
+	"display": "USDC",
+	"name": "Usdc",
+	"symbol": "USDC"
+}

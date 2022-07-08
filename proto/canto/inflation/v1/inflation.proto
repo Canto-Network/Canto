@@ -1,0 +1,51 @@
+syntax = "proto3";
+package canto.inflation.v1;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/Canto-Network/Canto-Testnet-v2/v1/x/inflation/types";
+
+// InflationDistribution defines the distribution in which inflation is
+// allocated through minting on each epoch (staking, incentives, community). It
+// excludes the team vesting distribution, as this is minted once at genesis.
+// Model like this:
+// mintDistribution1 = distribution1 / (1 - teamVestingDistribution)
+// 0.5333333         = 40%           / (1 - 25%)
+message InflationDistribution {
+  // staking_rewards defines the proportion of the minted minted_denom that is
+  // to be allocated as staking rewards
+  string staking_rewards = 1 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+  // community_pool defines the proportion of the minted minted_denom that is to
+  // be allocated to the community pool
+  string community_pool = 2 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+}
+
+
+  //newInflation = min(maxInflation, Max(minInflation, curInflation * ((target - actual) * adjustSpeed)
+  message ExponentialCalculation { 
+    string minInflation = 1 [
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable) = false 
+    ];
+
+    string maxInflation  = 2 [
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable) = false  
+    ];
+
+    string adjustSpeed = 3 [
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable) = false   
+    ];
+
+    string bondingTarget = 4 [
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable) = false   
+    ];
+  } 

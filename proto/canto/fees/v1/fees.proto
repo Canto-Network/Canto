@@ -1,0 +1,16 @@
+syntax = "proto3";
+package canto.fees.v1;
+
+option go_package = "github.com/Canto-Network/Canto-Testnet-v2/v1/x/fees/types";
+
+// Fee defines an instance that organizes fee distribution conditions for the
+// owner of a given smart contract
+message Fee {
+  // hex address of registered contract
+  string contract_address = 1;
+  // bech32 address of contract deployer
+  string deployer_address = 2;
+  // bech32 address of account receiving the transaction fees it defaults to
+  // deployer_address
+  string withdraw_address = 3;
+}
