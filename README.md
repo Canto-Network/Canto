@@ -178,7 +178,7 @@ WantedBy=multi-user.target
 
 * Create the symlinlk: `sudo systemctl enable cantod.service`
 
-* Start the node sudo: `systemctl start cantod && journalctl -u cantod -f`
+* Start the node: `sudo systemctl start cantod && journalctl -u cantod -f`
 
   
 
