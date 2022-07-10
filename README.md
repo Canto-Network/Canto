@@ -120,7 +120,7 @@ mv $HOME/go/bin/cantod /usr/bin/
 
   
 
-* Download the Genesis file: `wget https://github.com/Canto-Network/Canto/raw/main/Mainnet/genesis.json -P $HOME/.cantod/config/`
+* Download the Genesis file: `wget https://github.com/Canto-Network/Canto/raw/main/Mainnet/genesis.json -P $HOME/.cantod/config/` (be sure to `rm -rf genesis.json` as it is automatically generated upon init.) 
 
 * Edit the minimum-gas-prices in ${HOME}/.cantod/config/app.toml: `sed -i 's/minimum-gas-prices = ""/minimum-gas-prices = "0.0001acanto"/g' $HOME/.cantod/config/app.toml`
 
