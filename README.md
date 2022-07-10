@@ -82,9 +82,7 @@
 
 git clone https://github.com/Canto-Network/Canto.git
 
-cd Canto
-
-cd cmd/cantod
+cd Canto/cmd/cantod
 
 go install -tags ledger ./...
 
