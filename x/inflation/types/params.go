@@ -7,9 +7,10 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	evm "github.com/Canto-Network/ethermint-v2/x/evm/types"
 )
 
-var DefaultInflationDenom = "acanto"
+var DefaultInflationDenom = evm.DefaultEVMDenom
 
 // Parameter store keys
 var (
@@ -43,14 +44,16 @@ func DefaultParams() Params {
 	return Params{
 		MintDenom: DefaultInflationDenom,
 		ExponentialCalculation: ExponentialCalculation{
-			MinInflation:  sdk.NewDecWithPrec(2999, 5),
-			MaxInflation:  sdk.NewDecWithPrec(3001, 5), // 50%
-			AdjustSpeed:   sdk.NewDec(1),
-			BondingTarget: sdk.NewDecWithPrec(30, 2), // 66%
+			A:             sdk.NewDec(int64(300_000_000)),
+			R:             sdk.NewDecWithPrec(50, 2), // 50%
+			C:             sdk.NewDec(int64(9_375_000)),
+			BondingTarget: sdk.NewDecWithPrec(66, 2), // 66%
+			MaxVariance:   sdk.ZeroDec(),             // 0%
 		},
 		InflationDistribution: InflationDistribution{
-			StakingRewards: sdk.NewDecWithPrec(100, 2), // 80% / (1 - 25%)
-			CommunityPool:  sdk.NewDecWithPrec(0, 2),   // 20% / (1 - 25%)
+			StakingRewards:  sdk.NewDecWithPrec(533333334, 9), // 0.53 = 40% / (1 - 25%)
+			UsageIncentives: sdk.NewDecWithPrec(333333333, 9), // 0.33 = 25% / (1 - 25%)
+			CommunityPool:   sdk.NewDecWithPrec(133333333, 9), // 0.13 = 10% / (1 - 25%)
 		},
 		EnableInflation: true,
 	}
@@ -82,7 +85,6 @@ func validateMintDenom(i interface{}) error {
 	return nil
 }
 
-//Validate exponential calculation params
 func validateExponentialCalculation(i interface{}) error {
 	v, ok := i.(ExponentialCalculation)
 	if !ok {
@@ -90,16 +92,21 @@ func validateExponentialCalculation(i interface{}) error {
 	}
 
 	// validate initial value
-	if v.MinInflation.IsNegative() {
+	if v.A.IsNegative() {
 		return fmt.Errorf("initial value cannot be negative")
 	}
 
 	// validate reduction factor
-	if v.MinInflation.GT(v.MaxInflation) {
-		return fmt.Errorf("MinInflation is greater than MaxInflation")
+	if v.R.GT(sdk.NewDec(1)) {
+		return fmt.Errorf("reduction factor cannot be greater than 1")
 	}
+
+	if v.R.IsNegative() {
+		return fmt.Errorf("reduction factor cannot be negative")
+	}
+
 	// validate long term inflation
-	if v.AdjustSpeed.IsNegative() {
+	if v.C.IsNegative() {
 		return fmt.Errorf("long term inflation cannot be negative")
 	}
 
@@ -110,6 +117,11 @@ func validateExponentialCalculation(i interface{}) error {
 
 	if !v.BondingTarget.IsPositive() {
 		return fmt.Errorf("bonded target cannot be zero or negative")
+	}
+
+	// validate max variance
+	if v.MaxVariance.IsNegative() {
+		return fmt.Errorf("max variance cannot be negative")
 	}
 
 	return nil
@@ -125,11 +137,15 @@ func validateInflationDistribution(i interface{}) error {
 		return errors.New("staking distribution ratio must not be negative")
 	}
 
+	if v.UsageIncentives.IsNegative() {
+		return errors.New("pool incentives distribution ratio must not be negative")
+	}
+
 	if v.CommunityPool.IsNegative() {
 		return errors.New("community pool distribution ratio must not be negative")
 	}
 
-	totalProportions := v.StakingRewards.Add(v.CommunityPool)
+	totalProportions := v.StakingRewards.Add(v.UsageIncentives).Add(v.CommunityPool)
 	if !totalProportions.Equal(sdk.NewDec(1)) {
 		return errors.New("total distributions ratio should be 1")
 	}

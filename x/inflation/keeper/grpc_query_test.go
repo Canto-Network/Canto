@@ -73,8 +73,13 @@ func (suite *KeeperTestSuite) TestEpochMintProvision() {
 		{
 			"default epochMintProvision",
 			func() {
-				defaultEpochMintProvision, err := suite.app.InflationKeeper.CalculateEpochMintProvision(suite.ctx)
-				suite.Require().NoError(err)
+				params := types.DefaultParams()
+				defaultEpochMintProvision := types.CalculateEpochMintProvision(
+					params,
+					uint64(0),
+					365,
+					sdk.OneDec(),
+				)
 				req = &types.QueryEpochMintProvisionRequest{}
 				expRes = &types.QueryEpochMintProvisionResponse{
 					EpochMintProvision: sdk.NewDecCoinFromDec(types.DefaultInflationDenom, defaultEpochMintProvision),
@@ -174,7 +179,7 @@ func (suite *KeeperTestSuite) TestQueryCirculatingSupply() {
 	suite.Require().NoError(err)
 
 	// team allocation is zero if not on mainnet
-	expCirculatingSupply := sdk.NewDecCoin(mintDenom, sdk.TokensFromConsensusPower(400_000_000, ethermint.PowerReduction))
+	expCirculatingSupply := sdk.NewDecCoin(mintDenom, sdk.TokensFromConsensusPower(200_000_000, ethermint.PowerReduction))
 
 	res, err := suite.queryClient.CirculatingSupply(ctx, &types.QueryCirculatingSupplyRequest{})
 	suite.Require().NoError(err)
@@ -190,7 +195,7 @@ func (suite *KeeperTestSuite) TestQueryInflationRate() {
 	err := suite.app.InflationKeeper.MintCoins(suite.ctx, mintCoin)
 	suite.Require().NoError(err)
 
-	expInflationRate := sdk.MustNewDecFromStr("0.007640821917808219")
+	expInflationRate := sdk.MustNewDecFromStr("154.687500000000000000")
 	res, err := suite.queryClient.InflationRate(ctx, &types.QueryInflationRateRequest{})
 	suite.Require().NoError(err)
 	suite.Require().Equal(expInflationRate, res.InflationRate)
