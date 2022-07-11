@@ -3,27 +3,20 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	ethermint "github.com/Canto-Network/ethermint-v2/types"
-
-	evmos "github.com/Canto-Network/Canto-Testnet-v2/v1/types"
-	incentivestypes "github.com/Canto-Network/Canto-Testnet-v2/v1/x/incentives/types"
 	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/inflation/types"
 )
-
-// 200M token at year 4 allocated to the team
-var teamAlloc = sdk.NewInt(200_000_000).Mul(ethermint.PowerReduction)
 
 // MintAndAllocateInflation performs inflation minting and allocation
 func (k Keeper) MintAndAllocateInflation(
 	ctx sdk.Context,
 	coin sdk.Coin,
 ) (
-	staking, incentives, communityPool sdk.Coins,
+	staking, communityPool sdk.Coins,
 	err error,
 ) {
 	// Mint coins for distribution
 	if err := k.MintCoins(ctx, coin); err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 
 	// Allocate minted coins according to allocation proportions (staking, usage
@@ -53,7 +46,7 @@ func (k Keeper) AllocateExponentialInflation(
 	ctx sdk.Context,
 	mintedCoin sdk.Coin,
 ) (
-	staking, incentives, communityPool sdk.Coins,
+	staking, communityPool sdk.Coins,
 	err error,
 ) {
 	params := k.GetParams(ctx)
@@ -68,19 +61,7 @@ func (k Keeper) AllocateExponentialInflation(
 		staking,
 	)
 	if err != nil {
-		return nil, nil, nil, err
-	}
-
-	// Allocate usage incentives to incentives module account
-	incentives = sdk.NewCoins(k.GetProportions(ctx, mintedCoin, proportions.UsageIncentives))
-	err = k.bankKeeper.SendCoinsFromModuleToModule(
-		ctx,
-		types.ModuleName,
-		incentivestypes.ModuleName,
-		incentives,
-	)
-	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 
 	// Allocate community pool amount (remaining module balance) to community
@@ -93,10 +74,10 @@ func (k Keeper) AllocateExponentialInflation(
 		moduleAddr,
 	)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 
-	return staking, incentives, communityPool, nil
+	return staking, communityPool, nil
 }
 
 // GetAllocationProportion calculates the proportion of coins that is to be
@@ -117,15 +98,8 @@ func (k Keeper) GetProportions(
 func (k Keeper) BondedRatio(ctx sdk.Context) sdk.Dec {
 	stakeSupply := k.stakingKeeper.StakingTokenSupply(ctx)
 
-	isMainnet := evmos.IsMainnet(ctx.ChainID())
-
-	if !stakeSupply.IsPositive() || (isMainnet && stakeSupply.LTE(teamAlloc)) {
+	if !stakeSupply.IsPositive() {
 		return sdk.ZeroDec()
-	}
-
-	// don't count team allocation in bonded ratio's stake supple
-	if isMainnet {
-		stakeSupply = stakeSupply.Sub(teamAlloc)
 	}
 
 	return k.stakingKeeper.TotalBondedTokens(ctx).ToDec().QuoInt(stakeSupply)
@@ -137,12 +111,6 @@ func (k Keeper) GetCirculatingSupply(ctx sdk.Context) sdk.Dec {
 	mintDenom := k.GetParams(ctx).MintDenom
 
 	circulatingSupply := k.bankKeeper.GetSupply(ctx, mintDenom).Amount.ToDec()
-	teamAllocation := teamAlloc.ToDec()
-
-	// Consider team allocation only on mainnet chain id
-	if evmos.IsMainnet(ctx.ChainID()) {
-		circulatingSupply = circulatingSupply.Sub(teamAllocation)
-	}
 
 	return circulatingSupply
 }
