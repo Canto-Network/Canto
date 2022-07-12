@@ -6,9 +6,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
-	v2 "github.com/Canto-Network/Canto/v2/app/upgrades/v2"
-	v4 "github.com/Canto-Network/Canto/v2/app/upgrades/v4"
-	"github.com/Canto-Network/Canto/v2/types"
+	v2 "github.com/Canto-Network/Canto/v1/app/upgrades/v2"
+	v4 "github.com/Canto-Network/Canto/v1/app/upgrades/v4"
+	"github.com/Canto-Network/Canto/v1/types"
 )
 
 // ScheduleForkUpgrade executes any necessary fork logic for based upon the current

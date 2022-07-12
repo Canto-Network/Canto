@@ -7,9 +7,9 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/Canto-Network/Canto/v2/app"
-	"github.com/Canto-Network/Canto/v2/app/ante"
-	"github.com/Canto-Network/Canto/v2/testutil"
+	"github.com/Canto-Network/Canto/v1/app"
+	"github.com/Canto-Network/Canto/v1/app/ante"
+	"github.com/Canto-Network/Canto/v1/testutil"
 	"github.com/Canto-Network/ethermint-v2/encoding"
 	"github.com/Canto-Network/ethermint-v2/tests"
 
@@ -22,7 +22,7 @@ import (
 	sdkvesting "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	"github.com/Canto-Network/Canto/v2/x/vesting/types"
+	"github.com/Canto-Network/Canto/v1/x/vesting/types"
 )
 
 // Clawback vesting with Cliff and Lock. In this case the cliff is reached

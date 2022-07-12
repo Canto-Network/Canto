@@ -1,8 +1,8 @@
 package unigov
 
 import (
-	"github.com/Canto-Network/Canto/v2/x/unigov/keeper"
-	"github.com/Canto-Network/Canto/v2/x/unigov/types"
+	"github.com/Canto-Network/Canto/v1/x/unigov/keeper"
+	"github.com/Canto-Network/Canto/v1/x/unigov/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 )

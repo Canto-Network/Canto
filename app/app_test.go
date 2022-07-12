@@ -13,7 +13,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/Canto-Network/Canto/v2/types"
+	"github.com/Canto-Network/Canto/v1/types"
 	"github.com/Canto-Network/ethermint-v2/encoding"
 )
 

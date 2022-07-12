@@ -12,9 +12,9 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/Canto-Network/Canto/v2/x/unigov/client/cli"
-	"github.com/Canto-Network/Canto/v2/x/unigov/keeper"
-	"github.com/Canto-Network/Canto/v2/x/unigov/types"
+	"github.com/Canto-Network/Canto/v1/x/unigov/client/cli"
+	"github.com/Canto-Network/Canto/v1/x/unigov/keeper"
+	"github.com/Canto-Network/Canto/v1/x/unigov/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"

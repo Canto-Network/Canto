@@ -3,7 +3,7 @@ package ibc
 import (
 	"testing"
 
-	// "github.com/Canto-Network/Canto/v2/x/claims/types"
+	// "github.com/Canto-Network/Canto/v1/x/claims/types"
 	"github.com/stretchr/testify/require"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"

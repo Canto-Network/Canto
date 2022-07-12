@@ -3,13 +3,13 @@ package keeper
 import (
 	"math/big"
 
-	"github.com/Canto-Network/Canto/v2/contracts"
+	"github.com/Canto-Network/Canto/v1/contracts"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/Canto-Network/Canto/v2/x/unigov/types"
+	"github.com/Canto-Network/Canto/v1/x/unigov/types"
 
-	erc20types "github.com/Canto-Network/Canto/v2/x/erc20/types"
+	erc20types "github.com/Canto-Network/Canto/v1/x/erc20/types"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 )

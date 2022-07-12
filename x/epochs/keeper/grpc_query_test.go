@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Canto-Network/Canto/v2/x/epochs/types"
+	"github.com/Canto-Network/Canto/v1/x/epochs/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 )

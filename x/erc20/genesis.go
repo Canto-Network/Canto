@@ -4,8 +4,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 
-	"github.com/Canto-Network/Canto/v2/x/erc20/keeper"
-	"github.com/Canto-Network/Canto/v2/x/erc20/types"
+	"github.com/Canto-Network/Canto/v1/x/erc20/keeper"
+	"github.com/Canto-Network/Canto/v1/x/erc20/types"
 )
 
 // InitGenesis import module genesis

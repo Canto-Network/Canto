@@ -18,9 +18,9 @@ import (
 	"github.com/spf13/cobra"
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/Canto-Network/Canto/v2/x/fees/client/cli"
-	"github.com/Canto-Network/Canto/v2/x/fees/keeper"
-	"github.com/Canto-Network/Canto/v2/x/fees/types"
+	"github.com/Canto-Network/Canto/v1/x/fees/client/cli"
+	"github.com/Canto-Network/Canto/v1/x/fees/keeper"
+	"github.com/Canto-Network/Canto/v1/x/fees/types"
 )
 
 // type check to ensure the interface is properly implemented

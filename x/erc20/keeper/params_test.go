@@ -1,6 +1,6 @@
 package keeper_test
 
-import "github.com/Canto-Network/Canto/v2/x/erc20/types"
+import "github.com/Canto-Network/Canto/v1/x/erc20/types"
 
 func (suite *KeeperTestSuite) TestParams() {
 	params := suite.app.Erc20Keeper.GetParams(suite.ctx)

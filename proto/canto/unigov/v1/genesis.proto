@@ -5,7 +5,7 @@ import "gogoproto/gogo.proto";
 import "canto/unigov/v1/unigov.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
-option go_package = "github.com/Canto-Network/Canto/v2/x/unigov/types";
+option go_package = "github.com/Canto-Network/Canto/v1/x/unigov/types";
 
 // GenesisState defines the unigov module's genesis state.
 message GenesisState {

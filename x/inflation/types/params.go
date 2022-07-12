@@ -43,16 +43,15 @@ func DefaultParams() Params {
 	return Params{
 		MintDenom: "acanto",
 		ExponentialCalculation: ExponentialCalculation{
-			A: sdk.NewDec(int64(30_000_000)),
-			R: sdk.NewDecWithPrec(00, 2), // 50%
-			// C:             sdk.NewDec(int64(937_500)), //0
+			A:             sdk.NewDec(int64(16_304_348)),
+			R:             sdk.NewDecWithPrec(35, 2), // 35%
 			C:             sdk.ZeroDec(),
-			BondingTarget: sdk.NewDecWithPrec(00, 2), // 66%
+			BondingTarget: sdk.NewDecWithPrec(66, 2), // not relevant; max variance is 0
 			MaxVariance:   sdk.ZeroDec(),             // 0%
 		},
 		InflationDistribution: InflationDistribution{
-			StakingRewards: sdk.NewDecWithPrec(800000000, 9), // 0.53 = 40% / (1 - 25%)
-			CommunityPool:  sdk.NewDecWithPrec(200000000, 9), // 0.13 = 10% / (1 - 25%)
+			StakingRewards: sdk.NewDecWithPrec(1000000000, 9), // 0.53 = 40% / (1 - 25%)
+			CommunityPool:  sdk.ZeroDec(),                     // 0.13 = 10% / (1 - 25%)
 		},
 		EnableInflation: false,
 	}
