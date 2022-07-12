@@ -13,7 +13,7 @@ import (
 
 	ethermint "github.com/Canto-Network/ethermint-v2/types"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/fees/types"
+	"github.com/Canto-Network/Canto/v2/x/fees/types"
 )
 
 // NewTxCmd returns a root CLI command handler for certain modules/erc20 transaction commands.

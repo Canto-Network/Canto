@@ -12,9 +12,9 @@ import (
 	"github.com/Canto-Network/ethermint-v2/tests"
 	feemarkettypes "github.com/Canto-Network/ethermint-v2/x/feemarket/types"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/app"
-	// claimtypes "github.com/Canto-Network/Canto-Testnet-v2/v1/x/claims/types"
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/fees/types"
+	"github.com/Canto-Network/Canto/v2/app"
+	// claimtypes "github.com/Canto-Network/Canto/v2/x/claims/types"
+	"github.com/Canto-Network/Canto/v2/x/fees/types"
 	evm "github.com/Canto-Network/ethermint-v2/x/evm/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"

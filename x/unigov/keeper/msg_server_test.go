@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	//sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/unigov/types"
-	//"github.com/Canto-Network/Canto-Testnet-v2/v1/x/unigov/keeper"
-	//keepertest "github.com/Canto-Network/Canto-Testnet-v2/v1/testutil/keeper"
+	"github.com/Canto-Network/Canto/v2/x/unigov/types"
+	//"github.com/Canto-Network/Canto/v2/x/unigov/keeper"
+	//keepertest "github.com/Canto-Network/Canto/v2/testutil/keeper"
 )
 
 func setupMsgServer(t testing.TB) (types.MsgServer, context.Context) {

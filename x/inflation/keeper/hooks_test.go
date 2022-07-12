@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	epochstypes "github.com/Canto-Network/Canto-Testnet-v2/v1/x/epochs/types"
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/inflation/types"
+	epochstypes "github.com/Canto-Network/Canto/v2/x/epochs/types"
+	"github.com/Canto-Network/Canto/v2/x/inflation/types"
 )
 
 func (suite *KeeperTestSuite) TestEpochIdentifierAfterEpochEnd() {

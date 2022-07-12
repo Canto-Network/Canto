@@ -5,7 +5,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
-	erc20types "github.com/Canto-Network/Canto-Testnet-v2/v1/x/erc20/types"
+	erc20types "github.com/Canto-Network/Canto/v2/x/erc20/types"
 )
 
 // CreateUpgradeHandler creates an SDK upgrade handler for v2

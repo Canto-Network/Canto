@@ -23,10 +23,10 @@ import (
 	ethermint "github.com/Canto-Network/ethermint-v2/types"
 	evmtypes "github.com/Canto-Network/ethermint-v2/x/evm/types"
 
-	cantokr "github.com/Canto-Network/Canto-Testnet-v2/v1/crypto/keyring"
+	cantokr "github.com/Canto-Network/Canto/v2/crypto/keyring"
 
-	vestingcli "github.com/Canto-Network/Canto-Testnet-v2/v1/x/vesting/client/cli"
-	vestingtypes "github.com/Canto-Network/Canto-Testnet-v2/v1/x/vesting/types"
+	vestingcli "github.com/Canto-Network/Canto/v2/x/vesting/client/cli"
+	vestingtypes "github.com/Canto-Network/Canto/v2/x/vesting/types"
 )
 
 const (

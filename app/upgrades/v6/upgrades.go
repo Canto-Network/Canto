@@ -14,8 +14,8 @@ import (
 	evmtypes "github.com/Canto-Network/ethermint-v2/x/evm/types"
 	feemarkettypes "github.com/Canto-Network/ethermint-v2/x/feemarket/types"
 
-	v5 "github.com/Canto-Network/Canto-Testnet-v2/v1/app/upgrades/v5"
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/types"
+	v5 "github.com/Canto-Network/Canto/v2/app/upgrades/v5"
+	"github.com/Canto-Network/Canto/v2/types"
 )
 
 // CreateUpgradeHandler creates an SDK upgrade handler for v5

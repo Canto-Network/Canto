@@ -14,7 +14,7 @@ import (
 	ethante "github.com/Canto-Network/ethermint-v2/app/ante"
 	evmtypes "github.com/Canto-Network/ethermint-v2/x/evm/types"
 
-	vestingtypes "github.com/Canto-Network/Canto-Testnet-v2/v1/x/vesting/types"
+	vestingtypes "github.com/Canto-Network/Canto/v2/x/vesting/types"
 )
 
 // HandlerOptions defines the list of module keepers required to run the canto

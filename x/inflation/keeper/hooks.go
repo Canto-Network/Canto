@@ -3,11 +3,11 @@ package keeper
 import (
 	"fmt"
 
+	epochstypes "github.com/Canto-Network/Canto/v2/x/epochs/types"
+	"github.com/Canto-Network/Canto/v2/x/inflation/types"
 	"github.com/armon/go-metrics"
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	epochstypes "github.com/Canto-Network/Canto-Testnet-v2/v1/x/epochs/types"
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/inflation/types"
 )
 
 // BeforeEpochStart: noop, We don't need to do anything here

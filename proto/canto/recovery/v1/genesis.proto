@@ -4,7 +4,7 @@ package canto.recovery.v1;
 import "gogoproto/gogo.proto";
 import "google/protobuf/duration.proto";
 
-option go_package = "github.com/Canto-Network/Canto-Testnet-v2/v1/x/recovery/types";
+option go_package = "github.com/Canto-Network/Canto/v2/x/recovery/types";
 
 // GenesisState defines the recovery module's genesis state.
 message GenesisState {

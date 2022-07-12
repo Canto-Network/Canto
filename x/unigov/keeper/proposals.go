@@ -1,14 +1,15 @@
 package keeper
 
 import (
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/contracts"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"math/big"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/unigov/types"
+	"github.com/Canto-Network/Canto/v2/contracts"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	erc20types "github.com/Canto-Network/Canto-Testnet-v2/v1/x/erc20/types"
+	"github.com/Canto-Network/Canto/v2/x/unigov/types"
+
+	erc20types "github.com/Canto-Network/Canto/v2/x/erc20/types"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 )

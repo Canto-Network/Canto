@@ -4,7 +4,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	vestingtypes "github.com/Canto-Network/Canto-Testnet-v2/v1/x/vesting/types"
+	vestingtypes "github.com/Canto-Network/Canto/v2/x/vesting/types"
 	evmtypes "github.com/Canto-Network/ethermint-v2/x/evm/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/authz"

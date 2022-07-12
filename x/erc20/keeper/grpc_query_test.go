@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/erc20/types"
+	"github.com/Canto-Network/Canto/v2/x/erc20/types"
 )
 
 func (suite *KeeperTestSuite) TestTokenPairs() {

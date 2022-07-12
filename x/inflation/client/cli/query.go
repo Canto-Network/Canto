@@ -6,9 +6,9 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/Canto-Network/Canto/v2/x/inflation/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/inflation/types"
 )
 
 // GetQueryCmd returns the cli query commands for the inflation module.

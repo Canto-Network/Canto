@@ -21,9 +21,9 @@ import (
 
 	ibctransfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/app"
-	v5 "github.com/Canto-Network/Canto-Testnet-v2/v1/app/upgrades/v5"
-	cantotypes "github.com/Canto-Network/Canto-Testnet-v2/v1/types"
+	"github.com/Canto-Network/Canto/v2/app"
+	v5 "github.com/Canto-Network/Canto/v2/app/upgrades/v5"
+	cantotypes "github.com/Canto-Network/Canto/v2/types"
 )
 
 type UpgradeTestSuite struct {

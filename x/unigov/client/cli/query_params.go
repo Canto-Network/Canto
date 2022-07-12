@@ -3,7 +3,7 @@ package cli
 import (
 	"context"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/unigov/types"
+	"github.com/Canto-Network/Canto/v2/x/unigov/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/spf13/cobra"

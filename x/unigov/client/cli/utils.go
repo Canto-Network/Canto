@@ -2,10 +2,11 @@ package cli
 
 import (
 	"encoding/json"
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/unigov/types"
-	"github.com/cosmos/cosmos-sdk/codec"
 	"io/ioutil"
 	"path/filepath"
+
+	"github.com/Canto-Network/Canto/v2/x/unigov/types"
+	"github.com/cosmos/cosmos-sdk/codec"
 )
 
 // PARSING METADATA ACCORDING TO PROPOSAL STRUCT IN GOVTYPES TYPE IN UNIGOV

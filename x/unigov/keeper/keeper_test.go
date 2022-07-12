@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/app"
+	"github.com/Canto-Network/Canto/v2/app"
 	"github.com/Canto-Network/ethermint-v2/server/config"
 	evm "github.com/Canto-Network/ethermint-v2/x/evm/types"
 	feemarkettypes "github.com/Canto-Network/ethermint-v2/x/feemarket/types"
@@ -19,8 +19,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	//used for deploying contracts
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/contracts"
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/erc20/types"
+	"github.com/Canto-Network/Canto/v2/contracts"
+	"github.com/Canto-Network/Canto/v2/x/erc20/types"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 )
 
@@ -48,7 +48,7 @@ func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 	checkTx := false
 
 	feemarketGenesis := feemarkettypes.DefaultGenesisState()
-	feemarketGenesis.Params.EnableHeight = 1	
+	feemarketGenesis.Params.EnableHeight = 1
 	feemarketGenesis.Params.NoBaseFee = false
 
 	//init app

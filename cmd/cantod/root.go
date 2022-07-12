@@ -38,9 +38,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/app"
-	cmdcfg "github.com/Canto-Network/Canto-Testnet-v2/v1/cmd/config"
-	cantokr "github.com/Canto-Network/Canto-Testnet-v2/v1/crypto/keyring"
+	"github.com/Canto-Network/Canto/v2/app"
+	cmdcfg "github.com/Canto-Network/Canto/v2/cmd/config"
+	cantokr "github.com/Canto-Network/Canto/v2/crypto/keyring"
 )
 
 const (

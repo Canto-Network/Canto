@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/app"
-	// claimstypes "github.com/Canto-Network/Canto-Testnet-v2/v1/x/claims/types"
+	"github.com/Canto-Network/Canto/v2/app"
+	// claimstypes "github.com/Canto-Network/Canto/v2/x/claims/types"
 	"github.com/Canto-Network/ethermint-v2/crypto/ethsecp256k1"
 	"github.com/Canto-Network/ethermint-v2/encoding"
 	evmtypes "github.com/Canto-Network/ethermint-v2/x/evm/types"

@@ -16,9 +16,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/version"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 
-	v3 "github.com/Canto-Network/Canto-Testnet-v2/v1/app/upgrades/v3"
-	v5 "github.com/Canto-Network/Canto-Testnet-v2/v1/app/upgrades/v5"
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/types"
+	v3 "github.com/Canto-Network/Canto/v2/app/upgrades/v3"
+	v5 "github.com/Canto-Network/Canto/v2/app/upgrades/v5"
+	"github.com/Canto-Network/Canto/v2/types"
 )
 
 // FlagGenesisTime defines the genesis time in string format

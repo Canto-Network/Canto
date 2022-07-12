@@ -3,7 +3,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/fees/types"
+	"github.com/Canto-Network/Canto/v2/x/fees/types"
 )
 
 // GetParams returns the total set of fees parameters.

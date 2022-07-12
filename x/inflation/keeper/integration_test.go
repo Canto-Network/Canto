@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	epochstypes "github.com/Canto-Network/Canto-Testnet-v2/v1/x/epochs/types"
+	epochstypes "github.com/Canto-Network/Canto/v2/x/epochs/types"
 )
 
 var (

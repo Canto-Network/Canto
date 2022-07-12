@@ -3,7 +3,7 @@ package keeper_test
 import (
 	"fmt"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/testutil"
+	"github.com/Canto-Network/Canto/v2/testutil"
 	"github.com/Canto-Network/ethermint-v2/crypto/ethsecp256k1"
 	"github.com/Canto-Network/ethermint-v2/tests"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
@@ -17,9 +17,9 @@ import (
 	ibcgotesting "github.com/cosmos/ibc-go/v3/testing"
 	ibcmock "github.com/cosmos/ibc-go/v3/testing/mock"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/recovery/keeper"
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/recovery/types"
-	vestingtypes "github.com/Canto-Network/Canto-Testnet-v2/v1/x/vesting/types"
+	"github.com/Canto-Network/Canto/v2/x/recovery/keeper"
+	"github.com/Canto-Network/Canto/v2/x/recovery/types"
+	vestingtypes "github.com/Canto-Network/Canto/v2/x/vesting/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 )
 
