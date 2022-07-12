@@ -46,7 +46,7 @@ func DefaultParams() Params {
 			A:             sdk.NewDec(int64(16_304_348)),
 			R:             sdk.NewDecWithPrec(35, 2), // 35%
 			C:             sdk.ZeroDec(),
-			BondingTarget: sdk.NewDecWithPrec(66, 2), // not relevant; max variance is 0
+			BondingTarget: sdk.NewDecWithPrec(80, 2), // not relevant; max variance is 0
 			MaxVariance:   sdk.ZeroDec(),             // 0%
 		},
 		InflationDistribution: InflationDistribution{

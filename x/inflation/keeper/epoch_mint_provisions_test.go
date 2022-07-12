@@ -28,7 +28,7 @@ func (suite *KeeperTestSuite) TestSetGetEpochMintProvision() {
 		},
 	}
 
-	genesisProvision := sdk.MustNewDecFromStr("847602739726027397260274.000000000000000000")
+	genesisProvision := sdk.MustNewDecFromStr("543478266666666666666667.000000000000000000")
 
 	for _, tc := range testCases {
 		suite.Run(fmt.Sprintf("Case %s", tc.name), func() {

@@ -22,8 +22,8 @@ func (suite *KeeperTestSuite) TestMintAndAllocateInflation() {
 			"pass",
 			sdk.NewCoin(denomMint, sdk.NewInt(1_000_000)),
 			func() {},
-			sdk.NewCoin(denomMint, sdk.NewInt(800_000)),
-			sdk.NewDecCoins(sdk.NewDecCoin(denomMint, sdk.NewInt(200_000))),
+			sdk.NewCoin(denomMint, sdk.NewInt(1_000_000)),
+			sdk.NewDecCoins(),
 			true,
 		},
 		{
@@ -31,7 +31,7 @@ func (suite *KeeperTestSuite) TestMintAndAllocateInflation() {
 			sdk.NewCoin(denomMint, sdk.ZeroInt()),
 			func() {},
 			sdk.NewCoin(denomMint, sdk.ZeroInt()),
-			sdk.DecCoins(nil),
+			sdk.DecCoins{},
 			true,
 		},
 	}
@@ -97,13 +97,13 @@ func (suite *KeeperTestSuite) TestGetCirculatingSupplyAndInflationRate() {
 			"high supply",
 			800_000_000,
 			func() {},
-			sdk.MustNewDecFromStr("3.867187500000000000"),
+			sdk.MustNewDecFromStr("2.038043500000000000"),
 		},
 		{
 			"low supply",
 			400_000_000,
 			func() {},
-			sdk.MustNewDecFromStr("7.734375000000000000"),
+			sdk.MustNewDecFromStr("4.076087000000000000"),
 		},
 	}
 	for _, tc := range testCases {
@@ -112,7 +112,6 @@ func (suite *KeeperTestSuite) TestGetCirculatingSupplyAndInflationRate() {
 
 			// Team allocation is only set on mainnet
 			tc.malleate()
-
 			// Mint coins to increase supply
 			coin := sdk.NewCoin(types.DefaultInflationDenom, sdk.TokensFromConsensusPower(tc.bankSupply, ethermint.PowerReduction))
 			decCoin := sdk.NewDecCoinFromCoin(coin)
@@ -120,7 +119,6 @@ func (suite *KeeperTestSuite) TestGetCirculatingSupplyAndInflationRate() {
 			suite.Require().NoError(err)
 
 			circulatingSupply := s.app.InflationKeeper.GetCirculatingSupply(suite.ctx)
-
 			suite.Require().Equal(decCoin.Amount, circulatingSupply)
 
 			inflationRate := s.app.InflationKeeper.GetInflationRate(suite.ctx)

@@ -46,7 +46,7 @@ func (suite *KeeperTestSuite) TestEpochIdentifierAfterEpochEnd() {
 			feePoolNew := suite.app.DistrKeeper.GetFeePool(suite.ctx)
 			if tc.expDistribution {
 				// Actual distribution portions are tested elsewhere; we just want to verify the value of the pool is greater here
-				suite.Require().Greater(feePoolNew.CommunityPool.AmountOf(denomMint).BigInt().Uint64(),
+				suite.Require().Equal(feePoolNew.CommunityPool.AmountOf(denomMint).BigInt().Uint64(),
 					feePoolOrigin.CommunityPool.AmountOf(denomMint).BigInt().Uint64())
 			} else {
 				suite.Require().Equal(feePoolNew.CommunityPool.AmountOf(denomMint), feePoolOrigin.CommunityPool.AmountOf(denomMint))
