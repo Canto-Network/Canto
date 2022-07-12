@@ -108,10 +108,11 @@ import (
 	_ "github.com/Canto-Network/Canto/v1/client/docs/statik"
 
 	"github.com/Canto-Network/Canto/v1/app/ante"
-	v2 "github.com/Canto-Network/Canto/v1/app/upgrades/v2"
-	v4 "github.com/Canto-Network/Canto/v1/app/upgrades/v4"
-	v5 "github.com/Canto-Network/Canto/v1/app/upgrades/v5"
-	v6 "github.com/Canto-Network/Canto/v1/app/upgrades/v6"
+	// v2 "github.com/Canto-Network/Canto/v1/app/upgrades/v2"
+	// v4 "github.com/Canto-Network/Canto/v1/app/upgrades/v4"
+	// v5 "github.com/Canto-Network/Canto/v1/app/upgrades/v5"
+	// v6 "github.com/Canto-Network/Canto/v1/app/upgrades/v6"
+	v7 "github.com/Canto-Network/Canto/v1/app/upgrades/v7"
 	"github.com/Canto-Network/Canto/v1/x/epochs"
 	epochskeeper "github.com/Canto-Network/Canto/v1/x/epochs/keeper"
 	epochstypes "github.com/Canto-Network/Canto/v1/x/epochs/types"
@@ -1032,76 +1033,87 @@ func initParamsKeeper(
 }
 
 func (app *Canto) setupUpgradeHandlers() {
-	// v2 upgrade handler
 	app.UpgradeKeeper.SetUpgradeHandler(
-		v2.UpgradeName,
-		v2.CreateUpgradeHandler(app.mm, app.configurator),
+		v7.UpgradeName,
+		v7.CreateUpgradeHandler(
+			app.mm,	
+			app.configurator,
+			app.InflationKeeper,
+		)
 	)
-
-	// NOTE: no v3 upgrade handler as it required an unscheduled manual upgrade.
-
-	// v4 upgrade handler
-	app.UpgradeKeeper.SetUpgradeHandler(
-		v4.UpgradeName,
-		v4.CreateUpgradeHandler(
-			app.mm, app.configurator,
-			app.IBCKeeper.ClientKeeper,
-		),
-	)
-
-	// v5 upgrade handler
-	app.UpgradeKeeper.SetUpgradeHandler(
-		v5.UpgradeName,
-		v5.CreateUpgradeHandler(
-			app.mm, app.configurator,
-			app.BankKeeper,
-			app.StakingKeeper,
-			app.ParamsKeeper,
-			app.TransferKeeper,
-			app.SlashingKeeper,
-		),
-	)
-
-	// v6 upgrade handler
-	app.UpgradeKeeper.SetUpgradeHandler(
-		v6.UpgradeName,
-		v6.CreateUpgradeHandler(
-			app.mm, app.configurator,
-			app.BankKeeper,
-			app.StakingKeeper,
-			app.ParamsKeeper,
-			app.TransferKeeper,
-			app.SlashingKeeper,
-		),
-	)
-
-	// When a planned update height is reached, the old binary will panic
-	// writing on disk the height and name of the update that triggered it
-	// This will read that value, and execute the preparations for the upgrade.
-	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
-	if err != nil {
-		panic(fmt.Errorf("failed to read upgrade info from disk: %w", err))
-	}
-
-	if app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
-		return
-	}
-
-	var storeUpgrades *storetypes.StoreUpgrades
-
-	switch upgradeInfo.Name {
-	case v2.UpgradeName:
-		// no store upgrades in v2
-	case v4.UpgradeName:
-		// no store upgrades in v4
-	case v5.UpgradeName:
-		// no store upgrades in v5
-	case v6.UpgradeName:
-		// no store upgrades in v6
-	}
-
-	if storeUpgrades != nil {
-		// configure store loader that checks if version == upgradeHeight and applies store upgrades
-		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, storeUpgrades))
-	}
 }
+
+// func (app *Canto) setupUpgradeHandlers() {
+// 	// v2 upgrade handler
+// 	app.UpgradeKeeper.SetUpgradeHandler(
+// 		v2.UpgradeName,
+// 		v2.CreateUpgradeHandler(app.mm, app.configurator),
+// 	)
+
+// 	// NOTE: no v3 upgrade handler as it required an unscheduled manual upgrade.
+
+// 	// v4 upgrade handler
+// 	app.UpgradeKeeper.SetUpgradeHandler(
+// 		v4.UpgradeName,
+// 		v4.CreateUpgradeHandler(
+// 			app.mm, app.configurator,
+// 			app.IBCKeeper.ClientKeeper,
+// 		),
+// 	)
+
+// 	// v5 upgrade handler
+// 	app.UpgradeKeeper.SetUpgradeHandler(
+// 		v5.UpgradeName,
+// 		v5.CreateUpgradeHandler(
+// 			app.mm, app.configurator,
+// 			app.BankKeeper,
+// 			app.StakingKeeper,
+// 			app.ParamsKeeper,
+// 			app.TransferKeeper,
+// 			app.SlashingKeeper,
+// 		),
+// 	)
+
+// 	// v6 upgrade handler
+// 	app.UpgradeKeeper.SetUpgradeHandler(
+// 		v6.UpgradeName,
+// 		v6.CreateUpgradeHandler(
+// 			app.mm, app.configurator,
+// 			app.BankKeeper,
+// 			app.StakingKeeper,
+// 			app.ParamsKeeper,
+// 			app.TransferKeeper,
+// 			app.SlashingKeeper,
+// 		),
+// 	)
+
+// 	// When a planned update height is reached, the old binary will panic
+// 	// writing on disk the height and name of the update that triggered it
+// 	// This will read that value, and execute the preparations for the upgrade.
+// 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
+// 	if err != nil {
+// 		panic(fmt.Errorf("failed to read upgrade info from disk: %w", err))
+// 	}
+
+// 	if app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+// 		return
+// 	}
+
+// 	var storeUpgrades *storetypes.StoreUpgrades
+
+// 	switch upgradeInfo.Name {
+// 	case v2.UpgradeName:
+// 		// no store upgrades in v2
+// 	case v4.UpgradeName:
+// 		// no store upgrades in v4
+// 	case v5.UpgradeName:
+// 		// no store upgrades in v5
+// 	case v6.UpgradeName:
+// 		// no store upgrades in v6
+// 	}
+
+// 	if storeUpgrades != nil {
+// 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
+// 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, storeUpgrades))
+// 	}
+// }
