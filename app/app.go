@@ -3,7 +3,7 @@ package app
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	// "fmt"
 	"io"
 	"net/http"
 	"os"
@@ -29,7 +29,7 @@ import (
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	// storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
@@ -110,7 +110,7 @@ import (
 	"github.com/Canto-Network/Canto/v1/app/ante"
 	// v2 "github.com/Canto-Network/Canto/v1/app/upgrades/v2"
 	// v4 "github.com/Canto-Network/Canto/v1/app/upgrades/v4"
-	// v5 "github.com/Canto-Network/Canto/v1/app/upgrades/v5"
+	v5 "github.com/Canto-Network/Canto/v1/app/upgrades/v5"
 	// v6 "github.com/Canto-Network/Canto/v1/app/upgrades/v6"
 	v7 "github.com/Canto-Network/Canto/v1/app/upgrades/v7"
 	"github.com/Canto-Network/Canto/v1/x/epochs"
@@ -1039,7 +1039,7 @@ func (app *Canto) setupUpgradeHandlers() {
 			app.mm,	
 			app.configurator,
 			app.InflationKeeper,
-		)
+		),
 	)
 }
 
