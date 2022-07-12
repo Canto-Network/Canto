@@ -7,10 +7,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	evm "github.com/Canto-Network/ethermint-v2/x/evm/types"
 )
 
-var DefaultInflationDenom = evm.DefaultEVMDenom
+var DefaultInflationDenom = "acanto"
 
 // Parameter store keys
 var (
@@ -39,23 +38,23 @@ func NewParams(
 	}
 }
 
-// default minting module parameters
+// default minting module parameter
 func DefaultParams() Params {
 	return Params{
-		MintDenom: DefaultInflationDenom,
+		MintDenom: "acanto",
 		ExponentialCalculation: ExponentialCalculation{
-			A:             sdk.NewDec(int64(300_000_000)),
-			R:             sdk.NewDecWithPrec(50, 2), // 50%
-			C:             sdk.NewDec(int64(9_375_000)),
-			BondingTarget: sdk.NewDecWithPrec(66, 2), // 66%
+			A: sdk.NewDec(int64(30_000_000)),
+			R: sdk.NewDecWithPrec(00, 2), // 50%
+			// C:             sdk.NewDec(int64(937_500)), //0
+			C:             sdk.ZeroDec(),
+			BondingTarget: sdk.NewDecWithPrec(00, 2), // 66%
 			MaxVariance:   sdk.ZeroDec(),             // 0%
 		},
 		InflationDistribution: InflationDistribution{
-			StakingRewards:  sdk.NewDecWithPrec(533333334, 9), // 0.53 = 40% / (1 - 25%)
-			UsageIncentives: sdk.NewDecWithPrec(333333333, 9), // 0.33 = 25% / (1 - 25%)
-			CommunityPool:   sdk.NewDecWithPrec(133333333, 9), // 0.13 = 10% / (1 - 25%)
+			StakingRewards: sdk.NewDecWithPrec(800000000, 9), // 0.53 = 40% / (1 - 25%)
+			CommunityPool:  sdk.NewDecWithPrec(200000000, 9), // 0.13 = 10% / (1 - 25%)
 		},
-		EnableInflation: true,
+		EnableInflation: false,
 	}
 }
 
@@ -137,15 +136,11 @@ func validateInflationDistribution(i interface{}) error {
 		return errors.New("staking distribution ratio must not be negative")
 	}
 
-	if v.UsageIncentives.IsNegative() {
-		return errors.New("pool incentives distribution ratio must not be negative")
-	}
-
 	if v.CommunityPool.IsNegative() {
 		return errors.New("community pool distribution ratio must not be negative")
 	}
 
-	totalProportions := v.StakingRewards.Add(v.UsageIncentives).Add(v.CommunityPool)
+	totalProportions := v.StakingRewards.Add(v.CommunityPool)
 	if !totalProportions.Equal(sdk.NewDec(1)) {
 		return errors.New("total distributions ratio should be 1")
 	}

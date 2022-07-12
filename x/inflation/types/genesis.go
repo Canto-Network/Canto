@@ -29,7 +29,7 @@ func DefaultGenesisState() *GenesisState {
 		Params:          DefaultParams(),
 		Period:          uint64(0),
 		EpochIdentifier: epochstypes.DayEpochID,
-		EpochsPerPeriod: 365,
+		EpochsPerPeriod: 30,
 		SkippedEpochs:   0,
 	}
 }

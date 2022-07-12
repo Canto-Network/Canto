@@ -31,7 +31,6 @@ func (suite *ParamsTestSuite) TestParamsValidate() {
 
 	validInflationDistribution := InflationDistribution{
 		StakingRewards:  sdk.NewDecWithPrec(533334, 6),
-		UsageIncentives: sdk.NewDecWithPrec(333333, 6),
 		CommunityPool:   sdk.NewDecWithPrec(133333, 6),
 	}
 
@@ -204,7 +203,6 @@ func (suite *ParamsTestSuite) TestParamsValidate() {
 				ExponentialCalculation: validExponentialCalculation,
 				InflationDistribution: InflationDistribution{
 					StakingRewards:  sdk.OneDec().Neg(),
-					UsageIncentives: sdk.NewDecWithPrec(333333, 6),
 					CommunityPool:   sdk.NewDecWithPrec(133333, 6),
 				},
 				EnableInflation: true,
@@ -218,7 +216,6 @@ func (suite *ParamsTestSuite) TestParamsValidate() {
 				ExponentialCalculation: validExponentialCalculation,
 				InflationDistribution: InflationDistribution{
 					StakingRewards:  sdk.NewDecWithPrec(533334, 6),
-					UsageIncentives: sdk.OneDec().Neg(),
 					CommunityPool:   sdk.NewDecWithPrec(133333, 6),
 				},
 				EnableInflation: true,
@@ -232,7 +229,6 @@ func (suite *ParamsTestSuite) TestParamsValidate() {
 				ExponentialCalculation: validExponentialCalculation,
 				InflationDistribution: InflationDistribution{
 					StakingRewards:  sdk.NewDecWithPrec(533334, 6),
-					UsageIncentives: sdk.NewDecWithPrec(333333, 6),
 					CommunityPool:   sdk.OneDec().Neg(),
 				},
 				EnableInflation: true,
@@ -246,7 +242,6 @@ func (suite *ParamsTestSuite) TestParamsValidate() {
 				ExponentialCalculation: validExponentialCalculation,
 				InflationDistribution: InflationDistribution{
 					StakingRewards:  sdk.NewDecWithPrec(533333, 6),
-					UsageIncentives: sdk.NewDecWithPrec(333333, 6),
 					CommunityPool:   sdk.NewDecWithPrec(133333, 6),
 				},
 				EnableInflation: true,

@@ -38,3 +38,4 @@ type StakingKeeper interface {
 	StakingTokenSupply(ctx sdk.Context) sdk.Int
 	TotalBondedTokens(ctx sdk.Context) sdk.Int
 }
+
