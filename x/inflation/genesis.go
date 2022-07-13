@@ -46,8 +46,6 @@ func InitGenesis(
 		bondedRatio,
 	)
 	k.SetEpochMintProvision(ctx, epochMintProvision)
-	inflRate := k.GetInflationRate(ctx)
-	k.Set
 }
 
 // ExportGenesis returns a GenesisState for a given context and keeper.
