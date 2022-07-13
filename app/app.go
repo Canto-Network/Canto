@@ -804,7 +804,7 @@ func (app *Canto) Name() string { return app.BaseApp.Name() }
 // BeginBlocker will schedule the upgrade plan and perform the state migration (if any).
 func (app *Canto) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	// Perform any scheduled forks before executing the modules logic
-	BeginBlockForks(ctx, app)
+	// BeginBlockForks(ctx, app)
 	return app.mm.BeginBlock(ctx, req)
 }
 
