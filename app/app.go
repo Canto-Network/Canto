@@ -3,7 +3,7 @@ package app
 import (
 	"context"
 	"encoding/json"
-	// "fmt"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -1033,6 +1033,7 @@ func initParamsKeeper(
 }
 
 func (app *Canto) setupUpgradeHandlers() {
+	fmt.Println("SETTING UPGRADE HANDLER")
 	app.UpgradeKeeper.SetUpgradeHandler(
 		v7.UpgradeName,
 		v7.CreateUpgradeHandler(
