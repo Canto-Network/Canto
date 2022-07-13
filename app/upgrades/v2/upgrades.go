@@ -1,26 +1,22 @@
-package v2
+package v7
 
 import (
+	inflationkeeper "github.com/Canto-Network/Canto/v1/x/inflation/keeper"
+	inflationtypes "github.com/Canto-Network/Canto/v1/x/inflation/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-
-	erc20types "github.com/Canto-Network/Canto/v1/x/erc20/types"
 )
 
-// CreateUpgradeHandler creates an SDK upgrade handler for v2
 func CreateUpgradeHandler(
 	mm *module.Manager,
 	configurator module.Configurator,
+	ik inflationkeeper.Keeper,
 ) upgradetypes.UpgradeHandler {
 	return func(ctx sdk.Context, _ upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
-		// Refs:
-		// - https://docs.cosmos.network/master/building-modules/upgrade.html#registering-migrations
-		// - https://docs.cosmos.network/master/migrations/chain-upgrade-guide-044.html#chain-upgrade
+		ctx.Logger().Info("Canto v2 upgrade started")
 
-		// migrate claims and ERC20 module, other modules are left as-is to
-		// avoid running InitGenesis.
-		vm[erc20types.ModuleName] = 1
+		vm[inflationtypes.ModuleName] = 1
 
 		return mm.RunMigrations(ctx, configurator, vm)
 	}

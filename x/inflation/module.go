@@ -147,8 +147,8 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 
 	migrator := keeper.NewMigrator(am.keeper)
 
-	if err := cfg.RegisterMigration(types.ModuleName, 1, migrator.Migrate1to2); err != nil { 
-		panic(fmt.Errorf("FAILURE IN MIGRATION: %W", types.ModuleName, err))
+	if err := cfg.RegisterMigration(types.ModuleName, 1, migrator.Migrate1to2); err != nil {
+		panic(fmt.Errorf("FAILURE IN MIGRATION from v1 to v2 %s: %w", types.ModuleName, err))
 	}
 }
 
