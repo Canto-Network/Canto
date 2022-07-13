@@ -12,7 +12,7 @@ func BeginBlockForks(ctx sdk.Context, app *Canto) {
 
 	upgradePlan := upgradetypes.Plan{
 		Height: ctx.BlockHeight(),
-		Name:   "v2.0.0",
+		Name:   "upgrade-v2.0.0",
 	}
 
 	if err := app.UpgradeKeeper.ScheduleUpgrade(ctx, upgradePlan); err != nil {
