@@ -17,9 +17,11 @@ func CreateUpgradeHandler(
 ) upgradetypes.UpgradeHandler {
 	fmt.Println("CREATE UPGRADE HANDLER")
 	return func(ctx sdk.Context, _ upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
-		fmt.Println("Starting Upgrade Now")
+		ctx.Logger().Info("CANTO UPGRADE STARTED")
 
-		UpdateInflationParams(ctx, ik)
+		fmt.Println("UPGRADE HERE")
+
+		// UpdateInflationParams(ctx, ik)
 
 		vm[inflationtypes.ModuleName] = 1
 
