@@ -19,8 +19,8 @@ func TestInflationSuite(t *testing.T) {
 
 func (suite *InflationTestSuite) TestCalculateEpochMintProvision() {
 	bondingParams := DefaultParams()
-	bondingParams.ExponentialCalculation.MaxVariance = sdk.NewDecWithPrec(40, 2)
-	epochsPerPeriod := int64(365)
+	bondingParams.ExponentialCalculation.MaxVariance = sdk.NewDecWithPrec(0, 2)
+	epochsPerPeriod := int64(30)
 
 	testCases := []struct {
 		name              string
@@ -31,11 +31,11 @@ func (suite *InflationTestSuite) TestCalculateEpochMintProvision() {
 		expPass           bool
 	}{
 		{
-			"pass - initial perid",
+			"pass - initial period",
 			DefaultParams(),
 			uint64(0),
 			sdk.OneDec(),
-			sdk.MustNewDecFromStr("847602739726027397260274.000000000000000000"),
+			sdk.MustNewDecFromStr("543478266666666666666667.000000000000000000"),
 			true,
 		},
 		{
@@ -43,7 +43,7 @@ func (suite *InflationTestSuite) TestCalculateEpochMintProvision() {
 			DefaultParams(),
 			uint64(1),
 			sdk.OneDec(),
-			sdk.MustNewDecFromStr("436643835616438356164384.000000000000000000"),
+			sdk.MustNewDecFromStr("353260873333333333333333.000000000000000000"),
 			true,
 		},
 		{
@@ -51,7 +51,7 @@ func (suite *InflationTestSuite) TestCalculateEpochMintProvision() {
 			DefaultParams(),
 			uint64(2),
 			sdk.OneDec(),
-			sdk.MustNewDecFromStr("231164383561643835616438.000000000000000000"),
+			sdk.MustNewDecFromStr("229619567666666666666667.000000000000000000"),
 			true,
 		},
 		{
@@ -59,7 +59,7 @@ func (suite *InflationTestSuite) TestCalculateEpochMintProvision() {
 			DefaultParams(),
 			uint64(3),
 			sdk.OneDec(),
-			sdk.MustNewDecFromStr("128424657534246575342466.000000000000000000"),
+			sdk.MustNewDecFromStr("149252718983333333333333.000000000000000000"),
 			true,
 		},
 		{
@@ -67,7 +67,7 @@ func (suite *InflationTestSuite) TestCalculateEpochMintProvision() {
 			DefaultParams(),
 			uint64(20),
 			sdk.OneDec(),
-			sdk.MustNewDecFromStr("25685715348753210410959.000000000000000000"),
+			sdk.MustNewDecFromStr("98502967552518961527.000000000000000000"),
 			true,
 		},
 		{
@@ -75,7 +75,7 @@ func (suite *InflationTestSuite) TestCalculateEpochMintProvision() {
 			DefaultParams(),
 			uint64(21),
 			sdk.OneDec(),
-			sdk.MustNewDecFromStr("25685323427801262739726.000000000000000000"),
+			sdk.MustNewDecFromStr("64026928909137053253.000000000000000000"),
 			true,
 		},
 		{
@@ -83,7 +83,7 @@ func (suite *InflationTestSuite) TestCalculateEpochMintProvision() {
 			bondingParams,
 			uint64(0),
 			sdk.ZeroDec(),
-			sdk.MustNewDecFromStr("1186643835616438356164384.000000000000000000"),
+			sdk.MustNewDecFromStr("543478266666666666666667.000000000000000000"),
 			true,
 		},
 		{
@@ -91,7 +91,7 @@ func (suite *InflationTestSuite) TestCalculateEpochMintProvision() {
 			bondingParams,
 			uint64(1),
 			sdk.ZeroDec(),
-			sdk.MustNewDecFromStr("611301369863013698630137.000000000000000000"),
+			sdk.MustNewDecFromStr("353260873333333333333333.000000000000000000"),
 			true,
 		},
 		{
@@ -99,7 +99,7 @@ func (suite *InflationTestSuite) TestCalculateEpochMintProvision() {
 			bondingParams,
 			uint64(2),
 			sdk.ZeroDec(),
-			sdk.MustNewDecFromStr("323630136986301369863014.000000000000000000"),
+			sdk.MustNewDecFromStr("229619567666666666666667.000000000000000000"),
 			true,
 		},
 		{
@@ -107,7 +107,7 @@ func (suite *InflationTestSuite) TestCalculateEpochMintProvision() {
 			bondingParams,
 			uint64(3),
 			sdk.ZeroDec(),
-			sdk.MustNewDecFromStr("179794520547945205479452.000000000000000000"),
+			sdk.MustNewDecFromStr("149252718983333333333333.000000000000000000"),
 			true,
 		},
 		{
@@ -115,7 +115,7 @@ func (suite *InflationTestSuite) TestCalculateEpochMintProvision() {
 			bondingParams,
 			uint64(20),
 			sdk.ZeroDec(),
-			sdk.MustNewDecFromStr("35960001488254494575342.000000000000000000"),
+			sdk.MustNewDecFromStr("98502967552518961527.000000000000000000"),
 			true,
 		},
 		{
@@ -123,7 +123,7 @@ func (suite *InflationTestSuite) TestCalculateEpochMintProvision() {
 			bondingParams,
 			uint64(21),
 			sdk.ZeroDec(),
-			sdk.MustNewDecFromStr("35959452798921767835616.000000000000000000"),
+			sdk.MustNewDecFromStr("64026928909137053253.000000000000000000"),
 			true,
 		},
 	}

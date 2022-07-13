@@ -29,6 +29,7 @@ import (
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
+
 	// storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
@@ -1033,11 +1034,11 @@ func initParamsKeeper(
 }
 
 func (app *Canto) setupUpgradeHandlers() {
-	fmt.Println("SETTING UPGRADE HANDLER")
+	fmt.Println("Setting upgrade handler for Canto v2... standby")
 	app.UpgradeKeeper.SetUpgradeHandler(
 		v7.UpgradeName,
 		v7.CreateUpgradeHandler(
-			app.mm,	
+			app.mm,
 			app.configurator,
 			app.InflationKeeper,
 		),

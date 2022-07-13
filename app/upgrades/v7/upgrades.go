@@ -14,23 +14,10 @@ func CreateUpgradeHandler(
 	ik inflationkeeper.Keeper,
 ) upgradetypes.UpgradeHandler {
 	return func(ctx sdk.Context, _ upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("CANTO UPGRADE STARTED")
+		ctx.Logger().Info("Canto v2 upgrade started")
 
 		vm[inflationtypes.ModuleName] = 1
 
 		return mm.RunMigrations(ctx, configurator, vm)
 	}
 }
-
-// func UpdateInflationParams(ctx sdk.Context, ik inflationkeeper.Keeper) {
-// 	fmt.Println("Setting Params")
-// 	params := ik.GetParams(ctx)
-// 	newExp := inflationtypes.ExponentialCalculation{
-// 		A:             sdk.NewDec(int64(16_304_348)),
-// 		R:             sdk.NewDecWithPrec(35, 2), // 35%
-// 		C:             sdk.ZeroDec(),
-// 		BondingTarget: sdk.NewDecWithPrec(80, 2), // not relevant; max variance is 0
-// 		MaxVariance:   sdk.ZeroDec(),             // 0%
-// 	}
-// 	params.ExponentialCalculation = newExp
-// }
