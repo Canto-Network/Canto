@@ -1,12 +1,10 @@
 package keeper
 
 import (
+	v2 "github.com/Canto-Network/Canto/v1/x/inflation/migrations/v2"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	v7 "github.com/Canto-Network/Canto/v1/x/inflation/migrations/v7"
-
 )
-
 
 var _ module.MigrationHandler = Migrator{}.Migrate1to2
 
@@ -22,7 +20,6 @@ func NewMigrator(keeper Keeper) Migrator {
 	}
 }
 
-
 func (m Migrator) Migrate1to2(ctx sdk.Context) error {
-	return v7.UpdateParams(ctx, m.keeper)
+	return v2.UpdateParams(ctx, m.keeper)
 }
