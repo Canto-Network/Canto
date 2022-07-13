@@ -145,7 +145,11 @@ func (am AppModule) LegacyQuerierHandler(amino *codec.LegacyAmino) sdk.Querier {
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
 
-	_ = keeper.NewMigrator(am.keeper)
+	migrator := keeper.NewMigrator(am.keeper)
+
+	if err := cfg.RegisterMigration(types.ModuleName, 1, migrator.Migrate1to2); err != nil { 
+		panic(fmt.Errorf("FAILURE IN MIGRATION: %W", types.ModuleName, err))
+	}
 }
 
 // BeginBlock returns the begin blocker for the inflation module.
