@@ -72,7 +72,7 @@ pubkey: {
 
 You'll use this file later when creating your validator txn.
 
-## Validator setup instructions
+## Set up validator
 
 * Install cantod binary
 * Initialize node: `cantod init <moniker> --chain-id canto_7744-1`
