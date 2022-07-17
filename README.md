@@ -4,8 +4,8 @@
 
 *(canto_7744-1)*
 
-> Genesis [Published](https://github.com/Canto-Network/Canto/raw/main/Mainnet/genesis.json)
-> Peers [Published](https://github.com/Canto-Network/Canto/blob/main/Mainnet/peers.txt)
+> Genesis file [Published](https://github.com/Canto-Network/Canto/raw/main/Mainnet/genesis.json)
+> Peers list [Published](https://github.com/Canto-Network/Canto/blob/main/Mainnet/peers.txt)
 
 ## Hardware Requirements
 
