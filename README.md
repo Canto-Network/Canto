@@ -9,39 +9,35 @@
 
 ## Hardware Requirements
 
-**Minimum**
-
+### Minimum:
 * 16 GB RAM
 * 100 GB NVME SSD
 * 3.2 GHz x4 CPU
 
-**Recommended**
-
+### Recommended:
 * 32 GB RAM
 * 500 GB NVME SSD
 * 4.2 GHz x6 CPU
 
-## Operating System
+### Operating System:
+* Linux (x86_64) or Linux (amd64)
+* Recommended Ubuntu or Arch Linux
 
-> Linux (x86_64) or Linux (amd64) Reccomended Arch Linux
+## Install dependencies 
 
-**Dependencies**
+If using Ubuntu:
 
-> Prerequisite: go1.18+ required.
+* go1.18+: `sudo snap install go --classic`
+* git: `sudo apt-get install git`
+* gcc: `sudo apt-get install gcc`
+* make: `sudo apt-get install make`
 
-* Arch Linux: `pacman -S go`
-* Ubuntu: `sudo snap install go --classic`
+If using Arch Linux:
 
-> Prerequisite: git.
-
-* Arch Linux: `pacman -S git`
-* Ubuntu: `sudo apt-get install git`
-
-> Optional requirement: GNU make.
-
-* Arch Linux: `pacman -S make`
-* Ubuntu: `sudo apt-get install make`
-
+* go1.18+: `pacman -S go`
+* git: `pacman -S git`
+* gcc: `pacman -S gcc`
+* make: `pacman -S make`
 
 ## Cantod Installation Steps
 
