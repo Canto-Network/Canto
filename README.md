@@ -39,7 +39,7 @@ If using Arch Linux:
 * gcc: `pacman -S gcc`
 * make: `pacman -S make`
 
-## Cantod Installation Steps
+## Install `cantod`
 
 ### Clone git repository
 
