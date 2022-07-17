@@ -74,7 +74,9 @@ You'll use this file later when creating your validator txn.
 
 ## Set up validator
 
-Install cantod binary
+Install cantod binary from `Canto` directory: 
+
+`sudo make install`
 
 Initialize node:
 
