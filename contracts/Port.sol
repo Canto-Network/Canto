@@ -25,11 +25,6 @@ contract ProposalStore {
         // @notice The ordered list of calldata to be passed to each call
         bytes[] calldatas;
     }
-	
-    modifier OnlyUniGov {
-	require(msg.sender == UniGovModAcct);
-	_;
-    }
 
     address private UniGovModAcct;
     
