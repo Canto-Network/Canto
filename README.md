@@ -57,6 +57,8 @@ mv $HOME/go/bin/cantod /usr/bin/
 *  `cantod keys add [key_name] --recover` to regenerate keys with your mnemonic
 *  `cantod keys add [key_name] --ledger` to generate keys with ledger device
 
+Store a backup of your keys and mnemonic securely offline.
+
 ## Validator setup instructions
 
 * Install cantod binary
