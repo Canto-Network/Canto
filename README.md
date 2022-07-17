@@ -51,7 +51,7 @@ mv $HOME/go/bin/cantod /usr/bin/
 
 ```
 
-**Generate keys**
+**Generate and store keys**
 
 *  `cantod keys add [key_name]`
 *  `cantod keys add [key_name] --recover` to regenerate keys with your mnemonic
