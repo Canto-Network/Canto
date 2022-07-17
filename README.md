@@ -92,6 +92,8 @@ Edit the minimum-gas-prices in `${HOME}/.cantod/config/app.toml`:
 
 `sed -i 's/minimum-gas-prices = ""/minimum-gas-prices = "0.0001acanto"/g' $HOME/.cantod/config/app.toml`
 
+### Set `cantod` to run automatically
+
 * Start cantod by creating a systemd service to run the node in the background
 
 `nano /etc/systemd/system/cantod.service`
