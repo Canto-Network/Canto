@@ -41,7 +41,7 @@ If using Arch Linux:
 
 ## Cantod Installation Steps
 
-**Clone git repository**
+### Clone git repository
 
 ```bash
 git clone https://github.com/Canto-Network/Canto.git
@@ -51,7 +51,7 @@ mv $HOME/go/bin/cantod /usr/bin/
 
 ```
 
-**Generate and store keys**
+### Generate and store keys
 
 *  `cantod keys add [key_name]`
 *  `cantod keys add [key_name] --recover` to regenerate keys with your mnemonic
