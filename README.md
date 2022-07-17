@@ -124,7 +124,7 @@ WantedBy=multi-user.target
 
 * Reload the service files: `sudo systemctl daemon-reload`
 * Create the symlinlk: `sudo systemctl enable cantod.service`
-* Start the node sudo: `systemctl start cantod && journalctl -u cantod -f`
+* Start the node: `sudo systemctl start cantod && journalctl -u cantod -f`
 
 ### Create Validator Transaction
 
