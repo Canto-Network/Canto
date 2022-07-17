@@ -74,10 +74,22 @@ You'll use this file later when creating your validator txn.
 
 ## Set up validator
 
-* Install cantod binary
-* Initialize node: `cantod init <moniker> --chain-id canto_7744-1`
-* Download the Genesis file: `wget https://github.com/Canto-Network/Canto/raw/main/Mainnet/genesis.json -P $HOME/.cantod/config/` (be sure to `rm -rf genesis.json` as it is automatically generated upon init.) 
-* Edit the minimum-gas-prices in ${HOME}/.cantod/config/app.toml: `sed -i 's/minimum-gas-prices = ""/minimum-gas-prices = "0.0001acanto"/g' $HOME/.cantod/config/app.toml`
+Install cantod binary
+
+Initialize node:
+
+`cantod init <moniker> --chain-id canto_7744-1`
+
+Download the Genesis file: 
+
+`wget https://github.com/Canto-Network/Canto/raw/main/Mainnet/genesis.json -P $HOME/.cantod/config/` 
+
+(be sure to `rm -rf genesis.json` as it is automatically generated upon init.) 
+
+Edit the minimum-gas-prices in `${HOME}/.cantod/config/app.toml`:
+
+`sed -i 's/minimum-gas-prices = ""/minimum-gas-prices = "0.0001acanto"/g' $HOME/.cantod/config/app.toml`
+
 * Start cantod by creating a systemd service to run the node in the background
 
 `nano /etc/systemd/system/cantod.service`
