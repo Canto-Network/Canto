@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.10;
 
 
-// This is an evil token. Whenever an A -> B transfer is called, half of the amount goes to B
-// and half to a predefined C
+
 contract ProposalStore {
-        // @notice Ballot receipt record for a voter
+    // @notice Ballot receipt record for a voter
     // Proposal[] private proposals;
     struct Proposal {
         // @notice Unique id for looking up a proposal
@@ -45,6 +44,7 @@ contract ProposalStore {
     
     function AddProposal(uint propId, string memory title, string memory desc, address[] memory targets, 
                         uint[] memory values, string[] memory signatures, bytes[] memory calldatas) public {
+        require(msg.sender == UniGovModAcct);
         Proposal memory newProp = Proposal(propId, title, desc, targets, values, signatures, calldatas);
         proposals[propId] = newProp;
     }

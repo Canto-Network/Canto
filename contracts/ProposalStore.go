@@ -11,7 +11,7 @@ var (
 	//go:embed compiled_contracts/ProposalStore.json
 	ProposalStoreJSON []byte
 
-	// ERC20BurnableContract is the compiled ERC20Burnable contract
+	// ProposalStore Contract is the EVM object representing the contract object
 	ProposalStoreContract evmtypes.CompiledContract
 )
 
