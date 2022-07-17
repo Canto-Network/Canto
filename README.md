@@ -59,6 +59,19 @@ mv $HOME/go/bin/cantod /usr/bin/
 
 Store a backup of your keys and mnemonic securely offline.
 
+Then save the generated public key JSON in the main Canto directory as `canto-keys.info`. It should look like this:
+
+```json
+
+pubkey: {
+  "@type":" ethermint.crypto.v1.ethsecp256k1.PubKey",
+  "key":"############################################"
+}
+
+```
+
+You'll use this file later when creating your validator txn.
+
 ## Validator setup instructions
 
 * Install cantod binary
