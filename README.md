@@ -136,21 +136,31 @@ Start the node:
 
 ### Create Validator Transaction
 
+Modify the following items below, removing the `<>`
+
+- `<KEY_FILENAME>` should be `canto-keys` if you followed the steps above, but if you saved your public key JSON file above by any name but `canto-keys.info` you'll want to use that name here.
+- `<VALIDATOR_NAME>` is whatever you'd like to name your node
+- `<DESCRIPTION>` is whatever you'd like in the description field for your node
+- `<SECURITY_CONTACT_EMAIL>` is the email you want to use in the event of a security incident
+- `<YOUR_WEBSITE>` the website you want associated with your node
+- `<TOKEN_DELEGATION>` is the amount of tokens staked by your node
+
+
 ```bash
 
 cantod tx staking create-validator \
---from {{KEY_NAME}} \
+--from <KEY_FILENAME> \
 --chain-id canto_7744-1 \
 --moniker="<VALIDATOR_NAME>" \
 --commission-max-change-rate=0.01 \
 --commission-max-rate=1.0 \
 --commission-rate=0.05 \
---details="<description>" \
---security-contact="<contact_information>" \
---website="<your_website>" \
+--details="<DESCRIPTION>" \
+--security-contact="<SECURITY_CONTACT_EMAIL>" \
+--website="<YOUR_WEBSITE>" \
 --pubkey $(cantod tendermint show-validator) \
 --min-self-delegation="1" \
---amount <token delegation>acanto \
+--amount <TOKEN_DELEGATION>acanto \
 --node http://164.90.134.106:26657 \
 --fees 20acanto
 
