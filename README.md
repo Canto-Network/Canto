@@ -151,7 +151,7 @@ Start the node:
 
 You should then get several lines of log files and then see: `No addresses to dial. Falling back to seeds module=pex server=node`
 
-This is an indicator things thus far are working and now you need to create your validator txn.
+This is an indicator things thus far are working and now you need to create your validator txn. `^c` out and follow the next steps.
 
 ### Create Validator Transaction
 
