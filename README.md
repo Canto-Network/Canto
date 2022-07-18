@@ -59,15 +59,17 @@ sudo mv $HOME/go/bin/cantod /usr/bin/
 
 ### Generate and store keys
 
-*  `cantod keys add [key_name]`
-*  `cantod keys add [key_name] --recover` to regenerate keys with your mnemonic
-*  `cantod keys add [key_name] --ledger` to generate keys with ledger device
+Replace `<keyname>` below with whatever you'd like to name your key.
+
+*  `cantod keys add <key_name>`
+*  `cantod keys add <key_name> --recover` to regenerate keys with your mnemonic
+*  `cantod keys add <key_name> --ledger` to generate keys with ledger device
 
 Store a backup of your keys and mnemonic securely offline.
 
-Then save the generated public key JSON in the main Canto directory as `canto-keys.info`. It should look like this:
+Then save the generated public key config in the main Canto directory as `<key_name>.info`. It should look like this:
 
-```json
+```
 
 pubkey: {
   "@type":" ethermint.crypto.v1.ethsecp256k1.PubKey",
