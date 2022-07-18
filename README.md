@@ -86,7 +86,7 @@ Install cantod binary from `Canto` directory:
 
 `sudo make install`
 
-Initialize node:
+Initialize the node. Replace `<moniker>` with whatever you'd like to name your validator.
 
 `cantod init <moniker> --chain-id canto_7744-1`
 
