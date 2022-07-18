@@ -102,7 +102,7 @@ Download the Genesis file:
 
 Edit the minimum-gas-prices in `${HOME}/.cantod/config/app.toml`:
 
-`sed -i 's/minimum-gas-prices = ""/minimum-gas-prices = "0.0001acanto"/g' $HOME/.cantod/config/app.toml`
+`sed -i 's/minimum-gas-prices = "0acanto"/minimum-gas-prices = "0.0001acanto"/g' $HOME/.cantod/config/app.toml`
 
 ### Set `cantod` to run automatically
 
