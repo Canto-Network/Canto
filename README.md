@@ -90,6 +90,8 @@ Initialize the node. Replace `<moniker>` with whatever you'd like to name your v
 
 `cantod init <moniker> --chain-id canto_7744-1`
 
+If this runs successfully, it should dump a blob of JSON to the terminal.
+
 Download the Genesis file: 
 
 `wget https://github.com/Canto-Network/Canto/raw/main/Mainnet/genesis.json -P $HOME/.cantod/config/` 
