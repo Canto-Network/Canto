@@ -104,6 +104,9 @@ Edit the minimum-gas-prices in `${HOME}/.cantod/config/app.toml`:
 
 `sed -i 's/minimum-gas-prices = "0acanto"/minimum-gas-prices = "0.0001acanto"/g' $HOME/.cantod/config/app.toml`
 
+Add persistent peers to `$HOME/.cantod/config/config.toml`:
+`sed -i 's/persistent_peers = ""/persistent_peers = "ec770ae4fd0fb4871b9a7c09f61764a0b010b293@164.90.134.106:26656"/g' $HOME/.cantod/config/config.toml`
+
 ### Set `cantod` to run automatically
 
 * Start `cantod` by creating a systemd service to run the node in the background: 
@@ -175,6 +178,7 @@ cantod tx staking create-validator \
 --website="<YOUR_WEBSITE>" \
 --pubkey $(cantod tendermint show-validator) \
 --min-self-delegation="1" \
+--node http://164.90.134.106:26657 \
 --amount <TOKEN_DELEGATION>acanto \
 --fees 20acanto
 
