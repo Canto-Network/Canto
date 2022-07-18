@@ -159,8 +159,7 @@ Modify the following items below, removing the `<>`
 - `<DESCRIPTION>` is whatever you'd like in the description field for your node
 - `<SECURITY_CONTACT_EMAIL>` is the email you want to use in the event of a security incident
 - `<YOUR_WEBSITE>` the website you want associated with your node
-- `<TOKEN_DELEGATION>` is the amount of tokens staked by your node
-
+- `<TOKEN_DELEGATION>` is the amount of tokens staked by your node (`1acanto` should work here, but you'll also need to make sure your address contains tokens.)
 
 ```bash
 
@@ -177,7 +176,6 @@ cantod tx staking create-validator \
 --pubkey $(cantod tendermint show-validator) \
 --min-self-delegation="1" \
 --amount <TOKEN_DELEGATION>acanto \
---node http://164.90.134.106:26657 \
 --fees 20acanto
 
 ```
