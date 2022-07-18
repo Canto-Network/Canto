@@ -146,6 +146,10 @@ Start the node:
 
 `sudo systemctl start cantod && journalctl -u cantod -f`
 
+You should then get several lines of log files and then see: `No addresses to dial. Falling back to seeds module=pex server=node`
+
+This is an indicator things thus far are working and now you need to create your validator txn.
+
 ### Create Validator Transaction
 
 Modify the following items below, removing the `<>`
