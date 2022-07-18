@@ -154,7 +154,7 @@ This is an indicator things thus far are working and now you need to create your
 
 Modify the following items below, removing the `<>`
 
-- `<KEY_FILENAME>` should be `canto-keys` if you followed the steps above, but if you saved your public key JSON file above by any name but `canto-keys.info` you'll want to use that name here.
+- `<KEY_NAME>` should be the same as `<key_name>` when you followed the steps above in creating or restoring your key.
 - `<VALIDATOR_NAME>` is whatever you'd like to name your node
 - `<DESCRIPTION>` is whatever you'd like in the description field for your node
 - `<SECURITY_CONTACT_EMAIL>` is the email you want to use in the event of a security incident
@@ -165,7 +165,7 @@ Modify the following items below, removing the `<>`
 ```bash
 
 cantod tx staking create-validator \
---from <KEY_FILENAME> \
+--from <KEY_NAME> \
 --chain-id canto_7744-1 \
 --moniker="<VALIDATOR_NAME>" \
 --commission-max-change-rate=0.01 \
