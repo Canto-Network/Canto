@@ -96,7 +96,9 @@ Download the Genesis file:
 
 `wget https://github.com/Canto-Network/Canto/raw/main/Mainnet/genesis.json -P $HOME/.cantod/config/` 
 
-(be sure to `rm -rf genesis.json` as it is automatically generated upon init.) 
+> _**Note:** If you later get `Error: couldn't read GenesisDoc file: open /root/.cantod/config/genesis.json: no such file or directory` put the genesis.json file wherever it wants instead, such as:
+> 
+> `sudo wget https://github.com/Canto-Network/Canto/raw/main/Mainnet/genesis.json -P/root/.cantod/config/`
 
 Edit the minimum-gas-prices in `${HOME}/.cantod/config/app.toml`:
 
