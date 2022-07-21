@@ -1,0 +1,1112 @@
+make all --print-data-base --no-builtin-variables --no-builtin-rules --question
+# GNU Make 3.81
+# Copyright (C) 2006  Free Software Foundation, Inc.
+# This is free software; see the source for copying conditions.
+# There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
+
+# This program built for i386-apple-darwin11.3.0
+ 
+
+# Make data base, printed on Thu Jul 21 14:35:32 2022
+
+# Variables
+
+# makefile (from `Makefile', line 62)
+build_tags := netgo ledger
+# automatic
+<D = $(patsubst %/,%,$(dir $<))
+# automatic
+?F = $(notdir $?)
+# environment
+ELECTRON_NO_ATTACH_CONSOLE = 1
+ 
+# makefile (from `Makefile', line 482)
+TM_CRYPTO_TYPES = third_party/proto/tendermint/crypto
+# makefile (from `Makefile', line 19)
+NAMESPACE := Canto
+# makefile (from `Makefile', line 18)
+DOCKER_BUF := /usr/local/bin/docker run --rm -v /Users/tkkwon/Github/Canto:/workspace --workdir /workspace bufbuild/buf
+# environment
+NVM_INC = /Users/tkkwon/.nvm/versions/node/v18.1.0/include/node
+# automatic
+?D = $(patsubst %/,%,$(dir $?))
+# automatic
+@D = $(patsubst %/,%,$(dir $@))
+# automatic
+@F = $(notdir $@)
+# makefile
+CURDIR := /Users/tkkwon/Github/Canto
+# makefile (from `Makefile', line 23)
+DOCKER_TAG := b0462f5
+# makefile
+SHELL = /bin/sh
+# environment
+VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
+# makefile (from `Makefile', line 65)
+whitespace := $(subst ,, )
+# environment
+_ = /usr/bin/make
+# makefile (from `Makefile', line 1)
+MAKEFILE_LIST :=  Makefile
+# makefile (from `Makefile', line 48)
+GCC = $(shell command -v gcc 2> /dev/null)
+# makefile (from `Makefile', line 483)
+TM_ABCI_TYPES = third_party/proto/tendermint/abci
+# makefile (from `Makefile', line 25)
+GO111MODULE = on
+# makefile (from `Makefile', line 575)
+TMP := tmp
+# environment
+WARP_IS_LOCAL_SHELL_SESSION = 1
+# makefile (from `Makefile', line 7)
+VERSION = $(shell echo $(shell git describe --tags $(or $(DIFF_TAG), $(DEFAULT_TAG))) | sed 's/^v//')
+# makefile (from `Makefile', line 14)
+BUILDDIR = $(CURDIR)/build
+# makefile (from `Makefile', line 452)
+containerProtoFmt = cosmos-sdk-proto-fmt-$(containerProtoVer)
+# makefile (from `Makefile', line 101)
+ldflags := -X github.com/cosmos/cosmos-sdk/version.Name=canto -X github.com/cosmos/cosmos-sdk/version.AppName=cantod -X github.com/cosmos/cosmos-sdk/version.Version=2.0.0 -X github.com/cosmos/cosmos-sdk/version.Commit=b0462f51785f87bdedc36aaba79647d6b9abd37f -X "github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger" -X github.com/tendermint/tendermint/version.TMCoreSemVer=v0.34.20-0.20220517115723-e6f071164839 -w -s
+# environment
+__CFBundleIdentifier = com.microsoft.VSCode
+# environment
+INFOPATH = /opt/homebrew/share/info:
+# makefile (from `Makefile', line 486)
+GOGO_PROTO_TYPES = third_party/proto/gogoproto
+# environment
+VSCODE_CWD = /Users/tkkwon/Github/Canto
+# environment
+GOPROXY = https://proxy.golang.org,direct
+# environment
+WARP_USE_SSH_WRAPPER = 1
+# environment
+PATH = /Users/tkkwon/.nvm/versions/node/v18.1.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/Users/tkkwon/.foundry/bin
+# makefile (from `Makefile', line 480)
+COSMOS_PROTO_URL = https://raw.githubusercontent.com/regen-network/cosmos-proto/master
+# makefile (from `Makefile', line 21)
+DOCKER_IMAGE := Canto/canto
+# makefile (from `Makefile', line 20)
+PROJECT := canto
+# makefile (from `Makefile', line 66)
+comma := ,
+# makefile (from `Makefile', line 17)
+DOCKER := /usr/local/bin/docker
+# environment
+GOPATH = /Users/tkkwon/go
+# environment
+NVM_BIN = /Users/tkkwon/.nvm/versions/node/v18.1.0/bin
+# makefile (from `Makefile', line 326)
+TEST_PACKAGES = ./...
+# makefile (from `Makefile', line 10)
+LEDGER_ENABLED = true
+# environment
+ELECTRON_RUN_AS_NODE = 1
+# makefile (from `Makefile', line 9)
+COMMIT := b0462f51785f87bdedc36aaba79647d6b9abd37f
+# default
+.FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
+# makefile (from `Makefile', line 475)
+TM_URL = https://raw.githubusercontent.com/tendermint/tendermint/v0.34.15/proto/tendermint
+# environment
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.G75RYnyjtP/Listeners
+# makefile (from `Makefile', line 574)
+COMPILED_DIR := contracts/compiled_contracts
+# automatic
+%F = $(notdir $%)
+# makefile (from `Makefile', line 44)
+UNAME_S = $(shell uname -s)
+# makefile (from `Makefile', line 67)
+build_tags_comma_sep := netgo,ledger
+# makefile (from `Makefile', line 577)
+TMP_COMPILED := tmp/compiled.json
+# environment
+PWD = /Users/tkkwon/Github/Canto
+# environment
+WARP_PS1 = %n@%m %1~ %# 
+# environment
+HOMEBREW_CELLAR = /opt/homebrew/Cellar
+# environment
+ORIGINAL_XDG_CURRENT_DESKTOP = undefined
+# makefile (from `Makefile', line 3)
+PACKAGES_NOSIMULATION = $(shell go list ./... | grep -v '/simulation')
+# environment
+MANPATH = /Users/tkkwon/.nvm/versions/node/v18.1.0/share/man:/opt/homebrew/share/man::
+# environment
+GOMODCACHE = /Users/tkkwon/go/pkg/mod
+# environment
+HOME = /Users/tkkwon
+# default
+MAKEFILEPATH = $(shell /usr/bin/xcode-select -print-path 2>/dev/null || echo /Developer)/Makefiles
+# environment
+VSCODE_CLI = 1
+# environment
+VSCODE_CODE_CACHE_PATH = /Users/tkkwon/Library/Application Support/Code/CachedData/3b889b090b5ad5793f524b5d1d39fda662b96a2a
+# environment
+LOGNAME = tkkwon
+# environment
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
+# makefile (from `Makefile', line 479)
+IBC_GO_URL = https://raw.githubusercontent.com/cosmos/ibc-go/v3.0.0-rc0
+# environment
+NVM_CD_FLAGS = -q
+# environment
+VSCODE_HANDLES_UNCAUGHT_ERRORS = true
+# automatic
+^D = $(patsubst %/,%,$(dir $^))
+# makefile (from `Makefile', line 180)
+STATIK = $(TOOLS_DESTDIR)/statik
+# environment
+XPC_FLAGS = 0x0
+# environment
+COLORTERM = truecolor
+# default
+MAKE = $(MAKE_COMMAND)
+# default
+MAKECMDGOALS := all
+# makefile (from `Makefile', line 448)
+containerProtoVer = v0.2
+# environment
+SHLVL = 3
+# makefile (from `Makefile', line 11)
+BINDIR = $(GOPATH)/bin
+# makefile (from `Makefile', line 449)
+containerProtoImage = tendermintdev/sdk-proto-gen:$(containerProtoVer)
+# makefile (from `Makefile', line 106)
+BUILD_FLAGS := -tags "netgo ledger" -ldflags '-X github.com/cosmos/cosmos-sdk/version.Name=canto -X github.com/cosmos/cosmos-sdk/version.AppName=cantod -X github.com/cosmos/cosmos-sdk/version.Version=2.0.0 -X github.com/cosmos/cosmos-sdk/version.Commit=b0462f51785f87bdedc36aaba79647d6b9abd37f -X "github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger" -X github.com/tendermint/tendermint/version.TMCoreSemVer=v0.34.20-0.20220517115723-e6f071164839 -w -s' -trimpath
+# default
+MAKE_VERSION := 3.81
+# environment
+USER = tkkwon
+# makefile
+.DEFAULT_GOAL := default_target
+# makefile (from `Makefile', line 6)
+DEFAULT_TAG = $(shell git rev-list --tags="v*" --max-count=1)
+# makefile (from `Makefile', line 450)
+containerProtoGen = cosmos-sdk-proto-gen-$(containerProtoVer)
+# automatic
+%D = $(patsubst %/,%,$(dir $%))
+# makefile (from `Makefile', line 327)
+TEST_TARGETS := test-unit test-unit-cover test-race
+# makefile (from `Makefile', line 477)
+COSMOS_SDK_URL = https://raw.githubusercontent.com/cosmos/cosmos-sdk/v0.45.1
+# default
+MAKE_COMMAND := /Library/Developer/CommandLineTools/usr/bin/make
+# makefile (from `Makefile', line 4)
+PACKAGES_SIMTEST = $(shell go list ./... | grep '/simulation')
+# environment
+TERM_PROGRAM = WarpTerminal
+# default
+.VARIABLES := 
+# environment
+TMPDIR = /var/folders/lj/qbry43ss34jbqm1ff8fprkz80000gn/T/
+# makefile (from `Makefile', line 478)
+ETHERMINT_URL = https://raw.githubusercontent.com/Canto-Network/ethermint-v2/v0.10.0
+# automatic
+*F = $(notdir $*)
+# environment
+VSCODE_IPC_HOOK = /Users/tkkwon/Library/Application Support/Code/1.69.2-main.sock
+# environment
+MallocNanoZone = 0
+# makefile
+MAKEFLAGS = Rrqp
+# makefile (from `Makefile', line 179)
+TOOLS_DESTDIR = $(GOPATH)/bin
+# makefile (from `Makefile', line 451)
+containerProtoGenSwagger = cosmos-sdk-proto-gen-swagger-$(containerProtoVer)
+# environment
+MFLAGS = -Rrqp
+# automatic
+*D = $(patsubst %/,%,$(dir $*))
+# environment
+TERM_PROGRAM_VERSION = v0.2022.07.11.09.11.stable_01
+# environment
+NVM_DIR = /Users/tkkwon/.nvm
+# makefile (from `Makefile', line 578)
+TMP_JSON := tmp/tmp.json
+# environment
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.13573611.13573617.7C25F573-FB56-456F-B038-35787CEF47A1
+# environment
+HOMEBREW_PREFIX = /opt/homebrew
+ 
+# automatic
++D = $(patsubst %/,%,$(dir $+))
+# makefile (from `Makefile', line 16)
+HTTPS_GIT := https://github.com/canto/canto.git
+# makefile (from `Makefile', line 181)
+RUNSIM = $(TOOLS_DESTDIR)/runsim
+# automatic
++F = $(notdir $+)
+# makefile (from `Makefile', line 13)
+canto_DIR = canto
+# makefile (from `Makefile', line 573)
+CONTRACTS_DIR := contracts
+# environment
+HOMEBREW_REPOSITORY = /opt/homebrew
+# makefile (from `Makefile', line 12)
+canto_BINARY = cantod
+# makefile (from `Makefile', line 5)
+DIFF_TAG = $(shell git rev-list --tags="v*" --max-count=1 --not $(shell git rev-list --tags="v*" "HEAD..origin"))
+# environment
+__CF_USER_TEXT_ENCODING = 0x1F5:0x0:0x0
+# environment
+COMMAND_MODE = unix2003
+# makefile (from `Makefile', line 484)
+TM_TYPES = third_party/proto/tendermint/types
+# default
+MAKEFILES := 
+# makefile (from `Makefile', line 576)
+TMP_CONTRACTS := tmp.contracts
+# automatic
+<F = $(notdir $<)
+# environment
+LC_ALL = C
+# environment
+CONDA_CHANGEPS1 = false
+# environment
+VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
+# makefile (from `Makefile', line 22)
+COMMIT_HASH := b0462f5
+# makefile (from `Makefile', line 15)
+SIMAPP = ./app
+# makefile (from `Makefile', line 325)
+PACKAGES_UNIT = $(shell go list ./...)
+# automatic
+^F = $(notdir $^)
+# makefile (from `Makefile', line 488)
+COSMOS_PROTO_TYPES = third_party/proto/cosmos_proto
+# makefile (from `Makefile', line 476)
+GOGO_PROTO_URL = https://raw.githubusercontent.com/regen-network/protobuf/cosmos
+# default
+SUFFIXES := 
+# default
+.INCLUDE_DIRS = /usr/local/include
+# makefile (from `Makefile', line 116)
+BUILD_TARGETS := build install
+# environment
+MAKELEVEL := 0
+# environment
+LANG = C
+# environment
+TERM = xterm-256color
+# environment
+VSCODE_PID = 16772
+# makefile (from `Makefile', line 8)
+TMVERSION := v0.34.20-0.20220517115723-e6f071164839
+# variable set hash-table stats:
+# Load=139/1024=14%, Rehash=0, Collisions=37/284=13%
+
+# Pattern-specific Variable Values
+
+# No pattern-specific variable values.
+
+# Directories
+
+# . (device 16777234, inode 11775053): 49 files, no impossibilities.
+
+# 49 files, no impossibilities in 1 directories.
+
+# Implicit Rules
+
+# No implicit rules.
+
+# Files
+
+proto-lint:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 469):
+	@$(DOCKER_BUF) lint --error-format=json
+	
+
+runsim: /Users/tkkwon/go/bin/runsim
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+
+build-linux:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 120):
+	GOOS=linux GOARCH=amd64 LEDGER_ENABLED=false $(MAKE) build
+	
+
+go.sum: go.mod
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: `'
+#  Last modified 2022-07-12 10:27:49
+#  File has been updated.
+#  Needs to be updated (-q is set).
+# automatic
+# @ := go.sum
+# automatic
+# % := 
+# automatic
+# * := 
+# automatic
+# + := go.mod
+# automatic
+# | := 
+# automatic
+# < := go.mod
+# automatic
+# ^ := go.mod
+# automatic
+# ? := go.mod
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=1/10=10%
+#  commands to execute (from `Makefile', line 269):
+	echo "Ensure dependencies have not been modified ..." >&2
+	go mod verify
+	go mod tidy
+	
+
+all: build
+#  Command-line target.
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has been updated.
+#  Needs to be updated (-q is set).
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/2=0%
+
+localnet-clean:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 545):
+	docker-compose down
+	sudo rm -rf localnet-setup
+	
+
+proto-gen:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 457):
+	@echo "Generating Protobuf files"
+	$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace tendermintdev/sdk-proto-gen sh ./scripts/protocgen.sh
+	
+
+.PHONY: default_target distclean clean build-all runsim statik tools contract-tools docs-tools proto-tools tools-stamp tools-clean docs-tools-stamp update-swagger-docs docs-serve build-docs build-docs-versioned run-tests test test-all test-import test-rpc test-unit test-unit-cover test-race test-sim-nondeterminism test-sim-custom-genesis-fast test-sim-import-export test-sim-after-import test-sim-custom-genesis-multi-seed test-sim-multi-seed-short test-sim-multi-seed-long test-sim-benchmark-invariants benchmark lint lint-fix format proto-all proto-gen proto-gen-any proto-swagger-gen proto-format proto-lint proto-check-breaking proto-update-deps build-docker-local-canto localnet-start localnet-stop
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+test-import:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 350):
+	@go test ./tests/importer -v --vet=off --run=TestImportBlocks --datadir tmp \
+	--blockchain blockchain
+	rm -rf tests/importer/tmp
+	
+
+create-contracts-json:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 608):
+	@for c in $(shell ls $(CONTRACTS_DIR) | grep '\.sol' | sed 's/.sol//g'); do \
+	command -v jq > /dev/null 2>&1 || { echo >&2 "jq not installed."; exit 1; } ;\
+	command -v solc > /dev/null 2>&1 || { echo >&2 "solc not installed."; exit 1; } ;\
+	mkdir -p $(COMPILED_DIR) ;\
+	mkdir -p $(TMP) ;\
+	echo "\nCompiling solidity contract $${c}..." ;\
+	solc --combined-json abi,bin $(CONTRACTS_DIR)/$${c}.sol > $(TMP_COMPILED) ;\
+	echo "Formatting JSON..." ;\
+	get_contract=$$(jq '.contracts["$(CONTRACTS_DIR)/'$$c'.sol:'$$c'"]' $(TMP_COMPILED)) ;\
+	add_contract_name=$$(echo $$get_contract | jq '. + { "contractName": "'$$c'" }') ;\
+	echo $$add_contract_name | jq > $(TMP_JSON) ;\
+	abi_string=$$(echo $$add_contract_name | jq -cr '.abi') ;\
+	echo $$add_contract_name | jq --arg newval "$$abi_string" '.abi = $$newval' > $(TMP_JSON) ;\
+	mv $(TMP_JSON) $(COMPILED_DIR)/$${c}.json ;\
+	done
+	@rm -rf tmp
+	
+
+/Users/tkkwon/go/bin/statik:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 195):
+	@echo "Installing statik..."
+	@(cd /tmp && go get github.com/rakyll/statik@v0.1.6)
+	
+
+distclean: clean tools-clean
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+
+proto-gen-any:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+
+update-swagger-docs: statik
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 278):
+	$(BINDIR)/statik -src=client/docs/swagger-ui -dest=client/docs -f -m
+	@if [ -n "$(git status --porcelain)" ]; then \
+	echo "\033[91mSwagger docs are out of sync!!!\033[0m";\
+	exit 1;\
+	else \
+	echo "\033[92mSwagger docs are in sync\033[0m";\
+	fi
+	
+
+openzeppelin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 586):
+	@echo "Importing openzeppelin contracts..."
+	@cd $(CONTRACTS_DIR)
+	@npm install
+	@cd ../../../../
+	@mv node_modules $(TMP)
+	@mv package-lock.json $(TMP)
+	@mv $(TMP)/@openzeppelin $(CONTRACTS_DIR)
+	
+
+# Not a target:
+go.mod:
+#  Implicit rule search has been done.
+#  Last modified 2022-07-17 18:01:03
+#  File has been updated.
+#  Successfully updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+
+ 
+proto-format:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 465):
+	@echo "Formatting Protobuf files"
+	find ./ -not -path "./third_party/*" -name *.proto -exec clang-format -i {} \;
+	
+
+# Not a target:
+.SUFFIXES:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+test-sim-multi-seed-short: runsim
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 391):
+	@echo "Running short multi-seed application simulation. This may take awhile!"
+	@$(BINDIR)/runsim -Jobs=4 -SimAppPkg=$(SIMAPP) -ExitOnFail 50 10 TestFullAppSimulation
+	
+
+format:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 439):
+	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./client/docs/statik/statik.go" -not -name '*.pb.go' | xargs gofmt -w -s
+	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./client/docs/statik/statik.go" -not -name '*.pb.go' | xargs misspell -w
+	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./client/docs/statik/statik.go" -not -name '*.pb.go' | xargs goimports -w -local github.com/canto/canto
+	
+
+# Not a target:
+Makefile:
+#  Implicit rule search has been done.
+#  Last modified 2022-07-12 10:02:24
+#  File has been updated.
+#  Successfully updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+
+test-sim-custom-genesis-fast:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 368):
+	@echo "Running custom genesis simulation..."
+	@echo "By default, ${HOME}/.$(canto_DIR)/config/genesis.json will be used."
+	@go test -mod=readonly $(SIMAPP) -run TestFullAppSimulation -Genesis=${HOME}/.$(canto_DIR)/config/genesis.json \
+	-Enabled=true -NumBlocks=100 -BlockSize=200 -Commit=true -Seed=99 -Period=5 -v -timeout 24h
+	
+
+docs-tools:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 246):
+	@echo "yarn already installed; skipping..."
+	
+
+test: test-unit
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+
+build: go.sum /Users/tkkwon/Github/Canto/build/
+#  Implicit rule search has not been done.
+#  Last modified 2022-07-12 10:40:51
+#  File has been updated.
+#  Needs to be updated (-q is set).
+# makefile (from `Makefile', line 118)
+# BUILD_ARGS = -o $(BUILDDIR)/
+# variable set hash-table stats:
+# Load=1/32=3%, Rehash=0, Collisions=0/3=0%
+#  commands to execute (from `Makefile', line 123):
+	go $@ $(BUILD_FLAGS) $(BUILD_ARGS) ./...
+	
+
+contract-tools:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 200):
+	@echo "Installing stringer..."
+	@go get golang.org/x/tools/cmd/stringer
+	@echo "Installing go-bindata..."
+	@go get github.com/kevinburke/go-bindata/go-bindata
+	@echo "Installing gencodec..."
+	@go get github.com/fjl/gencodec
+	@echo "Installing protoc-gen-go..."
+	@go get github.com/fjl/gencodec
+	@go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+	@go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
+	@echo "Installing solcjs..."
+	@npm install -g solc@0.5.11
+	
+
+proto-all: proto-format proto-lint proto-gen
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+
+benchmark:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 411):
+	@go test -mod=readonly -bench=. $(PACKAGES_NOSIMULATION)
+	
+
+test-unit: run-tests
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+# makefile (from `Makefile', line 332)
+# ARGS = -timeout=10m -race
+# makefile (from `Makefile', line 333)
+# TEST_PACKAGES = $(PACKAGES_UNIT)
+# variable set hash-table stats:
+# Load=2/32=6%, Rehash=0, Collisions=0/2=0%
+
+/Users/tkkwon/go/bin/runsim:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 190):
+	@echo "Installing runsim..."
+	@(cd /tmp && ${GO_MOD} go get github.com/cosmos/tools/cmd/runsim@master)
+	
+
+test-all: test-unit test-race
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+
+test-sim-benchmark-invariants:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 395):
+	@echo "Running simulation invariant benchmarks..."
+	@go test -mod=readonly $(SIMAPP) -benchmem -bench=BenchmarkInvariants -run=^$ \
+	-Enabled=true -NumBlocks=1000 -BlockSize=200 \
+	-Period=1 -Commit=true -Seed=57 -v -timeout 24h
+	
+
+tools-stamp: contract-tools docs-tools proto-tools statik runsim
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 251):
+	# Create dummy file to satisfy dependency and avoid
+	# rebuilding when this Makefile target is hit twice
+	# in a row.
+	touch $@
+	
+
+localnet-stop:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 541):
+	docker-compose down
+	
+
+build-all: tools build lint test
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+
+test-rpc:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 355):
+	./scripts/integration-test-all.sh -t "rpc" -q 1 -z 1 -s 2 -m "rpc" -r "true"
+	
+
+test-sim-custom-genesis-multi-seed: runsim
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 382):
+	@echo "Running multi-seed custom genesis simulation..."
+	@echo "By default, ${HOME}/.$(canto_DIR)/config/genesis.json will be used."
+	@$(BINDIR)/runsim -Genesis=${HOME}/.$(canto_DIR)/config/genesis.json -SimAppPkg=$(SIMAPP) -ExitOnFail 400 5 TestFullAppSimulation
+	
+
+test-rpc-pending:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 358):
+	./scripts/integration-test-all.sh -t "pending" -q 1 -z 1 -s 2 -m "pending" -r "true"
+	
+
+godocs:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 288):
+	@echo "--> Wait a few seconds and visit http://localhost:6060/pkg/github.com/canto/canto/types"
+	godoc -http=:6060
+	
+
+run-tests:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 346):
+	go test -mod=readonly $(ARGS)  $(EXTRA_ARGS) $(TEST_PACKAGES)
+	
+
+contracts-compile: contracts-clean openzeppelin create-contracts-json
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+ 
+#  File has not been updated.
+
+/Users/tkkwon/Github/Canto/build/:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 126):
+	mkdir -p $(BUILDDIR)/
+	
+
+test-race: run-tests
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+# makefile (from `Makefile', line 335)
+# ARGS = -race
+# makefile (from `Makefile', line 336)
+# TEST_PACKAGES = $(PACKAGES_NOSIMULATION)
+# variable set hash-table stats:
+# Load=2/32=6%, Rehash=0, Collisions=0/2=0%
+
+push-docker: build-docker
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 155):
+	$(DOCKER) push ${DOCKER_IMAGE}:${DOCKER_TAG}
+	$(DOCKER) push ${DOCKER_IMAGE}:latest
+	
+
+# Not a target:
+.DEFAULT:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+localnet-build:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 521):
+	@$(MAKE) -C networks/local
+	
+
+default_target: all
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+
+localnet-unsafe-reset:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 550):
+	docker-compose down
+	@docker run --rm -v $(CURDIR)/localnet-setup/node0/cantod:/canto:Z cantod/node "./cantod unsafe-reset-all --home=/canto"
+	@docker run --rm -v $(CURDIR)/localnet-setup/node1/cantod:/canto:Z cantod/node "./cantod unsafe-reset-all --home=/canto"
+	@docker run --rm -v $(CURDIR)/localnet-setup/node2/cantod:/canto:Z cantod/node "./cantod unsafe-reset-all --home=/canto"
+	@docker run --rm -v $(CURDIR)/localnet-setup/node3/cantod:/canto:Z cantod/node "./cantod unsafe-reset-all --home=/canto"
+	
+
+contracts-clean:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 596):
+	@rm -rf tmp
+	@rm -rf node_modules
+	@rm -rf $(COMPILED_DIR)
+	@rm -rf $(CONTRACTS_DIR)/@openzeppelin
+	
+
+statik: /Users/tkkwon/go/bin/statik
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+
+build-docker:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 142):
+	# TODO replace with kaniko
+	$(DOCKER) build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
+	$(DOCKER) tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest
+	# docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:${COMMIT_HASH}
+	# update old container
+	$(DOCKER) rm canto || true
+	# create a new container from the latest image
+	$(DOCKER) create --name canto -t -i ${DOCKER_IMAGE}:latest canto
+	# move the binaries to the ./build directory
+	mkdir -p ./build/
+	$(DOCKER) cp canto:/usr/bin/cantod ./build/
+	
+
+clean:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 164):
+	rm -rf \
+	$(BUILDDIR)/ \
+	artifacts/ \
+	tmp-swagger-gen/
+	
+
+build-reproducible: go.sum
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 129):
+	$(DOCKER) rm latest-build || true
+	$(DOCKER) run --volume=$(CURDIR):/sources:ro \
+	--env TARGET_PLATFORMS='linux/amd64' \
+	--env APP=cantod \
+	--env VERSION=$(VERSION) \
+	--env COMMIT=$(COMMIT) \
+	--env CGO_ENABLED=1 \
+	--env LEDGER_ENABLED=$(LEDGER_ENABLED) \
+	--name latest-build tendermintdev/rbuilder:latest
+	$(DOCKER) cp -a latest-build:/home/builder/artifacts/ $(CURDIR)/
+	
+
+test-sim-multi-seed-long: runsim
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 387):
+	@echo "Running long multi-seed application simulation. This may take awhile!"
+	@$(BINDIR)/runsim -Jobs=4 -SimAppPkg=$(SIMAPP) -ExitOnFail 500 50 TestFullAppSimulation
+	
+
+proto-update-deps:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 491):
+	@mkdir -p $(GOGO_PROTO_TYPES)
+	@curl -sSL $(GOGO_PROTO_URL)/gogoproto/gogo.proto > $(GOGO_PROTO_TYPES)/gogo.proto
+	@mkdir -p $(COSMOS_PROTO_TYPES)
+	@curl -sSL $(COSMOS_PROTO_URL)/cosmos.proto > $(COSMOS_PROTO_TYPES)/cosmos.proto
+	@mkdir -p $(TM_ABCI_TYPES)
+	@curl -sSL $(TM_URL)/abci/types.proto > $(TM_ABCI_TYPES)/types.proto
+	@mkdir -p $(TM_TYPES)
+	@curl -sSL $(TM_URL)/types/types.proto > $(TM_TYPES)/types.proto
+	@mkdir -p $(TM_CRYPTO_TYPES)
+	@curl -sSL $(TM_URL)/crypto/proof.proto > $(TM_CRYPTO_TYPES)/proof.proto
+	@curl -sSL $(TM_URL)/crypto/keys.proto > $(TM_CRYPTO_TYPES)/keys.proto
+	
+
+proto-swagger-gen:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 461):
+	@echo "Generating Protobuf Swagger"
+	@./scripts/protoc-swagger-gen.sh
+	
+
+build-docs:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 299):
+	@$(MAKE) docs-tools-stamp && \
+	cd docs && \
+	yarn && \
+	yarn run build
+	
+
+localnet-start: localnet-stop
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 532):
+	mkdir -p localnet-setup
+	@$(MAKE) localnet-build
+	if ! [ -f localnet-setup/node0/$(canto_BINARY)/config/genesis.json ]; then docker run --rm -v $(CURDIR)/localnet-setup:/canto:Z cantod/node "./cantod testnet --v 4 -o /canto --keyring-backend=test --ip-addresses cantodnode0,cantodnode1,cantodnode2,cantodnode3"; fi
+	docker-compose up -d
+	
+
+test-unit-cover: run-tests
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+# makefile (from `Makefile', line 339)
+# ARGS = -timeout=10m -race -coverprofile=coverage.txt -covermode=atomic
+# makefile (from `Makefile', line 340)
+# TEST_PACKAGES = $(PACKAGES_UNIT)
+# variable set hash-table stats:
+# Load=2/32=6%, Rehash=0, Collisions=0/2=0%
+
+test-sim-after-import: runsim
+ 
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 378):
+	@echo "Running application simulation-after-import. This may take several minutes..."
+	@$(BINDIR)/runsim -Jobs=4 -SimAppPkg=$(SIMAPP) -ExitOnFail 50 5 TestAppSimulationAfterImport
+	
+
+docs-tools-stamp: docs-tools
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 261):
+	# Create dummy file to satisfy dependency and avoid
+	# rebuilding when this Makefile target is hit twice
+	# in a row.
+	touch $@
+	
+
+lint-contracts:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 423):
+	@cd contracts && \
+	npm i && \
+	npm run lint
+	
+
+proto-tools:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+
+lint:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 419):
+	golangci-lint run --out-format=tab
+	solhint contracts/**/*.sol
+	
+
+localnet-show-logstream:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 565):
+	docker-compose logs --tail=1000 -f
+	
+
+lint-fix-contracts:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 431):
+	@cd contracts && \
+	npm i && \
+	npm run lint-fix
+	solhint --fix contracts/**/*.sol
+	
+
+tools-clean:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 257):
+	rm -f $(RUNSIM)
+	rm -f tools-stamp
+	
+
+docs-serve:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 293):
+	@cd docs && \
+	yarn && \
+	yarn run serve
+	
+
+lint-fix:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 428):
+	golangci-lint run --fix --out-format=tab --issues-exit-code=0
+	
+
+test-sim-nondeterminism:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 363):
+	@echo "Running non-determinism test..."
+	@go test -mod=readonly $(SIMAPP) -run TestAppStateDeterminism -Enabled=true \
+	-NumBlocks=100 -BlockSize=200 -Commit=true -Period=0 -v -timeout 24h
+	
+
+tools: tools-stamp
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+
+proto-check-breaking:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 472):
+	@$(DOCKER_BUF) breaking --against $(HTTPS_GIT)#branch=main
+	
+
+test-sim-import-export: runsim
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 374):
+	@echo "Running application import/export simulation. This may take several minutes..."
+	@$(BINDIR)/runsim -Jobs=4 -SimAppPkg=$(SIMAPP) -ExitOnFail 50 5 TestAppImportExport
+	
+
+install: go.sum /Users/tkkwon/Github/Canto/build/
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 123):
+	go $@ $(BUILD_FLAGS) $(BUILD_ARGS) ./...
+	
+
+build-docker-local-canto:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+
+build-docs-versioned:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 308):
+	@$(MAKE) docs-tools-stamp && \
+	cd docs && \
+	while read -r branch path_prefix; do \
+	(git checkout $${branch} && npm install && VUEPRESS_BASE="/$${path_prefix}/" npm run build) ; \
+	mkdir -p ~/output/$${path_prefix} ; \
+	cp -r .vuepress/dist/* ~/output/$${path_prefix}/ ; \
+	cp ~/output/$${path_prefix}/index.html ~/output ; \
+	done < versions ;
+	
+
+# files hash-table stats:
+# Load=76/1024=7%, Rehash=0, Collisions=5/202=2%
+# VPATH Search Paths
+
+# No `vpath' search paths.
+
+# No general (`VPATH' variable) search path.
+
+# # of strings in strcache: 1
+# # of strcache buffers: 1
+# strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
+# strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
+
+# Finished Make data base on Thu Jul 21 14:35:32 2022
+
+ 

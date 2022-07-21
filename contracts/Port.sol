@@ -17,12 +17,12 @@ contract ProposalStore {
         bytes[] calldatas;
     }
 
-    modifier OnlyUniGov() {
-        require(msg.sender == UniGovModAcct);
+    modifier Onlygovshuttle() {
+        require(msg.sender == govshuttleModAcct);
         _;
     }
 
-    address immutable UniGovModAcct;
+    address immutable govshuttleModAcct;
 
     mapping(uint256 => Proposal) private proposals;
 
@@ -35,7 +35,7 @@ contract ProposalStore {
         string[] memory signatures,
         bytes[] memory calldatas
     ) {
-        UniGovModAcct = msg.sender;
+        govshuttleModAcct = msg.sender;
         Proposal memory prop = Proposal(
             propId,
             title,
@@ -57,7 +57,7 @@ contract ProposalStore {
         string[] memory signatures,
         bytes[] memory calldatas
     ) public {
-        require(msg.sender == UniGovModAcct); // only unigov account can add proposals to store
+        require(msg.sender == govshuttleModAcct); // only govshuttle account can add proposals to store
         Proposal memory newProp = Proposal(
             propId,
             title,

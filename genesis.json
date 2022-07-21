@@ -405,7 +405,7 @@
         "receive_enabled": true
       }
     },
-    "unigov": {
+    "govshuttle": {
       "params": {}
     },
     "upgrade": {},

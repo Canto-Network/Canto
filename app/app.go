@@ -108,7 +108,6 @@ import (
 	_ "github.com/Canto-Network/Canto/v1/client/docs/statik"
 
 	"github.com/Canto-Network/Canto/v1/app/ante"
-	v2 "github.com/Canto-Network/Canto/v1/app/upgrades/v2"
 	"github.com/Canto-Network/Canto/v1/x/epochs"
 	epochskeeper "github.com/Canto-Network/Canto/v1/x/epochs/keeper"
 	epochstypes "github.com/Canto-Network/Canto/v1/x/epochs/types"
@@ -130,11 +129,11 @@ import (
 	vestingkeeper "github.com/Canto-Network/Canto/v1/x/vesting/keeper"
 	vestingtypes "github.com/Canto-Network/Canto/v1/x/vesting/types"
 
-	//unigov imports
-	"github.com/Canto-Network/Canto/v1/x/unigov"
-	unigovclient "github.com/Canto-Network/Canto/v1/x/unigov/client"
-	unigovkeeper "github.com/Canto-Network/Canto/v1/x/unigov/keeper"
-	unigovtypes "github.com/Canto-Network/Canto/v1/x/unigov/types"
+	//govshuttle imports
+	"github.com/Canto-Network/Canto/v1/x/govshuttle"
+	govshuttleclient "github.com/Canto-Network/Canto/v1/x/govshuttle/client"
+	govshuttlekeeper "github.com/Canto-Network/Canto/v1/x/govshuttle/keeper"
+	govshuttletypes "github.com/Canto-Network/Canto/v1/x/govshuttle/types"
 )
 
 func init() {
@@ -174,8 +173,8 @@ var (
 			ibcclientclient.UpdateClientProposalHandler, ibcclientclient.UpgradeProposalHandler,
 			// Canto proposal types
 			erc20client.RegisterCoinProposalHandler, erc20client.RegisterERC20ProposalHandler, erc20client.ToggleTokenConversionProposalHandler,
-			unigovclient.LendingMarketProposalHandler,
-			unigovclient.TreasuryProposalHandler,
+			govshuttleclient.LendingMarketProposalHandler,
+			govshuttleclient.TreasuryProposalHandler,
 		),
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
@@ -191,7 +190,7 @@ var (
 		feemarket.AppModuleBasic{},
 		inflation.AppModuleBasic{},
 		erc20.AppModuleBasic{},
-		unigov.AppModuleBasic{},
+		govshuttle.AppModuleBasic{},
 		epochs.AppModuleBasic{},
 		recovery.AppModuleBasic{},
 		fees.AppModuleBasic{},
@@ -208,7 +207,7 @@ var (
 		evmtypes.ModuleName:            {authtypes.Minter, authtypes.Burner}, // used for secure addition and subtraction of balance using module account
 		inflationtypes.ModuleName:      {authtypes.Minter},
 		erc20types.ModuleName:          {authtypes.Minter, authtypes.Burner},
-		unigovtypes.ModuleName:         {authtypes.Minter, authtypes.Burner},
+		govshuttletypes.ModuleName:     {authtypes.Minter, authtypes.Burner},
 	}
 
 	// module accounts that are allowed to receive tokens
@@ -267,13 +266,13 @@ type Canto struct {
 	FeeMarketKeeper feemarketkeeper.Keeper
 
 	// Canto keepers
-	InflationKeeper inflationkeeper.Keeper
-	Erc20Keeper     erc20keeper.Keeper
-	EpochsKeeper    epochskeeper.Keeper
-	VestingKeeper   vestingkeeper.Keeper
-	RecoveryKeeper  *recoverykeeper.Keeper
-	FeesKeeper      feeskeeper.Keeper
-	UnigovKeeper    unigovkeeper.Keeper
+	InflationKeeper  inflationkeeper.Keeper
+	Erc20Keeper      erc20keeper.Keeper
+	EpochsKeeper     epochskeeper.Keeper
+	VestingKeeper    vestingkeeper.Keeper
+	RecoveryKeeper   *recoverykeeper.Keeper
+	FeesKeeper       feeskeeper.Keeper
+	GovshuttleKeeper govshuttlekeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -414,7 +413,7 @@ func NewCanto(
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
 		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper)).
 		AddRoute(erc20types.RouterKey, erc20.NewErc20ProposalHandler(&app.Erc20Keeper)).
-		AddRoute(unigovtypes.RouterKey, unigov.NewUniGovProposalHandler(&app.UnigovKeeper))
+		AddRoute(govshuttletypes.RouterKey, govshuttle.NewgovshuttleProposalHandler(&app.GovshuttleKeeper))
 
 	govKeeper := govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName),
@@ -448,8 +447,8 @@ func NewCanto(
 		app.AccountKeeper, app.BankKeeper, app.EvmKeeper,
 	)
 
-	app.UnigovKeeper = unigovkeeper.NewKeeper(
-		keys[unigovtypes.StoreKey], appCodec, app.GetSubspace(unigovtypes.ModuleName),
+	app.GovshuttleKeeper = govshuttlekeeper.NewKeeper(
+		keys[govshuttletypes.StoreKey], appCodec, app.GetSubspace(govshuttletypes.ModuleName),
 		app.AccountKeeper, app.Erc20Keeper, govKeeper,
 	)
 
@@ -597,7 +596,7 @@ func NewCanto(
 		vesting.NewAppModule(app.VestingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		recovery.NewAppModule(*app.RecoveryKeeper),
 		fees.NewAppModule(app.FeesKeeper, app.AccountKeeper),
-		unigov.NewAppModule(app.UnigovKeeper, app.AccountKeeper),
+		govshuttle.NewAppModule(app.GovshuttleKeeper, app.AccountKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -633,7 +632,7 @@ func NewCanto(
 		erc20types.ModuleName,
 		recoverytypes.ModuleName,
 		feestypes.ModuleName,
-		unigovtypes.ModuleName,
+		govshuttletypes.ModuleName,
 	)
 
 	// NOTE: fee market module must go last in order to retrieve the block gas used.
@@ -664,7 +663,7 @@ func NewCanto(
 		vestingtypes.ModuleName,
 		inflationtypes.ModuleName,
 		erc20types.ModuleName,
-		unigovtypes.ModuleName,
+		govshuttletypes.ModuleName,
 		// recoverytypes.ModuleName,
 		feestypes.ModuleName,
 	)
@@ -705,7 +704,7 @@ func NewCanto(
 		epochstypes.ModuleName,
 		recoverytypes.ModuleName,
 		feestypes.ModuleName,
-		unigovtypes.ModuleName,
+		govshuttletypes.ModuleName,
 		// NOTE: crisis module must go at the end to check for invariants on each module
 		crisistypes.ModuleName,
 	)
@@ -774,7 +773,7 @@ func NewCanto(
 
 	app.SetAnteHandler(ante.NewAnteHandler(options))
 	app.SetEndBlocker(app.EndBlocker)
-	app.setupUpgradeHandlers()
+	// app.setupUpgradeHandlers()
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
@@ -1024,17 +1023,17 @@ func initParamsKeeper(
 	paramsKeeper.Subspace(erc20types.ModuleName)
 	paramsKeeper.Subspace(recoverytypes.ModuleName)
 	paramsKeeper.Subspace(feestypes.ModuleName)
-	paramsKeeper.Subspace(unigovtypes.ModuleName)
+	paramsKeeper.Subspace(govshuttletypes.ModuleName)
 	return paramsKeeper
 }
 
-func (app *Canto) setupUpgradeHandlers() {
-	app.UpgradeKeeper.SetUpgradeHandler(
-		v2.UpgradeName,
-		v2.CreateUpgradeHandler(
-			app.mm,
-			app.configurator,
-			app.InflationKeeper,
-		),
-	)
-}
+// func (app *Canto) setupUpgradeHandlers() {
+// 	app.UpgradeKeeper.SetUpgradeHandler(
+// 		v2.UpgradeName,
+// 		v2.CreateUpgradeHandler(
+// 			app.mm,
+// 			app.configurator,
+// 			app.InflationKeeper,
+// 		),
+// 	)
+// }
