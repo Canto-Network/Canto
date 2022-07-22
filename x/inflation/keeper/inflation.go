@@ -40,7 +40,6 @@ func (k Keeper) MintCoins(ctx sdk.Context, coin sdk.Coin) error {
 // AllocateExponentialInflation allocates coins from the inflation to external
 // modules according to allocation proportions:
 //   - staking rewards -> sdk `auth` module fee collector
-//   - usage incentives -> `x/incentives` module
 //   - community pool -> `sdk `distr` module community pool
 func (k Keeper) AllocateExponentialInflation(
 	ctx sdk.Context,
@@ -51,7 +50,6 @@ func (k Keeper) AllocateExponentialInflation(
 ) {
 	params := k.GetParams(ctx)
 	proportions := params.InflationDistribution
-
 	// Allocate staking rewards into fee collector account
 	staking = sdk.NewCoins(k.GetProportions(ctx, mintedCoin, proportions.StakingRewards))
 	err = k.bankKeeper.SendCoinsFromModuleToModule(
@@ -68,11 +66,13 @@ func (k Keeper) AllocateExponentialInflation(
 	// pool address
 	moduleAddr := k.accountKeeper.GetModuleAddress(types.ModuleName)
 	communityPool = k.bankKeeper.GetAllBalances(ctx, moduleAddr)
+
 	err = k.distrKeeper.FundCommunityPool(
 		ctx,
 		communityPool,
 		moduleAddr,
 	)
+
 	if err != nil {
 		return nil, nil, err
 	}
@@ -105,7 +105,7 @@ func (k Keeper) BondedRatio(ctx sdk.Context) sdk.Dec {
 	return k.stakingKeeper.TotalBondedTokens(ctx).ToDec().QuoInt(stakeSupply)
 }
 
-// GetCirculatingSupply returns the bank supply of the mintDenom 
+// GetCirculatingSupply returns the bank supply of the mintDenom
 func (k Keeper) GetCirculatingSupply(ctx sdk.Context) sdk.Dec {
 	mintDenom := k.GetParams(ctx).MintDenom
 

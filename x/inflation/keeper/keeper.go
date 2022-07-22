@@ -60,3 +60,7 @@ func NewKeeper(
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", "x/"+types.ModuleName)
 }
+
+func (k Keeper) GetComPool(ctx sdk.Context) sdk.DecCoins {
+	return k.distrKeeper.GetFeePoolCommunityCoins(ctx)
+}

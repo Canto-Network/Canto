@@ -82,7 +82,7 @@ func (k Keeper) AfterEpochEnd(ctx sdk.Context, epochIdentifier string, epochNumb
 		)
 		k.SetEpochMintProvision(ctx, newProvision)
 	}
-
+	
 	defer func() {
 		if mintedCoin.Amount.IsInt64() {
 			telemetry.IncrCounterWithLabels(

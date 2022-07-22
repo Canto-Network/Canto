@@ -29,6 +29,7 @@ type BankKeeper interface {
 // DistrKeeper defines the contract needed to be fulfilled for distribution keeper
 type DistrKeeper interface {
 	FundCommunityPool(ctx sdk.Context, amount sdk.Coins, sender sdk.AccAddress) error
+	GetFeePoolCommunityCoins(ctx sdk.Context) sdk.DecCoins
 }
 
 // StakingKeeper expected staking keeper
@@ -38,4 +39,3 @@ type StakingKeeper interface {
 	StakingTokenSupply(ctx sdk.Context) sdk.Int
 	TotalBondedTokens(ctx sdk.Context) sdk.Int
 }
-

@@ -39,6 +39,7 @@ var _ = Describe("Inflation", Ordered, func() {
 				})
 				It("should not allocate funds to the community pool", func() {
 					balance := s.app.DistrKeeper.GetFeePoolCommunityCoins(s.ctx)
+					fmt.Println("Community Pool balance before epoch end: ", balance.AmountOf(denomMint))
 					Expect(balance.IsZero()).To(BeTrue())
 				})
 			})
@@ -48,16 +49,20 @@ var _ = Describe("Inflation", Ordered, func() {
 					s.CommitAfter(time.Minute)    // Start Epoch
 					s.CommitAfter(time.Hour * 25) // End Epoch
 				})
-				It("should allocate funds to the community pool", func() {
+				It("should allocate staking provision funds to the community pool", func() {
 					balanceCommunityPool := s.app.DistrKeeper.GetFeePoolCommunityCoins(s.ctx)
 
 					provision, _ := s.app.InflationKeeper.GetEpochMintProvision(s.ctx)
 					params := s.app.InflationKeeper.GetParams(s.ctx)
-					distribution := params.InflationDistribution.CommunityPool
-					expected := provision.Mul(distribution)
 
-					Expect(balanceCommunityPool.IsZero()).ToNot(BeTrue())
-					Expect(balanceCommunityPool.AmountOf(denomMint).GT(expected)).To(BeTrue())
+					distributionStaking := params.InflationDistribution.StakingRewards
+					expectedStaking := provision.Mul(distributionStaking)
+
+					staking := s.app.AccountKeeper.GetModuleAddress("fee_collector")
+					stakingBal := s.app.BankKeeper.GetAllBalances(s.ctx, staking)
+					// fees distributed
+					Expect(balanceCommunityPool.AmountOf(denomMint).Equal(expectedStaking)).To(BeTrue())
+					Expect(stakingBal.AmountOf(denomMint).Equal(sdk.NewInt(0))).To(BeTrue())
 				})
 			})
 		})
@@ -159,6 +164,27 @@ var _ = Describe("Inflation", Ordered, func() {
 							Expect(provisionAfter).To(Equal(sdk.MustNewDecFromStr("10597826200000000000000000.000000000000000000")))
 						})
 					})
+				})
+			})
+		})
+	})
+
+	Describe("Allocating earned inflation rewards", func() {
+		Context("With Only One Validator To Claim Rewards", func() {
+			Context("With Inflation Param Enabled", func() {
+				BeforeEach(func() {
+					params := s.app.InflationKeeper.GetParams(s.ctx)
+					params.EnableInflation = true
+					s.app.InflationKeeper.SetParams(s.ctx, params) // inflation has been enabled
+					s.CommitAfter(time.Minute)                     // start Epoch
+					s.CommitAfter(time.Hour * 25)                  // end Epoch
+				})
+				It("Proposer Earns Rewards from Staking", func() {
+					header := s.ctx.BlockHeader()
+					proposerAddr := sdk.AccAddress(header.GetProposerAddress())
+					fmt.Println("Header: ", s.consAddress)
+					fmt.Println("Block Proposer ADdress: ", sdk.AccAddress(s.consAddress))
+					fmt.Println("new Block Proposer Address: ", proposerAddr)
 				})
 			})
 		})
