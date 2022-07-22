@@ -12,6 +12,8 @@ const (
 	DayEpochID = "day"
 	// HourEpochID defines the identifier for hourly epochs
 	HourEpochID = "hour"
+	// MinuteEpochID defines the identifier for minutely epochs
+	MinuteEpochID = "minute"
 )
 
 // ValidateEpochIdentifierInterface performs a stateless
