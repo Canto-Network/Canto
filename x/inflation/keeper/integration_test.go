@@ -219,10 +219,11 @@ var _ = Describe("Inflation", Ordered, func() {
 			provision, _ := s.app.InflationKeeper.GetEpochMintProvision(s.ctx)
 			s.CommitAfter(time.Minute)
 			s.CommitAfter(time.Hour * 25) // epoch will have ended
+			s.app.DistrKeeper.GetFeePoolCommunityCoins(s.ctx) //Get Fee Pool befor
+			//
 			valAddr, _ := sdk.ValAddressFromBech32(v.OperatorAddress)
 			valBal := s.app.DistrKeeper.GetValidatorCurrentRewards(s.ctx, valAddr)
-			fmt.Println("Validator Rewards: ", valBal.Rewards.AmountOf(denomMint))
-			Expect(valBal.Rewards.AmountOf(denomMint).Equal(provision))
+			Expect(valBal.Rewards.AmountOf(denomMint).Equal(provision)).To(BeTrue())
 		})
 	})
 })
