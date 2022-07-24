@@ -1026,14 +1026,3 @@ func initParamsKeeper(
 	paramsKeeper.Subspace(govshuttletypes.ModuleName)
 	return paramsKeeper
 }
-
-// func (app *Canto) setupUpgradeHandlers() {
-// 	app.UpgradeKeeper.SetUpgradeHandler(
-// 		v2.UpgradeName,
-// 		v2.CreateUpgradeHandler(
-// 			app.mm,
-// 			app.configurator,
-// 			app.InflationKeeper,
-// 		),
-// 	)
-// }
