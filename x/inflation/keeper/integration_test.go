@@ -4,17 +4,14 @@ import (
 	"fmt"
 	"time"
 
+	epochstypes "github.com/Canto-Network/Canto/v1/x/epochs/types"
+	"github.com/Canto-Network/Canto/v1/x/inflation/types"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	bankKeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-
-	"github.com/Canto-Network/Canto/v1/app"
-	epochstypes "github.com/Canto-Network/Canto/v1/x/epochs/types"
-	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
-	bankKeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	// staking "github.com/cosmos/cosmos-sdk/x/staking"
 )
 
 var (
@@ -175,10 +172,10 @@ var _ = Describe("Inflation", Ordered, func() {
 		})
 	})
 })
-
+var v stakingtypes.Validator
 var _ = Describe("Inflation", Ordered, func() {
 	BeforeEach(func() {
-		clearValidatorsAndInitPool(s.ctx, s.app, 1000)
+		s.clearValidatorsAndInitPool(1000)
 		valAddrs := MakeValAccts(1)
 		pk := GenKeys(1)
 		// instantiate validator
@@ -187,18 +184,17 @@ var _ = Describe("Inflation", Ordered, func() {
 		s.Require().Equal(stakingtypes.Unbonded, v.Status)
 		// Increment Validator balance + power Index
 		tokens := s.app.StakingKeeper.TokensFromConsensusPower(s.ctx, 1000)
-		v.AddTokensFromDel(tokens)
+		v, _ = v.AddTokensFromDel(tokens)
 		// set validator in state
 		s.app.StakingKeeper.SetValidator(s.ctx, v)
 		s.app.StakingKeeper.SetValidatorByPowerIndex(s.ctx, v)
 		//update validator set
-		_, err = s.app.StakingKeeper.ApplyAndReturnValidatorSetUpdates(s.ctx)
+		_, err = s.app.StakingKeeper.ApplyAndReturnValidatorSetUpdates(s.ctx) // failing bc validator tokens are not enough
 		v, found := s.app.StakingKeeper.GetValidator(s.ctx, valAddrs[0])
 		s.Require().True(found)
 		s.Require().NoError(err)
 		s.Require().Equal(stakingtypes.Bonded, v.Status)
 		// set consAddress
-		fmt.Println("Validator: ", v)
 		s.consAddress = sdk.GetConsAddress(pk[0].PubKey())
 		s.SetupTest()
 	})
@@ -223,30 +219,28 @@ var _ = Describe("Inflation", Ordered, func() {
 			provision, _ := s.app.InflationKeeper.GetEpochMintProvision(s.ctx)
 			s.CommitAfter(time.Minute)
 			s.CommitAfter(time.Hour * 25) // epoch will have ended
-			valBal := s.app.BankKeeper.GetAllBalances(s.ctx, sdk.AccAddress(sdk.AccAddress(s.consAddress)))
-			fmt.Println("Validator Balance: ", valBal.AmountOf(denomMint))
-			fmt.Println("Provision: ", provision)
-			Expect(valBal.AmountOf(denomMint).Equal(sdk.Int(provision)))
+			valAddr, _ := sdk.ValAddressFromBech32(v.OperatorAddress)
+			valBal := s.app.DistrKeeper.GetValidatorCurrentRewards(s.ctx, valAddr)
+			fmt.Println("Validator Rewards: ", valBal.Rewards.AmountOf(denomMint))
+			Expect(valBal.Rewards.AmountOf(denomMint).Equal(provision))
 		})
 	})
 })
 
-func clearValidatorsAndInitPool(ctx sdk.Context, app *app.Canto, power int64) {
-	amt := app.StakingKeeper.TokensFromConsensusPower(ctx, power)
-	notBondedPool := app.StakingKeeper.GetNotBondedPool(ctx)
-	totalSupply := sdk.NewCoins(sdk.NewCoin(app.StakingKeeper.BondDenom(ctx), amt))
-	app.AccountKeeper.SetModuleAccount(ctx, notBondedPool)
+func (s *KeeperTestSuite) clearValidatorsAndInitPool(power int64) {
+	amt := s.app.StakingKeeper.TokensFromConsensusPower(s.ctx, power)
+	notBondedPool := s.app.StakingKeeper.GetNotBondedPool(s.ctx)
+	totalSupply := sdk.NewCoins(sdk.NewCoin(s.app.StakingKeeper.BondDenom(s.ctx), amt))
+	s.app.AccountKeeper.SetModuleAccount(s.ctx, notBondedPool)
 	err := FundModuleAccount(s.app.BankKeeper, s.ctx, notBondedPool.GetName(), totalSupply)
 	s.Require().NoError(err)
-
 }
 
 func FundModuleAccount(bk bankKeeper.Keeper, ctx sdk.Context, recipient string, amount sdk.Coins) error {
-	err := bk.MintCoins(ctx, minttypes.ModuleName, amount)
-	if err != nil {
+	if err := bk.MintCoins(ctx, types.ModuleName, amount); err != nil {
 		panic(err)
 	}
-	return bk.SendCoinsFromModuleToModule(ctx, minttypes.ModuleName, recipient, amount)
+	return bk.SendCoinsFromModuleToModule(ctx, types.ModuleName, recipient, amount)
 }
 
 func MakeValAccts(numAccts int) []sdk.ValAddress {
