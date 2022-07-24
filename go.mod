@@ -4,8 +4,6 @@ go 1.18
 
 require (
 	github.com/armon/go-metrics v0.4.0
-	// github.com/cosmos/cosmos-sdk v0.45.5-0.20220523154235-2921a1c3c918
-	// github.com/cosmos/cosmos-sdk v0.45.5-0.20220523154235-2921a1c3c918
 	github.com/cosmos/cosmos-sdk v0.45.6
 	github.com/cosmos/go-bip39 v1.0.0
 	github.com/ethereum/go-ethereum v1.10.16

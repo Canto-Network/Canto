@@ -8,7 +8,13 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	"github.com/Canto-Network/Canto/v1/app"
 	epochstypes "github.com/Canto-Network/Canto/v1/x/epochs/types"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
+	bankKeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	// staking "github.com/cosmos/cosmos-sdk/x/staking"
 )
 
 var (
@@ -168,25 +174,94 @@ var _ = Describe("Inflation", Ordered, func() {
 			})
 		})
 	})
+})
 
-	Describe("Allocating earned inflation rewards", func() {
-		Context("With Only One Validator To Claim Rewards", func() {
-			Context("With Inflation Param Enabled", func() {
-				BeforeEach(func() {
-					params := s.app.InflationKeeper.GetParams(s.ctx)
-					params.EnableInflation = true
-					s.app.InflationKeeper.SetParams(s.ctx, params) // inflation has been enabled
-					s.CommitAfter(time.Minute)                     // start Epoch
-					s.CommitAfter(time.Hour * 25)                  // end Epoch
-				})
-				It("Proposer Earns Rewards from Staking", func() {
-					header := s.ctx.BlockHeader()
-					proposerAddr := sdk.AccAddress(header.GetProposerAddress())
-					fmt.Println("Header: ", s.consAddress)
-					fmt.Println("Block Proposer ADdress: ", sdk.AccAddress(s.consAddress))
-					fmt.Println("new Block Proposer Address: ", proposerAddr)
-				})
-			})
+var _ = Describe("Inflation", Ordered, func() {
+	BeforeEach(func() {
+		clearValidatorsAndInitPool(s.ctx, s.app, 1000)
+		valAddrs := MakeValAccts(1)
+		pk := GenKeys(1)
+		// instantiate validator
+		v, err := stakingtypes.NewValidator(valAddrs[0], pk[0].PubKey(), stakingtypes.Description{})
+		s.Require().NoError(err)
+		s.Require().Equal(stakingtypes.Unbonded, v.Status)
+		// Increment Validator balance + power Index
+		tokens := s.app.StakingKeeper.TokensFromConsensusPower(s.ctx, 1000)
+		v.AddTokensFromDel(tokens)
+		// set validator in state
+		s.app.StakingKeeper.SetValidator(s.ctx, v)
+		s.app.StakingKeeper.SetValidatorByPowerIndex(s.ctx, v)
+		//update validator set
+		_, err = s.app.StakingKeeper.ApplyAndReturnValidatorSetUpdates(s.ctx)
+		v, found := s.app.StakingKeeper.GetValidator(s.ctx, valAddrs[0])
+		s.Require().True(found)
+		s.Require().NoError(err)
+		s.Require().Equal(stakingtypes.Bonded, v.Status)
+		// set consAddress
+		fmt.Println("Validator: ", v)
+		s.consAddress = sdk.GetConsAddress(pk[0].PubKey())
+		s.SetupTest()
+	})
+	Context("Expect the validator consAddress to be the block proposer address", func() {
+		BeforeEach(func() {
+			params := s.app.InflationKeeper.GetParams(s.ctx)
+			params.EnableInflation = true
+			s.app.InflationKeeper.SetParams(s.ctx, params)
+		})
+		It("Commit a block and check that proposer address is the address of the suite consAddress", func() {
+			// commit
+			s.CommitAfter(time.Minute)
+			header := s.ctx.BlockHeader()
+			s.Require().Equal(sdk.AccAddress(s.consAddress), sdk.AccAddress(header.ProposerAddress))
+		})
+		It("Commit Block Before Epoch and check rewards", func() {
+			s.CommitAfter(time.Minute)
+			valBal := s.app.BankKeeper.GetAllBalances(s.ctx, sdk.AccAddress(sdk.AccAddress(s.consAddress)))
+			Expect(valBal.AmountOf(denomMint).Equal(sdk.NewInt(0))).To(BeTrue())
+		})
+		It("Commit block after Epoch and balance will be Epoch Mint Provision", func() {
+			provision, _ := s.app.InflationKeeper.GetEpochMintProvision(s.ctx)
+			s.CommitAfter(time.Minute)
+			s.CommitAfter(time.Hour * 25) // epoch will have ended
+			valBal := s.app.BankKeeper.GetAllBalances(s.ctx, sdk.AccAddress(sdk.AccAddress(s.consAddress)))
+			fmt.Println("Validator Balance: ", valBal.AmountOf(denomMint))
+			fmt.Println("Provision: ", provision)
+			Expect(valBal.AmountOf(denomMint).Equal(sdk.Int(provision)))
 		})
 	})
 })
+
+func clearValidatorsAndInitPool(ctx sdk.Context, app *app.Canto, power int64) {
+	amt := app.StakingKeeper.TokensFromConsensusPower(ctx, power)
+	notBondedPool := app.StakingKeeper.GetNotBondedPool(ctx)
+	totalSupply := sdk.NewCoins(sdk.NewCoin(app.StakingKeeper.BondDenom(ctx), amt))
+	app.AccountKeeper.SetModuleAccount(ctx, notBondedPool)
+	err := FundModuleAccount(s.app.BankKeeper, s.ctx, notBondedPool.GetName(), totalSupply)
+	s.Require().NoError(err)
+
+}
+
+func FundModuleAccount(bk bankKeeper.Keeper, ctx sdk.Context, recipient string, amount sdk.Coins) error {
+	err := bk.MintCoins(ctx, minttypes.ModuleName, amount)
+	if err != nil {
+		panic(err)
+	}
+	return bk.SendCoinsFromModuleToModule(ctx, minttypes.ModuleName, recipient, amount)
+}
+
+func MakeValAccts(numAccts int) []sdk.ValAddress {
+	addrs := make([]sdk.ValAddress, numAccts)
+	for i := 0; i < numAccts; i++ {
+		pk := ed25519.GenPrivKey().PubKey()
+		addrs[i] = sdk.ValAddress(sdk.AccAddress(pk.Address()))
+	}
+	return addrs
+}
+
+func GenKeys(numKeys int) []*ed25519.PrivKey {
+	pks := make([]*ed25519.PrivKey, numKeys)
+	for i := 0; i < numKeys; i++ {
+		pks[i] = ed25519.GenPrivKey()
+	}
+	return pks
+}
