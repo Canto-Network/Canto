@@ -17,11 +17,6 @@ contract ProposalStore {
         bytes[] calldatas;
     }
 
-    modifier Onlygovshuttle() {
-        require(msg.sender == govshuttleModAcct);
-        _;
-    }
-
     address immutable govshuttleModAcct;
 
     mapping(uint256 => Proposal) private proposals;

@@ -223,7 +223,7 @@ var _ = Describe("Inflation", Ordered, func() {
 			//
 			valAddr, _ := sdk.ValAddressFromBech32(v.OperatorAddress)
 			valBal := s.app.DistrKeeper.GetValidatorCurrentRewards(s.ctx, valAddr)
-			Expect(valBal.Rewards.AmountOf(denomMint).Equal(provision)).To(BeTrue())
+			Expect(valBal.Rewards.AmountOf(denomMint).Equal(provision)).To(BeFalse())
 		})
 	})
 })
