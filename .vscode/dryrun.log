@@ -4,6 +4,6 @@ echo "Ensure dependencies have not been modified ..." >&2
 go mod verify
 go mod tidy
 mkdir -p /Users/tkkwon/Github/Canto/build/
-go build -tags "netgo ledger" -ldflags '-X github.com/cosmos/cosmos-sdk/version.Name=canto -X github.com/cosmos/cosmos-sdk/version.AppName=cantod -X github.com/cosmos/cosmos-sdk/version.Version=2.0.0 -X github.com/cosmos/cosmos-sdk/version.Commit=b0462f51785f87bdedc36aaba79647d6b9abd37f -X "github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger" -X github.com/tendermint/tendermint/version.TMCoreSemVer=v0.34.20-0.20220517115723-e6f071164839 -w -s' -trimpath -o /Users/tkkwon/Github/Canto/build/ ./...
+go build -tags "netgo ledger" -ldflags '-X github.com/cosmos/cosmos-sdk/version.Name=canto -X github.com/cosmos/cosmos-sdk/version.AppName=cantod -X github.com/cosmos/cosmos-sdk/version.Version=2.0.0 -X github.com/cosmos/cosmos-sdk/version.Commit=cd42482e62ae6c74f768d3e3f2a367573e3846cb -X "github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger" -X github.com/tendermint/tendermint/version.TMCoreSemVer=v0.34.20-0.20220517115723-e6f071164839 -w -s' -trimpath -o /Users/tkkwon/Github/Canto/build/ ./...
 make: Leaving directory `/Users/tkkwon/Github/Canto'
  
