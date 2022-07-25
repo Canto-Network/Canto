@@ -1,3 +1,4 @@
 .vscode
 .testnets
 .bencher
+init_genesis.sh
