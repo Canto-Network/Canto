@@ -33,13 +33,6 @@ func handleLendingMarketProposal(ctx sdk.Context, k *keeper.Keeper, p *types.Len
 		return err
 	}
 
-	// ctx.EventManager().EmitEvent(
-	// 	sdk.NewEvent(
-	// 		types.EventLendingMarketProposal,
-
-	// 	)
-	// )
-
 	return nil
 }
 

@@ -1,7 +1,7 @@
 {
-    "Account"       : ["0x8446813A61d3E09c1F493C5b21aC5319878FBf1C"],
+    "Account"       : ["0xDb0f558943eeC3145E22414aBc590bD5787807B3"],
     "PropId"        : 1,
     "values"        : [0],
     "calldatas"     : [""],
-    "signatures"    : ["_accept()"]
+    "signatures"    : ["_acceptAdmin()"]
 }
