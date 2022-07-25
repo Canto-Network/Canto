@@ -802,8 +802,6 @@ func (app *Canto) Name() string { return app.BaseApp.Name() }
 // of the new block for every registered module. If there is a registered fork at the current height,
 // BeginBlocker will schedule the upgrade plan and perform the state migration (if any).
 func (app *Canto) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
-	// Perform any scheduled forks before executing the modules logic
-	// BeginBlockForks(ctx, app)
 	return app.mm.BeginBlock(ctx, req)
 }
 
