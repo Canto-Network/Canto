@@ -8,7 +8,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This program built for i386-apple-darwin11.3.0
  
 
-# Make data base, printed on Sun Jul 24 23:23:18 2022
+# Make data base, printed on Mon Jul 25 23:02:21 2022
 
 # Variables
 
@@ -23,6 +23,7 @@ ELECTRON_NO_ATTACH_CONSOLE = 1
 # makefile (from `Makefile', line 482)
 TM_CRYPTO_TYPES = third_party/proto/tendermint/crypto
 # makefile (from `Makefile', line 19)
+ 
 NAMESPACE := Canto
 # makefile (from `Makefile', line 18)
 DOCKER_BUF := /usr/local/bin/docker run --rm -v /Users/tkkwon/Github/Canto:/workspace --workdir /workspace bufbuild/buf
@@ -37,7 +38,7 @@ NVM_INC = /Users/tkkwon/.nvm/versions/node/v18.1.0/include/node
 # makefile
 CURDIR := /Users/tkkwon/Github/Canto
 # makefile (from `Makefile', line 23)
-DOCKER_TAG := cd42482
+DOCKER_TAG := f65c840
 # makefile
 SHELL = /bin/sh
 # environment
@@ -65,7 +66,7 @@ BUILDDIR = $(CURDIR)/build
 # makefile (from `Makefile', line 452)
 containerProtoFmt = cosmos-sdk-proto-fmt-$(containerProtoVer)
 # makefile (from `Makefile', line 101)
-ldflags := -X github.com/cosmos/cosmos-sdk/version.Name=canto -X github.com/cosmos/cosmos-sdk/version.AppName=cantod -X github.com/cosmos/cosmos-sdk/version.Version=2.0.0 -X github.com/cosmos/cosmos-sdk/version.Commit=cd42482e62ae6c74f768d3e3f2a367573e3846cb -X "github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger" -X github.com/tendermint/tendermint/version.TMCoreSemVer=v0.34.20-0.20220517115723-e6f071164839 -w -s
+ldflags := -X github.com/cosmos/cosmos-sdk/version.Name=canto -X github.com/cosmos/cosmos-sdk/version.AppName=cantod -X github.com/cosmos/cosmos-sdk/version.Version=2.0.0 -X github.com/cosmos/cosmos-sdk/version.Commit=f65c84036cefb0d9e46aca5644594dd5f9e8aeed -X "github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger" -X github.com/tendermint/tendermint/version.TMCoreSemVer=v0.34.20-0.20220517115723-e6f071164839 -w -s
 # environment
 __CFBundleIdentifier = com.microsoft.VSCode
 # environment
@@ -79,7 +80,7 @@ GOPROXY = https://proxy.golang.org,direct
 # environment
 WARP_USE_SSH_WRAPPER = 1
 # environment
-PATH = /Users/tkkwon/opt/anaconda3/bin:/Users/tkkwon/opt/anaconda3/condabin:/Users/tkkwon/.nvm/versions/node/v18.1.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/Users/tkkwon/.foundry/bin
+PATH = /Users/tkkwon/opt/anaconda3/bin:/Users/tkkwon/opt/anaconda3/condabin:/Users/tkkwon/.nvm/versions/node/v18.1.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/Users/tkkwon/.foundry/bin:/Users/tkkwon/go/bin
 # makefile (from `Makefile', line 480)
 COSMOS_PROTO_URL = https://raw.githubusercontent.com/regen-network/cosmos-proto/master
 # makefile (from `Makefile', line 21)
@@ -103,7 +104,7 @@ LEDGER_ENABLED = true
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # makefile (from `Makefile', line 9)
-COMMIT := cd42482e62ae6c74f768d3e3f2a367573e3846cb
+COMMIT := f65c84036cefb0d9e46aca5644594dd5f9e8aeed
 # default
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
 # makefile (from `Makefile', line 475)
@@ -179,8 +180,7 @@ BINDIR = $(GOPATH)/bin
 # makefile (from `Makefile', line 449)
 containerProtoImage = tendermintdev/sdk-proto-gen:$(containerProtoVer)
 # makefile (from `Makefile', line 106)
- 
-BUILD_FLAGS := -tags "netgo ledger" -ldflags '-X github.com/cosmos/cosmos-sdk/version.Name=canto -X github.com/cosmos/cosmos-sdk/version.AppName=cantod -X github.com/cosmos/cosmos-sdk/version.Version=2.0.0 -X github.com/cosmos/cosmos-sdk/version.Commit=cd42482e62ae6c74f768d3e3f2a367573e3846cb -X "github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger" -X github.com/tendermint/tendermint/version.TMCoreSemVer=v0.34.20-0.20220517115723-e6f071164839 -w -s' -trimpath
+BUILD_FLAGS := -tags "netgo ledger" -ldflags '-X github.com/cosmos/cosmos-sdk/version.Name=canto -X github.com/cosmos/cosmos-sdk/version.AppName=cantod -X github.com/cosmos/cosmos-sdk/version.Version=2.0.0 -X github.com/cosmos/cosmos-sdk/version.Commit=f65c84036cefb0d9e46aca5644594dd5f9e8aeed -X "github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger" -X github.com/tendermint/tendermint/version.TMCoreSemVer=v0.34.20-0.20220517115723-e6f071164839 -w -s' -trimpath
 # default
 MAKE_VERSION := 3.81
 # environment
@@ -234,7 +234,7 @@ NVM_DIR = /Users/tkkwon/.nvm
 # makefile (from `Makefile', line 578)
 TMP_JSON := tmp/tmp.json
 # environment
-XPC_SERVICE_NAME = application.com.microsoft.VSCode.13573611.13573617.048A2161-E507-49C6-BA62-2ACB0B68682E
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.13573611.13573617.8B51D069-7E7E-4084-9120-E7A71B2A0A39
 # environment
 HOMEBREW_PREFIX = /opt/homebrew
 # automatic
@@ -244,6 +244,7 @@ HTTPS_GIT := https://github.com/canto/canto.git
 # makefile (from `Makefile', line 181)
 RUNSIM = $(TOOLS_DESTDIR)/runsim
 # automatic
+ 
 +F = $(notdir $+)
 # makefile (from `Makefile', line 13)
 canto_DIR = canto
@@ -274,7 +275,7 @@ CONDA_CHANGEPS1 = false
 # environment
 VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
 # makefile (from `Makefile', line 22)
-COMMIT_HASH := cd42482
+COMMIT_HASH := f65c840
 # makefile (from `Makefile', line 15)
 SIMAPP = ./app
 # environment
@@ -355,7 +356,7 @@ build-linux:
 
 go.sum: go.mod
 #  Implicit rule search has not been done.
-#  Last modified 2022-07-24 23:23:00
+#  Last modified 2022-07-24 23:41:39
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -420,7 +421,6 @@ create-contracts-json:
 	command -v solc > /dev/null 2>&1 || { echo >&2 "solc not installed."; exit 1; } ;\
 	mkdir -p $(COMPILED_DIR) ;\
 	mkdir -p $(TMP) ;\
- 
 	echo "\nCompiling solidity contract $${c}..." ;\
 	solc --combined-json abi,bin $(CONTRACTS_DIR)/$${c}.sol > $(TMP_COMPILED) ;\
 	echo "Formatting JSON..." ;\
@@ -487,7 +487,7 @@ openzeppelin:
 # Not a target:
 go.mod:
 #  Implicit rule search has been done.
-#  Last modified 2022-07-24 23:23:00
+#  Last modified 2022-07-24 23:41:39
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -500,6 +500,7 @@ proto-format:
 #  File has not been updated.
 #  commands to execute (from `Makefile', line 465):
 	@echo "Formatting Protobuf files"
+ 
 	find ./ -not -path "./third_party/*" -name *.proto -exec clang-format -i {} \;
 	
 
@@ -608,9 +609,7 @@ contract-tools:
 	@go get github.com/kevinburke/go-bindata/go-bindata
 	@echo "Installing gencodec..."
 	@go get github.com/fjl/gencodec
-	@echo "Installing protoc-gen-go..."
-	@go get github.com/fjl/gencodec
-	@go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+	@echo "protoc-gen-go already installed; skipping..."
 	@go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
 	@echo "Installing solcjs..."
 	@npm install -g solc@0.5.11
@@ -668,7 +667,6 @@ test-sim-benchmark-invariants:
 	@go test -mod=readonly $(SIMAPP) -benchmem -bench=BenchmarkInvariants -run=^$ \
 	-Enabled=true -NumBlocks=1000 -BlockSize=200 \
 	-Period=1 -Commit=true -Seed=57 -v -timeout 24h
- 
 	
 
 tools-stamp: contract-tools docs-tools proto-tools statik runsim
@@ -749,6 +747,7 @@ contracts-compile: contracts-clean openzeppelin create-contracts-json
 #  Modification time never checked.
 #  File has not been updated.
 
+ 
 /Users/tkkwon/Github/Canto/build/:
 #  Implicit rule search has not been done.
 #  Last modified 2022-07-12 10:40:51
@@ -784,7 +783,6 @@ push-docker: build-docker
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
- 
 
 localnet-build:
 #  Implicit rule search has not been done.
@@ -996,6 +994,7 @@ lint:
 #  File has not been updated.
 #  commands to execute (from `Makefile', line 419):
 	golangci-lint run --out-format=tab
+ 
 	solhint contracts/**/*.sol
 	
 
@@ -1040,7 +1039,6 @@ docs-serve:
 	
 
 lint-fix:
- 
 #  Phony target (prerequisite of .PHONY).
 #  Implicit rule search has not been done.
 #  File does not exist.
@@ -1128,6 +1126,6 @@ build-docs-versioned:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Sun Jul 24 23:23:18 2022
+# Finished Make data base on Mon Jul 25 23:02:21 2022
 
  
