@@ -3,8 +3,14 @@
 ### Install & Initialize
 
 -   Install cantod binary
+```
+cd $HOME/Canto
+git checkout genesis
+make install
+mv $HOME/go/bin/cantod /usr/bin/
+```
 
--   Initialize canto node directory
+-   (Can Skip) Initialize canto node directory
 
 ```bash
 cantod init <node_name> --chain-id canto_7700-1
@@ -73,7 +79,7 @@ If you do not reinitialize then your peer id and ip address will remain the same
 
 ```
 cd $HOME/Canto
-git checkout <branch>
+git checkout genesis
 make install
 mv $HOME/go/bin/cantod /usr/bin/
 ```
