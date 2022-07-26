@@ -1,5 +1,5 @@
 {
-  "genesis_time": "2022-07-26T04:04:28.62943Z",
+  "genesis_time": "2022-07-26T04:07:10.395216142Z",
   "chain_id": "canto_740-1",
   "initial_height": "1",
   "consensus_params": {
@@ -34,7 +34,7 @@
         {
           "@type": "/ethermint.types.v1.EthAccount",
           "base_account": {
-            "address": "canto1swuwqaagfj9t7ygzy2xppl6ge3c7n4fnrwfp6t",
+            "address": "canto19m8ln5566r70ak68vmpz6tvz4lvtltp8r7073f",
             "pub_key": null,
             "account_number": "0",
             "sequence": "0"
@@ -44,7 +44,7 @@
         {
           "@type": "/ethermint.types.v1.EthAccount",
           "base_account": {
-            "address": "canto12wvkdgz5xewz4r9ahcqplxryv69f4m9h8jwvp9",
+            "address": "canto1ps0ys6tzsurf8ux8d9vrxnvpljex8rwzsas562",
             "pub_key": null,
             "account_number": "0",
             "sequence": "0"
@@ -291,6 +291,24 @@
           ]
         },
         {
+          "address": "canto1ps0ys6tzsurf8ux8d9vrxnvpljex8rwzsas562",
+          "coins": [
+            {
+              "denom": "acanto",
+              "amount": "35808383230000000000000000"
+            }
+          ]
+        },
+        {
+          "address": "canto19m8ln5566r70ak68vmpz6tvz4lvtltp8r7073f",
+          "coins": [
+            {
+              "denom": "acanto",
+              "amount": "850000000000000000000000000"
+            }
+          ]
+        },
+        {
           "address": "canto1x3apk8hcrtxhgaq0dcrn2ae502x4lug8fugsql",
           "coins": [
             {
@@ -345,29 +363,11 @@
           ]
         },
         {
-          "address": "canto12wvkdgz5xewz4r9ahcqplxryv69f4m9h8jwvp9",
-          "coins": [
-            {
-              "denom": "acanto",
-              "amount": "35808383230000000000000000"
-            }
-          ]
-        },
-        {
           "address": "canto1twej433h8td4arrdh967w089c0x8gplv89tcap",
           "coins": [
             {
               "denom": "acanto",
               "amount": "311377245500000000000000"
-            }
-          ]
-        },
-        {
-          "address": "canto1swuwqaagfj9t7ygzy2xppl6ge3c7n4fnrwfp6t",
-          "coins": [
-            {
-              "denom": "acanto",
-              "amount": "850000000000000000000000000"
             }
           ]
         },
@@ -620,11 +620,11 @@
                   "max_change_rate": "0.010000000000000000"
                 },
                 "min_self_delegation": "1",
-                "delegator_address": "canto12wvkdgz5xewz4r9ahcqplxryv69f4m9h8jwvp9",
-                "validator_address": "cantovaloper12wvkdgz5xewz4r9ahcqplxryv69f4m9h9vfgsq",
+                "delegator_address": "canto1ps0ys6tzsurf8ux8d9vrxnvpljex8rwzsas562",
+                "validator_address": "cantovaloper1ps0ys6tzsurf8ux8d9vrxnvpljex8rwzjrhst0",
                 "pubkey": {
                   "@type": "/cosmos.crypto.ed25519.PubKey",
-                  "key": "Ml38GLNZvLMTY5b0yvTsfTKgf1phMXIj2fHV+X1+qvk="
+                  "key": "xWIw8pAm9XhPB+F4eJGSANIPfjdQclb+6lYIhnShEzM="
                 },
                 "value": {
                   "denom": "acanto",
@@ -632,7 +632,7 @@
                 }
               }
             ],
-            "memo": "2ec9119a6e7b2cd7515cc6c0f30a48f3292f65b1@10.0.0.120:26656",
+            "memo": "4826b71e7d34840cc12bd9c075226555eb27ea8a@137.184.0.69:26656",
             "timeout_height": "0",
             "extension_options": [],
             "non_critical_extension_options": []
@@ -642,7 +642,7 @@
               {
                 "public_key": {
                   "@type": "/ethermint.crypto.v1.ethsecp256k1.PubKey",
-                  "key": "A70eEY5HQIoUfomgLEyikgUvtxfSR0MOLc0ELvVuGYhL"
+                  "key": "Az8Jg+o9J6MrOOvV6iIJvQtMXzQlIRGu6Hlws547LXEq"
                 },
                 "mode_info": {
                   "single": {
@@ -660,7 +660,7 @@
             }
           },
           "signatures": [
-            "IhjAiT5MAPgBx/7V+1v4hChO9bE3ClUMGeAme+zmyABcMO+1E2qEwxQRrYy6sRwyU4iPBSU2lXx14N1ENHJIfQE="
+            "zkn9dGOUshbyXqaOeSg46S0GP7W6Mg+kNW/B6wr20wYIzWTd03XORw7+iGwV275t5/E628+3Rcb23NE56ZcfsQA="
           ]
         }
       ]
