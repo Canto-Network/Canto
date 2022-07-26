@@ -16,14 +16,6 @@ cantod init <node_name> --chain-id canto_7700-1
 wget https://github.com/Canto-Network/Canto/raw/genesis/Mainnet/genesis.json -b $HOME/.cantod/config
 ```
 
-### Add a Genesis Account
-
-A genesis account is required to create a GENTX
-
-```bash
-cantod add-genesis-account <address-or-key-name> acanto --chain-id canto_7700-1
-```
-
 ### Create & Submit a GENTX file + genesis.json
 
 A GENTX is a genesis transaction that adds a validator node to the genesis file.
@@ -35,8 +27,6 @@ cantod gentx <key_name> <token-amount>acanto --chain-id=canto_7700-1 --moniker=<
 -   Fork [Canto](https://github.com/Canto-Network/Canto)
 
 -   Copy the contents of `${HOME}/.cantod/config/gentx/gentx-XXXXXXXX.json` to `$HOME/Canto/Mainnet/Gentx/<yourvalidatorname>.json`
-
--   Copy the genesis.json file `${HOME}/.cantod/config/genesis.json` to `$HOME/Canto/Mainnet/Genesis-Files/`
 
 -   Create a pull request to the genesis branch of the [repository](https://github.com/Canto-Network/Canto/Mainnet/gentx)
 
