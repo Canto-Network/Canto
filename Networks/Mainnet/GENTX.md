@@ -10,7 +10,7 @@
 cantod init <node_name> --chain-id canto_7700-1
 ```
 
--   Download the [genesis file](https://github.com/Canto-Network/Canto/raw/main/Mainnet/genesis.json)
+-   Download the [genesis file](https://github.com/Canto-Network/Canto/raw/main/Networks/Mainnet/genesis.json)
 
 ```bash
 wget https://github.com/Canto-Network/Canto/raw/genesis/Mainnet/genesis.json -b $HOME/.cantod/config
