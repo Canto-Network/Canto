@@ -7,13 +7,13 @@
 -   Initialize canto node directory
 
 ```bash
-cantod init <node_name> --chain-id <chain_id>
+cantod init <node_name> --chain-id canto_7700-1
 ```
 
 -   Download the [genesis file](https://github.com/Canto-Network/Canto/raw/main/Mainnet/genesis.json)
 
 ```bash
-wget https://github.com/Canto-Network/Canto/raw/main/Mainnet/genesis.json -b $HOME/.cantod/config
+wget https://github.com/Canto-Network/Canto/raw/genesis/Mainnet/genesis.json -b $HOME/.cantod/config
 ```
 
 ### Add a Genesis Account
@@ -21,7 +21,7 @@ wget https://github.com/Canto-Network/Canto/raw/main/Mainnet/genesis.json -b $HO
 A genesis account is required to create a GENTX
 
 ```bash
-cantod add-genesis-account <address-or-key-name> acanto --chain-id <chain-id>
+cantod add-genesis-account <address-or-key-name> acanto --chain-id canto_7700-1
 ```
 
 ### Create & Submit a GENTX file + genesis.json
@@ -29,16 +29,16 @@ cantod add-genesis-account <address-or-key-name> acanto --chain-id <chain-id>
 A GENTX is a genesis transaction that adds a validator node to the genesis file.
 
 ```bash
-cantod gentx <key_name> <token-amount>acanto --chain-id=<chain_id> --moniker=<your_moniker> --commission-max-change-rate=0.01 --commission-max-rate=0.10 --commission-rate=0.05 --details="<details here>" --security-contact="<email>" --website="<website>"
+cantod gentx <key_name> <token-amount>acanto --chain-id=canto_7700-1 --moniker=<your_moniker> --commission-max-change-rate=0.01 --commission-max-rate=0.10 --commission-rate=0.05 --details="<details here>" --security-contact="<email>" --website="<website>"
 ```
 
 -   Fork [Canto](https://github.com/Canto-Network/Canto)
 
--   Copy the contents of `${HOME}/.cantod/config/gentx/gentx-XXXXXXXX.json` to `$HOME/Canto/Mainnet/gentx/<yourvalidatorname>.json`
+-   Copy the contents of `${HOME}/.cantod/config/gentx/gentx-XXXXXXXX.json` to `$HOME/Canto/Mainnet/Gentx/<yourvalidatorname>.json`
 
 -   Copy the genesis.json file `${HOME}/.cantod/config/genesis.json` to `$HOME/Canto/Mainnet/Genesis-Files/`
 
--   Create a pull request to the main branch of the [repository](https://github.com/Canto-Network/Canto/Mainnet/gentx)
+-   Create a pull request to the genesis branch of the [repository](https://github.com/Canto-Network/Canto/Mainnet/gentx)
 
 ### Restarting Your Node
 
