@@ -52,13 +52,24 @@ You do not need to reinitialize your Canto Node. Basically a hard fork on Cosmos
 
 -   `rm -rf $HOME/.cantod/data`
 
-5. Create a new data directory
+6. Create a new data directory
 
 -   `mkdir $HOME/.cantod/data`
 
+7. copy the contents of the `priv_validator_state.json` file 
+
+-   `nano $HOME/.cantod/data/priv_validator_state.json`
+
+-   Copy the json string and paste into the file
+ {
+"height": "0",
+ "round": 0,
+ "step": 0
+ }
+
 If you do not reinitialize then your peer id and ip address will remain the same which will prevent you from needing to update your peers list.
 
-7. Download the new binary
+8. Download the new binary
 
 ```
 cd $HOME/Canto
@@ -67,7 +78,7 @@ make install
 mv $HOME/go/bin/cantod /usr/bin/
 ```
 
-6. Restart your node
+9. Restart your node
 
 -   `systemctl restart cantod`
 
