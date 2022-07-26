@@ -1,6 +1,6 @@
 KEY="mykey"
 KEY2="plexkey"
-CHAINID="canto_740-1"
+CHAINID="canto_7700-1"
 MONIKER="plex-validator"
 KEYRING="os"
 KEYALGO="eth_secp256k1"
@@ -35,7 +35,7 @@ cat $HOME/.cantod/config/genesis.json | jq '.app_state["evm"]["params"]["evm_den
 cat $HOME/.cantod/config/genesis.json | jq '.app_state["inflation"]["params"]["mint_denom"]="acanto"' > $HOME/.cantod/config/tmp_genesis.json && mv $HOME/.cantod/config/tmp_genesis.json $HOME/.cantod/config/genesis.json
 
 # Change voting params so that submitted proposals pass immediately for testing
-cat $HOME/.cantod/config/genesis.json| jq '.app_state.gov.voting_params.voting_period="70s"' > $HOME/.cantod/config/tmp_genesis.json && mv $HOME/.cantod/config/tmp_genesis.json $HOME/.cantod/config/genesis.json
+cat $HOME/.cantod/config/genesis.json| jq '.app_state.gov.voting_params.voting_period="7200s"' > $HOME/.cantod/config/tmp_genesis.json && mv $HOME/.cantod/config/tmp_genesis.json $HOME/.cantod/config/genesis.json
 
 
 # disable produce empty block
@@ -70,7 +70,7 @@ if [[ $1 == "pending" ]]; then
 fi
 
 # Allocate genesis accounts (cosmos formatted addresses)
-cantod add-genesis-account $KEY 850000000000000000000000000acanto --keyring-backend $KEYRING
+cantod add-genesis-account $KEY 851201264446789000000000000acanto --keyring-backend $KEYRING
 cantod add-genesis-account $KEY2 35808383230000000000000000acanto --keyring-backend $KEYRING
 
 # Contributors
@@ -84,7 +84,6 @@ cantod add-genesis-account canto1nw479jevfl8ql6t8fl4z5pdz22qpz3zpr9ej3n 15568862
 cantod add-genesis-account canto1g5ghweev32gdmmm2wkauecnvl7cgq7yh6ywea2 1556886228000000000000000acanto
 cantod add-genesis-account canto1curufsg0j9a7qfxwl2ef7qxtcf4d7jh3nklyh9 1556886228000000000000000acanto
 cantod add-genesis-account canto1qphfgwv8h594ma9q2jkmudghp9hypa3g66wf2f 1556886228000000000000000acanto
-cantod add-genesis-account canto1x3apk8hcrtxhgaq0dcrn2ae502x4lug8fugsql 1556886228000000000000000acanto
 cantod add-genesis-account canto16mrzhlxz4rr9vekjv7qye9rjr9uk3d8y9y00qm 778443113800000000000000acanto
 cantod add-genesis-account canto1j2eg8p5zujqrs58hyasqwudsccctjn27758c43 778443113800000000000000acanto
 cantod add-genesis-account canto1mlptkz63vk822vl8ekqeg9f80fmdsjxwzdwftp 778443113800000000000000acanto
@@ -95,9 +94,9 @@ cantod add-genesis-account canto1j0x25v3le6qwn8edeczc6j25xny7usmug5226k 77844311
 cantod add-genesis-account canto1twej433h8td4arrdh967w089c0x8gplv89tcap 311377245500000000000000acanto
 cantod add-genesis-account canto1h249yu69yur9n4yn7czrmcn65a0pf8dk3hpyc5 389221556900000000000000acanto
 cantod add-genesis-account canto18j2cgsnyxt4c28jk3y3s6h8u2pjezq74zx7ygs 77844311380000000000000acanto
+cantod add-genesis-account canto1cvgazt3lplcrhf04ct9k4y2y00vyvrnn9gct00 9341317365000000000000000acanto
 
 # Settlers/Helpers
-cantod add-genesis-account canto1d97vm97ggx0thfe50nhs8gxdq2qya06589dzc8 33599776130000000000000acanto
 cantod add-genesis-account canto1cvuuh8e7q9ascu0ptqztk7c7y0euutkvy5qmmd 34138044660000000000000acanto
 cantod add-genesis-account canto1szsvm7ew4xw3n2428gz56ynmhzzx2pr86kwd6d 27427774990000000000000acanto
 cantod add-genesis-account canto1pgj3m7v63z3q4yu8vgzlkl6l4uhgtfypcs3de5 25261373630000000000000acanto
