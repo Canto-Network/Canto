@@ -17,12 +17,12 @@ wget https://github.com/Canto-Network/Canto/raw/main/Mainnet/genesis.json -b $HO
 A genesis account is required to create a GENTX
 
 ```bash
-cantod add-genesis-account <address-or-key-name> ucanto --chain-id <chain-id>
+cantod add-genesis-account <address-or-key-name> acanto --chain-id <chain-id>
 ```
 ### Create & Submit a GENTX file
 A GENTX is a genesis transaction that adds a validator node to the genesis file.
 ```bash
-cantod gentx <key_name> <token-amount>ucanto --chain-id=<chain_id> --moniker=<your_moniker> --commission-max-change-rate=0.01 --commission-max-rate=0.10 --commission-rate=0.05 --details="<details here>" --security-contact="<email>" --website="<website>"
+cantod gentx <key_name> <token-amount>acanto --chain-id=<chain_id> --moniker=<your_moniker> --commission-max-change-rate=0.01 --commission-max-rate=0.10 --commission-rate=0.05 --details="<details here>" --security-contact="<email>" --website="<website>"
 ```
 * Fork [Canto](https://github.com/Canto-Network/Canto)
 
