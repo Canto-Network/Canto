@@ -64,7 +64,7 @@ var _ = Describe("Inflation", Ordered, func() {
 					staking := s.app.AccountKeeper.GetModuleAddress("fee_collector")
 					stakingBal := s.app.BankKeeper.GetAllBalances(s.ctx, staking)
 					// fees distributed
-					Expect(balanceCommunityPool.AmountOf(denomMint).Equal(expectedStaking)).To(BeTrue())
+					Expect(balanceCommunityPool.AmountOf(denomMint).Equal(expectedStaking)).To(BeTrue()) // Staking Rewards are distributed to Fee Pool
 					Expect(stakingBal.AmountOf(denomMint).Equal(sdk.NewInt(0))).To(BeTrue())
 				})
 			})
@@ -172,12 +172,14 @@ var _ = Describe("Inflation", Ordered, func() {
 		})
 	})
 })
-var v stakingtypes.Validator
-var _ = Describe("Inflation", Ordered, func() {
+var _ = Describe("Inflation Rewards with one validator", Ordered, func() {
 	BeforeEach(func() {
-		s.clearValidatorsAndInitPool(1000)
-		valAddrs := MakeValAccts(1)
 		pk := GenKeys(1)
+		valAddrs := MakeValAccts(1)
+
+		s.consAddress = sdk.GetConsAddress(pk[0].PubKey()) // set consAddress so that ProposerAddress in Block header is validator's address
+		s.SetupTest()
+		s.clearValidatorsAndInitPool(1000)
 		// instantiate validator
 		v, err := stakingtypes.NewValidator(valAddrs[0], pk[0].PubKey(), stakingtypes.Description{})
 		s.Require().NoError(err)
@@ -188,15 +190,17 @@ var _ = Describe("Inflation", Ordered, func() {
 		// set validator in state
 		s.app.StakingKeeper.SetValidator(s.ctx, v)
 		s.app.StakingKeeper.SetValidatorByPowerIndex(s.ctx, v)
+		s.app.StakingKeeper.SetValidatorByConsAddr(s.ctx, v)
+		//set validator in slashing keeper
+		s.app.SlashingKeeper.AddPubkey(s.ctx, pk[0].PubKey())
 		//update validator set
-		_, err = s.app.StakingKeeper.ApplyAndReturnValidatorSetUpdates(s.ctx) // failing bc validator tokens are not enough
+		_, err = s.app.StakingKeeper.ApplyAndReturnValidatorSetUpdates(s.ctx)
 		v, found := s.app.StakingKeeper.GetValidator(s.ctx, valAddrs[0])
 		s.Require().True(found)
 		s.Require().NoError(err)
 		s.Require().Equal(stakingtypes.Bonded, v.Status)
-		// set consAddress
-		s.consAddress = sdk.GetConsAddress(pk[0].PubKey())
-		s.SetupTest()
+		s.Require().Equal(v.BondedTokens(), s.app.StakingKeeper.TokensFromConsensusPower(s.ctx, 1000))
+		s.validator = &v
 	})
 	Context("Expect the validator consAddress to be the block proposer address", func() {
 		BeforeEach(func() {
@@ -213,17 +217,37 @@ var _ = Describe("Inflation", Ordered, func() {
 		It("Commit Block Before Epoch and check rewards", func() {
 			s.CommitAfter(time.Minute)
 			valBal := s.app.BankKeeper.GetAllBalances(s.ctx, sdk.AccAddress(sdk.AccAddress(s.consAddress)))
-			Expect(valBal.AmountOf(denomMint).Equal(sdk.NewInt(0))).To(BeTrue())
+			Expect(valBal.AmountOf(denomMint).Equal(sdk.NewInt(0))).To(BeTrue()) // Nothing is minted before epoch ends
 		})
 		It("Commit block after Epoch and balance will be Epoch Mint Provision", func() {
 			provision, _ := s.app.InflationKeeper.GetEpochMintProvision(s.ctx)
+
 			s.CommitAfter(time.Minute)
-			s.CommitAfter(time.Hour * 25) // epoch will have ended
-			s.app.DistrKeeper.GetFeePoolCommunityCoins(s.ctx) //Get Fee Pool befor
+			s.CommitAfterWithVoteInfo(time.Hour * 25)         // epoch will have ended
+			s.app.DistrKeeper.GetFeePoolCommunityCoins(s.ctx) // Staking Rewards sent to FeePool on BeginBlock
 			//
-			valAddr, _ := sdk.ValAddressFromBech32(v.OperatorAddress)
-			valBal := s.app.DistrKeeper.GetValidatorCurrentRewards(s.ctx, valAddr)
-			Expect(valBal.Rewards.AmountOf(denomMint).Equal(provision)).To(BeFalse())
+			valAddr, _ := sdk.ValAddressFromBech32(s.validator.OperatorAddress)
+			valRewards := s.app.DistrKeeper.GetValidatorCurrentRewards(s.ctx, valAddr).Rewards.AmountOf(denomMint)
+			balanceCommunityPool := s.app.DistrKeeper.GetFeePoolCommunityCoins(s.ctx).AmountOf(denomMint)
+			comTax := s.app.DistrKeeper.GetParams(s.ctx).CommunityTax
+			comRewards := provision.Mul(comTax)
+			expectedValRewards := provision.Sub(comRewards)
+			s.Require().Equal(balanceCommunityPool, comRewards)
+			s.Require().Equal(valRewards, expectedValRewards)
+		})
+
+		It("Delegate to Validator And Check Delegation Rewards", func() {
+			//Set validator rewards period to 1
+			valAddr, _ := sdk.ValAddressFromBech32(s.validator.OperatorAddress)
+			s.CommitAfter(time.Minute)                // begin new Epoch
+			s.CommitAfterWithVoteInfo(time.Hour * 25) // End this epoch and set begin blocker to run with new Validator
+			fmt.Println("HistoricalRewards: ", s.app.DistrKeeper.GetValidatorHistoricalRewards(s.ctx, valAddr, 1))
+			delegatorAddr := makeAddr()
+			tokens := s.app.StakingKeeper.TokensFromConsensusPower(s.ctx, 1000)
+			// shares, _ := s.validator.SharesFromTokens(tokens)
+			FundAccount(s.app.BankKeeper, s.ctx, delegatorAddr, tokens)
+			s.app.StakingKeeper.Delegate(s.ctx, delegatorAddr, tokens, stakingtypes.Unbonded, *s.validator, false)
+			fmt.Println("Validator: ", s.validator)
 		})
 	})
 })
@@ -244,6 +268,14 @@ func FundModuleAccount(bk bankKeeper.Keeper, ctx sdk.Context, recipient string, 
 	return bk.SendCoinsFromModuleToModule(ctx, types.ModuleName, recipient, amount)
 }
 
+func FundAccount(bk bankKeeper.Keeper, ctx sdk.Context, recipient sdk.AccAddress, tokens sdk.Int) error {
+	amount := sdk.NewCoins(sdk.NewCoin(denomMint, tokens))
+	if err := bk.MintCoins(ctx, types.ModuleName, amount); err != nil {
+		panic(err)
+	}
+	return bk.SendCoinsFromModuleToAccount(ctx, types.ModuleName, recipient, amount)
+}
+
 func MakeValAccts(numAccts int) []sdk.ValAddress {
 	addrs := make([]sdk.ValAddress, numAccts)
 	for i := 0; i < numAccts; i++ {
@@ -251,6 +283,11 @@ func MakeValAccts(numAccts int) []sdk.ValAddress {
 		addrs[i] = sdk.ValAddress(sdk.AccAddress(pk.Address()))
 	}
 	return addrs
+}
+
+func makeAddr() sdk.AccAddress {
+	pk := ed25519.GenPrivKey().PubKey()
+	return sdk.AccAddress(pk.Address())
 }
 
 func GenKeys(numKeys int) []*ed25519.PrivKey {

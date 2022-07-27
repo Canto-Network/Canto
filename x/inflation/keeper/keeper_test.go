@@ -22,6 +22,8 @@ import (
 	"github.com/Canto-Network/Canto/v1/app"
 	epochstypes "github.com/Canto-Network/Canto/v1/x/epochs/types"
 	"github.com/Canto-Network/Canto/v1/x/inflation/types"
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
 var denomMint = "acanto"
@@ -34,6 +36,8 @@ type KeeperTestSuite struct {
 	queryClientEvm evm.QueryClient
 	queryClient    types.QueryClient
 	consAddress    sdk.ConsAddress
+	validator      *stakingtypes.Validator
+	pk             cryptotypes.PubKey
 }
 
 var s *KeeperTestSuite
@@ -111,6 +115,37 @@ func (suite *KeeperTestSuite) CommitAfter(t time.Duration) {
 	header.Time = header.Time.Add(t)
 	suite.app.BeginBlock(abci.RequestBeginBlock{
 		Header: header,
+	})
+
+	// update ctx
+	suite.ctx = suite.app.BaseApp.NewContext(false, header)
+
+	queryHelper := baseapp.NewQueryServerTestHelper(suite.ctx, suite.app.InterfaceRegistry())
+	evm.RegisterQueryServer(queryHelper, suite.app.EvmKeeper)
+	suite.queryClientEvm = evm.NewQueryClient(queryHelper)
+}
+
+func (suite *KeeperTestSuite) CommitAfterWithVoteInfo(t time.Duration) {
+	_ = suite.app.Commit()
+	header := suite.ctx.BlockHeader()
+	header.Height += 1
+	header.Time = header.Time.Add(t)
+	consAddr, err := suite.validator.GetConsAddr()
+	if err != nil {
+		panic(err)
+	}
+	voteInfo := abci.VoteInfo{
+		Validator: abci.Validator{
+			Address: consAddr,
+			Power:   suite.app.StakingKeeper.TokensToConsensusPower(suite.ctx, (*suite.validator).Tokens),
+		},
+		SignedLastBlock: true,
+	}
+
+
+	suite.app.BeginBlock(abci.RequestBeginBlock{
+		Header:         header,
+		LastCommitInfo: abci.LastCommitInfo{Votes: []abci.VoteInfo{voteInfo}},
 	})
 
 	// update ctx
