@@ -1,0 +1,7 @@
+{
+  "title": "Community Pool Spend",
+  "description": "This is proposal will send funds to the reservoir to drip rewards.",
+  "recipient": "canto1zj77zq58n8e3caagmvvcklrz7jlm6emfxp5sw7",
+  "amount": "500000000000000000000acanto",
+  "deposit": "10000000acanto"
+}
