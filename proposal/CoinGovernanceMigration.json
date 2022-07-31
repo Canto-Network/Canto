@@ -1,0 +1,7 @@
+{
+    "Account"       : ["0xC7Cd4Bb14066622d37A31231A08808A48BED3758", "0xBEA5c64A45220E719a28D12acD7A9D3a293beB93", "0x47b027d01bfd4B310043BCd6830FF24A6a4E9e5C", "0xE72B323f6d28d2c54e40df5B0f6b6E298455ced9", "0xdAB7Ab3cAd7082aA23A168580CbdE9846Dfe7acc"],
+    "PropId"        : 1,
+    "values"        : [0, 0,0,0,0],
+    "calldatas"     : ["","","","",""],
+    "signatures"    : ["_acceptAdmin()", "_acceptAdmin()", "_acceptAdmin()", "_acceptAdmin()", "_acceptAdmin()"]
+}

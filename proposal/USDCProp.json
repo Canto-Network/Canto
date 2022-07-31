@@ -1,0 +1,18 @@
+{
+	"description": "Convert Canto Transferred from canto_100-1 to its ERC20 rep",
+	"denom_units": [
+		{
+				"denom": "ibc/17CD484EE7D9723B847D95015FA3EBD1572FD13BC84FB838F55B18A57450F25B",
+				"exponent": 0,
+				"aliases": ["ibcusdc"]
+		},
+		{
+				"denom": "USDC",
+				"exponent": 6
+		}
+	],
+	"base": "ibc/17CD484EE7D9723B847D95015FA3EBD1572FD13BC84FB838F55B18A57450F25B",
+	"display": "USDC",
+	"name": "Usdc",
+	"symbol": "USDC"
+}
