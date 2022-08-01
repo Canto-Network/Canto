@@ -1,19 +1,13 @@
 {
-    "description": "staking, gas and governance token of the Canto testnets",
-    "denom_units": [
-	{
-	    "denom": "acanto",
-	    "exponent": 0,
-	    "aliases": ["atto canto"]
-	},
-	{
-	    "denom": "canto",
-	    "exponent": 18
-	}
-	],
-    "base": "acanto",
-    "display": "canto",
-    "name": "Canto",
-    "symbol": "CANTO"
+  "title": "Increase the minimum deposit for governance proposals",
+  "description": "If successful this parameter-change governance proposal will change the voting period",
+  "changes": [
+    {
+      "subspace": "gov",
+      "key": "votingparams",
+      "value": { "voting_period": "60000000000" }
+    }
+  ],
+  "deposit": "201000000000acanto"
 }
 

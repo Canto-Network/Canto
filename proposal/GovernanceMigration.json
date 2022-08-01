@@ -1,7 +1,7 @@
 {
-    "Account"       : ["0x9ac037F26f6C3f3474E166da0823AE5910Fd1883"],
+    "Account"       : ["0x6cf25037353516dA84E455DcEFECea2c9a47e682", "0x01fcb00A58Ef97eF1876D981C04166d1EE3d7c1e", "0x5e58a9944425AC296B539302D82f6a9e1Bdfb8aD", "0xeb3a9D45F7429DEEd3Fc271d0144694aBFC7fcE6", "0x87f28a392151C92f5f1D45cf068549E2bf19beE2", "0x7BCeeE07ED3aAc97f651AC814ca52d258e963eC1", "0x56046F513e8CC43eF8b3A8bD7352C89b2Ff5b8e4", "0xbA95577a81a29ab87e1e38C14eBd821af0476a3C", "0xd50FE3F587929485a9E5922f36228dAFB5f33b25"],
     "PropId"        : 1,
-    "values"        : [0],
-    "calldatas"     : [""],
-    "signatures"    : ["_acceptAdmin()"]
+    "values"        : [0,0,0,0,0,0,0,0,0],
+    "calldatas"     : ["", "", "", "","","","","",""],
+    "signatures"    : ["_acceptAdmin()", "_acceptAdmin()", "_acceptAdmin()", "_acceptAdmin()", "_acceptAdmin()", "_acceptAdmin()", "_acceptAdmin()", "_acceptAdmin()", "_acceptAdmin()"]
 }

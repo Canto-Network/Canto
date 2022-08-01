@@ -2,7 +2,7 @@
 	"description": "Convert Canto Transferred from canto_100-1 to its ERC20 rep",
 	"denom_units": [
 		{
-				"denom": "ibc/DC186CA7A8C009B43774EBDC825C935CABA9743504CE6037507E6E5CCE12858A",
+				"denom": "ibc/947F9A71DAF096AE5B11F99C1365C75C397EC0B6400FE947E70FF88DA0229030",
 				"exponent": 0,
 				"aliases": ["ibceth"]
 		},
@@ -11,7 +11,7 @@
 				"exponent": 18
 		}
 	],
-	"base": "ibc/DC186CA7A8C009B43774EBDC825C935CABA9743504CE6037507E6E5CCE12858A",
+	"base": "ibc/947F9A71DAF096AE5B11F99C1365C75C397EC0B6400FE947E70FF88DA0229030",
 	"display": "ETH",
 	"name": "Eth",
 	"symbol": "ETH"

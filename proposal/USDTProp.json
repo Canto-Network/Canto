@@ -2,7 +2,7 @@
 	"description": "Convert Canto Transferred from canto_100-1 to its ERC20 rep",
 	"denom_units": [
 		{
-				"denom": "ibc/4F6A2DEFEA52CD8D90966ADCB2BD0593D3993AB0DF7F6AEB3EFD6167D79237B0",
+				"denom": "ibc/5690F4307B9352D14A270C1B6E61BC4FC52FEB214E8DBFE88AD95D0EA60926FD",
 				"exponent": 0,
 				"aliases": ["ibcusdt"]
 		},
@@ -11,7 +11,7 @@
 				"exponent": 6
 		}
 	],
-	"base": "ibc/4F6A2DEFEA52CD8D90966ADCB2BD0593D3993AB0DF7F6AEB3EFD6167D79237B0",
+	"base": "ibc/5690F4307B9352D14A270C1B6E61BC4FC52FEB214E8DBFE88AD95D0EA60926FD",
 	"display": "USDT",
 	"name": "Usdt",
 	"symbol": "USDT"
