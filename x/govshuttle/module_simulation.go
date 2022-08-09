@@ -3,9 +3,9 @@ package govshuttle
 import (
 	"math/rand"
 
-	//"github.com/Canto-Network/Canto/v1/testutil/sample"
-	govshuttlesimulation "github.com/Canto-Network/Canto/v1/x/govshuttle/simulation"
-	"github.com/Canto-Network/Canto/v1/x/govshuttle/types"
+	//"github.com/Canto-Network/Canto/v2/testutil/sample"
+	govshuttlesimulation "github.com/Canto-Network/Canto/v2/x/govshuttle/simulation"
+	"github.com/Canto-Network/Canto/v2/x/govshuttle/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"

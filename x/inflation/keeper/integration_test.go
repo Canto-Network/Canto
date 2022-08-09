@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	epochstypes "github.com/Canto-Network/Canto/v1/x/epochs/types"
-	"github.com/Canto-Network/Canto/v1/x/inflation/types"
+	epochstypes "github.com/Canto-Network/Canto/v2/x/epochs/types"
+	"github.com/Canto-Network/Canto/v2/x/inflation/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bankKeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
@@ -218,7 +218,7 @@ var _ = Describe("Inflation", Ordered, func() {
 		It("Commit block after Epoch and balance will be Epoch Mint Provision", func() {
 			provision, _ := s.app.InflationKeeper.GetEpochMintProvision(s.ctx)
 			s.CommitAfter(time.Minute)
-			s.CommitAfter(time.Hour * 25) // epoch will have ended
+			s.CommitAfter(time.Hour * 25)                     // epoch will have ended
 			s.app.DistrKeeper.GetFeePoolCommunityCoins(s.ctx) //Get Fee Pool befor
 			//
 			valAddr, _ := sdk.ValAddressFromBech32(v.OperatorAddress)

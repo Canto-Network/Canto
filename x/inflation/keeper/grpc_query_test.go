@@ -5,7 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/Canto-Network/Canto/v1/x/inflation/types"
+	"github.com/Canto-Network/Canto/v2/x/inflation/types"
 	ethermint "github.com/evmos/ethermint/types"
 )
 

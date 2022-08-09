@@ -3,7 +3,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/Canto-Network/Canto/v1/x/inflation/types"
+	"github.com/Canto-Network/Canto/v2/x/inflation/types"
 )
 
 // GetParams returns the total set of inflation parameters.

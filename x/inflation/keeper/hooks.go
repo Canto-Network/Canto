@@ -3,8 +3,8 @@ package keeper
 import (
 	"fmt"
 
-	epochstypes "github.com/Canto-Network/Canto/v1/x/epochs/types"
-	"github.com/Canto-Network/Canto/v1/x/inflation/types"
+	epochstypes "github.com/Canto-Network/Canto/v2/x/epochs/types"
+	"github.com/Canto-Network/Canto/v2/x/inflation/types"
 	"github.com/armon/go-metrics"
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -82,7 +82,7 @@ func (k Keeper) AfterEpochEnd(ctx sdk.Context, epochIdentifier string, epochNumb
 		)
 		k.SetEpochMintProvision(ctx, newProvision)
 	}
-	
+
 	defer func() {
 		if mintedCoin.Amount.IsInt64() {
 			telemetry.IncrCounterWithLabels(

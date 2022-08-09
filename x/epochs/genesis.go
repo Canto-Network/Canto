@@ -5,8 +5,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/Canto-Network/Canto/v1/x/epochs/keeper"
-	"github.com/Canto-Network/Canto/v1/x/epochs/types"
+	"github.com/Canto-Network/Canto/v2/x/epochs/keeper"
+	"github.com/Canto-Network/Canto/v2/x/epochs/types"
 )
 
 // InitGenesis initializes the epochs module's state from a provided genesis

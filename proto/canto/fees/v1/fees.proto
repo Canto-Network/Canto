@@ -1,7 +1,7 @@
 syntax = "proto3";
 package canto.fees.v1;
 
-option go_package = "github.com/Canto-Network/Canto/v1/x/fees/types";
+option go_package = "github.com/Canto-Network/Canto/v2/x/fees/types";
 
 // Fee defines an instance that organizes fee distribution conditions for the
 // owner of a given smart contract

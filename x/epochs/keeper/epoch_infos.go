@@ -4,7 +4,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/Canto-Network/Canto/v1/x/epochs/types"
+	"github.com/Canto-Network/Canto/v2/x/epochs/types"
 )
 
 // GetEpochInfo returns epoch info by identifier

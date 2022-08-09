@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/Canto-Network/Canto/v1/app"
+	"github.com/Canto-Network/Canto/v2/app"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/common"
@@ -19,8 +19,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	//used for deploying contracts
-	"github.com/Canto-Network/Canto/v1/contracts"
-	"github.com/Canto-Network/Canto/v1/x/erc20/types"
+	"github.com/Canto-Network/Canto/v2/contracts"
+	"github.com/Canto-Network/Canto/v2/x/erc20/types"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 )
 

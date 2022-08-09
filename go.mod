@@ -1,4 +1,4 @@
-module github.com/Canto-Network/Canto/v1
+module github.com/Canto-Network/Canto/v2
 
 go 1.18
 
@@ -161,5 +161,3 @@ replace (
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 )
-
-replace github.com/evmos/ethermint => github.com/Canto-Network/ethermint-test v0.0.0
