@@ -9,8 +9,8 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 
-	"github.com/Canto-Network/ethermint-v2/tests"
-	evmtypes "github.com/Canto-Network/ethermint-v2/x/evm/types"
+	"github.com/evmos/ethermint/tests"
+	evmtypes "github.com/evmos/ethermint/x/evm/types"
 
 	"github.com/Canto-Network/Canto/v1/x/erc20/keeper"
 	"github.com/Canto-Network/Canto/v1/x/erc20/types"

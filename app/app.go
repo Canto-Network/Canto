@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -29,7 +30,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/simapp"
 	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
 
-	// storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
@@ -92,17 +93,17 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
 	ibctesting "github.com/cosmos/ibc-go/v3/testing"
 
-	ethermintapp "github.com/Canto-Network/ethermint-v2/app"
-	"github.com/Canto-Network/ethermint-v2/encoding"
-	srvflags "github.com/Canto-Network/ethermint-v2/server/flags"
-	ethermint "github.com/Canto-Network/ethermint-v2/types"
-	"github.com/Canto-Network/ethermint-v2/x/evm"
-	evmrest "github.com/Canto-Network/ethermint-v2/x/evm/client/rest"
-	evmkeeper "github.com/Canto-Network/ethermint-v2/x/evm/keeper"
-	evmtypes "github.com/Canto-Network/ethermint-v2/x/evm/types"
-	"github.com/Canto-Network/ethermint-v2/x/feemarket"
-	feemarketkeeper "github.com/Canto-Network/ethermint-v2/x/feemarket/keeper"
-	feemarkettypes "github.com/Canto-Network/ethermint-v2/x/feemarket/types"
+	ethermintapp "github.com/evmos/ethermint/app"
+	"github.com/evmos/ethermint/encoding"
+	srvflags "github.com/evmos/ethermint/server/flags"
+	ethermint "github.com/evmos/ethermint/types"
+	"github.com/evmos/ethermint/x/evm"
+	evmrest "github.com/evmos/ethermint/x/evm/client/rest"
+	evmkeeper "github.com/evmos/ethermint/x/evm/keeper"
+	evmtypes "github.com/evmos/ethermint/x/evm/types"
+	"github.com/evmos/ethermint/x/feemarket"
+	feemarketkeeper "github.com/evmos/ethermint/x/feemarket/keeper"
+	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
 	// unnamed import of statik for swagger UI support
 	_ "github.com/Canto-Network/Canto/v1/client/docs/statik"
@@ -134,6 +135,8 @@ import (
 	govshuttleclient "github.com/Canto-Network/Canto/v1/x/govshuttle/client"
 	govshuttlekeeper "github.com/Canto-Network/Canto/v1/x/govshuttle/keeper"
 	govshuttletypes "github.com/Canto-Network/Canto/v1/x/govshuttle/types"
+
+	v2 "github.com/Canto-Network/Canto/v1/app/upgrades/v2"
 )
 
 func init() {
@@ -773,7 +776,7 @@ func NewCanto(
 
 	app.SetAnteHandler(ante.NewAnteHandler(options))
 	app.SetEndBlocker(app.EndBlocker)
-	// app.setupUpgradeHandlers()
+	app.setupUpgradeHandlers()
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
@@ -1023,4 +1026,36 @@ func initParamsKeeper(
 	paramsKeeper.Subspace(feestypes.ModuleName)
 	paramsKeeper.Subspace(govshuttletypes.ModuleName)
 	return paramsKeeper
+}
+
+func (app *Canto) setupUpgradeHandlers() {
+	// v2 upgrade handler
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v2.UpgradeName,
+		v2.CreateUpgradeHandler(app.mm, app.configurator),
+	)
+
+	// When a planned update height is reached, the old binary will panic
+	// writing on disk the height and name of the update that triggered it
+	// This will read that value, and execute the preparations for the upgrade.
+	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
+	if err != nil {
+		panic(fmt.Errorf("failed to read upgrade info from disk: %w", err))
+	}
+
+	if app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		return
+	}
+
+	var storeUpgrades *storetypes.StoreUpgrades
+
+	switch upgradeInfo.Name {
+	case v2.UpgradeName:
+		// no store upgrades in v2
+	}
+
+	if storeUpgrades != nil {
+		// configure store loader that checks if version == upgradeHeight and applies store upgrades
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, storeUpgrades))
+	}
 }

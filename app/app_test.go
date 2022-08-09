@@ -14,7 +14,7 @@ import (
 	dbm "github.com/tendermint/tm-db"
 
 	"github.com/Canto-Network/Canto/v1/types"
-	"github.com/Canto-Network/ethermint-v2/encoding"
+	"github.com/evmos/ethermint/encoding"
 )
 
 func TestCantoExport(t *testing.T) {

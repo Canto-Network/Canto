@@ -8,14 +8,14 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"github.com/Canto-Network/Canto/v1/app"
-	"github.com/Canto-Network/ethermint-v2/server/config"
-	evm "github.com/Canto-Network/ethermint-v2/x/evm/types"
-	feemarkettypes "github.com/Canto-Network/ethermint-v2/x/feemarket/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/evmos/ethermint/server/config"
+	evm "github.com/evmos/ethermint/x/evm/types"
+	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 	"github.com/stretchr/testify/require"
 
 	//used for deploying contracts

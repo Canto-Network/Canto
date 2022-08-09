@@ -4,8 +4,8 @@ import (
 	_ "embed" // embed compiled smart contract
 	"encoding/json"
 
-	evmtypes "github.com/Canto-Network/ethermint-v2/x/evm/types"
 	"github.com/ethereum/go-ethereum/common"
+	evmtypes "github.com/evmos/ethermint/x/evm/types"
 
 	"github.com/Canto-Network/Canto/v1/x/erc20/types"
 )

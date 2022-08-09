@@ -5,11 +5,11 @@ import (
 	// nolint: typecheck
 	"math/big"
 
-	evmtypes "github.com/Canto-Network/ethermint-v2/x/evm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
+	evmtypes "github.com/evmos/ethermint/x/evm/types"
 
 	"github.com/Canto-Network/Canto/v1/contracts"
 	"github.com/Canto-Network/Canto/v1/x/erc20/types"

@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/Canto-Network/Canto/v1/x/inflation/types"
-	ethermint "github.com/Canto-Network/ethermint-v2/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	ethermint "github.com/evmos/ethermint/types"
 )
 
 func (suite *KeeperTestSuite) TestMintAndAllocateInflation() {

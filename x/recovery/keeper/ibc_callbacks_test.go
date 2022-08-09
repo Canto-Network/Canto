@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	"github.com/Canto-Network/Canto/v1/testutil"
-	"github.com/Canto-Network/ethermint-v2/crypto/ethsecp256k1"
-	"github.com/Canto-Network/ethermint-v2/tests"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/evmos/ethermint/crypto/ethsecp256k1"
+	"github.com/evmos/ethermint/tests"
 	"github.com/stretchr/testify/mock"
 
 	transfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
