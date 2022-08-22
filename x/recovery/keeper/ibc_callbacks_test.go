@@ -17,10 +17,10 @@ import (
 	ibcgotesting "github.com/cosmos/ibc-go/v3/testing"
 	ibcmock "github.com/cosmos/ibc-go/v3/testing/mock"
 
+	distrtypes "github.com/Canto-Network/Canto/v2/x/distribution/types"
 	"github.com/Canto-Network/Canto/v2/x/recovery/keeper"
 	"github.com/Canto-Network/Canto/v2/x/recovery/types"
 	vestingtypes "github.com/Canto-Network/Canto/v2/x/vesting/types"
-	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 )
 
 func (suite *KeeperTestSuite) TestOnRecvPacket() {
