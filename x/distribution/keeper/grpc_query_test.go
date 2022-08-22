@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	"github.com/Canto-Network/Canto/v2/x/distribution/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -17,32 +16,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking/teststaking"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
-
-type KeeperTestSuite struct {
-	suite.Suite
-
-	app         *simapp.SimApp
-	ctx         sdk.Context
-	queryClient types.QueryClient
-	addrs       []sdk.AccAddress
-	valAddrs    []sdk.ValAddress
-}
-
-func (suite *KeeperTestSuite) SetupTest() {
-	app := simapp.Setup(false)
-	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
-
-	queryHelper := baseapp.NewQueryServerTestHelper(ctx, app.InterfaceRegistry())
-	types.RegisterQueryServer(queryHelper, app.DistrKeeper)
-	queryClient := types.NewQueryClient(queryHelper)
-
-	suite.app = app
-	suite.ctx = ctx
-	suite.queryClient = queryClient
-
-	suite.addrs = simapp.AddTestAddrs(app, ctx, 2, sdk.NewInt(1000000000))
-	suite.valAddrs = simapp.ConvertAddrsToValAddrs(suite.addrs)
-}
 
 func (suite *KeeperTestSuite) TestGRPCParams() {
 	app, ctx, queryClient := suite.app, suite.ctx, suite.queryClient

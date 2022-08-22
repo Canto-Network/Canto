@@ -48,8 +48,10 @@ func (k Keeper) AllocateTokens(
 	baseFeeBurned := parentBaseFee.Mul(parentGasUsed)
 	// @TODO: parametrize the denom of the coins to burn
 	baseFeeBurnedCoins := sdk.NewCoins(sdk.NewCoin("acanto", sdk.Int(baseFeeBurned)))
-	// now burn the baseFee from the feeCollector Module Account
-	k.bankKeeper.BurnCoins(ctx, types.ModuleName, baseFeeBurnedCoins)
+	// now burn the baseFee from the feeCollector Module Account, panic on err as we are in top level app method
+	if err = k.bankKeeper.BurnCoins(ctx, types.ModuleName, baseFeeBurnedCoins); err != nil {
+		panic(err)
+	}
 
 	// calculate fraction votes
 	previousFractionVotes := sdk.NewDec(sumPreviousPrecommitPower).Quo(sdk.NewDec(totalPreviousPower))
