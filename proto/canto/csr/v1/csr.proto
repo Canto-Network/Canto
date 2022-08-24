@@ -1,0 +1,47 @@
+syntax = "proto3";
+package canto.csr.v1;
+
+import "gogoproto/gogo.proto";
+import "cosmos_proto/cosmos.proto";
+
+option go_package = "github.com/Canto-Network/Canto/v2/x/csr/types";
+
+// The CSR struct is a wrapper to all of the metadata associated with a given Contract Secured Revenue registration. It maintains the pool 
+// where all of the fees are being sent to, the deployer that is responsible for all deployments, and the set of dApps (smart contracts) 
+// that are registered with this pool.
+message CSR {
+    option (gogoproto.equal) = true;
+    // The Deployer keeps track of the user that deployed all of the dApps as well as this CSR pool.
+    string deployer = 1 [(gogoproto.nullable) = false];
+    // Contracts is the list of all EVM address that are registered to this pool.
+    repeated string contracts = 2;
+    // The CSRPool keeps track of data on the pool itself include NFTs involved, accumulated rewards, and more (see below). 
+    CSPPool csr_pool = 3;
+}
+
+// The CSRPool is the data structure that wraps around the sdk account address for which all txFees from the 
+// CSR will be sent. The pool is controlled by the CSR module account, and withdrawal methods automatically 
+// take into account shares owned by an NFT identifier. 
+message CSRPool {
+    option (gogoproto.equal) = true;
+    // The mapping of NFT identifiers to their last withdrawal period (the period is a running total of the number of times txFees have been accrued) 
+    map<string, CSRNFT> csr_nfts = 1;
+    // The number of unique NFTs minted for this CSR
+    uint64 nft_supply = 2 [(gogoproto.nullable) = false];
+    // The address of the sdk account for which accumulated fees are gathered 
+    string pool_address = 3 [(gogoproto.nullable) = false];
+    // The address of the NFT Factory for this CSR 
+    string contract_address = 4 [(gogoproto.nullable) = false];
+}
+
+// This is a wrapper around the EVM NFT that is used for verification in withdrawal of rewards 
+message CSRNFT {
+    option (gogoproto.equal) = true;
+    // the period at which the last withdrawal for this NFT occurred 
+    uint64 period = 1 [(gogoproto.nullable) = false];
+    // the NFT Identifier for this NFT
+    uint64 id = 2 [(gogoproto.nullable) = false];
+    // the smart contract address that minted this nft
+    string address = 3 [(gogoproto.nullable) = false];
+} 
+
