@@ -29,7 +29,10 @@ message CSRPool {
     // The number of unique NFTs minted for this CSR
     uint64 nft_supply = 2 [(gogoproto.nullable) = false];
     // The address of the sdk account for which accumulated fees are gathered 
-    string pool_address = 3 [(gogoproto.nullable) = false];
+    string pool_address = 3 [
+        (gogoproto.nullable) = false
+        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"
+        ];
     // The address of the NFT Factory for this CSR 
     string contract_address = 4 [(gogoproto.nullable) = false];
 }
