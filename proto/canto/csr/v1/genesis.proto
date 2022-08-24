@@ -1,14 +1,16 @@
 syntax = "proto3";
-package canto.v2.csr;
+package canto.csr.v1;
 
 import "gogoproto/gogo.proto";
-import "csr/params.proto";
-// this line is used by starport scaffolding # genesis/proto/import
+import "canto/csr/v1/csr.proto";
+import "canto/csr/v1/params.proto";
 
 option go_package = "github.com/Canto-Network/Canto/v2/x/csr/types";
 
 // GenesisState defines the csr module's genesis state.
 message GenesisState {
+  // params defines all of the parameters of the module
   Params params = 1 [(gogoproto.nullable) = false];
-  // this line is used by starport scaffolding # genesis/proto/state
+  // holds all of the csr pools that may have been registered at a previous height
+  repeated CSR csrs = 2;
 }
