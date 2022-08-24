@@ -4,8 +4,9 @@ package canto.csr.v1;
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
-import "csr/params.proto";
-// this line is used by starport scaffolding # 1
+import "canto/csr/v1/params.proto";
+import "canto/csr/v1/csr.proto";
+
 
 option go_package = "github.com/Canto-Network/Canto/v2/x/csr/types";
 
@@ -13,9 +14,31 @@ option go_package = "github.com/Canto-Network/Canto/v2/x/csr/types";
 service Query {
   // Parameters queries the parameters of the module.
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
-    option (google.api.http).get = "/Canto/v2/csr/params";
+    option (google.api.http).get = "/canto/v2/csr/params";
   }
-  // this line is used by starport scaffolding # 2
+  // query all registered CSRs
+  rpc CSRs(QueryCSRsRequest) returns (QueryCSRsResponse) {
+    option (google.api.http).get = "/canto/v2/csr/csrs"; 
+  }
+  // query a specific CSR by the pool addr 
+  rpc CSR(QueryCSRRequest) returns (QueryCSRResponse) {
+    // query by address
+    option (google.api.http).get = "/canto/v2/csr/csr/{pool_address}";
+  }
+  // query a CSR by a specific deployer
+  rpc DeployerCSR(QueryDeployerCSRRequest) returns (QueryDeployerCSRResponse) { 
+    // query by deployer address 
+    option (google.api.http).get = "/canto/v2/csr/csr_deployer/{deployer_address}";
+  }
+  // query a CSR by a specific user
+  rpc UserToCSR(QueryUserToCSRRequest) returns (QueryUserToCSRResponse) { 
+    // query csrs by account address
+    option (google.api.http).get = "/canto/v2/csr/user_to_csr/{acc_address}";
+  }
+  // query accumulated rewards by users
+  rpc Rewards(QueryRewardsRequest) returns (QueryRewardsResponse) { 
+    option (google.api.http).get = "/canto/v2/csr/rewards/{acc_address}";
+  }
 }
 
 // QueryParamsRequest is request type for the Query/Params RPC method.
@@ -24,7 +47,72 @@ message QueryParamsRequest {}
 // QueryParamsResponse is response type for the Query/Params RPC method.
 message QueryParamsResponse {
   // params holds all the parameters of this module.
-  Params params = 1 [(gogoproto.nullable) = false];
+  Params params = 1 [ (gogoproto.nullable) = false];
 }
 
-// this line is used by starport scaffolding # 3
+// Query for all registered CSRs, no argument required 
+message QueryCSRsRequest {}
+
+// Response contains PoolAddresses of all registered CSRs
+message QueryCSRsResponse {
+  repeated CSR csrs = 1 [ (gogoproto.nullable) = false ];
+  // pagination for response
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// request a specific CSR via the address of the pool in which funds for the CSR are accumulated
+message QueryCSRRequest { 
+  // query CSR via pool address, sdk.AccAddress of the pool in which funds will be accumulated
+  string pool_address = 1 [ 
+    (gogoproto.nullable) = false
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"
+    ]; 
+}
+
+// response for query of CSR by pool addr
+message QueryCSRResponse { 
+  // csr object queried by pool address
+  CSR csr = 1 [ (gogoproto.nullable) = false];
+}
+
+// query all CSRs deployed by an address
+message QueryDeployerCSRRequest {
+  //query by deployer_address for all
+  string deployer_address = 1 [ (gogoproto.nullable) = false]; 
+}
+// returns array of all CSRs registered by deployer 
+message QueryDeployerCSRResponse { 
+  repeated CSR csrs = 1 [ (gogoproto.nullable) = false ];
+  // pagination for response
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// query for all entered CSRs by account address
+message QueryUserToCSRRequest {
+  // account address for querying all entered CSRs
+  string acc_address = 1 [ 
+   (gogoproto.nullable) = false
+   (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"
+   ];
+}
+// returns array of all CSRs entered
+message QueryUserToCSRResponse { 
+  repeated CSR csrs = 1 [ (gogoproto.nullable) = false ];
+  // pagination for response
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// query for all accumulated rewards
+message QueryRewardsRequest { 
+    // account address for querying all rewards
+    string acc_address = 1 [ (gogoproto.nullable) = false];
+}
+
+// returns rewards as an sdk.Coin, rewards will be in acanto (gas token)
+message QueryRewardsResponse { 
+  // rewards as an sdk.Coin 
+  string rewards = 1 [ 
+    (gogoproto.nullable) = false
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin"
+  ];
+}
