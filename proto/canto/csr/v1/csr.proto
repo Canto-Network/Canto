@@ -12,7 +12,7 @@ option go_package = "github.com/Canto-Network/Canto/v2/x/csr/types";
 message CSR {
     option (gogoproto.equal) = true;
     // The Deployer keeps track of the user that deployed all of the dApps as well as this CSR pool.
-    string deployer = 1 [(gogoproto.nullable) = false];
+    string deployer = 1;
     // Contracts is the list of all EVM address that are registered to this pool.
     repeated string contracts = 2;
     // The CSRPool keeps track of data on the pool itself include NFTs involved, accumulated rewards, and more (see below). 
