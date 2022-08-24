@@ -51,5 +51,5 @@ echo "3"
 
 
 # move proto files to the right places
-cp -r github.com/Canto-Network/Canto/v1/x/* x/
+cp -r github.com/Canto-Network/Canto/v2/x/* x/
 rm -rf github.com
