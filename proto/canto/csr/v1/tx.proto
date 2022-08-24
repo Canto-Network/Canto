@@ -36,12 +36,18 @@ message CantoAddress {
     ];
 }
 
+// Defining an NFT array type so that we can nest it in a map
+message NFTArray {
+    repeated string nfts = 1;
+}
+
+
 // This message allows users to register a set of smart contracts into the CSR store. 
 // It will input the deployer address, number of NFTs to mint, NFT allocation per account 
 // if desired, set of smart contracts to start accepting transaction revenue, and nonces for address derivation.
 message MsgRegisterCSR {
     // The deployer is the same account that signed the MsgRegisterCSR transaction
-    CantoAddress deployer = 1;
+    string deployer = 1;
     // nft_supply tracks the number of NFTs the deployer wants to mint
     uint64 nft_supply = 2;
     // allocations keeps track of the allocations of NFTs that the deployer desires upon registration
@@ -61,7 +67,7 @@ message MsgRegisterCSRResponse {
 // to add, and nonces for derivation.
 message MsgUpdateCSR {
     // The deployer is the same account that signed the MsgUpdateCSR transaction
-    CantoAddress deployer = 1;
+    string deployer = 1;
     // pool_address corresponds to the Canto address of the CSR pool 
     // that is accumulating rewards for a given set of NFTs
     CantoAddress pool_address = 2;
@@ -74,11 +80,6 @@ message MsgUpdateCSR {
 
 // MsgUpdateCSRResponse returns no fields
 message MsgUpdateCSRResponse {
-}
-
-// Defining an NFT array type so that we can nest it in a map
-message NFTArray {
-    repeated string nfts = 1;
 }
 
 // Whenever a user, owning a set number of NFTs for a set of CSRs, would like to 
