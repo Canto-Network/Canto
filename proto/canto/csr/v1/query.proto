@@ -31,7 +31,7 @@ service Query {
     option (google.api.http).get = "/canto/v2/csr/csr_deployer/{deployer_address}";
   }
   // query a CSR by a specific user
-  rpc EnteredCSR(QueryUserToCSRRequest) returns (QueryUserToCSRResponse) { 
+  rpc UserToCSR(QueryUserToCSRRequest) returns (QueryUserToCSRResponse) { 
     // query csrs by account address
     option (google.api.http).get = "/canto/v2/csr/user_to_csr/{acc_address}";
   }
