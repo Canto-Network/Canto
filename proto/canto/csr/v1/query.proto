@@ -36,7 +36,7 @@ service Query {
     option (google.api.http).get = "/canto/v2/csr/user_to_csr/{acc_address}";
   }
   // query accumulated rewards by users
-  rpc Rewards(QueryRewardsRequest) returns () { 
+  rpc Rewards(QueryRewardsRequest) returns (QueryRewardsResponse) { 
     option (google.api.http).get = "/canto/v2/csr/rewards/{acc_address}";
   }
 }
