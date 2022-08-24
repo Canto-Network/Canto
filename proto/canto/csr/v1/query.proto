@@ -64,7 +64,7 @@ message QueryCSRsResponse {
 message QueryCSRRequest { 
   // query CSR via pool address, sdk.AccAddress of the pool in which funds will be accumulated
   string pool_address = 1 [ 
-    (gogoproto.nullable) = false
+    (gogoproto.nullable) = false,
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"
     ]; 
 }
@@ -91,7 +91,7 @@ message QueryDeployerCSRResponse {
 message QueryUserToCSRRequest {
   // account address for querying all entered CSRs
   string acc_address = 1 [ 
-   (gogoproto.nullable) = false
+   (gogoproto.nullable) = false, 
    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"
    ];
 }
@@ -112,7 +112,7 @@ message QueryRewardsRequest {
 message QueryRewardsResponse { 
   // rewards as an sdk.Coin 
   string rewards = 1 [ 
-    (gogoproto.nullable) = false
+    (gogoproto.nullable) = false,
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin"
   ];
 }

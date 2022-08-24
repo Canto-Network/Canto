@@ -57,7 +57,7 @@ message MsgUpdateCSR {
     // pool_address corresponds to the Canto address of the CSR pool 
     // that is accumulating rewards for a given set of NFTs
     string pool_address = 2 [
-        (gogoproto.nullable) = false
+        (gogoproto.nullable) = false,
         (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"
     ];
     // contracts are EVM addresses of the new contracts to be added to this CSR
