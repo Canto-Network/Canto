@@ -33,9 +33,9 @@ message UIntArray {
 // if desired, set of smart contracts to start accepting transaction revenue, and nonces for address derivation.
 message MsgRegisterCSR {
     // The deployer is the same account that signed the MsgRegisterCSR transaction
-    string deployer = 1 [(gogoproto.nullable) = false];
+    string deployer = 1;
     // nft_supply tracks the number of NFTs the deployer wants to mint
-    uint64 nft_supply = 2 [(gogoproto.nullable) = false];
+    uint64 nft_supply = 2;
     // allocations keeps track of the allocations of NFTs that the deployer desires upon registration
     map<string, uint64> allocations = 3;
     // contracts are the smart contract addresses that we want to register with this CSR pool
@@ -53,7 +53,7 @@ message MsgRegisterCSRResponse {
 // to add, and nonces for derivation.
 message MsgUpdateCSR {
     // The deployer is the same account that signed the MsgUpdateCSR transaction
-    string deployer = 1 [(gogoproto.nullable) = false];
+    string deployer = 1;
     // pool_address corresponds to the Canto address of the CSR pool 
     // that is accumulating rewards for a given set of NFTs
     string pool_address = 2 [

@@ -27,24 +27,24 @@ message CSRPool {
     // The mapping of NFT identifiers to their last withdrawal period (the period is a running total of the number of times txFees have been accrued) 
     map<string, CSRNFT> csr_nfts = 1;
     // The number of unique NFTs minted for this CSR
-    uint64 nft_supply = 2 [(gogoproto.nullable) = false];
+    uint64 nft_supply = 2;
     // The address of the sdk account for which accumulated fees are gathered 
     string pool_address = 3 [
         (gogoproto.nullable) = false,
         (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"
         ];
     // The address of the NFT Factory for this CSR 
-    string contract_address = 4 [(gogoproto.nullable) = false];
+    string contract_address = 4;
 }
 
 // This is a wrapper around the EVM NFT that is used for verification in withdrawal of rewards 
 message CSRNFT {
     option (gogoproto.equal) = true;
     // the period at which the last withdrawal for this NFT occurred 
-    uint64 period = 1 [(gogoproto.nullable) = false];
+    uint64 period = 1;
     // the NFT Identifier for this NFT
-    uint64 id = 2 [(gogoproto.nullable) = false];
+    uint64 id = 2;
     // the smart contract address that minted this nft
-    string address = 3 [(gogoproto.nullable) = false];
+    string address = 3;
 } 
 

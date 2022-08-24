@@ -78,7 +78,7 @@ message QueryCSRResponse {
 // query all CSRs deployed by an address
 message QueryDeployerCSRRequest {
   //query by deployer_address for all
-  string deployer_address = 1 [ (gogoproto.nullable) = false]; 
+  string deployer_address = 1; 
 }
 // returns array of all CSRs registered by deployer 
 message QueryDeployerCSRResponse { 
@@ -105,7 +105,7 @@ message QueryUserToCSRResponse {
 // query for all accumulated rewards
 message QueryRewardsRequest { 
     // account address for querying all rewards
-    string acc_address = 1 [ (gogoproto.nullable) = false];
+    string acc_address = 1;
 }
 
 // returns rewards as an sdk.Coin, rewards will be in acanto (gas token)
