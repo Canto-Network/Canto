@@ -23,7 +23,7 @@ service Query {
   // query a specific CSR by the pool addr 
   rpc CSR(QueryCSRRequest) returns (QueryCSRResponse) {
     // query by address
-    option (google.api.http).get = "/canto/v2/csr/csr/{pool_address";
+    option (google.api.http).get = "/canto/v2/csr/csr/{pool_address}";
   }
   // query a CSR by a specific deployer
   rpc DeployerCSR(QueryDeployerCSRRequest) returns (QueryDeployerCSRResponse) { 
@@ -31,9 +31,9 @@ service Query {
     option (google.api.http).get = "/canto/v2/csr/csr_deployer/{deployer_address}";
   }
   // query a CSR by a specific user
-  rpc EnteredCSR(QueryEnteredCSRRequest) returns (QueryEnteredCSRResponse) { 
+  rpc EnteredCSR(QueryUserToCSRRequest) returns (QueryUserToCSRResponse) { 
     // query csrs by account address
-    option (google.api.http).get = "/canto/v2/csr/csr_entered/{acc_address}";
+    option (google.api.http).get = "/canto/v2/csr/user_to_csr/{acc_address}";
   }
   // query accumulated rewards by users
   rpc Rewards(QueryRewardsRequest) returns () { 
@@ -47,7 +47,7 @@ message QueryParamsRequest {}
 // QueryParamsResponse is response type for the Query/Params RPC method.
 message QueryParamsResponse {
   // params holds all the parameters of this module.
-  Params params = 1 [(gogoproto.nullable) = false];
+  Params params = 1 [ (gogoproto.nullable) = false];
 }
 
 // Query for all registered CSRs, no argument required 
@@ -55,7 +55,7 @@ message QueryCSRsRequest {}
 
 // Response contains PoolAddresses of all registered CSRs
 message QueryCSRsResponse {
-  repeated CSR csrs = 1 [(gogoproto.nullable) = false ];
+  repeated CSR csrs = 1 [ (gogoproto.nullable) = false ];
   // pagination for response
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
@@ -63,35 +63,41 @@ message QueryCSRsResponse {
 // request a specific CSR via the address of the pool in which funds for the CSR are accumulated
 message QueryCSRRequest { 
   // query CSR via pool address, sdk.AccAddress of the pool in which funds will be accumulated
-  string pool_address = 1 [(gogoproto.nullable) = false]; 
+  string pool_address = 1 [ 
+    (gogoproto.nullable) = false
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"
+    ]; 
 }
 
 // response for query of CSR by pool addr
 message QueryCSRResponse { 
   // csr object queried by pool address
-  CSR csr = 1 [(gogoproto.nullable) = false];
+  CSR csr = 1 [ (gogoproto.nullable) = false];
 }
 
 // query all CSRs deployed by an address
 message QueryDeployerCSRRequest {
   //query by deployer_address for all
-  string deployer_address = 1 [(gogoproto.nullable) = false]; 
+  string deployer_address = 1 [ (gogoproto.nullable) = false]; 
 }
 // returns array of all CSRs registered by deployer 
 message QueryDeployerCSRResponse { 
-  repeated CSR csrs = 1 [(gogoproto.nullable) = false ];
+  repeated CSR csrs = 1 [ (gogoproto.nullable) = false ];
   // pagination for response
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 // query for all entered CSRs by account address
-message QueryEnteredCSRRequest {
+message QueryUserToCSRRequest {
   // account address for querying all entered CSRs
-  string acc_address = 1 [(gogoproto.nullable) = false];
+  string acc_address = 1 [ 
+   (gogoproto.nullable) = false
+   (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"
+   ];
 }
 // returns array of all CSRs entered
-message QueryEnteredCSRResponse { 
-  repeated CSR csrs = 1 [(gogoproto.nullable) = false ];
+message QueryUserToCSRResponse { 
+  repeated CSR csrs = 1 [ (gogoproto.nullable) = false ];
   // pagination for response
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
@@ -99,7 +105,7 @@ message QueryEnteredCSRResponse {
 // query for all accumulated rewards
 message QueryRewardsRequest { 
     // account address for querying all rewards
-    string acc_address = 1 [(gogoproto.nullable) = false];
+    string acc_address = 1 [ (gogoproto.nullable) = false];
 }
 
 // returns rewards as an sdk.Coin, rewards will be in acanto (gas token)
