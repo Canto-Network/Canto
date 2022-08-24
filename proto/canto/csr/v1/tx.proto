@@ -2,12 +2,94 @@ syntax = "proto3";
 package canto.csr.v1;
 
 // this line is used by starport scaffolding # proto/tx/import
+import "gogoproto/gogo.proto";
+import "cosmos_proto/cosmos.proto";
 
 option go_package = "github.com/Canto-Network/Canto/v2/x/csr/types";
 
-// Msg defines the Msg service.
+// Msg defines the csr Msg service.
 service Msg {
-    // this line is used by starport scaffolding # proto/tx/rpc
+    // register a new CSR with a set of smart contracts
+    rpc RegisterCSR(MsgRegisterCSR) returns (MsgRegisterCSRResponse) {
+        option (google.api.http).get = "/canto/csr/v1/register_csr";
+    };
+    // update an existing CSR with a new set of smart contracts
+    rpc UpdateCSR(MsgUpdateCSR) returns (MsgUpdateCSRResponse) {
+        option (google.api.http).get = "/canto/csr/v1/update_csr";
+    };
+    // withdraw rewards for CSRs
+    rpc WithdrawCSR(MsgWithdrawCSR) returns (MsgWithdrawCSRResponse) {
+        option (google.api.http).get = "/canto/csr/v1/withdraw_csr";
+    };
 }
 
-// this line is used by starport scaffolding # proto/tx/message
+// Wrapper so that we can create a map to an array of Nonces in MsgRegisterCSR and MsgUpdateCSR
+message NoncesArray {
+    repeated string nonces = 1;
+}
+
+message CantoAddress {
+    string address = 1 [
+        (gogoproto.nullable) = false
+        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"
+    ];
+}
+
+// This message allows users to register a set of smart contracts into the CSR store. 
+// It will input the deployer address, number of NFTs to mint, NFT allocation per account 
+// if desired, set of smart contracts to start accepting transaction revenue, and nonces for address derivation.
+message MsgRegisterCSR {
+    // The deployer is the same account that signed the MsgRegisterCSR transaction
+    CantoAddress deployer = 1;
+    // nft_supply tracks the number of NFTs the deployer wants to mint
+    uint64 nft_supply = 2;
+    // allocations keeps track of the allocations of NFTs that the deployer desires upon registration
+    map<string, uint64> allocations = 3;
+    // contracts are the smart contract addresses that we want to register with this CSR pool
+    repeated string contracts = 4;
+    // nonces is used for address derivation and deployment verification.
+    map<string, NoncesArray> nonces = 5;
+}
+
+// MsgRegisterCSRResponse returns no fields
+message MsgRegisterCSRResponse {
+}
+
+// This message allows users to update an existing CSR pool with additional smart contracts. 
+// It will input the deployer address, the existing CSR pool address, a list of smart contracts 
+// to add, and nonces for derivation.
+message MsgUpdateCSR {
+    // The deployer is the same account that signed the MsgUpdateCSR transaction
+    CantoAddress deployer = 1;
+    // pool_address corresponds to the Canto address of the CSR pool 
+    // that is accumulating rewards for a given set of NFTs
+    CantoAddress pool_address = 2;
+    // contracts are EVM addresses of the new contracts to be added to this CSR
+    repeated string contracts = 3;
+    // nonces is used for address derivation and deployment verification
+    map<string, NoncesArray> nonces = 4;
+}
+
+
+// MsgUpdateCSRResponse returns no fields
+message MsgUpdateCSRResponse {
+}
+
+message NFTArray {
+    repeated string nfts = 1;
+}
+
+// Whenever a user, owning a set number of NFTs for a set of CSRs, would like to 
+// withdraw the rewards associated with each of their NFTs, they submit a MsgWithdrawCSR. 
+// The user submits the message with a set of CSRs that they would like to withdraw from, 
+// and the set of NFTs within each CSR that they will be withdrawing from.
+message MsgWithdrawCSR {
+    // The addresses of the csr_pools that the rewards will be withdrawn from
+    repeated CantoAddress csr_pools = 1;
+    // The identifiers of each NFT for each CSRPool
+    map<CantoAddress, NFTArray> pool_to_nfts = 2;
+}
+
+// MsgWithdrawCSRResponse returns no fields
+message MsgWithdrawCSRResponse {
+}
