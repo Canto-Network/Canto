@@ -16,7 +16,7 @@ message CSR {
     // Contracts is the list of all EVM address that are registered to this pool.
     repeated string contracts = 2;
     // The CSRPool keeps track of data on the pool itself include NFTs involved, accumulated rewards, and more (see below). 
-    CSPPool csr_pool = 3;
+    CSRPool csr_pool = 3;
 }
 
 // The CSRPool is the data structure that wraps around the sdk account address for which all txFees from the 
