@@ -25,9 +25,10 @@ service Msg {
 
 // Wrapper so that we can create a map to an array of Nonces in MsgRegisterCSR and MsgUpdateCSR
 message NoncesArray {
-    repeated string nonces = 1;
+    repeated uint64 nonces = 1;
 }
 
+// Defining a type for the canto addresses used across messages
 message CantoAddress {
     string address = 1 [
         (gogoproto.nullable) = false
@@ -75,6 +76,7 @@ message MsgUpdateCSR {
 message MsgUpdateCSRResponse {
 }
 
+// Defining an NFT array type so that we can nest it in a map
 message NFTArray {
     repeated string nfts = 1;
 }
