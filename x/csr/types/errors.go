@@ -13,4 +13,7 @@ var (
 	ErrInvalidNFTSupply = sdkerrors.Register(ModuleName, 6970, "csr::MsgRegisterCSR: InvalidNFTSupply")
 	ErrInvalidNonce = sdkerrors.Register(ModuleName, 6971, "csr::MsgRegisterCSR: InvalidNonce")
 	ErrInvalidArity = sdkerrors.Register(ModuleName, 6972, "csr::MsgRegisterCSR: InvalidArity")
+	ErrSmartContractSupply = sdkerrors.Register(ModuleName, 1000, "csr::CSRPool")
+	ErrNFTSupply           = sdkerrors.Register(ModuleName, 1001, "csr::CSRPool")
+	ErrMisMatchedNFTSupply = sdkerrors.Register(ModuleName, 1002, "csr::CSRPool")
 )

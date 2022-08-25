@@ -24,14 +24,12 @@ message CSR {
 // take into account shares owned by an NFT identifier. 
 message CSRPool {
     option (gogoproto.equal) = true;
-    // The mapping of NFT identifiers to their last withdrawal period (the period is a running total of the number of times txFees have been accrued) 
-    map<string, CSRNFT> csr_nfts = 1;
+    // The CSRNFTs that are a part of this pool, this is a array because each NFT id is incremented by 1 starting at 0
+    repeated CSRNFT csr_nfts = 1;
     // The number of unique NFTs minted for this CSR
     uint64 nft_supply = 2;
-    // The address of the sdk account for which accumulated fees are gathered 
-    string pool_address = 3;
     // The address of the NFT Factory for this CSR 
-    string contract_address = 4;
+    string pool_address = 3;
 }
 
 // This is a wrapper around the EVM NFT that is used for verification in withdrawal of rewards 
