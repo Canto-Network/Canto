@@ -8,6 +8,7 @@ import (
 
 // x/csr module sentinel errors
 var (
-	ErrSample = sdkerrors.Register(ModuleName, 1100, "sample error")
-	
+	ErrSmartContractSupply = sdkerrors.Register(ModuleName, 1000, "csr::CSRPool")
+	ErrNFTSupply           = sdkerrors.Register(ModuleName, 1001, "csr::CSRPool")
+	ErrMisMatchedNFTSupply = sdkerrors.Register(ModuleName, 1002, "csr::CSRPool")
 )
