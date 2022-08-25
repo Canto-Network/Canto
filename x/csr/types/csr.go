@@ -76,10 +76,5 @@ func (csrPool CSRPool) Validate() error {
 		return sdkerrors.Wrapf(ErrNFTSupply, "The total supply of NFTs must be greater than 0 got: %d", nftSupply)
 	}
 
-	internalNFTSize := len(csrPool.GetCsrNfts())
-	if nftSupply != uint64(internalNFTSize) {
-		return sdkerrors.Wrapf(ErrMisMatchedNFTSupply, "supply of EVM NFT must equal internal NFT supply got: %d evm nfts got: %d internal nfts", nftSupply, internalNFTSize)
-	}
-
 	return nil
 }

@@ -128,19 +128,6 @@ func (suite *CSRTestSuite) TestCSR() {
 			},
 			false,
 		},
-		{
-			"Create CSR object with mismatched nft supply - fail",
-			CSR{
-				Deployer:  suite.deployer,
-				Contracts: suite.contractAddresses,
-				CsrPool: &CSRPool{
-					CsrNfts:     suite.nfts[:2],
-					NftSupply:   suite.nftSupply,
-					PoolAddress: suite.poolAddress,
-				},
-			},
-			true,
-		},
 	}
 	for _, tc := range testCases {
 		err := tc.csr.Validate()
