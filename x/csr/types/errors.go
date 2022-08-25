@@ -8,6 +8,9 @@ import (
 
 // x/csr module sentinel errors
 var (
-	ErrSample = sdkerrors.Register(ModuleName, 1100, "sample error")
-	
+	// error in allocation of NFT supply in MsgRegisterCSR
+	ErrMisMatchedAllocations = sdkerrors.Register(ModuleName, 6969, "csr::MsgRegisterCSR: MismatchedAllocations")
+	ErrInvalidNFTSupply = sdkerrors.Register(ModuleName, 6970, "csr::MsgRegisterCSR: InvalidNFTSupply")
+	ErrInvalidNonce = sdkerrors.Register(ModuleName, 6971, "csr::MsgRegisterCSR: InvalidNonce")
+	ErrInvalidArity = sdkerrors.Register(ModuleName, 6972, "csr::MsgRegisterCSR: InvalidArity")
 )
