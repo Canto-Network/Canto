@@ -105,7 +105,7 @@ func (suite *MsgTestSuite) TestCheckAllocations() {
 			false,
 		},
 		{
-			"when allocations is greater than nftsupply - fail",
+			"when allocations is equal to nftsupply but an invalid address - fail",
 			testArgs{
 				map[string]uint64{acct1: uint64(12), "": uint64(7), acct3: uint64(1)},
 				uint64(20),
@@ -113,7 +113,7 @@ func (suite *MsgTestSuite) TestCheckAllocations() {
 			false,
 		},
 		{
-			"when allocations is greater than nftsupply - fail",
+			"when allocations is equal to  nftsupply and all addresses are valid - pass ",
 			testArgs{
 				map[string]uint64{acct1: uint64(12), acct2: uint64(7), acct3: uint64(1)},
 				uint64(20),
