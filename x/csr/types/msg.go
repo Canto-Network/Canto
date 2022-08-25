@@ -47,7 +47,7 @@ func (msg MsgRegisterCSR) Type() string { return TypeMsgRegisterCSR }
 func (msg MsgRegisterCSR) ValidateBasic() error {
 	// error group for concurrent validation methods
 	eg := &errgroup.Group{}
-	// check that the deployer is a valid evm address
+	// check that the deployer is a valid canto address
 	if _, err := sdk.AccAddressFromBech32(msg.Deployer); err != nil {
 		return sdkerrors.Wrapf(err, "MsgRegisterCSR: ValidateBasic: invalid sdk address: %s", msg.Deployer)
 	}
