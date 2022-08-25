@@ -18,19 +18,19 @@ const (
 // method to create a new instance of msgRegisterCSR
 func NewMsgRegisterCSR(
 	deployer sdk.AccAddress,
-	nftsupply uint,
+	nftsupply uint64,
 	allocations map[string]uint64, //mapping between Bech32 AccAddress
 	contracts []string,
 	nonces []*UIntArray,
 ) *MsgRegisterCSR {
 	// if there are no allocations, then set the sole allocation to the deployer
 	if len(allocations) == 0 {
-		allocations[deployer.String()] = uint64(nftsupply) // all nfts go to deployer
+		allocations[deployer.String()] = nftsupply // all nfts go to deployer
 	}
 	// return address of the newly constructed MsgRegisterCSR
 	return &MsgRegisterCSR{
 		Deployer:    deployer.String(), // canto address of deployer
-		NftSupply:   uint64(nftsupply),
+		NftSupply:   nftsupply,
 		Allocations: allocations,
 		Contracts:   contracts,
 		Nonces:      nonces,
