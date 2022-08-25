@@ -18,7 +18,7 @@ type MsgTestSuite struct {
 
 	nftsupply   uint64
 	deployer    sdk.AccAddress
-	allocations map[string]uint64 // map between bech32 address and
+	allocations map[string]uint64 // map between bech32 address and amount
 	contracts   []string
 	nonces      []*UIntArray
 }
