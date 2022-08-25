@@ -29,7 +29,7 @@ func NewMsgRegisterCSR(
 	}
 	// return address of the newly constructed MsgRegisterCSR
 	return &MsgRegisterCSR{
-		Deployer:    deployer.String(), // eth address of deployer
+		Deployer:    deployer.String(), // canto address of deployer
 		NftSupply:   uint64(nftsupply),
 		Allocations: allocations,
 		Contracts:   contracts,
