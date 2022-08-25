@@ -188,15 +188,15 @@ func request_Query_UserToCSR_0(ctx context.Context, marshaler runtime.Marshaler,
 		_   = err
 	)
 
-	val, ok = pathParams["acc_address"]
+	val, ok = pathParams["account_address"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "acc_address")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "account_address")
 	}
 
-	protoReq.AccAddress, err = runtime.String(val)
+	protoReq.AccountAddress, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "acc_address", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "account_address", err)
 	}
 
 	msg, err := client.UserToCSR(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -215,15 +215,15 @@ func local_request_Query_UserToCSR_0(ctx context.Context, marshaler runtime.Mars
 		_   = err
 	)
 
-	val, ok = pathParams["acc_address"]
+	val, ok = pathParams["account_address"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "acc_address")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "account_address")
 	}
 
-	protoReq.AccAddress, err = runtime.String(val)
+	protoReq.AccountAddress, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "acc_address", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "account_address", err)
 	}
 
 	msg, err := server.UserToCSR(ctx, &protoReq)
@@ -242,15 +242,15 @@ func request_Query_Rewards_0(ctx context.Context, marshaler runtime.Marshaler, c
 		_   = err
 	)
 
-	val, ok = pathParams["acc_address"]
+	val, ok = pathParams["account_address"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "acc_address")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "account_address")
 	}
 
-	protoReq.AccAddress, err = runtime.String(val)
+	protoReq.AccountAddress, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "acc_address", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "account_address", err)
 	}
 
 	msg, err := client.Rewards(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -269,15 +269,15 @@ func local_request_Query_Rewards_0(ctx context.Context, marshaler runtime.Marsha
 		_   = err
 	)
 
-	val, ok = pathParams["acc_address"]
+	val, ok = pathParams["account_address"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "acc_address")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "account_address")
 	}
 
-	protoReq.AccAddress, err = runtime.String(val)
+	protoReq.AccountAddress, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "acc_address", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "account_address", err)
 	}
 
 	msg, err := server.Rewards(ctx, &protoReq)
@@ -602,9 +602,9 @@ var (
 
 	pattern_Query_DeployerCSR_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"canto", "v2", "csr", "csr_deployer", "deployer_address"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_UserToCSR_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"canto", "v2", "csr", "user_to_csr", "acc_address"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_UserToCSR_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"canto", "v2", "csr", "user_to_csr", "account_address"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_Rewards_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"canto", "v2", "csr", "rewards", "acc_address"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_Rewards_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"canto", "v2", "csr", "rewards", "account_address"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

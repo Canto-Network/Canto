@@ -33,11 +33,11 @@ service Query {
   // query a CSR by a specific user
   rpc UserToCSR(QueryUserToCSRRequest) returns (QueryUserToCSRResponse) { 
     // query csrs by account address
-    option (google.api.http).get = "/canto/v2/csr/user_to_csr/{acc_address}";
+    option (google.api.http).get = "/canto/v2/csr/user_to_csr/{account_address}";
   }
   // query accumulated rewards by users
   rpc Rewards(QueryRewardsRequest) returns (QueryRewardsResponse) { 
-    option (google.api.http).get = "/canto/v2/csr/rewards/{acc_address}";
+    option (google.api.http).get = "/canto/v2/csr/rewards/{account_address}";
   }
 }
 
@@ -63,10 +63,7 @@ message QueryCSRsResponse {
 // request a specific CSR via the address of the pool in which funds for the CSR are accumulated
 message QueryCSRRequest { 
   // query CSR via pool address, sdk.AccAddress of the pool in which funds will be accumulated
-  string pool_address = 1 [ 
-    (gogoproto.nullable) = false,
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"
-    ]; 
+  string pool_address = 1; 
 }
 
 // response for query of CSR by pool addr
@@ -90,10 +87,7 @@ message QueryDeployerCSRResponse {
 // query for all entered CSRs by account address
 message QueryUserToCSRRequest {
   // account address for querying all entered CSRs
-  string acc_address = 1 [ 
-   (gogoproto.nullable) = false, 
-   (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"
-   ];
+  string account_address = 1;
 }
 // returns array of all CSRs entered
 message QueryUserToCSRResponse { 
@@ -105,7 +99,7 @@ message QueryUserToCSRResponse {
 // query for all accumulated rewards
 message QueryRewardsRequest { 
     // account address for querying all rewards
-    string acc_address = 1;
+    string account_address = 1;
 }
 
 // returns rewards as an sdk.Coin, rewards will be in acanto (gas token)

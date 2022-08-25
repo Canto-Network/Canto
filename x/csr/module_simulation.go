@@ -3,7 +3,6 @@ package csr
 import (
 	"math/rand"
 
-	"github.com/Canto-Network/Canto/v2/testutil/sample"
 	csrsimulation "github.com/Canto-Network/Canto/v2/x/csr/simulation"
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -16,7 +15,6 @@ import (
 
 // avoid unused import issue
 var (
-	_ = sample.AccAddress
 	_ = csrsimulation.FindAccount
 	_ = simappparams.StakePerAccount
 	_ = simulation.MsgEntryKind
@@ -24,7 +22,7 @@ var (
 )
 
 const (
-    // this line is used by starport scaffolding # simapp/module/const
+// this line is used by starport scaffolding # simapp/module/const
 )
 
 // GenerateGenesisState creates a randomized GenState of the module
@@ -34,7 +32,7 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 		accs[i] = acc.Address.String()
 	}
 	csrGenesis := types.GenesisState{
-		Params:	types.DefaultParams(),
+		Params: types.DefaultParams(),
 		// this line is used by starport scaffolding # simapp/module/genesisState
 	}
 	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(&csrGenesis)
@@ -47,9 +45,8 @@ func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedP
 
 // RandomizedParams creates randomized  param changes for the simulator
 func (am AppModule) RandomizedParams(_ *rand.Rand) []simtypes.ParamChange {
-	
-	return []simtypes.ParamChange{
-	}
+
+	return []simtypes.ParamChange{}
 }
 
 // RegisterStoreDecoder registers a decoder
