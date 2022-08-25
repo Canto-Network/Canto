@@ -6,11 +6,11 @@ import (
 )
 
 // Creates a new instance of the CSR object. This consumes a fully created CSRPool object.
-func NewCSR(deployer string, contracts []string, csrPool CSRPool) CSR {
+func NewCSR(deployer string, contracts []string, csrPool *CSRPool) CSR {
 	return CSR{
 		Deployer:  deployer,
 		Contracts: contracts,
-		CsrPool:   &csrPool,
+		CsrPool:   csrPool,
 	}
 }
 
