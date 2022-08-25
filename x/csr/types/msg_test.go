@@ -59,7 +59,7 @@ func generateAllocations(numShares int, allocations []int) map[string]uint64 {
 func (suite *MsgTestSuite) TestMsgRegisterCSR() {
 	msg := types.NewMsgRegisterCSR(
 		suite.deployer,
-		uint(suite.nftsupply),
+		suite.nftsupply,
 		suite.allocations,
 		suite.contracts,
 		suite.nonces,
@@ -127,7 +127,7 @@ func (suite *MsgTestSuite) TestCheckAllocations() {
 		// construct Msg
 		msg := types.NewMsgRegisterCSR(
 			suite.deployer,
-			uint(suite.nftsupply),
+			suite.nftsupply,
 			suite.allocations,
 			suite.contracts,
 			suite.nonces,
@@ -137,7 +137,7 @@ func (suite *MsgTestSuite) TestCheckAllocations() {
 
 		if tc.expectPass {
 			suite.Require().NoError(msg.CheckAllocations())
-			// test that validate basic also passes 
+			// test that validate basic also passes
 			suite.Require().NoError(msg.ValidateBasic())
 		} else {
 			suite.Require().Error(msg.CheckAllocations())
@@ -195,7 +195,7 @@ func (suite *MsgTestSuite) TestCheckContracts() {
 		// construct Msg
 		msg := types.NewMsgRegisterCSR(
 			suite.deployer,
-			uint(suite.nftsupply),
+			suite.nftsupply,
 			suite.allocations,
 			suite.contracts,
 			suite.nonces,
@@ -210,7 +210,7 @@ func (suite *MsgTestSuite) TestCheckContracts() {
 			suite.Require().NoError(msg.ValidateBasic())
 		} else {
 			suite.Require().Error(msg.CheckContracts())
-			// test that ValidateBasic also fails 
+			// test that ValidateBasic also fails
 			suite.Require().Error(msg.ValidateBasic())
 		}
 	}
@@ -271,7 +271,7 @@ func (suite *MsgTestSuite) TestCheckNonces() {
 		// construct Msg
 		msg := types.NewMsgRegisterCSR(
 			suite.deployer,
-			uint(suite.nftsupply),
+			suite.nftsupply,
 			suite.allocations,
 			suite.contracts,
 			suite.nonces,
@@ -285,28 +285,28 @@ func (suite *MsgTestSuite) TestCheckNonces() {
 			suite.Require().NoError(msg.ValidateBasic())
 		} else {
 			suite.Require().Error(msg.CheckNonces())
-			// test that ValidateBasic also fails 
+			// test that ValidateBasic also fails
 			suite.Require().Error(msg.ValidateBasic())
 		}
 	}
 }
 
 func (suite *MsgTestSuite) TestValidateBasic() {
-	type testArgs struct { 
-		deployer string 
+	type testArgs struct {
+		deployer  string
 		NFTSupply uint64
 		noncesLen uint64
 	}
 
-	testCases := []struct{
-		name string 
-		args testArgs
+	testCases := []struct {
+		name       string
+		args       testArgs
 		expectPass bool
-	}{ 
+	}{
 		{
 			"if contracts / nonces are not same length - fail",
-			testArgs{ 
-				deployer: "", 
+			testArgs{
+				deployer:  "",
 				NFTSupply: uint64(100),
 				noncesLen: 3,
 			},
@@ -315,7 +315,7 @@ func (suite *MsgTestSuite) TestValidateBasic() {
 		{
 			"if deployer address is invalid - fail",
 			testArgs{
-				deployer: "x",
+				deployer:  "x",
 				NFTSupply: uint64(100),
 				noncesLen: 5,
 			},
@@ -324,7 +324,7 @@ func (suite *MsgTestSuite) TestValidateBasic() {
 		{
 			"if NFT supply is 0 - fail",
 			testArgs{
-				deployer: "",
+				deployer:  "",
 				NFTSupply: uint64(0),
 				noncesLen: 5,
 			},
@@ -333,7 +333,7 @@ func (suite *MsgTestSuite) TestValidateBasic() {
 		{
 			"if none if msg setupTest msg - pass",
 			testArgs{
-				deployer: "", 
+				deployer:  "",
 				NFTSupply: uint64(100),
 				noncesLen: 5,
 			},
@@ -345,7 +345,7 @@ func (suite *MsgTestSuite) TestValidateBasic() {
 		// construct Msg
 		msg := types.NewMsgRegisterCSR(
 			suite.deployer,
-			uint(suite.nftsupply),
+			suite.nftsupply,
 			suite.allocations,
 			suite.contracts,
 			suite.nonces,
@@ -357,7 +357,7 @@ func (suite *MsgTestSuite) TestValidateBasic() {
 		msg.NftSupply = tc.args.NFTSupply
 		msg.Contracts = msg.Contracts[:tc.args.noncesLen]
 
-		if tc.expectPass { 
+		if tc.expectPass {
 			suite.Require().NoError(msg.ValidateBasic())
 		} else {
 			suite.Require().Error(msg.ValidateBasic())
