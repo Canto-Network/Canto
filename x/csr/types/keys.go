@@ -1,8 +1,6 @@
 package types
 
 import (
-	"strconv"
-
 	"github.com/ethereum/go-ethereum/common"
 )
 
@@ -24,8 +22,8 @@ const (
 	prefixSmartContract
 	// deployer address -> csr pool addresses
 	prefixDeployer
-	// smart contract address + NFT id -> last withdraw period
-	prefixLastPeriodNFT
+	// smart contract address -> NFTs
+	prefixNFT
 )
 
 // KVStore key prefixes
@@ -33,11 +31,10 @@ var (
 	KeyPrefixCSR           = []byte{prefixCSR}
 	KeyPrefixSmartContract = []byte{prefixSmartContract}
 	KeyPrefixDeployer      = []byte{prefixDeployer}
-	KeyPrefixLastPeriodNFT = []byte{prefixLastPeriodNFT}
+	KeyPrefixNFT           = []byte{prefixNFT}
 )
 
 // Multi-tier index to find the latest withdrawal period for an NFT
-func GetKeyPrefixLastPeriodNFT(contractAddress common.Address, id uint64) []byte {
-	contractPrefix := append(KeyPrefixLastPeriodNFT, contractAddress.Bytes()...)
-	return append(contractPrefix, []byte(strconv.FormatUint(id, 10))...)
+func GetKeyPrefixLastPeriodNFT(contractAddress common.Address) []byte {
+	return append(KeyPrefixNFT, contractAddress.Bytes()...)
 }
