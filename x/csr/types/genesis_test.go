@@ -3,6 +3,8 @@ package types_test
 import (
 	"testing"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
 	"github.com/evmos/ethermint/tests"
 	"github.com/stretchr/testify/suite"
@@ -22,7 +24,7 @@ func (suite *GensisStateSuite) SetupTest() {
 	suite.params = types.DefaultParams()
 
 	contracts := []string{tests.GenerateAddress().String(), tests.GenerateAddress().String(), tests.GenerateAddress().String()}
-	poolAddress := tests.GenerateAddress().String()
+	poolAddress := sdk.AccAddress(tests.GenerateAddress().Bytes()).String()
 	nft1 := types.NewCSRNFT(0, poolAddress)
 	nft2 := types.NewCSRNFT(1, poolAddress)
 
@@ -32,7 +34,7 @@ func (suite *GensisStateSuite) SetupTest() {
 		CsrNfts:     []*types.CSRNFT{&nft1, &nft2},
 	}
 	csr := types.CSR{
-		Deployer:  tests.GenerateAddress().String(),
+		Deployer:  sdk.AccAddress(tests.GenerateAddress().Bytes()).String(),
 		Contracts: contracts,
 		CsrPool:   &csrPool,
 	}
