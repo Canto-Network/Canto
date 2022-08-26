@@ -11,4 +11,7 @@ var (
 	ErrSmartContractSupply = sdkerrors.Register(ModuleName, 1000, "csr::CSRPool")
 	ErrNFTSupply           = sdkerrors.Register(ModuleName, 1001, "csr::CSRPool")
 	ErrMisMatchedNFTSupply = sdkerrors.Register(ModuleName, 1002, "csr::CSRPool")
+	ErrInvalidParams       = sdkerrors.Register(ModuleName, 1003, "csr::Params")
+	ErrDuplicatePools      = sdkerrors.Register(ModuleName, 1004, "csr::GenesisState")
+	ErrDuplicateNFTs       = sdkerrors.Register(ModuleName, 1005, "csr::GenesisState")
 )
