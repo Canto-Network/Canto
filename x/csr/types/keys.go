@@ -1,8 +1,6 @@
 package types
 
-import (
-	"github.com/ethereum/go-ethereum/common"
-)
+import sdk "github.com/cosmos/cosmos-sdk/types"
 
 const (
 	// ModuleName defines the module name
@@ -22,19 +20,22 @@ const (
 	prefixSmartContract
 	// deployer address -> csr pool addresses
 	prefixDeployer
-	// smart contract address -> NFTs
-	prefixNFT
+	// csr pool address -> current period
+	prefixCurrentPeriod
+	// csr pool address -> cumulative rewards
+	prefixCumulativeRewards
 )
 
 // KVStore key prefixes
 var (
-	KeyPrefixCSR           = []byte{prefixCSR}
-	KeyPrefixSmartContract = []byte{prefixSmartContract}
-	KeyPrefixDeployer      = []byte{prefixDeployer}
-	KeyPrefixNFT           = []byte{prefixNFT}
+	KeyPrefixCSR               = []byte{prefixCSR}
+	KeyPrefixSmartContract     = []byte{prefixSmartContract}
+	KeyPrefixDeployer          = []byte{prefixDeployer}
+	KeyPrefixCurrentPeriod     = []byte{prefixCurrentPeriod}
+	KeyPrefixCumulativeRewards = []byte{prefixCumulativeRewards}
 )
 
-// Multi-tier index to find the latest withdrawal period for an NFT
-func GetKeyPrefixLastPeriodNFT(contractAddress common.Address) []byte {
-	return append(KeyPrefixNFT, contractAddress.Bytes()...)
+// Get the key for the pool so that we can extract rewards at a given period
+func GetKeyPrefixPoolRewards(poolAddress sdk.AccAddress) []byte {
+	return append(KeyPrefixCumulativeRewards, poolAddress.Bytes()...)
 }
