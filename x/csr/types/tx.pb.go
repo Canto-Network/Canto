@@ -75,6 +75,61 @@ func (m *UIntArray) GetValue() []uint64 {
 	return nil
 }
 
+// Wrapper around nonces and contracts objects
+type ContractData struct {
+	// contracts are the smart contract addresses that we want to register with this CSR pool
+	Contracts []string `protobuf:"bytes,1,rep,name=contracts,proto3" json:"contracts,omitempty"`
+	// nonces is used for address derivation and deployment verification.
+	Nonces []*UIntArray `protobuf:"bytes,2,rep,name=nonces,proto3" json:"nonces,omitempty"`
+}
+
+func (m *ContractData) Reset()         { *m = ContractData{} }
+func (m *ContractData) String() string { return proto.CompactTextString(m) }
+func (*ContractData) ProtoMessage()    {}
+func (*ContractData) Descriptor() ([]byte, []int) {
+	return fileDescriptor_249005a6451fe2d1, []int{1}
+}
+func (m *ContractData) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ContractData) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ContractData.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ContractData) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ContractData.Merge(m, src)
+}
+func (m *ContractData) XXX_Size() int {
+	return m.Size()
+}
+func (m *ContractData) XXX_DiscardUnknown() {
+	xxx_messageInfo_ContractData.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ContractData proto.InternalMessageInfo
+
+func (m *ContractData) GetContracts() []string {
+	if m != nil {
+		return m.Contracts
+	}
+	return nil
+}
+
+func (m *ContractData) GetNonces() []*UIntArray {
+	if m != nil {
+		return m.Nonces
+	}
+	return nil
+}
+
 // This message allows users to register a set of smart contracts into the CSR store.
 // It will input the deployer address, number of NFTs to mint, NFT allocation per account
 // if desired, set of smart contracts to start accepting transaction revenue, and nonces for address derivation.
@@ -85,17 +140,15 @@ type MsgRegisterCSR struct {
 	NftSupply uint64 `protobuf:"varint,2,opt,name=nft_supply,json=nftSupply,proto3" json:"nft_supply,omitempty"`
 	// allocations keeps track of the allocations of NFTs that the deployer desires upon registration
 	Allocations map[string]uint64 `protobuf:"bytes,3,rep,name=allocations,proto3" json:"allocations,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"varint,2,opt,name=value,proto3"`
-	// contracts are the smart contract addresses that we want to register with this CSR pool
-	Contracts []string `protobuf:"bytes,4,rep,name=contracts,proto3" json:"contracts,omitempty"`
-	// nonces is used for address derivation and deployment verification.
-	Nonces []*UIntArray `protobuf:"bytes,5,rep,name=nonces,proto3" json:"nonces,omitempty"`
+	// contract Data is a wrapper around the contracts in this CSR and the nonces with which they were deployed
+	ContractData *ContractData `protobuf:"bytes,4,opt,name=contract_data,json=contractData,proto3" json:"contract_data,omitempty"`
 }
 
 func (m *MsgRegisterCSR) Reset()         { *m = MsgRegisterCSR{} }
 func (m *MsgRegisterCSR) String() string { return proto.CompactTextString(m) }
 func (*MsgRegisterCSR) ProtoMessage()    {}
 func (*MsgRegisterCSR) Descriptor() ([]byte, []int) {
-	return fileDescriptor_249005a6451fe2d1, []int{1}
+	return fileDescriptor_249005a6451fe2d1, []int{2}
 }
 func (m *MsgRegisterCSR) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -145,16 +198,9 @@ func (m *MsgRegisterCSR) GetAllocations() map[string]uint64 {
 	return nil
 }
 
-func (m *MsgRegisterCSR) GetContracts() []string {
+func (m *MsgRegisterCSR) GetContractData() *ContractData {
 	if m != nil {
-		return m.Contracts
-	}
-	return nil
-}
-
-func (m *MsgRegisterCSR) GetNonces() []*UIntArray {
-	if m != nil {
-		return m.Nonces
+		return m.ContractData
 	}
 	return nil
 }
@@ -167,7 +213,7 @@ func (m *MsgRegisterCSRResponse) Reset()         { *m = MsgRegisterCSRResponse{}
 func (m *MsgRegisterCSRResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgRegisterCSRResponse) ProtoMessage()    {}
 func (*MsgRegisterCSRResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_249005a6451fe2d1, []int{2}
+	return fileDescriptor_249005a6451fe2d1, []int{3}
 }
 func (m *MsgRegisterCSRResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -205,17 +251,15 @@ type MsgUpdateCSR struct {
 	// pool_address corresponds to the Canto address of the CSR pool
 	// that is accumulating rewards for a given set of NFTs
 	PoolAddress string `protobuf:"bytes,2,opt,name=pool_address,json=poolAddress,proto3" json:"pool_address,omitempty"`
-	// contracts are EVM addresses of the new contracts to be added to this CSR
-	Contracts []string `protobuf:"bytes,3,rep,name=contracts,proto3" json:"contracts,omitempty"`
-	// nonces is used for address derivation and deployment verification
-	Nonces []*UIntArray `protobuf:"bytes,4,rep,name=nonces,proto3" json:"nonces,omitempty"`
+	// contract Data is a wrapper around the contracts in this CSR and the nonces with which they were deployed
+	ContractData *ContractData `protobuf:"bytes,3,opt,name=contract_data,json=contractData,proto3" json:"contract_data,omitempty"`
 }
 
 func (m *MsgUpdateCSR) Reset()         { *m = MsgUpdateCSR{} }
 func (m *MsgUpdateCSR) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateCSR) ProtoMessage()    {}
 func (*MsgUpdateCSR) Descriptor() ([]byte, []int) {
-	return fileDescriptor_249005a6451fe2d1, []int{3}
+	return fileDescriptor_249005a6451fe2d1, []int{4}
 }
 func (m *MsgUpdateCSR) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -258,16 +302,9 @@ func (m *MsgUpdateCSR) GetPoolAddress() string {
 	return ""
 }
 
-func (m *MsgUpdateCSR) GetContracts() []string {
+func (m *MsgUpdateCSR) GetContractData() *ContractData {
 	if m != nil {
-		return m.Contracts
-	}
-	return nil
-}
-
-func (m *MsgUpdateCSR) GetNonces() []*UIntArray {
-	if m != nil {
-		return m.Nonces
+		return m.ContractData
 	}
 	return nil
 }
@@ -280,7 +317,7 @@ func (m *MsgUpdateCSRResponse) Reset()         { *m = MsgUpdateCSRResponse{} }
 func (m *MsgUpdateCSRResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateCSRResponse) ProtoMessage()    {}
 func (*MsgUpdateCSRResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_249005a6451fe2d1, []int{4}
+	return fileDescriptor_249005a6451fe2d1, []int{5}
 }
 func (m *MsgUpdateCSRResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -314,17 +351,21 @@ var xxx_messageInfo_MsgUpdateCSRResponse proto.InternalMessageInfo
 // The user submits the message with a set of CSRs that they would like to withdraw from,
 // and the set of NFTs within each CSR that they will be withdrawing from.
 type MsgWithdrawCSR struct {
+	// address of the withdrawer
+	Withdrawer string `protobuf:"bytes,1,opt,name=withdrawer,proto3" json:"withdrawer,omitempty"`
+	// address receiving the funds, in the case that the withdrawer is not receiving the funds by default
+	Receiver string `protobuf:"bytes,2,opt,name=receiver,proto3" json:"receiver,omitempty"`
 	// The addresses of the csr_pools that the rewards will be withdrawn from
-	CsrPools []string `protobuf:"bytes,1,rep,name=csr_pools,json=csrPools,proto3" json:"csr_pools,omitempty"`
+	CsrPools []string `protobuf:"bytes,3,rep,name=csr_pools,json=csrPools,proto3" json:"csr_pools,omitempty"`
 	// The identifiers of each NFT for each CSRPool
-	Nfts []*UIntArray `protobuf:"bytes,2,rep,name=nfts,proto3" json:"nfts,omitempty"`
+	Nfts []*UIntArray `protobuf:"bytes,4,rep,name=nfts,proto3" json:"nfts,omitempty"`
 }
 
 func (m *MsgWithdrawCSR) Reset()         { *m = MsgWithdrawCSR{} }
 func (m *MsgWithdrawCSR) String() string { return proto.CompactTextString(m) }
 func (*MsgWithdrawCSR) ProtoMessage()    {}
 func (*MsgWithdrawCSR) Descriptor() ([]byte, []int) {
-	return fileDescriptor_249005a6451fe2d1, []int{5}
+	return fileDescriptor_249005a6451fe2d1, []int{6}
 }
 func (m *MsgWithdrawCSR) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -353,6 +394,20 @@ func (m *MsgWithdrawCSR) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgWithdrawCSR proto.InternalMessageInfo
 
+func (m *MsgWithdrawCSR) GetWithdrawer() string {
+	if m != nil {
+		return m.Withdrawer
+	}
+	return ""
+}
+
+func (m *MsgWithdrawCSR) GetReceiver() string {
+	if m != nil {
+		return m.Receiver
+	}
+	return ""
+}
+
 func (m *MsgWithdrawCSR) GetCsrPools() []string {
 	if m != nil {
 		return m.CsrPools
@@ -375,7 +430,7 @@ func (m *MsgWithdrawCSRResponse) Reset()         { *m = MsgWithdrawCSRResponse{}
 func (m *MsgWithdrawCSRResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgWithdrawCSRResponse) ProtoMessage()    {}
 func (*MsgWithdrawCSRResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_249005a6451fe2d1, []int{6}
+	return fileDescriptor_249005a6451fe2d1, []int{7}
 }
 func (m *MsgWithdrawCSRResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -406,6 +461,7 @@ var xxx_messageInfo_MsgWithdrawCSRResponse proto.InternalMessageInfo
 
 func init() {
 	proto.RegisterType((*UIntArray)(nil), "canto.csr.v1.UIntArray")
+	proto.RegisterType((*ContractData)(nil), "canto.csr.v1.ContractData")
 	proto.RegisterType((*MsgRegisterCSR)(nil), "canto.csr.v1.MsgRegisterCSR")
 	proto.RegisterMapType((map[string]uint64)(nil), "canto.csr.v1.MsgRegisterCSR.AllocationsEntry")
 	proto.RegisterType((*MsgRegisterCSRResponse)(nil), "canto.csr.v1.MsgRegisterCSRResponse")
@@ -418,44 +474,47 @@ func init() {
 func init() { proto.RegisterFile("canto/csr/v1/tx.proto", fileDescriptor_249005a6451fe2d1) }
 
 var fileDescriptor_249005a6451fe2d1 = []byte{
-	// 579 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x54, 0x41, 0x6f, 0xd3, 0x30,
-	0x18, 0x6d, 0x9a, 0x6e, 0x5a, 0xdc, 0x0a, 0x4d, 0x56, 0x19, 0x21, 0x94, 0x28, 0x8b, 0x38, 0x54,
-	0x42, 0x4d, 0xb4, 0x72, 0x41, 0x1c, 0x90, 0xca, 0x84, 0x10, 0x87, 0x02, 0xca, 0x34, 0x21, 0xed,
-	0x52, 0x65, 0xae, 0x9b, 0x55, 0x4b, 0xed, 0xc8, 0x76, 0xda, 0xe5, 0xca, 0x2f, 0x40, 0xe2, 0xca,
-	0x3f, 0xe0, 0x8f, 0x70, 0x9c, 0xc4, 0x85, 0x23, 0x6a, 0xf9, 0x21, 0x28, 0x4e, 0x48, 0x13, 0xb6,
-	0x96, 0xdd, 0xfc, 0x7d, 0xef, 0xf5, 0x7b, 0xef, 0x7d, 0x76, 0x03, 0xee, 0x23, 0x9f, 0x08, 0xea,
-	0x22, 0xce, 0xdc, 0xf9, 0x91, 0x2b, 0xae, 0x9c, 0x88, 0x51, 0x41, 0x61, 0x4b, 0xb6, 0x1d, 0xc4,
-	0x99, 0x33, 0x3f, 0x32, 0x3a, 0x01, 0xa5, 0x41, 0x88, 0x5d, 0x3f, 0x9a, 0xba, 0x3e, 0x21, 0x54,
-	0xf8, 0x62, 0x4a, 0x09, 0xcf, 0xb8, 0x46, 0x3b, 0xa0, 0x01, 0x95, 0x47, 0x37, 0x3d, 0xe5, 0xdd,
-	0x87, 0x88, 0xf2, 0x19, 0xe5, 0xa3, 0x0c, 0xc8, 0x8a, 0x0c, 0xb2, 0x0f, 0x81, 0x76, 0xfa, 0x96,
-	0x88, 0x01, 0x63, 0x7e, 0x02, 0xdb, 0x60, 0x67, 0xee, 0x87, 0x31, 0xd6, 0x15, 0x4b, 0xed, 0x36,
-	0xbc, 0xac, 0xb0, 0xbf, 0xd5, 0xc1, 0xbd, 0x21, 0x0f, 0x3c, 0x1c, 0x4c, 0xb9, 0xc0, 0xec, 0xf8,
-	0xc4, 0x83, 0x06, 0xd8, 0x1b, 0xe3, 0x28, 0xa4, 0x09, 0x66, 0xba, 0x62, 0x29, 0x5d, 0xcd, 0x2b,
-	0x6a, 0xf8, 0x18, 0x00, 0x32, 0x11, 0x23, 0x1e, 0x47, 0x51, 0x98, 0xe8, 0x75, 0x4b, 0xe9, 0x36,
-	0x3c, 0x8d, 0x4c, 0xc4, 0x89, 0x6c, 0xc0, 0xf7, 0xa0, 0xe9, 0x87, 0x21, 0x45, 0x99, 0x6d, 0x5d,
-	0xb5, 0xd4, 0x6e, 0xb3, 0xdf, 0x73, 0xca, 0x19, 0x9d, 0xaa, 0x9a, 0x33, 0x58, 0xf3, 0x5f, 0x13,
-	0xc1, 0x12, 0xaf, 0x3c, 0x01, 0x76, 0x80, 0x86, 0x28, 0x11, 0xcc, 0x47, 0x82, 0xeb, 0x0d, 0x4b,
-	0xed, 0x6a, 0xde, 0xba, 0x01, 0x5d, 0xb0, 0x4b, 0x28, 0x41, 0x98, 0xeb, 0x3b, 0x52, 0xe9, 0x41,
-	0x55, 0xa9, 0xc8, 0xee, 0xe5, 0x34, 0xe3, 0x25, 0xd8, 0xff, 0x57, 0x0f, 0xee, 0x03, 0xf5, 0x12,
-	0x27, 0x79, 0xd2, 0xf4, 0xb8, 0xde, 0x54, 0x96, 0x2f, 0x2b, 0x5e, 0xd4, 0x9f, 0x2b, 0xb6, 0x0e,
-	0x0e, 0xaa, 0xf6, 0x3d, 0xcc, 0x23, 0x4a, 0x38, 0xb6, 0xbf, 0x2a, 0xa0, 0x35, 0xe4, 0xc1, 0x69,
-	0x34, 0xf6, 0x05, 0xfe, 0xdf, 0x16, 0x0f, 0x41, 0x2b, 0xa2, 0x34, 0x1c, 0xf9, 0xe3, 0x31, 0xc3,
-	0x9c, 0x4b, 0x1d, 0xcd, 0x6b, 0xa6, 0xbd, 0x41, 0xd6, 0xaa, 0x06, 0x57, 0x37, 0x07, 0x6f, 0xdc,
-	0x29, 0xb8, 0x7d, 0x00, 0xda, 0x65, 0x77, 0x85, 0xed, 0x33, 0x79, 0xfb, 0x1f, 0xa7, 0xe2, 0x62,
-	0xcc, 0xfc, 0x45, 0xea, 0xfb, 0x11, 0xd0, 0x10, 0x67, 0xa3, 0xd4, 0x0b, 0x97, 0x4f, 0x45, 0xf3,
-	0xf6, 0x10, 0x67, 0x1f, 0xd2, 0x1a, 0x3e, 0x05, 0x0d, 0x32, 0x11, 0xa9, 0xe1, 0xad, 0xaa, 0x92,
-	0x94, 0x2f, 0xab, 0x34, 0xfb, 0xaf, 0x6a, 0x7f, 0x59, 0x07, 0xea, 0x90, 0x07, 0x30, 0x06, 0xcd,
-	0xf2, 0xc3, 0xeb, 0x6c, 0x7b, 0x28, 0xc6, 0x93, 0x6d, 0x68, 0x11, 0xc8, 0xfe, 0xf4, 0xe3, 0xf7,
-	0x97, 0x7a, 0x07, 0x1a, 0x6e, 0xe5, 0xff, 0xc6, 0x72, 0xea, 0x08, 0x71, 0x06, 0x67, 0x40, 0x2b,
-	0xdd, 0xd3, 0x8d, 0xb1, 0x05, 0x66, 0xd8, 0x9b, 0xb1, 0x42, 0xd0, 0x92, 0x82, 0x06, 0xd4, 0xab,
-	0x82, 0xb1, 0x24, 0x4a, 0xb9, 0x18, 0x34, 0xcb, 0x0b, 0xbe, 0x99, 0xb2, 0x84, 0xde, 0x92, 0xf2,
-	0x96, 0x05, 0x6e, 0x4a, 0xb9, 0xc8, 0xa9, 0xa9, 0xec, 0xab, 0x37, 0xdf, 0x97, 0xa6, 0x72, 0xbd,
-	0x34, 0x95, 0x5f, 0x4b, 0x53, 0xf9, 0xbc, 0x32, 0x6b, 0xd7, 0x2b, 0xb3, 0xf6, 0x73, 0x65, 0xd6,
-	0xce, 0x7a, 0xc1, 0x54, 0x5c, 0xc4, 0xe7, 0x0e, 0xa2, 0x33, 0xf7, 0x38, 0xfd, 0x7d, 0xef, 0x1d,
-	0x16, 0x0b, 0xca, 0x2e, 0xb3, 0xca, 0x9d, 0xf7, 0xdd, 0x2b, 0x39, 0x52, 0x24, 0x11, 0xe6, 0xe7,
-	0xbb, 0xf2, 0x63, 0xf2, 0xec, 0x4f, 0x00, 0x00, 0x00, 0xff, 0xff, 0xa2, 0xf2, 0x6b, 0x15, 0xc2,
-	0x04, 0x00, 0x00,
+	// 628 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x54, 0xcf, 0x6b, 0xd4, 0x4e,
+	0x14, 0x6f, 0x76, 0xf7, 0x5b, 0x9a, 0xb7, 0xfb, 0x95, 0x32, 0xd4, 0x1a, 0xe3, 0x1a, 0xb6, 0xc1,
+	0xc3, 0x82, 0x34, 0xa1, 0xeb, 0x45, 0x3c, 0x28, 0xb5, 0x8a, 0x78, 0xa8, 0xca, 0x94, 0x22, 0x08,
+	0xb2, 0x4c, 0x67, 0xa7, 0xe9, 0xd2, 0x74, 0x26, 0xcc, 0xcc, 0x6e, 0x9b, 0xab, 0x7f, 0x80, 0x08,
+	0x82, 0x37, 0xff, 0x1f, 0x8f, 0x05, 0x2f, 0x1e, 0x65, 0xeb, 0x1f, 0x22, 0x99, 0xa4, 0x69, 0x62,
+	0xdb, 0x15, 0x6f, 0xf3, 0x79, 0xef, 0xed, 0x7c, 0x7e, 0xbc, 0xd9, 0xc0, 0x4d, 0x4a, 0xb8, 0x16,
+	0x21, 0x55, 0x32, 0x9c, 0x6e, 0x84, 0xfa, 0x24, 0x48, 0xa4, 0xd0, 0x02, 0x75, 0x4c, 0x39, 0xa0,
+	0x4a, 0x06, 0xd3, 0x0d, 0xb7, 0x1b, 0x09, 0x11, 0xc5, 0x2c, 0x24, 0xc9, 0x38, 0x24, 0x9c, 0x0b,
+	0x4d, 0xf4, 0x58, 0x70, 0x95, 0xcf, 0xba, 0x2b, 0x91, 0x88, 0x84, 0x39, 0x86, 0xd9, 0xa9, 0xa8,
+	0xde, 0xa6, 0x42, 0x1d, 0x09, 0x35, 0xcc, 0x1b, 0x39, 0xc8, 0x5b, 0xfe, 0x1a, 0xd8, 0xbb, 0x2f,
+	0xb9, 0xde, 0x94, 0x92, 0xa4, 0x68, 0x05, 0xfe, 0x9b, 0x92, 0x78, 0xc2, 0x1c, 0xab, 0xd7, 0xec,
+	0xb7, 0x70, 0x0e, 0xfc, 0xf7, 0xd0, 0xd9, 0x12, 0x5c, 0x4b, 0x42, 0xf5, 0x33, 0xa2, 0x09, 0xea,
+	0x82, 0x4d, 0x0b, 0xac, 0xcc, 0xa4, 0x8d, 0x2f, 0x0a, 0x28, 0x84, 0x45, 0x2e, 0x38, 0x65, 0xca,
+	0x69, 0xf4, 0x9a, 0xfd, 0xf6, 0xe0, 0x56, 0x50, 0x95, 0x1f, 0x94, 0x64, 0xb8, 0x18, 0xf3, 0xbf,
+	0x36, 0xe0, 0xc6, 0xb6, 0x8a, 0x30, 0x8b, 0xc6, 0x4a, 0x33, 0xb9, 0xb5, 0x83, 0x91, 0x0b, 0x4b,
+	0x23, 0x96, 0xc4, 0x22, 0x65, 0xd2, 0xb1, 0x7a, 0x56, 0xdf, 0xc6, 0x25, 0x46, 0x77, 0x01, 0xf8,
+	0xbe, 0x1e, 0xaa, 0x49, 0x92, 0xc4, 0xa9, 0xd3, 0xe8, 0x59, 0xfd, 0x16, 0xb6, 0xf9, 0xbe, 0xde,
+	0x31, 0x05, 0xf4, 0x1a, 0xda, 0x24, 0x8e, 0x05, 0xcd, 0x53, 0x71, 0x9a, 0x46, 0xc3, 0x7a, 0x5d,
+	0x43, 0x9d, 0x2d, 0xd8, 0xbc, 0x98, 0x7f, 0xce, 0xb5, 0x4c, 0x71, 0xf5, 0x06, 0xf4, 0x04, 0xfe,
+	0x3f, 0x37, 0x37, 0x1c, 0x11, 0x4d, 0x9c, 0x56, 0xcf, 0xea, 0xb7, 0x07, 0x6e, 0xfd, 0xca, 0x6a,
+	0x40, 0xb8, 0x43, 0x2b, 0xc8, 0x7d, 0x0c, 0xcb, 0x7f, 0x32, 0xa0, 0x65, 0x68, 0x1e, 0xb2, 0xb4,
+	0xf0, 0x96, 0x1d, 0x2f, 0xa2, 0xcf, 0x1d, 0xe5, 0xe0, 0x51, 0xe3, 0xa1, 0xe5, 0x3b, 0xb0, 0x5a,
+	0x17, 0x8c, 0x99, 0x4a, 0x04, 0x57, 0xcc, 0xff, 0x68, 0x41, 0x67, 0x5b, 0x45, 0xbb, 0xc9, 0x88,
+	0x68, 0xf6, 0xb7, 0xdc, 0xd6, 0xa0, 0x93, 0x08, 0x11, 0x0f, 0xc9, 0x68, 0x24, 0x99, 0x52, 0x86,
+	0xc7, 0xc6, 0xed, 0xac, 0xb6, 0x99, 0x97, 0x2e, 0x5b, 0x6d, 0xfe, 0x9b, 0x55, 0x7f, 0x15, 0x56,
+	0xaa, 0x7a, 0x4a, 0xa1, 0x5f, 0x2c, 0xb3, 0xe2, 0xb7, 0x63, 0x7d, 0x30, 0x92, 0xe4, 0x38, 0x93,
+	0xea, 0x01, 0x1c, 0x17, 0xb0, 0x14, 0x5b, 0xa9, 0x64, 0x56, 0x24, 0xa3, 0x6c, 0x3c, 0x65, 0xb2,
+	0x90, 0x5a, 0x62, 0x74, 0x07, 0x6c, 0xaa, 0xe4, 0x30, 0x93, 0x9e, 0x6f, 0xd8, 0xc6, 0x4b, 0x54,
+	0xc9, 0x37, 0x19, 0x46, 0xf7, 0xa1, 0xc5, 0xf7, 0xb5, 0x72, 0x5a, 0xf3, 0x5f, 0x9f, 0x19, 0x2a,
+	0xb2, 0xad, 0xe8, 0x3a, 0x97, 0x3c, 0x98, 0x35, 0xa0, 0xb9, 0xad, 0x22, 0x34, 0x81, 0x76, 0xf5,
+	0x65, 0x76, 0xe7, 0xbd, 0x24, 0xf7, 0xde, 0xbc, 0x6e, 0x99, 0x86, 0xff, 0xe1, 0xfb, 0xaf, 0xcf,
+	0x8d, 0x2e, 0x72, 0xc3, 0xda, 0xff, 0x5d, 0x16, 0xa3, 0x43, 0xaa, 0x24, 0x3a, 0x02, 0xbb, 0xb2,
+	0xd6, 0x4b, 0xd7, 0x96, 0x3d, 0xd7, 0xbf, 0xbe, 0x57, 0x12, 0xf6, 0x0c, 0xa1, 0x8b, 0x9c, 0x3a,
+	0xe1, 0xc4, 0x0c, 0x1a, 0xba, 0x09, 0xb4, 0xab, 0xcb, 0xb9, 0xec, 0xb2, 0xd2, 0xbd, 0xc2, 0xe5,
+	0x15, 0x01, 0x5e, 0xe7, 0xf2, 0x7c, 0xc5, 0x19, 0xed, 0xd3, 0x17, 0xdf, 0x66, 0x9e, 0x75, 0x3a,
+	0xf3, 0xac, 0x9f, 0x33, 0xcf, 0xfa, 0x74, 0xe6, 0x2d, 0x9c, 0x9e, 0x79, 0x0b, 0x3f, 0xce, 0xbc,
+	0x85, 0x77, 0xeb, 0xd1, 0x58, 0x1f, 0x4c, 0xf6, 0x02, 0x2a, 0x8e, 0xc2, 0xad, 0xec, 0xf7, 0xeb,
+	0xaf, 0x98, 0x3e, 0x16, 0xf2, 0x30, 0x47, 0xe1, 0x74, 0x10, 0x9e, 0x98, 0x2b, 0x75, 0x9a, 0x30,
+	0xb5, 0xb7, 0x68, 0x3e, 0x66, 0x0f, 0x7e, 0x07, 0x00, 0x00, 0xff, 0xff, 0xdf, 0x00, 0x98, 0x44,
+	0x42, 0x05, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -657,6 +716,52 @@ func (m *UIntArray) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *ContractData) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ContractData) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ContractData) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Nonces) > 0 {
+		for iNdEx := len(m.Nonces) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Nonces[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if len(m.Contracts) > 0 {
+		for iNdEx := len(m.Contracts) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Contracts[iNdEx])
+			copy(dAtA[i:], m.Contracts[iNdEx])
+			i = encodeVarintTx(dAtA, i, uint64(len(m.Contracts[iNdEx])))
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *MsgRegisterCSR) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -677,28 +782,17 @@ func (m *MsgRegisterCSR) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Nonces) > 0 {
-		for iNdEx := len(m.Nonces) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.Nonces[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintTx(dAtA, i, uint64(size))
+	if m.ContractData != nil {
+		{
+			size, err := m.ContractData.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
 			}
-			i--
-			dAtA[i] = 0x2a
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
 		}
-	}
-	if len(m.Contracts) > 0 {
-		for iNdEx := len(m.Contracts) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.Contracts[iNdEx])
-			copy(dAtA[i:], m.Contracts[iNdEx])
-			i = encodeVarintTx(dAtA, i, uint64(len(m.Contracts[iNdEx])))
-			i--
-			dAtA[i] = 0x22
-		}
+		i--
+		dAtA[i] = 0x22
 	}
 	if len(m.Allocations) > 0 {
 		for k := range m.Allocations {
@@ -775,28 +869,17 @@ func (m *MsgUpdateCSR) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Nonces) > 0 {
-		for iNdEx := len(m.Nonces) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.Nonces[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintTx(dAtA, i, uint64(size))
+	if m.ContractData != nil {
+		{
+			size, err := m.ContractData.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
 			}
-			i--
-			dAtA[i] = 0x22
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
 		}
-	}
-	if len(m.Contracts) > 0 {
-		for iNdEx := len(m.Contracts) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.Contracts[iNdEx])
-			copy(dAtA[i:], m.Contracts[iNdEx])
-			i = encodeVarintTx(dAtA, i, uint64(len(m.Contracts[iNdEx])))
-			i--
-			dAtA[i] = 0x1a
-		}
+		i--
+		dAtA[i] = 0x1a
 	}
 	if len(m.PoolAddress) > 0 {
 		i -= len(m.PoolAddress)
@@ -869,7 +952,7 @@ func (m *MsgWithdrawCSR) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 				i = encodeVarintTx(dAtA, i, uint64(size))
 			}
 			i--
-			dAtA[i] = 0x12
+			dAtA[i] = 0x22
 		}
 	}
 	if len(m.CsrPools) > 0 {
@@ -878,8 +961,22 @@ func (m *MsgWithdrawCSR) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			copy(dAtA[i:], m.CsrPools[iNdEx])
 			i = encodeVarintTx(dAtA, i, uint64(len(m.CsrPools[iNdEx])))
 			i--
-			dAtA[i] = 0xa
+			dAtA[i] = 0x1a
 		}
+	}
+	if len(m.Receiver) > 0 {
+		i -= len(m.Receiver)
+		copy(dAtA[i:], m.Receiver)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Receiver)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Withdrawer) > 0 {
+		i -= len(m.Withdrawer)
+		copy(dAtA[i:], m.Withdrawer)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Withdrawer)))
+		i--
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -934,6 +1031,27 @@ func (m *UIntArray) Size() (n int) {
 	return n
 }
 
+func (m *ContractData) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.Contracts) > 0 {
+		for _, s := range m.Contracts {
+			l = len(s)
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if len(m.Nonces) > 0 {
+		for _, e := range m.Nonces {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	return n
+}
+
 func (m *MsgRegisterCSR) Size() (n int) {
 	if m == nil {
 		return 0
@@ -955,17 +1073,9 @@ func (m *MsgRegisterCSR) Size() (n int) {
 			n += mapEntrySize + 1 + sovTx(uint64(mapEntrySize))
 		}
 	}
-	if len(m.Contracts) > 0 {
-		for _, s := range m.Contracts {
-			l = len(s)
-			n += 1 + l + sovTx(uint64(l))
-		}
-	}
-	if len(m.Nonces) > 0 {
-		for _, e := range m.Nonces {
-			l = e.Size()
-			n += 1 + l + sovTx(uint64(l))
-		}
+	if m.ContractData != nil {
+		l = m.ContractData.Size()
+		n += 1 + l + sovTx(uint64(l))
 	}
 	return n
 }
@@ -993,17 +1103,9 @@ func (m *MsgUpdateCSR) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if len(m.Contracts) > 0 {
-		for _, s := range m.Contracts {
-			l = len(s)
-			n += 1 + l + sovTx(uint64(l))
-		}
-	}
-	if len(m.Nonces) > 0 {
-		for _, e := range m.Nonces {
-			l = e.Size()
-			n += 1 + l + sovTx(uint64(l))
-		}
+	if m.ContractData != nil {
+		l = m.ContractData.Size()
+		n += 1 + l + sovTx(uint64(l))
 	}
 	return n
 }
@@ -1023,6 +1125,14 @@ func (m *MsgWithdrawCSR) Size() (n int) {
 	}
 	var l int
 	_ = l
+	l = len(m.Withdrawer)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Receiver)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	if len(m.CsrPools) > 0 {
 		for _, s := range m.CsrPools {
 			l = len(s)
@@ -1158,6 +1268,122 @@ func (m *UIntArray) Unmarshal(dAtA []byte) error {
 			} else {
 				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
 			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ContractData) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ContractData: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ContractData: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Contracts", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Contracts = append(m.Contracts, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Nonces", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Nonces = append(m.Nonces, &UIntArray{})
+			if err := m.Nonces[len(m.Nonces)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -1374,39 +1600,7 @@ func (m *MsgRegisterCSR) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Contracts", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Contracts = append(m.Contracts, string(dAtA[iNdEx:postIndex]))
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Nonces", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ContractData", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1433,8 +1627,10 @@ func (m *MsgRegisterCSR) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Nonces = append(m.Nonces, &UIntArray{})
-			if err := m.Nonces[len(m.Nonces)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if m.ContractData == nil {
+				m.ContractData = &ContractData{}
+			}
+			if err := m.ContractData.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1604,39 +1800,7 @@ func (m *MsgUpdateCSR) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Contracts", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Contracts = append(m.Contracts, string(dAtA[iNdEx:postIndex]))
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Nonces", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ContractData", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1663,8 +1827,10 @@ func (m *MsgUpdateCSR) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Nonces = append(m.Nonces, &UIntArray{})
-			if err := m.Nonces[len(m.Nonces)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if m.ContractData == nil {
+				m.ContractData = &ContractData{}
+			}
+			if err := m.ContractData.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1770,6 +1936,70 @@ func (m *MsgWithdrawCSR) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Withdrawer", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Withdrawer = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Receiver", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Receiver = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CsrPools", wireType)
 			}
 			var stringLen uint64
@@ -1800,7 +2030,7 @@ func (m *MsgWithdrawCSR) Unmarshal(dAtA []byte) error {
 			}
 			m.CsrPools = append(m.CsrPools, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
-		case 2:
+		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Nfts", wireType)
 			}

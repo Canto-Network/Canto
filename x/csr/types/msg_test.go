@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -17,6 +18,7 @@ type MsgTestSuite struct {
 	suite.Suite
 
 	nftsupply   uint64
+	poolAddress sdk.AccAddress
 	deployer    sdk.AccAddress
 	allocations map[string]uint64 // map between bech32 address and amount
 	contracts   []string
@@ -31,6 +33,7 @@ func (suite *MsgTestSuite) SetupTest() {
 	suite.nftsupply = uint64(100)
 	deployer := tests.GenerateAddress()
 	suite.deployer = sdk.AccAddress(deployer.Bytes())
+	suite.poolAddress = sdk.AccAddress((tests.GenerateAddress().Bytes()))
 	suite.contracts, suite.nonces = generateAddresses(deployer, 5)
 	suite.allocations = generateAllocations(3, []int{33, 33, 34})
 }
@@ -69,6 +72,22 @@ func (suite *MsgTestSuite) TestMsgRegisterCSR() {
 	suite.Require().Equal(types.TypeMsgRegisterCSR, msg.Type())
 	suite.Require().NotNil(msg.GetSignBytes())
 	suite.Require().Equal(suite.deployer.String(), msg.GetSigners()[0].String())
+	suite.Require().NoError(msg.ValidateBasic())
+}
+
+func (suite *MsgTestSuite) TestMsgUpdateCSR() {
+	msg := types.NewMsgUpdateCSR(
+		suite.deployer,
+		suite.poolAddress,
+		suite.contracts,
+		suite.nonces,
+	)
+
+	// check basic methods and validation
+	suite.Require().Equal(types.RouterKey, msg.Route())
+	suite.Require().Equal(types.TypeMsgUpdateCSR, msg.Type())
+	suite.Require().NotNil(msg.GetSignBytes())
+	suite.Require().Equal(msg.Deployer, msg.GetSigners()[0].String())
 	suite.Require().NoError(msg.ValidateBasic())
 }
 
@@ -127,13 +146,11 @@ func (suite *MsgTestSuite) TestCheckAllocations() {
 		// construct Msg
 		msg := types.NewMsgRegisterCSR(
 			suite.deployer,
-			suite.nftsupply,
-			suite.allocations,
+			tc.args.nftsupply,
+			tc.args.allocations,
 			suite.contracts,
 			suite.nonces,
 		)
-		msg.Allocations = tc.args.allocations
-		msg.NftSupply = tc.args.nftsupply
 
 		if tc.expectPass {
 			suite.Require().NoError(msg.CheckAllocations())
@@ -192,26 +209,35 @@ func (suite *MsgTestSuite) TestCheckContracts() {
 	}
 
 	for _, tc := range testCases {
-		// construct Msg
-		msg := types.NewMsgRegisterCSR(
+		// construct MsgRegisterCSR
+		msgRegister := types.NewMsgRegisterCSR(
 			suite.deployer,
 			suite.nftsupply,
 			suite.allocations,
-			suite.contracts,
-			suite.nonces,
+			tc.args.contracts,
+			suite.nonces[:len(tc.args.contracts)],
 		)
-		// overwrite contracts
-		msg.Contracts = tc.args.contracts
-		//adjust length of nonces to correct length so msg.ValidateBasic does not fail
-		msg.Nonces = msg.Nonces[:len(msg.Contracts)]
+
+		// construct MsgUpdateCSR
+		msgUpdate := types.NewMsgUpdateCSR(
+			suite.deployer,
+			suite.poolAddress,
+			tc.args.contracts,
+			msgRegister.ContractData.Nonces,
+		)
+
 		if tc.expectPass {
-			suite.Require().NoError(msg.CheckContracts())
-			// test that ValidateBasic also Passes
-			suite.Require().NoError(msg.ValidateBasic())
+			suite.Require().NoError(msgRegister.ContractData.CheckContracts())
+			// test that MsgRegisterCSR ValidateBasic Passes
+			suite.Require().NoError(msgRegister.ValidateBasic())
+			// test taht MsgUpdateCSR ValidateBasic also passes
+			suite.Require().NoError(msgUpdate.ValidateBasic())
 		} else {
-			suite.Require().Error(msg.CheckContracts())
-			// test that ValidateBasic also fails
-			suite.Require().Error(msg.ValidateBasic())
+			suite.Require().Error(msgRegister.ContractData.CheckContracts())
+			// test that MsgRegisterCSR ValidateBasic fails
+			suite.Require().Error(msgRegister.ValidateBasic())
+			// test taht MsgUpdateCSR ValidateBsic also fails
+			suite.Require().Error(msgUpdate.ValidateBasic())
 		}
 	}
 
@@ -268,30 +294,39 @@ func (suite *MsgTestSuite) TestCheckNonces() {
 
 	for _, tc := range testCases {
 		// instantiate msg
-		// construct Msg
-		msg := types.NewMsgRegisterCSR(
+		// construct MsgRegisterCSR
+		msgRegister := types.NewMsgRegisterCSR(
 			suite.deployer,
 			suite.nftsupply,
 			suite.allocations,
-			suite.contracts,
-			suite.nonces,
+			suite.contracts[:len(tc.args.nonces)],
+			tc.args.nonces,
 		)
-		// overwrite Nonces in message object
-		msg.Nonces = tc.args.nonces
-		msg.Contracts = msg.Contracts[:len(msg.Nonces)]
+		// construct MsgUpdateCSR
+		msgUpdate := types.NewMsgUpdateCSR(
+			suite.deployer,
+			suite.poolAddress,
+			suite.contracts[:len(tc.args.nonces)],
+			tc.args.nonces,
+		)
+
 		if tc.expectPass {
-			suite.Require().NoError(msg.CheckNonces())
-			// test that ValidateBasic also passes
-			suite.Require().NoError(msg.ValidateBasic())
+			suite.Require().NoError(msgRegister.ContractData.CheckNonces())
+			// test that ValidateBasic also passes for MsgRegisterCSR
+			suite.Require().NoError(msgRegister.ValidateBasic())
+			// test that ValidateBasic also passes for MsgUpdateCSR
+			suite.Require().NoError(msgUpdate.ValidateBasic())
 		} else {
-			suite.Require().Error(msg.CheckNonces())
-			// test that ValidateBasic also fails
-			suite.Require().Error(msg.ValidateBasic())
+			suite.Require().Error(msgRegister.ContractData.CheckNonces())
+			// test that ValidateBasic for MsgRegisterCSR fails
+			suite.Require().Error(msgRegister.ValidateBasic())
+			// test that Validate Basic for MsgUpdateCSR also fails
+			suite.Require().Error(msgUpdate.ValidateBasic())
 		}
 	}
 }
 
-func (suite *MsgTestSuite) TestValidateBasic() {
+func (suite *MsgTestSuite) TestRegisterValidateBasic() {
 	type testArgs struct {
 		deployer  string
 		NFTSupply uint64
@@ -355,7 +390,7 @@ func (suite *MsgTestSuite) TestValidateBasic() {
 		}
 
 		msg.NftSupply = tc.args.NFTSupply
-		msg.Contracts = msg.Contracts[:tc.args.noncesLen]
+		msg.ContractData.Contracts = msg.ContractData.Contracts[:tc.args.noncesLen]
 
 		if tc.expectPass {
 			suite.Require().NoError(msg.ValidateBasic())
@@ -363,4 +398,295 @@ func (suite *MsgTestSuite) TestValidateBasic() {
 			suite.Require().Error(msg.ValidateBasic())
 		}
 	}
+}
+
+// test validate basic for MsgRegisterCSR
+func (suite *MsgTestSuite) TestUpdateValidateBasic() {
+	type testArgs struct {
+		deployer  string
+		poolAddr  string
+		noncesLen int
+	}
+
+	testCases := []struct {
+		name       string
+		args       testArgs
+		expectPass bool
+	}{
+		{
+			"if deployer address is invalid - fail",
+			testArgs{
+				"x",
+				sdk.AccAddress(tests.GenerateAddress().Bytes()).String(),
+				5,
+			},
+			false,
+		},
+		{
+			"if pool address is invalid - fail",
+			testArgs{
+				sdk.AccAddress(tests.GenerateAddress().Bytes()).String(),
+				"x",
+				5,
+			},
+			false,
+		},
+		{
+			"if nonces/ contracts len is not equal - fail",
+			testArgs{
+				sdk.AccAddress(tests.GenerateAddress().Bytes()).String(),
+				sdk.AccAddress(tests.GenerateAddress().Bytes()).String(),
+				3,
+			},
+			false,
+		},
+		{
+			"if deployer / poolAddress is valid - pass",
+			testArgs{
+				sdk.AccAddress(tests.GenerateAddress().Bytes()).String(),
+				sdk.AccAddress(tests.GenerateAddress().Bytes()).String(),
+				5,
+			},
+			true,
+		},
+	}
+
+	for _, tc := range testCases {
+		// construct MsgUpdateCSR
+		msg := types.NewMsgUpdateCSR(
+			suite.deployer,
+			suite.poolAddress,
+			suite.contracts,
+			suite.nonces[:tc.args.noncesLen],
+		)
+
+		msg.Deployer = tc.args.deployer
+		msg.PoolAddress = tc.args.poolAddr
+
+		if tc.expectPass {
+			// ValidateBasic should pass
+			suite.Require().NoError(msg.ValidateBasic())
+		} else {
+			// ValidateBasic should fail
+			suite.Require().Error(msg.ValidateBasic())
+		}
+	}
+}
+
+type WithdrawTestSuite struct {
+	suite.Suite
+
+	withdrawer sdk.AccAddress
+	receiver   sdk.AccAddress
+	csrPools   []string
+	nftIds     []*UIntArray
+}
+
+// run the Withdrawal Test Suite
+func TestWithdrawTestSuite(t *testing.T) {
+	suite.Run(t, new(WithdrawTestSuite))
+}
+
+func (suite *WithdrawTestSuite) SetupTest() {
+	// generate both deployer and receiver addresses
+	suite.withdrawer = sdk.MustAccAddressFromBech32(generatePools(1)[0])
+	suite.receiver = sdk.MustAccAddressFromBech32(generatePools(1)[0])
+	// generate pools
+	suite.csrPools = generatePools(5)
+	// generate nftIds
+	_, suite.nftIds = generateAddresses(tests.GenerateAddress(), 5)
+}
+
+// check that upon construction, the setters/getter methods are well-defined and return expected values
+func (suite *WithdrawTestSuite) TestMsgWithdraw() {
+	// construct a msgWithdraw
+	msg := types.NewMsgWithdrawCSR(
+		suite.withdrawer,
+		suite.receiver,
+		suite.csrPools,
+		suite.nftIds,
+	)
+	// check that the type / routes are correct
+	suite.Require().Equal(msg.Type(), types.TypeMsgWithdrawCSR)
+	suite.Require().Equal(msg.Route(), types.RouterKey)
+	// check that getSigners is the withdrawer address
+	suite.Require().Equal(msg.GetSigners()[0].String(), msg.Withdrawer)
+	// check that GetSignBytes is non-nil (not many better ways to test this :()
+	suite.Require().NotNil(msg.GetSignBytes())
+	// check that ValidateBasic Passes
+	suite.Require().NoError(msg.ValidateBasic())
+}
+
+// check that if receiver is "", the receiver is made to the deployer's address
+func (suite *WithdrawTestSuite) TestEmptyReceiverAdddr() {
+	// construct msg Withdraw with empty receiver
+	msg := types.NewMsgWithdrawCSR(
+		suite.withdrawer,
+		nil,
+		suite.csrPools,
+		suite.nftIds,
+	)
+	// check that the receiver address and withdrawer are the same
+	suite.Require().Equal(msg.Withdrawer, msg.Receiver)
+	// check that ValidateBasic passes
+	suite.Require().NoError(msg.ValidateBasic())
+}
+
+// test checkAllocations, first,
+// fail when there is invalid addr, fail when there is a repeated address
+func (suite *WithdrawTestSuite) TestCheckPools() {
+	type testArgs struct {
+		poolAddrs []string
+		nftIds    []*UIntArray
+		setup     func(*types.MsgWithdrawCSR, []*UIntArray, []string)
+	}
+
+	testCases := []struct {
+		name       string
+		args       testArgs
+		expectPass bool
+	}{
+		{
+			"if repeated nftId in UintArray - fail",
+			testArgs{
+				suite.csrPools,
+				[]*UIntArray{
+					{
+						[]uint64{uint64(1), uint64(1)},
+					},
+				},
+				func(msg *types.MsgWithdrawCSR, nftIds []*UIntArray, poolAddrs []string) {
+					// make the csrPools len shorter than the len(nftIds)
+					msg.CsrPools = poolAddrs[:2]
+					msg.Nfts = nftIds
+					return
+				},
+			},
+			false,
+		},
+		{
+			"if there is an invalid sdk address in pool Addrs - fail",
+			testArgs{
+				// take all but last sdk address, last one will be empty (invalid address)
+				append(suite.csrPools[:4], "x"),
+				suite.nftIds,
+				func(msg *types.MsgWithdrawCSR, nftIds []*UIntArray, poolAddrs []string) {
+					// set pool addrs to what is passed to this func
+					msg.CsrPools = poolAddrs
+				},
+			},
+			false,
+		},
+	}
+
+	for _, tc := range testCases {
+		// instantiate msg
+		msg := types.NewMsgWithdrawCSR(
+			suite.withdrawer,
+			suite.receiver,
+			suite.csrPools,
+			suite.nftIds,
+		)
+		// run setup for test
+		tc.args.setup(msg, tc.args.nftIds, tc.args.poolAddrs)
+
+		if tc.expectPass {
+			// CheckPools should pass
+			suite.Require().NoError(msg.CheckPools())
+			// ValidateBasic should Pass
+			suite.Require().NoError(msg.CheckPools())
+		} else {
+			// CheckPools should fail
+			suite.Require().Error(msg.CheckPools())
+			// validate basic should fail
+			suite.Require().Error(msg.ValidateBasic())
+		}
+	}
+
+}
+
+// Test Validate Basic, fail if either receiver or withdrawer is an invalid accound address
+// fail if the length of the pools / nftIds is not equal
+func (suite *WithdrawTestSuite) TestValidateBasic() {
+	type testArgs struct {
+		withdrawer string
+		receiver   string
+		setup      func(msg *types.MsgWithdrawCSR, withdrawer, receiver string)
+	}
+
+	testCases := []struct {
+		name       string
+		args       testArgs
+		expectPass bool
+	}{
+		{
+			"if withdrawer address is invalid - fail",
+			testArgs{
+				"x",
+				suite.receiver.String(),
+				func(msg *types.MsgWithdrawCSR, withdrawer, receiver string) {
+					msg.Withdrawer = withdrawer
+				},
+			},
+			false,
+		},
+		{
+			"if the receiver address is invalid - fail",
+			testArgs{
+				suite.withdrawer.String(),
+				"x",
+				func(msg *types.MsgWithdrawCSR, withdrawer, receiver string) {
+					msg.Receiver = receiver
+				},
+			},
+			false,
+		},
+		{
+			"if the len of poolAddrs and nftIds is not equal fail",
+			testArgs{
+				"x",
+				"x",
+				func(msg *types.MsgWithdrawCSR, withdrawer, receiver string) {
+					// cut off last 3 entries of pool
+					msg.CsrPools = msg.CsrPools[:2]
+				},
+			},
+			false,
+		},
+	}
+
+	for _, tc := range testCases {
+		// instantiate msg
+		msg := types.NewMsgWithdrawCSR(
+			suite.withdrawer,
+			suite.receiver,
+			suite.csrPools,
+			suite.nftIds,
+		)
+
+		// setup test case
+		tc.args.setup(msg, tc.args.withdrawer, "")
+
+		if tc.expectPass {
+			// expect ValidateBasic to pass
+			suite.Require().NoError(msg.ValidateBasic())
+		} else {
+			// expect ValidateBasic to fail
+			suite.Require().Error(msg.ValidateBasic())
+		}
+	}
+}
+
+// helper function to generate test addresses for CheckPools tests
+func generatePools(numAccts int) []string {
+	// generate pks
+	accts := make([]string, numAccts)
+	for i := 0; i < numAccts; i++ {
+		// fill PrivKeyField
+		pk := ed25519.GenPrivKey().PubKey()
+		// generate account
+		accts[i] = sdk.AccAddress(pk.Bytes()).String()
+	}
+
+	return accts
 }

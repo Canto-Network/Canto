@@ -28,6 +28,14 @@ message UIntArray {
     repeated uint64 value = 1;
 }
 
+// Wrapper around nonces and contracts objects 
+message ContractData { 
+    // contracts are the smart contract addresses that we want to register with this CSR pool
+    repeated string contracts = 1;
+    // nonces is used for address derivation and deployment verification.
+    repeated UIntArray nonces = 2;
+}
+
 // This message allows users to register a set of smart contracts into the CSR store. 
 // It will input the deployer address, number of NFTs to mint, NFT allocation per account 
 // if desired, set of smart contracts to start accepting transaction revenue, and nonces for address derivation.
@@ -38,10 +46,9 @@ message MsgRegisterCSR {
     uint64 nft_supply = 2;
     // allocations keeps track of the allocations of NFTs that the deployer desires upon registration
     map<string, uint64> allocations = 3;
-    // contracts are the smart contract addresses that we want to register with this CSR pool
-    repeated string contracts = 4;
-    // nonces is used for address derivation and deployment verification.
-    repeated UIntArray nonces = 5;
+    // contract Data is a wrapper around the contracts in this CSR and the nonces with which they were deployed
+    ContractData contract_data  = 4; 
+
 }
 
 // MsgRegisterCSRResponse returns no fields
@@ -57,10 +64,8 @@ message MsgUpdateCSR {
     // pool_address corresponds to the Canto address of the CSR pool 
     // that is accumulating rewards for a given set of NFTs
     string pool_address = 2;
-    // contracts are EVM addresses of the new contracts to be added to this CSR
-    repeated string contracts = 3;
-    // nonces is used for address derivation and deployment verification
-    repeated UIntArray nonces = 4;
+    // contract Data is a wrapper around the contracts in this CSR and the nonces with which they were deployed
+    ContractData contract_data  = 3; 
 }
 
 
@@ -73,10 +78,14 @@ message MsgUpdateCSRResponse {
 // The user submits the message with a set of CSRs that they would like to withdraw from, 
 // and the set of NFTs within each CSR that they will be withdrawing from.
 message MsgWithdrawCSR {
+    // address of the withdrawer
+    string withdrawer = 1;
+    // address receiving the funds, in the case that the withdrawer is not receiving the funds by default
+    string receiver = 2;
     // The addresses of the csr_pools that the rewards will be withdrawn from
-    repeated string csr_pools = 1;
+    repeated string csr_pools = 3;
     // The identifiers of each NFT for each CSRPool
-    repeated UIntArray nfts = 2;
+    repeated UIntArray nfts = 4;
 }
 
 // MsgWithdrawCSRResponse returns no fields
