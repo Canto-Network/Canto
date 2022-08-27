@@ -57,18 +57,18 @@ func (msg MsgRegisterCSR) ValidateBasic() error {
 	eg := &errgroup.Group{}
 	// check that the deployer is a valid canto address
 	if _, err := sdk.AccAddressFromBech32(msg.Deployer); err != nil {
-		return sdkerrors.Wrapf(err, "MsgRegisterCSR: ValidateBasic: invalid sdk address of deployer: %s", msg.Deployer)
+		return sdkerrors.Wrapf(err, "MsgRegisterCSR::ValidateBasic: invalid sdk address of deployer: %s", msg.Deployer)
 	}
 	// check that the NFTSupply are non-zero
 	if msg.NftSupply < uint64(1) {
-		return sdkerrors.Wrapf(ErrInvalidNFTSupply, "MsgRegisterCSR: ValidateBasic: invalid NFT Supply: %d", msg.NftSupply)
+		return sdkerrors.Wrapf(ErrInvalidNFTSupply, "MsgRegisterCSR::ValidateBasic: invalid NFT Supply: %d", msg.NftSupply)
 	}
 
 	noncesLen := len(msg.ContractData.Nonces)
 	contractsLen := len(msg.ContractData.Contracts)
 	// fail if array of UintArray is not as long as the array of contracts
 	if noncesLen != contractsLen {
-		return sdkerrors.Wrapf(ErrInvalidArity, "MsgRegisterCSR: ValidateBase: invalid length of nonces/contracts: nonces: %d, contracts: %d", noncesLen, contractsLen)
+		return sdkerrors.Wrapf(ErrInvalidArity, "MsgRegisterCSR::ValidateBase: invalid length of nonces/contracts: nonces: %d, contracts: %d", noncesLen, contractsLen)
 	}
 
 	// concurrently run this method validation along
@@ -79,7 +79,7 @@ func (msg MsgRegisterCSR) ValidateBasic() error {
 	eg.Go(msg.ContractData.CheckNonces)
 	// fail on the first error returned from the group
 	if err := eg.Wait(); err != nil {
-		return sdkerrors.Wrap(err, "MsgRegisterCSR: ValidateBasic: error in validation")
+		return sdkerrors.Wrap(err, "MsgRegisterCSR::ValidateBasic: error in validation")
 	}
 
 	return nil
@@ -119,17 +119,17 @@ func NewMsgUpdateCSR(
 func (msg MsgUpdateCSR) ValidateBasic() error {
 	// first validate that the deployer's address is not an invalid sdk.AccAddress
 	if _, err := sdk.AccAddressFromBech32(msg.Deployer); err != nil {
-		return sdkerrors.Wrapf(err, "MsgUpdateCSR: ValidateBasic: invalid sdk address of deployer: %s", msg.Deployer)
+		return sdkerrors.Wrapf(err, "MsgUpdateCSR::ValidateBasic: invalid sdk address of deployer: %s", msg.Deployer)
 	}
 	// next check that the PoolAddress of the CSR is not invalid
 	if _, err := sdk.AccAddressFromBech32(msg.PoolAddress); err != nil {
-		return sdkerrors.Wrapf(err, "MsgUpdateCSR: ValidateBasic: invalid sdk address of CSR pool: %s", msg.PoolAddress)
+		return sdkerrors.Wrapf(err, "MsgUpdateCSR::ValidateBasic: invalid sdk address of CSR pool: %s", msg.PoolAddress)
 	}
 	// now check that nonces length and contracts length are equal
 	noncesLen := len(msg.ContractData.Nonces)
 	contractsLen := len(msg.ContractData.Contracts)
 	if noncesLen != contractsLen {
-		return sdkerrors.Wrapf(ErrInvalidArity, "MsgUpdateCSR: ValidateBasic: invalid length of nonces/contracts: nonces: %d, contracts: %d", noncesLen, contractsLen)
+		return sdkerrors.Wrapf(ErrInvalidArity, "MsgUpdateCSR::ValidateBasic: invalid length of nonces/contracts: nonces: %d, contracts: %d", noncesLen, contractsLen)
 	}
 	//initialize errgroup for concurrent processing of contracts and nonces
 	eg := &errgroup.Group{}
@@ -140,7 +140,7 @@ func (msg MsgUpdateCSR) ValidateBasic() error {
 	eg.Go(msg.ContractData.CheckContracts)
 	// block until groups finish and return err if non-nil
 	if err := eg.Wait(); err != nil {
-		return sdkerrors.Wrapf(err, "MsgUpdateCSR:: ValidateBasic: error validating contracts/nonces")
+		return sdkerrors.Wrapf(err, "MsgUpdateCSR::ValidateBasic: error validating contracts/nonces")
 	}
 
 	return nil
@@ -202,19 +202,19 @@ func (msg *MsgWithdrawCSR) GetSigners() []sdk.AccAddress {
 func (msg MsgWithdrawCSR) ValidateBasic() error {
 	// check that the Withdrawer address is valid first
 	if _, err := sdk.AccAddressFromBech32(msg.Withdrawer); err != nil {
-		return sdkerrors.Wrapf(err, "MsgUpdateCSR: ValidateBasic: invalid sdk address of withdrawer: %s", msg.Withdrawer)
+		return sdkerrors.Wrapf(err, "MsgUpdateCSR::ValidateBasic: invalid sdk address of withdrawer: %s", msg.Withdrawer)
 	}
 
 	// check that the receiver address is a valid cosmos-sdk address
 	if _, err := sdk.AccAddressFromBech32(msg.Receiver); err != nil {
-		return sdkerrors.Wrapf(err, "MsgUpdateCSR: ValidateBasic: invalid sdk address of receiver: %s", msg.Receiver)
+		return sdkerrors.Wrapf(err, "MsgUpdateCSR::ValidateBasic: invalid sdk address of receiver: %s", msg.Receiver)
 	}
 
 	// check that the length of the NFTIds / CsrPools is valid
 	lenPools := len(msg.CsrPools)
 	lenNFTs := len(msg.Nfts)
 	if lenPools != lenNFTs {
-		return sdkerrors.Wrapf(ErrInvalidArity, "MsgUpdateCSR: ValidateBasic: invalid length of pools/NFTs: pools: %d, NFTs: %d", lenPools, lenNFTs)
+		return sdkerrors.Wrapf(ErrInvalidArity, "MsgUpdateCSR::ValidateBasic: invalid length of pools/NFTs: pools: %d, NFTs: %d", lenPools, lenNFTs)
 	}
 
 	// finally handle the checking of the NFTIDs and the pool addresses
@@ -231,7 +231,7 @@ func (msg *MsgWithdrawCSR) CheckPools() error {
 	seenValues := make(map[string]bool)
 
 	if len(msg.CsrPools) != len(msg.Nfts) {
-		return sdkerrors.Wrapf(ErrInvalidArity, "MsgUpdateCSR: ValidateBasic: invalid length of pools/NFTs")
+		return sdkerrors.Wrapf(ErrInvalidArity, "MsgUpdateCSR::ValidateBasic: invalid length of pools/NFTs")
 	}
 
 	// iterate over all sdkpools
@@ -248,7 +248,7 @@ func (msg *MsgWithdrawCSR) CheckPools() error {
 			// index into map with key and check the value of the map
 			if seenValues[string(key)] {
 				// this value has been seen twice in same pool, fail
-				return sdkerrors.Wrapf(ErrRepeatedNFT, "MsgWithdrawCSR: CheckPools: nftId seen twice, poolAddr: %s, nftId: %d", addrS, nftId)
+				return sdkerrors.Wrapf(ErrRepeatedNFT, "MsgWithdrawCSR::CheckPools: nftId seen twice, poolAddr: %s, nftId: %d", addrS, nftId)
 			}
 			// if not seen before set value to true
 			seenValues[string(key)] = true
@@ -264,12 +264,12 @@ func (msg *MsgRegisterCSR) CheckAllocations() error {
 	for addr, alloc := range msg.Allocations {
 		// check that sdk addresses given are valid
 		if _, err := sdk.AccAddressFromBech32(addr); err != nil {
-			return sdkerrors.Wrapf(err, "CheckAllocations: invalid sdk address: %s", addr)
+			return sdkerrors.Wrapf(err, "CheckAllocations::invalid sdk address: %s", addr)
 		}
 		sumAlloc += alloc
 	}
 	if sumAlloc != msg.NftSupply {
-		return sdkerrors.Wrapf(ErrMisMatchedAllocations, "CheckAllocations: invalid NFT allocation: expected: %d, got: %d", msg.NftSupply, sumAlloc)
+		return sdkerrors.Wrapf(ErrMisMatchedAllocations, "CheckAllocations::invalid NFT allocation: expected: %d, got: %d", msg.NftSupply, sumAlloc)
 	}
 	return nil
 }
@@ -280,7 +280,7 @@ func (contractData *ContractData) CheckContracts() error {
 	for _, addr := range contractData.Contracts {
 		// check for zero-address or invalid address format
 		if err := ethermint.ValidateNonZeroAddress(addr); err != nil {
-			return sdkerrors.Wrapf(err, "CheckContracts: invalid evm address: %s", addr)
+			return sdkerrors.Wrapf(err, "CheckContracts::invalid evm address: %s", addr)
 		}
 	}
 	return nil
@@ -293,7 +293,7 @@ func (contractData *ContractData) CheckNonces() error {
 		for _, nonce := range arr.Value {
 			// if nonce is zero or negative throw error
 			if nonce < uint64(1) {
-				return sdkerrors.Wrapf(ErrInvalidNonce, "CheckAllocations: invalid nonce: %d", nonce)
+				return sdkerrors.Wrapf(ErrInvalidNonce, "CheckAllocations::invalid nonce: %d", nonce)
 			}
 		}
 	}
