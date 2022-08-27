@@ -3,10 +3,10 @@ package keeper_test
 import (
 	"testing"
 
+	testkeeper "github.com/Canto-Network/Canto/v2/testutil/keeper"
+	"github.com/Canto-Network/Canto/v2/x/csr/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
-	testkeeper 	"github.com/Canto-Network/Canto/v2/testutil/keeper"
-	"github.com/Canto-Network/Canto/v2/x/csr/types"
 )
 
 func TestParamsQuery(t *testing.T) {
