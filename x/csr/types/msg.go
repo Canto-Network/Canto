@@ -264,12 +264,12 @@ func (msg *MsgRegisterCSR) CheckAllocations() error {
 	for addr, alloc := range msg.Allocations {
 		// check that sdk addresses given are valid
 		if _, err := sdk.AccAddressFromBech32(addr); err != nil {
-			return sdkerrors.Wrapf(err, "CheckAllocations::invalid sdk address: %s", addr)
+			return sdkerrors.Wrapf(err, "MsgRegisterCSR::CheckAllocations::invalid sdk address: %s", addr)
 		}
 		sumAlloc += alloc
 	}
 	if sumAlloc != msg.NftSupply {
-		return sdkerrors.Wrapf(ErrMisMatchedAllocations, "CheckAllocations::invalid NFT allocation: expected: %d, got: %d", msg.NftSupply, sumAlloc)
+		return sdkerrors.Wrapf(ErrMisMatchedAllocations, "MsgRegisterCSR::CheckAllocations::invalid NFT allocation: expected: %d, got: %d", msg.NftSupply, sumAlloc)
 	}
 	return nil
 }
@@ -280,7 +280,7 @@ func (contractData *ContractData) CheckContracts() error {
 	for _, addr := range contractData.Contracts {
 		// check for zero-address or invalid address format
 		if err := ethermint.ValidateNonZeroAddress(addr); err != nil {
-			return sdkerrors.Wrapf(err, "CheckContracts::invalid evm address: %s", addr)
+			return sdkerrors.Wrapf(err, "ContractData::CheckContracts::invalid evm address: %s", addr)
 		}
 	}
 	return nil
@@ -293,7 +293,7 @@ func (contractData *ContractData) CheckNonces() error {
 		for _, nonce := range arr.Value {
 			// if nonce is zero or negative throw error
 			if nonce < uint64(1) {
-				return sdkerrors.Wrapf(ErrInvalidNonce, "CheckAllocations::invalid nonce: %d", nonce)
+				return sdkerrors.Wrapf(ErrInvalidNonce, "ContractData::CheckAllocations::invalid nonce: %d", nonce)
 			}
 		}
 	}
