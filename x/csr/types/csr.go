@@ -1,8 +1,8 @@
 package types
 
 import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	ethermint "github.com/evmos/ethermint/types"
 )
 
 // Creates a new instance of the CSR object. This consumes a fully created CSRPool object.
@@ -44,19 +44,26 @@ func NewCSRNFT(id uint64, address string) CSRNFT {
 // Validate performs stateless validation of a CSR object
 func (csr CSR) Validate() error {
 	// Check if the address of the deployer is valid
-	deployer := csr.GetDeployer()
-	if err := ethermint.ValidateNonZeroAddress(deployer); err != nil {
+	deployer := csr.Deployer
+	if _, err := sdk.AccAddressFromBech32(deployer); err != nil {
 		return err
 	}
 
+	seenSmartContracts := make(map[string]bool)
+	for _, smartContract := range csr.Contracts {
+		if seenSmartContracts[smartContract] {
+			return sdkerrors.Wrapf(ErrDuplicateSmartContracts, "CSR::Validate there are duplicate NFTs in this CSR.")
+		}
+	}
+
 	// Ensure that there is at least one smart contract in the CSR Pool
-	numSmartContracts := len(csr.GetContracts())
+	numSmartContracts := len(csr.Contracts)
 	if numSmartContracts < 1 {
 		return sdkerrors.Wrapf(ErrSmartContractSupply, "CSRPool::Validate # of smart contracts must be greater than 0 got: %d", numSmartContracts)
 	}
 
 	// Validate the CSR Pool that belongs to the
-	if err := csr.GetCsrPool().Validate(); err != nil {
+	if err := csr.CsrPool.Validate(); err != nil {
 		return err
 	}
 
@@ -66,12 +73,12 @@ func (csr CSR) Validate() error {
 // Validate performs stateless validation of a CSRPool object
 func (csrPool CSRPool) Validate() error {
 	// Ensure the NFT smart contract address is not empty
-	if err := ethermint.ValidateNonZeroAddress(csrPool.GetPoolAddress()); err != nil {
+	if _, err := sdk.AccAddressFromBech32(csrPool.PoolAddress); err != nil {
 		return err
 	}
 
 	// The total supply of NFTs must be greater than 0
-	nftSupply := csrPool.GetNftSupply()
+	nftSupply := csrPool.NftSupply
 	if nftSupply < 1 {
 		return sdkerrors.Wrapf(ErrNFTSupply, "The total supply of NFTs must be greater than 0 got: %d", nftSupply)
 	}

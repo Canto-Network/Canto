@@ -3,6 +3,8 @@ package types
 import (
 	"testing"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/evmos/ethermint/tests"
 	"github.com/stretchr/testify/suite"
 )
@@ -22,7 +24,7 @@ func TestCSRSuite(t *testing.T) {
 
 func (suite *CSRTestSuite) SetupTest() {
 	// deployer is the EVM address of the EOA that deploys everything
-	suite.deployer = tests.GenerateAddress().String()
+	suite.deployer = sdk.AccAddress(tests.GenerateAddress().Bytes()).String()
 
 	// contract addresses stores all of the EVM dapps we want to register
 	suite.contractAddresses = []string{tests.GenerateAddress().String(), tests.GenerateAddress().String()}
@@ -31,7 +33,7 @@ func (suite *CSRTestSuite) SetupTest() {
 	suite.nftSupply = 4
 
 	// pool address is the address of the csr smart contracted that minted the NFTs
-	suite.poolAddress = tests.GenerateAddress().String()
+	suite.poolAddress = sdk.AccAddress(tests.GenerateAddress().Bytes()).String()
 
 	suite.nfts = []*CSRNFT{
 		&CSRNFT{

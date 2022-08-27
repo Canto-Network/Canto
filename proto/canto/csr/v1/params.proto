@@ -11,8 +11,10 @@ message Params {
   // boolean to enable the csr module
   bool enable_csr = 1;
   // decimal to determine the transaction fee split between network operators (validators) and CSR
-  string csr_shares = 3 [
+  string csr_shares = 2 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];
+
+  uint64 address_derivation_cost_create = 3;
 }
