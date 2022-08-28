@@ -13,7 +13,6 @@ import (
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
 	"github.com/Canto-Network/Canto/v2/app"
-	// claimtypes "github.com/Canto-Network/Canto/v2/x/claims/types"
 	"github.com/Canto-Network/Canto/v2/x/fees/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
