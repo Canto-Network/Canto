@@ -136,6 +136,12 @@ import (
 	govshuttlekeeper "github.com/Canto-Network/Canto/v2/x/govshuttle/keeper"
 	govshuttletypes "github.com/Canto-Network/Canto/v2/x/govshuttle/types"
 
+	// csr imports
+
+	"github.com/Canto-Network/Canto/v2/x/csr"
+	csrkeeper "github.com/Canto-Network/Canto/v2/x/csr/keeper"
+	csrtypes "github.com/Canto-Network/Canto/v2/x/csr/types"
+
 	v2 "github.com/Canto-Network/Canto/v2/app/upgrades/v2"
 )
 
@@ -194,6 +200,7 @@ var (
 		inflation.AppModuleBasic{},
 		erc20.AppModuleBasic{},
 		govshuttle.AppModuleBasic{},
+		csr.AppModuleBasic{}, // csr Module to Module Basics map
 		epochs.AppModuleBasic{},
 		recovery.AppModuleBasic{},
 		fees.AppModuleBasic{},
@@ -276,6 +283,7 @@ type Canto struct {
 	RecoveryKeeper   *recoverykeeper.Keeper
 	FeesKeeper       feeskeeper.Keeper
 	GovshuttleKeeper govshuttlekeeper.Keeper
+	CSRKeeper        csrkeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -333,6 +341,8 @@ func NewCanto(
 		inflationtypes.StoreKey, erc20types.StoreKey,
 		epochstypes.StoreKey, vestingtypes.StoreKey, recoverytypes.StoreKey, //recoverytypes.StoreKe
 		feestypes.StoreKey,
+		// register CSR store key
+		csrtypes.StoreKey,
 	)
 
 	// Add the EVM transient store key
@@ -459,6 +469,11 @@ func NewCanto(
 		keys[feestypes.StoreKey], appCodec, app.GetSubspace(feestypes.ModuleName),
 		app.BankKeeper, app.EvmKeeper,
 		authtypes.FeeCollectorName,
+	)
+
+	app.CSRKeeper = csrkeeper.NewKeeper(
+		appCodec, keys[csrtypes.StoreKey],
+		app.GetSubspace(csrtypes.ModuleName),
 	)
 
 	epochsKeeper := epochskeeper.NewKeeper(appCodec, keys[epochstypes.StoreKey])
@@ -600,6 +615,7 @@ func NewCanto(
 		recovery.NewAppModule(*app.RecoveryKeeper),
 		fees.NewAppModule(app.FeesKeeper, app.AccountKeeper),
 		govshuttle.NewAppModule(app.GovshuttleKeeper, app.AccountKeeper),
+		csr.NewAppModule(app.CSRKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -636,6 +652,7 @@ func NewCanto(
 		recoverytypes.ModuleName,
 		feestypes.ModuleName,
 		govshuttletypes.ModuleName,
+		csrtypes.ModuleName,
 	)
 
 	// NOTE: fee market module must go last in order to retrieve the block gas used.
@@ -667,6 +684,7 @@ func NewCanto(
 		inflationtypes.ModuleName,
 		erc20types.ModuleName,
 		govshuttletypes.ModuleName,
+		csrtypes.ModuleName,
 		// recoverytypes.ModuleName,
 		feestypes.ModuleName,
 	)
@@ -708,6 +726,7 @@ func NewCanto(
 		recoverytypes.ModuleName,
 		feestypes.ModuleName,
 		govshuttletypes.ModuleName,
+		csrtypes.ModuleName,
 		// NOTE: crisis module must go at the end to check for invariants on each module
 		crisistypes.ModuleName,
 	)
@@ -1025,6 +1044,8 @@ func initParamsKeeper(
 	paramsKeeper.Subspace(recoverytypes.ModuleName)
 	paramsKeeper.Subspace(feestypes.ModuleName)
 	paramsKeeper.Subspace(govshuttletypes.ModuleName)
+	// initialize params Subspace for CSR
+	paramsKeeper.Subspace(csrtypes.ModuleName)
 	return paramsKeeper
 }
 
