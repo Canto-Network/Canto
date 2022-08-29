@@ -14,8 +14,7 @@ var (
 
 	ErrInvalidParams = sdkerrors.Register(ModuleName, 1003, "csr::Params")
 
-	ErrDuplicatePools = sdkerrors.Register(ModuleName, 1004, "csr::GenesisState")
-	ErrDuplicateNFTs  = sdkerrors.Register(ModuleName, 1005, "csr::GenesisState")
+	ErrNonZeroCSRs = sdkerrors.Register(ModuleName, 1004, "csr::GenesisState")
 
 	ErrMisMatchedAllocations = sdkerrors.Register(ModuleName, 6969, "csr::MsgRegisterCSR")
 	ErrInvalidNFTSupply      = sdkerrors.Register(ModuleName, 6970, "csr::MsgRegisterCSR")

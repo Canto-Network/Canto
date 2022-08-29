@@ -11,35 +11,12 @@ option go_package = "github.com/Canto-Network/Canto/v2/x/csr/types";
 // that are registered with this pool.
 message CSR {
     option (gogoproto.equal) = true;
-    // The Deployer keeps track of the user that deployed all of the dApps as well as this CSR pool.
-    string deployer = 1;
-    // Contracts is the list of all EVM address that are registered to this pool.
+    // The owner keeps track of the user that deploys all of the dApps, same user that initially owns the NFT
+    string owner = 1;
+    // Contracts is the list of all EVM address that are registered to this pool (EVM addresses)
     repeated string contracts = 2;
-    // The CSRPool keeps track of data on the pool itself include NFTs involved, accumulated rewards, and more (see below). 
-    CSRPool csr_pool = 3;
+    // The NFT id which this CSR corresponds to
+    uint64 id = 3;
+    // The account which will be accumulating rewards for this CSR (bech32 Canto address)
+    string account = 4;
 }
-
-// The CSRPool is the data structure that wraps around the sdk account address for which all txFees from the 
-// CSR will be sent. The pool is controlled by the CSR module account, and withdrawal methods automatically 
-// take into account shares owned by an NFT identifier. 
-message CSRPool {
-    option (gogoproto.equal) = true;
-    // The CSRNFTs that are a part of this pool, this is a array because each NFT id is incremented by 1 starting at 0
-    repeated CSRNFT csr_nfts = 1;
-    // The number of unique NFTs minted for this CSR
-    uint64 nft_supply = 2;
-    // The address of the NFT Factory for this CSR 
-    string pool_address = 3;
-}
-
-// This is a wrapper around the EVM NFT that is used for verification in withdrawal of rewards 
-message CSRNFT {
-    option (gogoproto.equal) = true;
-    // the period at which the last withdrawal for this NFT occurred 
-    uint64 period = 1;
-    // the NFT Identifier for this NFT
-    uint64 id = 2;
-    // the smart contract address that minted this nft
-    string address = 3;
-} 
-
