@@ -3,56 +3,35 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	ethermint "github.com/evmos/ethermint/types"
 )
 
-// Creates a new instance of the CSR object. This consumes a fully created CSRPool object.
-func NewCSR(deployer string, contracts []string, csrPool *CSRPool) CSR {
+// Creates a new instance of the CSR object
+func NewCSR(owner sdk.AccAddress, contracts []string, id uint64, account sdk.AccAddress) CSR {
 	return CSR{
-		Deployer:  deployer,
+		Owner:     owner.String(),
 		Contracts: contracts,
-		CsrPool:   csrPool,
-	}
-}
-
-// Creates a new instance of a CSRPool. This function will look through the entire supply of NFTs and
-// create a new internal representation of the NFT based on id.
-func NewCSRPool(nftSupply uint64, poolAddress string) CSRPool {
-	csrNFTs := []*CSRNFT{}
-	id := uint64(0)
-	for ; id < nftSupply; id++ {
-		csrNFT := NewCSRNFT(id, poolAddress)
-		csrNFTs = append(csrNFTs, &csrNFT)
-	}
-
-	return CSRPool{
-		CsrNfts:     csrNFTs,
-		NftSupply:   nftSupply,
-		PoolAddress: poolAddress,
-	}
-}
-
-// Creates a new instance of a CSRNFT. This will only be called when the CSRNFTs are initially created upon
-// registration. As such, the period will default to 0 for every minted NFT.
-func NewCSRNFT(id uint64, address string) CSRNFT {
-	return CSRNFT{
-		Period:  0,
-		Id:      id,
-		Address: address,
+		Id:        id,
+		Account:   account.String(),
 	}
 }
 
 // Validate performs stateless validation of a CSR object
 func (csr CSR) Validate() error {
-	// Check if the address of the deployer is valid
-	deployer := csr.Deployer
-	if _, err := sdk.AccAddressFromBech32(deployer); err != nil {
+	// Check if the address of the owner is valid
+	owner := csr.Owner
+	if _, err := sdk.AccAddressFromBech32(owner); err != nil {
 		return err
 	}
 
 	seenSmartContracts := make(map[string]bool)
 	for _, smartContract := range csr.Contracts {
+		if err := ethermint.ValidateNonZeroAddress(smartContract); err != nil {
+			return sdkerrors.Wrapf(ErrInvalidSmartContractAddress, "CSR::Validate one or more of the entered smart contract address are invalid.")
+		}
+
 		if seenSmartContracts[smartContract] {
-			return sdkerrors.Wrapf(ErrDuplicateSmartContracts, "CSR::Validate there are duplicate NFTs in this CSR.")
+			return sdkerrors.Wrapf(ErrDuplicateSmartContracts, "CSR::Validate there are duplicate smart contracts in this CSR.")
 		}
 	}
 
@@ -62,26 +41,10 @@ func (csr CSR) Validate() error {
 		return sdkerrors.Wrapf(ErrSmartContractSupply, "CSRPool::Validate # of smart contracts must be greater than 0 got: %d", numSmartContracts)
 	}
 
-	// Validate the CSR Pool that belongs to the
-	if err := csr.CsrPool.Validate(); err != nil {
+	// Ensure that the account address entered is a valid canto address
+	account := csr.Account
+	if _, err := sdk.AccAddressFromBech32(account); err != nil {
 		return err
 	}
-
-	return nil
-}
-
-// Validate performs stateless validation of a CSRPool object
-func (csrPool CSRPool) Validate() error {
-	// Ensure the NFT smart contract address is not empty
-	if _, err := sdk.AccAddressFromBech32(csrPool.PoolAddress); err != nil {
-		return err
-	}
-
-	// The total supply of NFTs must be greater than 0
-	nftSupply := csrPool.NftSupply
-	if nftSupply < 1 {
-		return sdkerrors.Wrapf(ErrNFTSupply, "The total supply of NFTs must be greater than 0 got: %d", nftSupply)
-	}
-
 	return nil
 }
