@@ -25,7 +25,7 @@ service Query {
     // query by address
     option (google.api.http).get = "/canto/v2/csr/csr/{nftId}";
   }
-  // query a CSR by a specific deployer
+  // query a CSR by a specific deployer (cantoAddress)
   rpc DeployerCSR(QueryDeployerCSRRequest) returns (QueryDeployerCSRResponse) { 
     // query by deployer address 
     option (google.api.http).get = "/canto/v2/csr/csr_deployer/{deployer_address}";
