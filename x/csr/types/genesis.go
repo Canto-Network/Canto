@@ -14,10 +14,8 @@ func DefaultGenesis() *GenesisState {
 	}
 }
 
-// Validate performs basic genesis state validation returning an error upon any
-// failure. Validation will check that there are no duplicate CSRPools registered,
-// that there are not the same NFTs registered for different groups, and that the smart contracts
-// in a given pool are not repeated elsewhere
+// Validate checks if there are any entered CSRs. By default, there should be no CSRs on genesis because
+// the CSR turnstile and NFT smart contracts have not been deployed yet. Checks if params are valid.
 func (gs GenesisState) Validate() error {
 	if len(gs.Csrs) != 0 {
 		return sdkerrors.Wrapf(ErrNonZeroCSRs, "GenesisState::Validate you cannot initialize a genesis state with a set of existing csrs.")
