@@ -11,6 +11,4 @@ option go_package = "github.com/Canto-Network/Canto/v2/x/csr/types";
 message GenesisState {
   // params defines all of the parameters of the module
   Params params = 1 [(gogoproto.nullable) = false];
-  // holds all of the csr pools that may have been registered at a previous height
-  repeated CSR csrs = 2;
 }
