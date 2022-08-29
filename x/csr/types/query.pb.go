@@ -6,7 +6,6 @@ package types
 import (
 	context "context"
 	fmt "fmt"
-	github_com_cosmos_cosmos_sdk_types "github.com/cosmos/cosmos-sdk/types"
 	query "github.com/cosmos/cosmos-sdk/types/query"
 	_ "github.com/gogo/protobuf/gogoproto"
 	grpc1 "github.com/gogo/protobuf/grpc"
@@ -205,10 +204,10 @@ func (m *QueryCSRsResponse) GetPagination() *query.PageResponse {
 	return nil
 }
 
-// request a specific CSR via the address of the pool in which funds for the CSR are accumulated
+// request a specific CSR via the nftId which has been minted for the CSR
 type QueryCSRRequest struct {
 	// query CSR via pool address, sdk.AccAddress of the pool in which funds will be accumulated
-	PoolAddress string `protobuf:"bytes,1,opt,name=pool_address,json=poolAddress,proto3" json:"pool_address,omitempty"`
+	NftId uint64 `protobuf:"varint,1,opt,name=nftId,proto3" json:"nftId,omitempty"`
 }
 
 func (m *QueryCSRRequest) Reset()         { *m = QueryCSRRequest{} }
@@ -244,11 +243,11 @@ func (m *QueryCSRRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryCSRRequest proto.InternalMessageInfo
 
-func (m *QueryCSRRequest) GetPoolAddress() string {
+func (m *QueryCSRRequest) GetNftId() uint64 {
 	if m != nil {
-		return m.PoolAddress
+		return m.NftId
 	}
-	return ""
+	return 0
 }
 
 // response for query of CSR by pool addr
@@ -397,24 +396,24 @@ func (m *QueryDeployerCSRResponse) GetPagination() *query.PageResponse {
 	return nil
 }
 
-// query for all entered CSRs by account address
-type QueryUserToCSRRequest struct {
-	// account address for querying all entered CSRs
-	AccountAddress string `protobuf:"bytes,1,opt,name=account_address,json=accountAddress,proto3" json:"account_address,omitempty"`
+// request the CSR that the provided smart contract belongs to
+type QueryContractCSRRequest struct {
+	// query takes the contract address
+	ContractAddress string `protobuf:"bytes,1,opt,name=contract_address,json=contractAddress,proto3" json:"contract_address,omitempty"`
 }
 
-func (m *QueryUserToCSRRequest) Reset()         { *m = QueryUserToCSRRequest{} }
-func (m *QueryUserToCSRRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryUserToCSRRequest) ProtoMessage()    {}
-func (*QueryUserToCSRRequest) Descriptor() ([]byte, []int) {
+func (m *QueryContractCSRRequest) Reset()         { *m = QueryContractCSRRequest{} }
+func (m *QueryContractCSRRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryContractCSRRequest) ProtoMessage()    {}
+func (*QueryContractCSRRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_a845ddc1dc245388, []int{8}
 }
-func (m *QueryUserToCSRRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryContractCSRRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryUserToCSRRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryContractCSRRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryUserToCSRRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryContractCSRRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -424,44 +423,43 @@ func (m *QueryUserToCSRRequest) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
-func (m *QueryUserToCSRRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryUserToCSRRequest.Merge(m, src)
+func (m *QueryContractCSRRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryContractCSRRequest.Merge(m, src)
 }
-func (m *QueryUserToCSRRequest) XXX_Size() int {
+func (m *QueryContractCSRRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryUserToCSRRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryUserToCSRRequest.DiscardUnknown(m)
+func (m *QueryContractCSRRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryContractCSRRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryUserToCSRRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryContractCSRRequest proto.InternalMessageInfo
 
-func (m *QueryUserToCSRRequest) GetAccountAddress() string {
+func (m *QueryContractCSRRequest) GetContractAddress() string {
 	if m != nil {
-		return m.AccountAddress
+		return m.ContractAddress
 	}
 	return ""
 }
 
-// returns array of all CSRs entered
-type QueryUserToCSRResponse struct {
-	Csrs []CSR `protobuf:"bytes,1,rep,name=csrs,proto3" json:"csrs"`
-	// pagination for response
-	Pagination *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+// response of QueryContractCSRResponse
+type QueryContractCSRResponse struct {
+	// returns the CSR that contrains this contract
+	Csr CSR `protobuf:"bytes,1,opt,name=csr,proto3" json:"csr"`
 }
 
-func (m *QueryUserToCSRResponse) Reset()         { *m = QueryUserToCSRResponse{} }
-func (m *QueryUserToCSRResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryUserToCSRResponse) ProtoMessage()    {}
-func (*QueryUserToCSRResponse) Descriptor() ([]byte, []int) {
+func (m *QueryContractCSRResponse) Reset()         { *m = QueryContractCSRResponse{} }
+func (m *QueryContractCSRResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryContractCSRResponse) ProtoMessage()    {}
+func (*QueryContractCSRResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_a845ddc1dc245388, []int{9}
 }
-func (m *QueryUserToCSRResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryContractCSRResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryUserToCSRResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryContractCSRResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryUserToCSRResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryContractCSRResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -471,116 +469,24 @@ func (m *QueryUserToCSRResponse) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return b[:n], nil
 	}
 }
-func (m *QueryUserToCSRResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryUserToCSRResponse.Merge(m, src)
+func (m *QueryContractCSRResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryContractCSRResponse.Merge(m, src)
 }
-func (m *QueryUserToCSRResponse) XXX_Size() int {
+func (m *QueryContractCSRResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryUserToCSRResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryUserToCSRResponse.DiscardUnknown(m)
+func (m *QueryContractCSRResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryContractCSRResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryUserToCSRResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryContractCSRResponse proto.InternalMessageInfo
 
-func (m *QueryUserToCSRResponse) GetCsrs() []CSR {
+func (m *QueryContractCSRResponse) GetCsr() CSR {
 	if m != nil {
-		return m.Csrs
+		return m.Csr
 	}
-	return nil
+	return CSR{}
 }
-
-func (m *QueryUserToCSRResponse) GetPagination() *query.PageResponse {
-	if m != nil {
-		return m.Pagination
-	}
-	return nil
-}
-
-// query for all accumulated rewards
-type QueryRewardsRequest struct {
-	// account address for querying all rewards
-	AccountAddress string `protobuf:"bytes,1,opt,name=account_address,json=accountAddress,proto3" json:"account_address,omitempty"`
-}
-
-func (m *QueryRewardsRequest) Reset()         { *m = QueryRewardsRequest{} }
-func (m *QueryRewardsRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryRewardsRequest) ProtoMessage()    {}
-func (*QueryRewardsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a845ddc1dc245388, []int{10}
-}
-func (m *QueryRewardsRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *QueryRewardsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_QueryRewardsRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *QueryRewardsRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryRewardsRequest.Merge(m, src)
-}
-func (m *QueryRewardsRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *QueryRewardsRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryRewardsRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QueryRewardsRequest proto.InternalMessageInfo
-
-func (m *QueryRewardsRequest) GetAccountAddress() string {
-	if m != nil {
-		return m.AccountAddress
-	}
-	return ""
-}
-
-// returns rewards as an sdk.Coin, rewards will be in acanto (gas token)
-type QueryRewardsResponse struct {
-	// rewards as an sdk.Coin
-	Rewards github_com_cosmos_cosmos_sdk_types.Coin `protobuf:"bytes,1,opt,name=rewards,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Coin" json:"rewards"`
-}
-
-func (m *QueryRewardsResponse) Reset()         { *m = QueryRewardsResponse{} }
-func (m *QueryRewardsResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryRewardsResponse) ProtoMessage()    {}
-func (*QueryRewardsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a845ddc1dc245388, []int{11}
-}
-func (m *QueryRewardsResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *QueryRewardsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_QueryRewardsResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *QueryRewardsResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryRewardsResponse.Merge(m, src)
-}
-func (m *QueryRewardsResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *QueryRewardsResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryRewardsResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QueryRewardsResponse proto.InternalMessageInfo
 
 func init() {
 	proto.RegisterType((*QueryParamsRequest)(nil), "canto.csr.v1.QueryParamsRequest")
@@ -591,62 +497,53 @@ func init() {
 	proto.RegisterType((*QueryCSRResponse)(nil), "canto.csr.v1.QueryCSRResponse")
 	proto.RegisterType((*QueryDeployerCSRRequest)(nil), "canto.csr.v1.QueryDeployerCSRRequest")
 	proto.RegisterType((*QueryDeployerCSRResponse)(nil), "canto.csr.v1.QueryDeployerCSRResponse")
-	proto.RegisterType((*QueryUserToCSRRequest)(nil), "canto.csr.v1.QueryUserToCSRRequest")
-	proto.RegisterType((*QueryUserToCSRResponse)(nil), "canto.csr.v1.QueryUserToCSRResponse")
-	proto.RegisterType((*QueryRewardsRequest)(nil), "canto.csr.v1.QueryRewardsRequest")
-	proto.RegisterType((*QueryRewardsResponse)(nil), "canto.csr.v1.QueryRewardsResponse")
+	proto.RegisterType((*QueryContractCSRRequest)(nil), "canto.csr.v1.QueryContractCSRRequest")
+	proto.RegisterType((*QueryContractCSRResponse)(nil), "canto.csr.v1.QueryContractCSRResponse")
 }
 
 func init() { proto.RegisterFile("canto/csr/v1/query.proto", fileDescriptor_a845ddc1dc245388) }
 
 var fileDescriptor_a845ddc1dc245388 = []byte{
-	// 727 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x55, 0x4d, 0x4f, 0xdb, 0x4a,
-	0x14, 0x8d, 0xf9, 0x14, 0x37, 0xe8, 0x01, 0xf3, 0xf2, 0x78, 0xa9, 0x45, 0x0d, 0xb8, 0x1f, 0x81,
-	0xa2, 0x78, 0x94, 0xd0, 0x2e, 0x5b, 0xb5, 0x04, 0x09, 0xb1, 0xa9, 0xa8, 0x69, 0x37, 0xdd, 0x44,
-	0x13, 0x67, 0xe4, 0x46, 0x80, 0xc7, 0xcc, 0x38, 0xa1, 0x08, 0xb1, 0x68, 0x77, 0x55, 0xa5, 0x0a,
-	0x89, 0x3f, 0xc5, 0x12, 0xa9, 0x9b, 0xaa, 0x0b, 0x54, 0x41, 0xff, 0x40, 0xff, 0x41, 0xe5, 0x99,
-	0x31, 0xd8, 0x49, 0xa0, 0xea, 0x8a, 0x55, 0x92, 0x7b, 0xcf, 0x9c, 0x73, 0xee, 0xf5, 0x1c, 0x07,
-	0x8a, 0x1e, 0x09, 0x22, 0x86, 0x3d, 0xc1, 0x71, 0xa7, 0x82, 0x77, 0xdb, 0x94, 0xef, 0x3b, 0x21,
-	0x67, 0x11, 0x43, 0xe3, 0xb2, 0xe3, 0x78, 0x82, 0x3b, 0x9d, 0x8a, 0x59, 0xf0, 0x99, 0xcf, 0x64,
-	0x03, 0xc7, 0xdf, 0x14, 0xc6, 0x9c, 0xf1, 0x19, 0xf3, 0xb7, 0x29, 0x26, 0x61, 0x0b, 0x93, 0x20,
-	0x60, 0x11, 0x89, 0x5a, 0x2c, 0x10, 0xba, 0xfb, 0xc8, 0x63, 0x62, 0x87, 0x09, 0xdc, 0x20, 0x82,
-	0x2a, 0x6a, 0xdc, 0xa9, 0x34, 0x68, 0x44, 0x2a, 0x38, 0x24, 0x7e, 0x2b, 0x90, 0x60, 0x8d, 0xbd,
-	0x93, 0xf1, 0x11, 0x12, 0x4e, 0x76, 0x12, 0x9a, 0xe9, 0x4c, 0x2b, 0xf6, 0x23, 0xeb, 0x76, 0x01,
-	0xd0, 0xab, 0x98, 0x74, 0x43, 0x82, 0x5d, 0xba, 0xdb, 0xa6, 0x22, 0xb2, 0xd7, 0xe1, 0xdf, 0x4c,
-	0x55, 0x84, 0x2c, 0x10, 0x14, 0x55, 0x61, 0x44, 0x91, 0x16, 0x8d, 0x39, 0x63, 0x21, 0x5f, 0x2d,
-	0x38, 0xe9, 0xf1, 0x1c, 0x85, 0x5e, 0x19, 0x3a, 0x39, 0x9b, 0xcd, 0xb9, 0x1a, 0x69, 0x23, 0x98,
-	0x94, 0x54, 0xb5, 0x4d, 0xf7, 0x92, 0xfe, 0x93, 0x01, 0x53, 0xa9, 0xa2, 0x66, 0x5f, 0x82, 0x21,
-	0x4f, 0xf0, 0x98, 0x7b, 0x70, 0x21, 0x5f, 0x9d, 0xca, 0x72, 0xd7, 0x36, 0x5d, 0x4d, 0x2c, 0x41,
-	0x68, 0x0d, 0xe0, 0x6a, 0xfc, 0xe2, 0x80, 0xb4, 0x53, 0x72, 0xd4, 0xae, 0x9c, 0x78, 0x57, 0x8e,
-	0x7a, 0x0c, 0x7a, 0x57, 0xce, 0x06, 0xf1, 0x69, 0xa2, 0xe4, 0xa6, 0x8e, 0xda, 0x8f, 0x61, 0x22,
-	0xb1, 0xa2, 0xed, 0xa1, 0x79, 0x18, 0x0f, 0x19, 0xdb, 0xae, 0x93, 0x66, 0x93, 0x53, 0xa1, 0x86,
-	0x1d, 0x73, 0xf3, 0x71, 0xed, 0x85, 0x2a, 0xd9, 0x4f, 0xaf, 0xa6, 0xba, 0xf4, 0xbf, 0x08, 0x83,
-	0x9e, 0xe0, 0x7a, 0x35, 0xd7, 0xda, 0x8f, 0x31, 0xf6, 0x2a, 0xfc, 0x2f, 0x8f, 0xaf, 0xd2, 0x70,
-	0x9b, 0xed, 0x53, 0x9e, 0x12, 0x5f, 0x84, 0xc9, 0xa6, 0xae, 0x76, 0x19, 0x98, 0x48, 0xea, 0x89,
-	0x89, 0x23, 0x03, 0x8a, 0xbd, 0x34, 0xb7, 0xba, 0xcd, 0xe7, 0xf0, 0x9f, 0x74, 0xf4, 0x46, 0x50,
-	0xfe, 0x9a, 0xa5, 0xc6, 0x2a, 0xc1, 0x04, 0xf1, 0x3c, 0xd6, 0x0e, 0xa2, 0xae, 0xa9, 0xfe, 0xd1,
-	0xe5, 0x64, 0xa8, 0x2f, 0x06, 0x4c, 0x77, 0x53, 0xdc, 0xea, 0x48, 0xcf, 0x74, 0x16, 0x5c, 0xba,
-	0x47, 0x78, 0x53, 0xfc, 0xf5, 0x40, 0x04, 0x0a, 0xd9, 0xf3, 0x7a, 0x9a, 0x75, 0x18, 0xe5, 0xaa,
-	0xa4, 0x0e, 0xae, 0xe0, 0xd8, 0xfd, 0xf7, 0xb3, 0xd9, 0x92, 0xdf, 0x8a, 0xde, 0xb5, 0x1b, 0x8e,
-	0xc7, 0x76, 0xb0, 0x0e, 0xbf, 0xfa, 0x28, 0x8b, 0xe6, 0x16, 0x8e, 0xf6, 0x43, 0x2a, 0x9c, 0x1a,
-	0x6b, 0x05, 0x6e, 0x72, 0xbe, 0xfa, 0x6b, 0x18, 0x86, 0xa5, 0x06, 0xda, 0x82, 0x11, 0x95, 0x42,
-	0x34, 0x97, 0x5d, 0x4f, 0x6f, 0xc8, 0xcd, 0xf9, 0x1b, 0x10, 0xca, 0xa3, 0x3d, 0xf3, 0xf1, 0xeb,
-	0xcf, 0xe3, 0x81, 0x69, 0x54, 0xc0, 0xea, 0xf5, 0xd1, 0xa9, 0xca, 0x37, 0x88, 0x8a, 0x36, 0xf2,
-	0x60, 0x28, 0x0e, 0x30, 0xb2, 0xfa, 0x10, 0xa5, 0xe2, 0x6e, 0xce, 0x5e, 0xdb, 0xd7, 0x32, 0xa6,
-	0x94, 0x29, 0x20, 0x94, 0x95, 0x91, 0xcf, 0x31, 0x80, 0xc1, 0xda, 0xa6, 0x8b, 0xee, 0xf6, 0xe7,
-	0x48, 0x24, 0xac, 0xeb, 0xda, 0x5a, 0x61, 0x41, 0x2a, 0xd8, 0x68, 0xae, 0x47, 0x01, 0x1f, 0xa4,
-	0xb3, 0x7e, 0x88, 0x8e, 0x0d, 0xc8, 0xa7, 0xf2, 0x84, 0x1e, 0xf4, 0x61, 0xee, 0x8d, 0xad, 0xf9,
-	0xf0, 0x4f, 0x30, 0x6d, 0xe4, 0x89, 0x34, 0x82, 0x51, 0xb9, 0xc7, 0x48, 0x3d, 0x89, 0x37, 0x3e,
-	0xe8, 0x7e, 0x01, 0x1c, 0xa2, 0xcf, 0x06, 0x8c, 0x5d, 0x06, 0x02, 0xdd, 0xeb, 0x23, 0xd6, 0x9d,
-	0x38, 0xf3, 0xfe, 0xcd, 0x20, 0xed, 0x67, 0x59, 0xfa, 0x29, 0xa3, 0xa5, 0xac, 0x9f, 0xb6, 0xa0,
-	0xbc, 0x1e, 0xb1, 0xba, 0x5c, 0x50, 0xd7, 0x3d, 0x3f, 0x44, 0x1f, 0x0c, 0x18, 0xd5, 0xd7, 0x19,
-	0xf5, 0xbb, 0x45, 0xd9, 0xa8, 0x98, 0xf6, 0x4d, 0x10, 0xed, 0x03, 0x4b, 0x1f, 0x8b, 0xa8, 0x94,
-	0xf5, 0xa1, 0x6f, 0x78, 0xaf, 0x87, 0x95, 0xb5, 0x93, 0x73, 0xcb, 0x38, 0x3d, 0xb7, 0x8c, 0x1f,
-	0xe7, 0x96, 0x71, 0x74, 0x61, 0xe5, 0x4e, 0x2f, 0xac, 0xdc, 0xb7, 0x0b, 0x2b, 0xf7, 0xb6, 0x9c,
-	0xca, 0x4f, 0x2d, 0x26, 0x2b, 0xbf, 0xa4, 0xd1, 0x1e, 0xe3, 0x5b, 0xea, 0x57, 0x4c, 0xfd, 0x5e,
-	0x92, 0xcb, 0x28, 0x35, 0x46, 0xe4, 0x1f, 0xe1, 0xf2, 0xef, 0x00, 0x00, 0x00, 0xff, 0xff, 0xe6,
-	0x77, 0x2c, 0xc3, 0xc5, 0x07, 0x00, 0x00,
+	// 618 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x54, 0xc1, 0x6f, 0xd3, 0x3e,
+	0x18, 0x6d, 0xd6, 0xae, 0xd2, 0xcf, 0xfd, 0x49, 0xdb, 0x4c, 0x34, 0xba, 0x30, 0xb2, 0x2d, 0x12,
+	0x6c, 0x03, 0x35, 0x56, 0x8b, 0x38, 0x72, 0x60, 0x1d, 0x9a, 0x76, 0x41, 0x23, 0xbd, 0x71, 0x99,
+	0xdc, 0xd4, 0x84, 0x6a, 0x6b, 0x9c, 0xd9, 0x6e, 0xa1, 0x9a, 0x76, 0xe1, 0xc6, 0x6d, 0xd2, 0xfe,
+	0xa9, 0x1d, 0x27, 0x71, 0xe1, 0x84, 0x50, 0xcb, 0x99, 0xbf, 0x01, 0xc5, 0x76, 0xb6, 0xa4, 0x49,
+	0x41, 0x9c, 0xb8, 0x35, 0xdf, 0xf7, 0xfc, 0xde, 0xfb, 0x3e, 0x3f, 0x17, 0xd4, 0x7d, 0x1c, 0x0a,
+	0x8a, 0x7c, 0xce, 0xd0, 0xa8, 0x89, 0xce, 0x86, 0x84, 0x8d, 0xdd, 0x88, 0x51, 0x41, 0xe1, 0xff,
+	0xb2, 0xe3, 0xfa, 0x9c, 0xb9, 0xa3, 0xa6, 0x65, 0x06, 0x34, 0xa0, 0xb2, 0x81, 0xe2, 0x5f, 0x0a,
+	0x63, 0xad, 0x07, 0x94, 0x06, 0xa7, 0x04, 0xe1, 0xa8, 0x8f, 0x70, 0x18, 0x52, 0x81, 0x45, 0x9f,
+	0x86, 0x5c, 0x77, 0x9f, 0xf8, 0x94, 0x0f, 0x28, 0x47, 0x5d, 0xcc, 0x89, 0xa2, 0x46, 0xa3, 0x66,
+	0x97, 0x08, 0xdc, 0x44, 0x11, 0x0e, 0xfa, 0xa1, 0x04, 0x6b, 0xec, 0x5a, 0xc6, 0x47, 0x84, 0x19,
+	0x1e, 0x24, 0x34, 0xab, 0x99, 0x56, 0xec, 0x47, 0xd6, 0x1d, 0x13, 0xc0, 0x37, 0x31, 0xe9, 0x91,
+	0x04, 0x7b, 0xe4, 0x6c, 0x48, 0xb8, 0x70, 0x0e, 0xc1, 0xbd, 0x4c, 0x95, 0x47, 0x34, 0xe4, 0x04,
+	0xb6, 0x40, 0x55, 0x91, 0xd6, 0x8d, 0x4d, 0x63, 0xa7, 0xd6, 0x32, 0xdd, 0xf4, 0x78, 0xae, 0x42,
+	0xef, 0x55, 0xae, 0xbf, 0x6d, 0x94, 0x3c, 0x8d, 0x74, 0x20, 0x58, 0x96, 0x54, 0xed, 0x8e, 0x77,
+	0x4b, 0xff, 0xd9, 0x00, 0x2b, 0xa9, 0xa2, 0x66, 0x7f, 0x0a, 0x2a, 0x3e, 0x67, 0x31, 0x77, 0x79,
+	0xa7, 0xd6, 0x5a, 0xc9, 0x72, 0xb7, 0x3b, 0x9e, 0x26, 0x96, 0x20, 0x78, 0x00, 0xc0, 0xdd, 0xf8,
+	0xf5, 0x05, 0x69, 0x67, 0xdb, 0x55, 0xbb, 0x72, 0xe3, 0x5d, 0xb9, 0xea, 0x1a, 0xf4, 0xae, 0xdc,
+	0x23, 0x1c, 0x90, 0x44, 0xc9, 0x4b, 0x1d, 0x75, 0xb6, 0xc1, 0x52, 0x62, 0x45, 0xdb, 0x83, 0x26,
+	0x58, 0x0c, 0xdf, 0x89, 0xc3, 0x9e, 0x9c, 0xb2, 0xe2, 0xa9, 0x0f, 0xe7, 0xc5, 0xdd, 0x20, 0xb7,
+	0x96, 0x77, 0x41, 0xd9, 0xe7, 0x4c, 0x6f, 0x63, 0xae, 0xe3, 0x18, 0xe3, 0xec, 0x83, 0xfb, 0xf2,
+	0xf8, 0x3e, 0x89, 0x4e, 0xe9, 0x98, 0xb0, 0x94, 0xde, 0x2e, 0x58, 0xee, 0xe9, 0xea, 0x31, 0xee,
+	0xf5, 0x18, 0xe1, 0x6a, 0xc1, 0xff, 0x79, 0x4b, 0x49, 0xfd, 0xa5, 0x2a, 0x3b, 0x97, 0x06, 0xa8,
+	0xe7, 0x69, 0xfe, 0xe9, 0x02, 0x93, 0xc1, 0xda, 0x34, 0x14, 0x0c, 0xfb, 0x22, 0x3b, 0x98, 0xaf,
+	0xab, 0xb3, 0x83, 0x25, 0xf5, 0x64, 0xb0, 0x57, 0x7a, 0xae, 0x0c, 0xcb, 0x5f, 0x6f, 0xb9, 0xf5,
+	0xb3, 0x02, 0x16, 0x25, 0x0f, 0x3c, 0x01, 0x55, 0x95, 0x47, 0xb8, 0x99, 0x3d, 0x91, 0x8f, 0xbb,
+	0xb5, 0xf5, 0x1b, 0x84, 0xf2, 0xe0, 0xac, 0x7f, 0xfa, 0xf2, 0xe3, 0x6a, 0x61, 0x15, 0x9a, 0x48,
+	0x3d, 0xa4, 0x51, 0x4b, 0xbe, 0x25, 0x15, 0x72, 0xe8, 0x83, 0x4a, 0x1c, 0x65, 0x68, 0x17, 0x10,
+	0xa5, 0x82, 0x6f, 0x6d, 0xcc, 0xed, 0x6b, 0x19, 0x4b, 0xca, 0x98, 0x10, 0x66, 0x65, 0xe4, 0x8d,
+	0x05, 0xa0, 0xdc, 0xee, 0x78, 0xf0, 0x61, 0x31, 0x47, 0x22, 0x61, 0xcf, 0x6b, 0x6b, 0x85, 0x2d,
+	0xa9, 0xf0, 0x00, 0xae, 0xe5, 0x14, 0xd0, 0xb9, 0x0c, 0xfa, 0x05, 0xbc, 0x32, 0x40, 0x2d, 0x95,
+	0x2f, 0xf8, 0xa8, 0x80, 0x32, 0x1f, 0x63, 0xeb, 0xf1, 0x9f, 0x60, 0xda, 0xc1, 0x73, 0xe9, 0x00,
+	0xc1, 0x46, 0xce, 0xc1, 0x71, 0x12, 0x77, 0x74, 0x3e, 0xfb, 0x20, 0x94, 0xab, 0x54, 0x3a, 0x0a,
+	0x5d, 0xe5, 0x33, 0x58, 0xe8, 0xaa, 0x20, 0x64, 0x73, 0x5d, 0x25, 0xf9, 0x95, 0x0b, 0x9a, 0x4d,
+	0xf3, 0xc5, 0xde, 0xc1, 0xf5, 0xc4, 0x36, 0x6e, 0x26, 0xb6, 0xf1, 0x7d, 0x62, 0x1b, 0x97, 0x53,
+	0xbb, 0x74, 0x33, 0xb5, 0x4b, 0x5f, 0xa7, 0x76, 0xe9, 0x6d, 0x23, 0xe8, 0x8b, 0xf7, 0xc3, 0xae,
+	0xeb, 0xd3, 0x01, 0x6a, 0xc7, 0x94, 0x8d, 0xd7, 0x44, 0x7c, 0xa0, 0xec, 0x44, 0x7d, 0xc5, 0x02,
+	0x1f, 0xa5, 0x84, 0x18, 0x47, 0x84, 0x77, 0xab, 0xf2, 0xff, 0xf8, 0xd9, 0xaf, 0x00, 0x00, 0x00,
+	0xff, 0xff, 0x14, 0x1b, 0x2c, 0x55, 0x4c, 0x06, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -665,14 +562,12 @@ type QueryClient interface {
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
 	// query all registered CSRs
 	CSRs(ctx context.Context, in *QueryCSRsRequest, opts ...grpc.CallOption) (*QueryCSRsResponse, error)
-	// query a specific CSR by the pool addr
+	// query a specific CSR by the nftId
 	CSR(ctx context.Context, in *QueryCSRRequest, opts ...grpc.CallOption) (*QueryCSRResponse, error)
 	// query a CSR by a specific deployer
 	DeployerCSR(ctx context.Context, in *QueryDeployerCSRRequest, opts ...grpc.CallOption) (*QueryDeployerCSRResponse, error)
-	// query a CSR by a specific user
-	UserToCSR(ctx context.Context, in *QueryUserToCSRRequest, opts ...grpc.CallOption) (*QueryUserToCSRResponse, error)
-	// query accumulated rewards by users
-	Rewards(ctx context.Context, in *QueryRewardsRequest, opts ...grpc.CallOption) (*QueryRewardsResponse, error)
+	// query a csr by the smart contract
+	ContractCSR(ctx context.Context, in *QueryContractCSRRequest, opts ...grpc.CallOption) (*QueryContractCSRResponse, error)
 }
 
 type queryClient struct {
@@ -719,18 +614,9 @@ func (c *queryClient) DeployerCSR(ctx context.Context, in *QueryDeployerCSRReque
 	return out, nil
 }
 
-func (c *queryClient) UserToCSR(ctx context.Context, in *QueryUserToCSRRequest, opts ...grpc.CallOption) (*QueryUserToCSRResponse, error) {
-	out := new(QueryUserToCSRResponse)
-	err := c.cc.Invoke(ctx, "/canto.csr.v1.Query/UserToCSR", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *queryClient) Rewards(ctx context.Context, in *QueryRewardsRequest, opts ...grpc.CallOption) (*QueryRewardsResponse, error) {
-	out := new(QueryRewardsResponse)
-	err := c.cc.Invoke(ctx, "/canto.csr.v1.Query/Rewards", in, out, opts...)
+func (c *queryClient) ContractCSR(ctx context.Context, in *QueryContractCSRRequest, opts ...grpc.CallOption) (*QueryContractCSRResponse, error) {
+	out := new(QueryContractCSRResponse)
+	err := c.cc.Invoke(ctx, "/canto.csr.v1.Query/ContractCSR", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -743,14 +629,12 @@ type QueryServer interface {
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
 	// query all registered CSRs
 	CSRs(context.Context, *QueryCSRsRequest) (*QueryCSRsResponse, error)
-	// query a specific CSR by the pool addr
+	// query a specific CSR by the nftId
 	CSR(context.Context, *QueryCSRRequest) (*QueryCSRResponse, error)
 	// query a CSR by a specific deployer
 	DeployerCSR(context.Context, *QueryDeployerCSRRequest) (*QueryDeployerCSRResponse, error)
-	// query a CSR by a specific user
-	UserToCSR(context.Context, *QueryUserToCSRRequest) (*QueryUserToCSRResponse, error)
-	// query accumulated rewards by users
-	Rewards(context.Context, *QueryRewardsRequest) (*QueryRewardsResponse, error)
+	// query a csr by the smart contract
+	ContractCSR(context.Context, *QueryContractCSRRequest) (*QueryContractCSRResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
@@ -769,11 +653,8 @@ func (*UnimplementedQueryServer) CSR(ctx context.Context, req *QueryCSRRequest) 
 func (*UnimplementedQueryServer) DeployerCSR(ctx context.Context, req *QueryDeployerCSRRequest) (*QueryDeployerCSRResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeployerCSR not implemented")
 }
-func (*UnimplementedQueryServer) UserToCSR(ctx context.Context, req *QueryUserToCSRRequest) (*QueryUserToCSRResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UserToCSR not implemented")
-}
-func (*UnimplementedQueryServer) Rewards(ctx context.Context, req *QueryRewardsRequest) (*QueryRewardsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Rewards not implemented")
+func (*UnimplementedQueryServer) ContractCSR(ctx context.Context, req *QueryContractCSRRequest) (*QueryContractCSRResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ContractCSR not implemented")
 }
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
@@ -852,38 +733,20 @@ func _Query_DeployerCSR_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_UserToCSR_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryUserToCSRRequest)
+func _Query_ContractCSR_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryContractCSRRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).UserToCSR(ctx, in)
+		return srv.(QueryServer).ContractCSR(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/canto.csr.v1.Query/UserToCSR",
+		FullMethod: "/canto.csr.v1.Query/ContractCSR",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).UserToCSR(ctx, req.(*QueryUserToCSRRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Query_Rewards_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryRewardsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(QueryServer).Rewards(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/canto.csr.v1.Query/Rewards",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).Rewards(ctx, req.(*QueryRewardsRequest))
+		return srv.(QueryServer).ContractCSR(ctx, req.(*QueryContractCSRRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -909,12 +772,8 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Query_DeployerCSR_Handler,
 		},
 		{
-			MethodName: "UserToCSR",
-			Handler:    _Query_UserToCSR_Handler,
-		},
-		{
-			MethodName: "Rewards",
-			Handler:    _Query_Rewards_Handler,
+			MethodName: "ContractCSR",
+			Handler:    _Query_ContractCSR_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -1069,12 +928,10 @@ func (m *QueryCSRRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.PoolAddress) > 0 {
-		i -= len(m.PoolAddress)
-		copy(dAtA[i:], m.PoolAddress)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.PoolAddress)))
+	if m.NftId != 0 {
+		i = encodeVarintQuery(dAtA, i, uint64(m.NftId))
 		i--
-		dAtA[i] = 0xa
+		dAtA[i] = 0x8
 	}
 	return len(dAtA) - i, nil
 }
@@ -1191,7 +1048,7 @@ func (m *QueryDeployerCSRResponse) MarshalToSizedBuffer(dAtA []byte) (int, error
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryUserToCSRRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryContractCSRRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1201,27 +1058,27 @@ func (m *QueryUserToCSRRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryUserToCSRRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryContractCSRRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryUserToCSRRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryContractCSRRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.AccountAddress) > 0 {
-		i -= len(m.AccountAddress)
-		copy(dAtA[i:], m.AccountAddress)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.AccountAddress)))
+	if len(m.ContractAddress) > 0 {
+		i -= len(m.ContractAddress)
+		copy(dAtA[i:], m.ContractAddress)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.ContractAddress)))
 		i--
 		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryUserToCSRResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryContractCSRResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1231,101 +1088,22 @@ func (m *QueryUserToCSRResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryUserToCSRResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryContractCSRResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryUserToCSRResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Pagination != nil {
-		{
-			size, err := m.Pagination.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintQuery(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Csrs) > 0 {
-		for iNdEx := len(m.Csrs) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.Csrs[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintQuery(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0xa
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *QueryRewardsRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *QueryRewardsRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *QueryRewardsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.AccountAddress) > 0 {
-		i -= len(m.AccountAddress)
-		copy(dAtA[i:], m.AccountAddress)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.AccountAddress)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *QueryRewardsResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *QueryRewardsResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *QueryRewardsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryContractCSRResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	{
-		size := m.Rewards.Size()
-		i -= size
-		if _, err := m.Rewards.MarshalTo(dAtA[i:]); err != nil {
+		size, err := m.Csr.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
 			return 0, err
 		}
+		i -= size
 		i = encodeVarintQuery(dAtA, i, uint64(size))
 	}
 	i--
@@ -1398,9 +1176,8 @@ func (m *QueryCSRRequest) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.PoolAddress)
-	if l > 0 {
-		n += 1 + l + sovQuery(uint64(l))
+	if m.NftId != 0 {
+		n += 1 + sovQuery(uint64(m.NftId))
 	}
 	return n
 }
@@ -1448,58 +1225,26 @@ func (m *QueryDeployerCSRResponse) Size() (n int) {
 	return n
 }
 
-func (m *QueryUserToCSRRequest) Size() (n int) {
+func (m *QueryContractCSRRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = len(m.AccountAddress)
+	l = len(m.ContractAddress)
 	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
 	}
 	return n
 }
 
-func (m *QueryUserToCSRResponse) Size() (n int) {
+func (m *QueryContractCSRResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if len(m.Csrs) > 0 {
-		for _, e := range m.Csrs {
-			l = e.Size()
-			n += 1 + l + sovQuery(uint64(l))
-		}
-	}
-	if m.Pagination != nil {
-		l = m.Pagination.Size()
-		n += 1 + l + sovQuery(uint64(l))
-	}
-	return n
-}
-
-func (m *QueryRewardsRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.AccountAddress)
-	if l > 0 {
-		n += 1 + l + sovQuery(uint64(l))
-	}
-	return n
-}
-
-func (m *QueryRewardsResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = m.Rewards.Size()
+	l = m.Csr.Size()
 	n += 1 + l + sovQuery(uint64(l))
 	return n
 }
@@ -1843,10 +1588,10 @@ func (m *QueryCSRRequest) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PoolAddress", wireType)
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NftId", wireType)
 			}
-			var stringLen uint64
+			m.NftId = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowQuery
@@ -1856,24 +1601,11 @@ func (m *QueryCSRRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				m.NftId |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.PoolAddress = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipQuery(dAtA[iNdEx:])
@@ -2180,7 +1912,7 @@ func (m *QueryDeployerCSRResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryUserToCSRRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryContractCSRRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2203,15 +1935,15 @@ func (m *QueryUserToCSRRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryUserToCSRRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryContractCSRRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryUserToCSRRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryContractCSRRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AccountAddress", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ContractAddress", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2239,7 +1971,7 @@ func (m *QueryUserToCSRRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.AccountAddress = string(dAtA[iNdEx:postIndex])
+			m.ContractAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -2262,7 +1994,7 @@ func (m *QueryUserToCSRRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryUserToCSRResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryContractCSRResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2285,15 +2017,15 @@ func (m *QueryUserToCSRResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryUserToCSRResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryContractCSRResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryUserToCSRResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryContractCSRResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Csrs", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Csr", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2320,210 +2052,7 @@ func (m *QueryUserToCSRResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Csrs = append(m.Csrs, CSR{})
-			if err := m.Csrs[len(m.Csrs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Pagination", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Pagination == nil {
-				m.Pagination = &query.PageResponse{}
-			}
-			if err := m.Pagination.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *QueryRewardsRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: QueryRewardsRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryRewardsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AccountAddress", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.AccountAddress = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *QueryRewardsResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: QueryRewardsResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryRewardsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Rewards", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.Rewards.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.Csr.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

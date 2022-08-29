@@ -20,24 +20,20 @@ service Query {
   rpc CSRs(QueryCSRsRequest) returns (QueryCSRsResponse) {
     option (google.api.http).get = "/canto/v2/csr/csrs"; 
   }
-  // query a specific CSR by the pool addr 
+  // query a specific CSR by the nftId 
   rpc CSR(QueryCSRRequest) returns (QueryCSRResponse) {
     // query by address
-    option (google.api.http).get = "/canto/v2/csr/csr/{pool_address}";
+    option (google.api.http).get = "/canto/v2/csr/csr/{nftId}";
   }
-  // query a CSR by a specific deployer
-  rpc DeployerCSR(QueryDeployerCSRRequest) returns (QueryDeployerCSRResponse) { 
+  // query a CSR by a specific owner (cantoAddress)
+  rpc OwnerToCSR(QueryOwnerCSRRequest) returns (QueryOwnerCSRResponse) { 
     // query by deployer address 
-    option (google.api.http).get = "/canto/v2/csr/csr_deployer/{deployer_address}";
+    option (google.api.http).get = "/canto/v2/csr/owner_csr/{deployer_address}";
   }
-  // query a CSR by a specific user
-  rpc UserToCSR(QueryUserToCSRRequest) returns (QueryUserToCSRResponse) { 
-    // query csrs by account address
-    option (google.api.http).get = "/canto/v2/csr/user_to_csr/{account_address}";
-  }
-  // query accumulated rewards by users
-  rpc Rewards(QueryRewardsRequest) returns (QueryRewardsResponse) { 
-    option (google.api.http).get = "/canto/v2/csr/rewards/{account_address}";
+  // query a csr by the smart contract
+  rpc ContractToCSR(QueryContractCSRRequest) returns (QueryContractCSRResponse) {
+    // query contract by contract address
+    option (google.api.http).get = "/canto/v2/csr/contract_csr/{contract_address}";
   }
 }
 
@@ -60,10 +56,10 @@ message QueryCSRsResponse {
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
-// request a specific CSR via the address of the pool in which funds for the CSR are accumulated
+// request a specific CSR via the nftId which has been minted for the CSR
 message QueryCSRRequest { 
   // query CSR via pool address, sdk.AccAddress of the pool in which funds will be accumulated
-  string pool_address = 1; 
+  uint64 nftId = 1; 
 }
 
 // response for query of CSR by pool addr
@@ -73,40 +69,25 @@ message QueryCSRResponse {
 }
 
 // query all CSRs deployed by an address
-message QueryDeployerCSRRequest {
+message QueryOwnerCSRRequest {
   //query by deployer_address for all
   string deployer_address = 1; 
 }
 // returns array of all CSRs registered by deployer 
-message QueryDeployerCSRResponse { 
+message QueryOwnerCSRResponse { 
   repeated CSR csrs = 1 [ (gogoproto.nullable) = false ];
   // pagination for response
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
-// query for all entered CSRs by account address
-message QueryUserToCSRRequest {
-  // account address for querying all entered CSRs
-  string account_address = 1;
-}
-// returns array of all CSRs entered
-message QueryUserToCSRResponse { 
-  repeated CSR csrs = 1 [ (gogoproto.nullable) = false ];
-  // pagination for response
-  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+// request the CSR that the provided smart contract belongs to
+message QueryContractCSRRequest {
+  // query takes the contract address 
+  string contract_address = 1;
 }
 
-// query for all accumulated rewards
-message QueryRewardsRequest { 
-    // account address for querying all rewards
-    string account_address = 1;
-}
-
-// returns rewards as an sdk.Coin, rewards will be in acanto (gas token)
-message QueryRewardsResponse { 
-  // rewards as an sdk.Coin 
-  string rewards = 1 [ 
-    (gogoproto.nullable) = false,
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin"
-  ];
+// response of QueryContractCSRResponse
+message QueryContractCSRResponse {
+  // returns the CSR that contrains this contract
+  CSR csr = 1 [ (gogoproto.nullable) = false ];
 }
