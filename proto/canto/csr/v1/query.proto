@@ -25,13 +25,13 @@ service Query {
     // query by address
     option (google.api.http).get = "/canto/v2/csr/csr/{nftId}";
   }
-  // query a CSR by a specific deployer (cantoAddress)
-  rpc DeployerCSR(QueryDeployerCSRRequest) returns (QueryDeployerCSRResponse) { 
+  // query a CSR by a specific owner (cantoAddress)
+  rpc OwnerToCSR(QueryOwnerCSRRequest) returns (QueryOwnerCSRResponse) { 
     // query by deployer address 
-    option (google.api.http).get = "/canto/v2/csr/csr_deployer/{deployer_address}";
+    option (google.api.http).get = "/canto/v2/csr/owner_csr/{deployer_address}";
   }
   // query a csr by the smart contract
-  rpc ContractCSR(QueryContractCSRRequest) returns (QueryContractCSRResponse) {
+  rpc ContractToCSR(QueryContractCSRRequest) returns (QueryContractCSRResponse) {
     // query contract by contract address
     option (google.api.http).get = "/canto/v2/csr/contract_csr/{contract_address}";
   }
@@ -69,12 +69,12 @@ message QueryCSRResponse {
 }
 
 // query all CSRs deployed by an address
-message QueryDeployerCSRRequest {
+message QueryOwnerCSRRequest {
   //query by deployer_address for all
   string deployer_address = 1; 
 }
 // returns array of all CSRs registered by deployer 
-message QueryDeployerCSRResponse { 
+message QueryOwnerCSRResponse { 
   repeated CSR csrs = 1 [ (gogoproto.nullable) = false ];
   // pagination for response
   cosmos.base.query.v1beta1.PageResponse pagination = 2;

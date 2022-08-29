@@ -15,10 +15,5 @@ var (
 	ErrDuplicatePools          = sdkerrors.Register(ModuleName, 1004, "csr::GenesisState")
 	ErrDuplicateNFTs           = sdkerrors.Register(ModuleName, 1005, "csr::GenesisState")
 	ErrDuplicateSmartContracts = sdkerrors.Register(ModuleName, 1006, "csr::CSR")
-  ErrMisMatchedAllocations   = sdkerrors.Register(ModuleName, 6969, "csr::MsgRegisterCSR")
-	ErrInvalidNFTSupply        = sdkerrors.Register(ModuleName, 6970, "csr::MsgRegisterCSR")
-	ErrInvalidNonce            = sdkerrors.Register(ModuleName, 6971, "csr::MsgRegisterCSR")
-	ErrInvalidArity            = sdkerrors.Register(ModuleName, 6972, "csr::MsgRegisterCSR")
-	ErrInvalidType             = sdkerrors.Register(ModuleName, 6973, "csr::MsgRegisterCSR")
-  ErrRepeatedNFT             = sdkerrors.Register(ModuleName, 6974, "csr::MsgWithdrawCSR")
+
 )
