@@ -11,11 +11,10 @@ import (
 
 type CSRTestSuite struct {
 	suite.Suite
-	deployer          string
-	contractAddresses []string
-	nftSupply         uint64
-	nfts              []*CSRNFT
-	poolAddress       string
+	owner     string
+	contracts []string
+	id        uint64
+	account   string
 }
 
 func TestCSRSuite(t *testing.T) {
@@ -23,40 +22,11 @@ func TestCSRSuite(t *testing.T) {
 }
 
 func (suite *CSRTestSuite) SetupTest() {
-	// deployer is the EVM address of the EOA that deploys everything
-	suite.deployer = sdk.AccAddress(tests.GenerateAddress().Bytes()).String()
-
-	// contract addresses stores all of the EVM dapps we want to register
-	suite.contractAddresses = []string{tests.GenerateAddress().String(), tests.GenerateAddress().String()}
-
-	// NFT supply is the total circulating supply of NFTs
-	suite.nftSupply = 4
-
-	// pool address is the address of the csr smart contracted that minted the NFTs
-	suite.poolAddress = sdk.AccAddress(tests.GenerateAddress().Bytes()).String()
-
-	suite.nfts = []*CSRNFT{
-		&CSRNFT{
-			Period:  0,
-			Id:      0,
-			Address: suite.poolAddress,
-		},
-		&CSRNFT{
-			Period:  0,
-			Id:      1,
-			Address: suite.poolAddress,
-		},
-		&CSRNFT{
-			Period:  0,
-			Id:      2,
-			Address: suite.poolAddress,
-		},
-		&CSRNFT{
-			Period:  0,
-			Id:      3,
-			Address: suite.poolAddress,
-		},
-	}
+	suite.owner = sdk.AccAddress(tests.GenerateAddress().Bytes()).String()
+	suite.contracts = []string{tests.GenerateAddress().String(), tests.GenerateAddress().String(),
+		tests.GenerateAddress().String(), tests.GenerateAddress().String()}
+	suite.id = 0
+	suite.account = sdk.AccAddress(tests.GenerateAddress().Bytes()).String()
 }
 
 func (suite *CSRTestSuite) TestCSR() {
@@ -68,65 +38,50 @@ func (suite *CSRTestSuite) TestCSR() {
 		{
 			"Create CSR object - pass",
 			CSR{
-				Deployer:  suite.deployer,
-				Contracts: suite.contractAddresses,
-				CsrPool: &CSRPool{
-					CsrNfts:     suite.nfts,
-					NftSupply:   suite.nftSupply,
-					PoolAddress: suite.poolAddress,
-				},
+				Owner:     suite.owner,
+				Contracts: suite.contracts,
+				Id:        suite.id,
+				Account:   suite.account,
 			},
 			true,
 		},
 		{
-			"Create CSR object with 0 nft supply - fail",
+			"Create CSR object with 0 smart contracts - fail",
 			CSR{
-				Deployer:  suite.deployer,
-				Contracts: suite.contractAddresses,
-				CsrPool: &CSRPool{
-					CsrNfts:     suite.nfts,
-					NftSupply:   0,
-					PoolAddress: suite.poolAddress,
-				},
-			},
-			false,
-		},
-		{
-			"Create CSR object with invalid deployer address - fail",
-			CSR{
-				Deployer:  "",
-				Contracts: suite.contractAddresses,
-				CsrPool: &CSRPool{
-					CsrNfts:     suite.nfts,
-					NftSupply:   suite.nftSupply,
-					PoolAddress: suite.poolAddress,
-				},
-			},
-			false,
-		},
-		{
-			"Create CSR object with invalid pool address - fail",
-			CSR{
-				Deployer:  suite.deployer,
-				Contracts: suite.contractAddresses,
-				CsrPool: &CSRPool{
-					CsrNfts:     suite.nfts,
-					NftSupply:   suite.nftSupply,
-					PoolAddress: "",
-				},
-			},
-			false,
-		},
-		{
-			"Create CSR object with no smart contracts (dApps) - fail",
-			CSR{
-				Deployer:  suite.deployer,
+				Owner:     suite.owner,
 				Contracts: []string{},
-				CsrPool: &CSRPool{
-					CsrNfts:     suite.nfts,
-					NftSupply:   suite.nftSupply,
-					PoolAddress: suite.poolAddress,
-				},
+				Id:        suite.id,
+				Account:   suite.account,
+			},
+			false,
+		},
+		{
+			"Create CSR object with invalid owner address - fail",
+			CSR{
+				Owner:     "",
+				Contracts: suite.contracts,
+				Id:        suite.id,
+				Account:   suite.account,
+			},
+			false,
+		},
+		{
+			"Create CSR object with invalid account address - fail",
+			CSR{
+				Owner:     suite.owner,
+				Contracts: suite.contracts,
+				Id:        suite.id,
+				Account:   "",
+			},
+			false,
+		},
+		{
+			"Create CSR object with invalid smart contract addresses - fail",
+			CSR{
+				Owner:     suite.owner,
+				Contracts: append(suite.contracts, ""),
+				Id:        suite.id,
+				Account:   suite.account,
 			},
 			false,
 		},
