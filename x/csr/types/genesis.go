@@ -1,9 +1,5 @@
 package types
 
-import (
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-)
-
 // DefaultIndex is the default capability global index
 const DefaultIndex uint64 = 1
 
@@ -17,9 +13,5 @@ func DefaultGenesis() *GenesisState {
 // Validate checks if there are any entered CSRs. By default, there should be no CSRs on genesis because
 // the CSR turnstile and NFT smart contracts have not been deployed yet. Checks if params are valid.
 func (gs GenesisState) Validate() error {
-	if len(gs.Csrs) != 0 {
-		return sdkerrors.Wrapf(ErrNonZeroCSRs, "GenesisState::Validate you cannot initialize a genesis state with a set of existing csrs.")
-	}
-
 	return gs.Params.Validate()
 }

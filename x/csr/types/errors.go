@@ -14,8 +14,6 @@ var (
 
 	ErrInvalidParams = sdkerrors.Register(ModuleName, 1003, "csr::Params")
 
-	ErrNonZeroCSRs = sdkerrors.Register(ModuleName, 1004, "csr::GenesisState")
-
 	ErrMisMatchedAllocations = sdkerrors.Register(ModuleName, 6969, "csr::MsgRegisterCSR")
 	ErrInvalidNFTSupply      = sdkerrors.Register(ModuleName, 6970, "csr::MsgRegisterCSR")
 	ErrInvalidNonce          = sdkerrors.Register(ModuleName, 6971, "csr::MsgRegisterCSR")

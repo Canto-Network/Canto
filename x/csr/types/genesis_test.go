@@ -50,22 +50,6 @@ func (suite *GensisStateSuite) TestGenesisStateValidate() {
 			genState: types.DefaultGenesis(),
 			valid:    true,
 		},
-		{
-			desc: "Non-empty csrs - fail",
-			genState: &types.GenesisState{
-				Params: suite.params,
-				Csrs:   suite.csrs,
-			},
-			valid: false,
-		},
-		{
-			desc: "Eempty csrs - pass",
-			genState: &types.GenesisState{
-				Params: suite.params,
-				Csrs:   []*types.CSR{},
-			},
-			valid: true,
-		},
 	}
 
 	for _, tc := range testCases {
