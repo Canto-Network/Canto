@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/Canto-Network/Canto/v2/app"
-	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/evmos/ethermint/crypto/ethsecp256k1"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
@@ -67,18 +66,4 @@ func (suite *KeeperTestSuite) SetupApp() {
 		ConsensusHash:      tmhash.Sum([]byte("consensus")),
 		LastResultsHash:    tmhash.Sum([]byte("last_result")),
 	})
-}
-
-// helper function to generate test addresses for CheckPools tests
-func generateSdkAddr(numAccts int) []string {
-	// generate pks
-	accts := make([]string, numAccts)
-	for i := 0; i < numAccts; i++ {
-		// fill PrivKeyField
-		pk := ed25519.GenPrivKey().PubKey()
-		// generate account
-		accts[i] = sdk.AccAddress(pk.Bytes()).String()
-	}
-
-	return accts
 }

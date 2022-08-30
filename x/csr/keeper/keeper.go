@@ -16,6 +16,7 @@ type (
 		cdc        codec.BinaryCodec
 		storeKey   sdk.StoreKey
 		paramstore paramtypes.Subspace
+		evmKeeper  types.EVMKeeper
 	}
 )
 
@@ -23,6 +24,7 @@ func NewKeeper(
 	cdc codec.BinaryCodec,
 	storeKey sdk.StoreKey,
 	ps paramtypes.Subspace,
+	evmKeeper types.EVMKeeper,
 
 ) Keeper {
 	// set KeyTable if it has not already been set
@@ -34,6 +36,7 @@ func NewKeeper(
 		storeKey:   storeKey,
 		cdc:        cdc,
 		paramstore: ps,
+		evmKeeper:  evmKeeper,
 	}
 }
 
