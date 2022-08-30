@@ -1,86 +1,103 @@
 package keeper
 
 import (
+	"encoding/binary"
+
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ethereum/go-ethereum/common"
 )
 
-func (k Keeper) GetCSR(ctx sdk.Context, poolAddress sdk.AccAddress) (*types.CSR, bool) {
-	deployer, found := k.GetDeployer(ctx, poolAddress)
-	if !found {
-		return nil, false
-	}
-	// If there was no deployer, this means that the CSR pool was never registered
-	// i.e. there are also no smart contracts for this pool
-	contracts := k.GetContracts(ctx, poolAddress)
-	return &types.CSR{
-		Deployer:  deployer.String(),
-		Contracts: contracts,
-		CsrPool: &types.CSRPool{
-			CsrNfts:     []*types.CSRNFT{},
-			NftSupply:   1,
-			PoolAddress: poolAddress.String(),
-		},
-	}, true
-}
+// Returns the CSR object given an NFT, returns nil if the NFT id has no
+// corresponding CSR object
+func (k Keeper) GetCSR(ctx sdk.Context, nftId uint64) (*types.CSR, bool) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixCSR)
+	key := UInt64ToBytes(nftId)
 
-// Returns the deployer of a CSR pool given the pool address.
-func (k Keeper) GetDeployer(ctx sdk.Context, poolAddress sdk.AccAddress) (sdk.AccAddress, bool) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixCSRPoolDeployer)
-	bz := store.Get(poolAddress.Bytes())
+	bz := store.Get(key)
 	if len(bz) == 0 {
 		return nil, false
 	}
-	return sdk.AccAddress(bz), true
+
+	csr := &types.CSR{}
+	csr.Unmarshal(bz)
+	return csr, true
 }
 
-// Returns all of the contracts deploying to a csr pool
-func (k Keeper) GetContracts(ctx sdk.Context, poolAddress sdk.AccAddress) []string {
-	contracts := []string{}
+// Returns the NFT id a given smart contract corresponds to if it exists in the store
+func (k Keeper) GetNFTByContract(ctx sdk.Context, address string) (uint64, bool) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixContract)
+	bz := store.Get([]byte(address))
+	if len(bz) == 0 {
+		return 0, false
+	}
+	nftId := BytesToUInt64(bz)
+	return nftId, true
+}
+
+// Returns all of the CSRs an account is the owner of
+func (k Keeper) GetCSRsByOwner(ctx sdk.Context, account string) []uint64 {
+	csrs := make([]uint64, 0)
 	// retrieve store / iterator
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, types.GetKeyPrefixPoolContracts(poolAddress.Bytes()))
+	iterator := sdk.KVStorePrefixIterator(store, types.KeyPrefixOwner)
 	defer iterator.Close()
 	// iterate over all contracts in storage and return them
 	for ; iterator.Valid(); iterator.Next() {
 		bz := iterator.Value()
-		contract := string(bz)
-		contracts = append(contracts, contract)
+		owner := string(bz[:])
+
+		if owner == account {
+			nftId := BytesToUInt64(iterator.Key()[1:])
+			csrs = append(csrs, nftId)
+		}
 	}
 
-	return contracts
+	return csrs
 }
 
-// Set CSR, sets the updated CSR object to be indexed by the pool address
-// Set the deployer by poolAddress, and the list of contracts
-// Assume this will only be called on instantiation of CSR
+// Set CSR will place a new or update CSR type into the store with the
+// key being the NFT id and the value being the marshalled CSR object
+// This will also allow mapping the owner to NFT id and contract to NFT id
+// for fast read and writes.
 func (k Keeper) SetCSR(ctx sdk.Context, csr types.CSR) {
-	// first set the deployer of this CSR
-	poolAddr := sdk.MustAccAddressFromBech32(csr.CsrPool.PoolAddress)
-	k.SetDeployer(ctx, sdk.MustAccAddressFromBech32(csr.Deployer), poolAddr)
-	// next for all contracts in the CSR, check if there are any that are left to be set
+	// Marshal the CSR object into a byte string
+	bz, _ := csr.Marshal()
+
+	// Convert the NFT id to bytes so we can store properly
+	nftId := UInt64ToBytes(csr.Id)
+
+	// Sets the id of the NFT to the CSR object itself
+	storeCSR := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixCSR)
+	storeCSR.Set(nftId, bz)
+
+	// Add a new key, value pair in the store mapping owner to nft id
+	k.SetCSROwner(ctx, csr.Id, csr.Owner)
+
+	// Add a new key, value pair in the store mapping the contract to NFT id
 	contracts := csr.Contracts
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.GetKeyPrefixPoolContracts(poolAddr))
+	storeContracts := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixContract)
 	for _, contract := range contracts {
-		store.Set([]byte(contract), []byte(contract))
+		storeContracts.Set([]byte(contract), nftId)
 	}
 }
 
-// SetDeployer sets the deployer of the CSR to be indexed by the PoolAddress of the CSR,
-// assumes that the poolAddress and deployer address are both valid sdk Addresses
-func (k Keeper) SetDeployer(ctx sdk.Context, deployer, poolAddress sdk.AccAddress) {
-	// retrieve store
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixCSRPoolDeployer)
-	// set state
-	store.Set(poolAddress.Bytes(), deployer.Bytes())
+// Sets the owner of the CSR object (denoated by id) to a new account
+// ONLY CHANGES THE STORE NOT THE CSR
+func (k Keeper) SetCSROwner(ctx sdk.Context, id uint64, account string) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixOwner)
+	key := UInt64ToBytes(id)
+	store.Set(key, []byte(account))
 }
 
-// SetContract appends to the current list of contracts for a CSR, the address passed to
-// the function. The contract is indexable only by poolAddress + contractAddress.
-func (k Keeper) SetContract(ctx sdk.Context, addr common.Address, poolAddress sdk.AccAddress) {
-	// get prefix for thisw specific contract address (which pool is this located in)
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.GetKeyPrefixPoolContracts(poolAddress))
-	store.Set(addr.Bytes(), addr.Bytes())
+// Converts a uint64 to a []byte
+func UInt64ToBytes(number uint64) []byte {
+	bz := make([]byte, 8)
+	binary.LittleEndian.PutUint64(bz, number)
+	return bz
+}
+
+// Converts a []byte into a uint64
+func BytesToUInt64(bz []byte) uint64 {
+	return uint64(binary.LittleEndian.Uint64(bz))
 }

@@ -5,12 +5,9 @@ import (
 	"time"
 
 	"github.com/Canto-Network/Canto/v2/app"
-	"github.com/Canto-Network/Canto/v2/x/csr/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/evmos/ethermint/crypto/ethsecp256k1"
-	"github.com/evmos/ethermint/tests"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -23,8 +20,7 @@ import (
 type KeeperTestSuite struct {
 	suite.Suite
 	// use keeper for tests
-	ctx sdk.Context
-
+	ctx         sdk.Context
 	app         *app.Canto
 	consAddress sdk.ConsAddress
 }
@@ -85,17 +81,4 @@ func generateSdkAddr(numAccts int) []string {
 	}
 
 	return accts
-}
-
-func generateAddresses(len int) ([]string, []*types.UIntArray) {
-	deployer := tests.GenerateAddress()
-	contracts := make([]string, len)
-	nonces := make([]*types.UIntArray, len)
-	for i := 0; i < len; i++ {
-		// generate nonces
-		nonces[i] = &types.UIntArray{Value: []uint64{uint64(i + 1)}}
-		// generate contract addresses
-		contracts[i] = crypto.CreateAddress(deployer, uint64(i+1)).String()
-	}
-	return contracts, nonces
 }

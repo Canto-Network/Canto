@@ -20,3 +20,8 @@ message CSR {
     // The account which will be accumulating rewards for this CSR (bech32 Canto address)
     string account = 4;
 }
+
+// Keeps track of all of the CSRs, primarily used to (un)marshal data
+message CSRs {
+    repeated CSR csrs = 1;
+}
