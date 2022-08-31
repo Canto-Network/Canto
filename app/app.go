@@ -474,6 +474,7 @@ func NewCanto(
 	app.CSRKeeper = csrkeeper.NewKeeper(
 		appCodec, keys[csrtypes.StoreKey],
 		app.GetSubspace(csrtypes.ModuleName),
+		app.EvmKeeper, app.BankKeeper,
 	)
 
 	epochsKeeper := epochskeeper.NewKeeper(appCodec, keys[epochstypes.StoreKey])
@@ -494,6 +495,7 @@ func NewCanto(
 		evmkeeper.NewMultiEvmHooks(
 			app.Erc20Keeper.Hooks(),
 			app.FeesKeeper.Hooks(),
+			app.CSRKeeper.Hooks(),
 		),
 	)
 

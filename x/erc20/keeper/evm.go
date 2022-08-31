@@ -227,7 +227,6 @@ func (k Keeper) monitorApprovalEvent(res *evmtypes.MsgEthereumTxResponse) error 
 
 	logApprovalSig := []byte("Approval(address,address,uint256)")
 	logApprovalSigHash := crypto.Keccak256Hash(logApprovalSig)
-
 	for _, log := range res.Logs {
 		if log.Topics[0] == logApprovalSigHash.Hex() {
 			return sdkerrors.Wrapf(
