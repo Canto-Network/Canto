@@ -803,14 +803,15 @@ func deployContract(priv *ethsecp256k1.PrivKey, contractCode string) common.Addr
 	res := deliverEthTx(priv, msgEthereumTx)
 	s.Commit()
 
-	ethereumTx := res.GetEvents()[11]
-	Expect(ethereumTx.Type).To(Equal("ethereum_tx"))
-	Expect(string(ethereumTx.Attributes[1].Key)).To(Equal("ethereumTxHash"))
-
 	contractAddress := crypto.CreateAddress(from, nonce)
 	acc := s.app.EvmKeeper.GetAccountWithoutBalance(s.ctx, contractAddress)
 	s.Require().NotEmpty(acc)
 	s.Require().True(acc.IsContract())
+
+	ethereumTx := res.GetEvents()[11]
+	Expect(ethereumTx.Type).To(Equal("ethereum_tx"))
+	Expect(string(ethereumTx.Attributes[1].Key)).To(Equal("ethereumTxHash"))
+
 	return contractAddress
 }
 
