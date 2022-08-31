@@ -16,7 +16,8 @@ type (
 		cdc        codec.BinaryCodec
 		storeKey   sdk.StoreKey
 		paramstore paramtypes.Subspace
-		EvmKeeper  types.EVMKeeper
+		evmKeeper  types.EVMKeeper
+		bankKeeper types.BankKeeper
 	}
 )
 
@@ -37,7 +38,8 @@ func NewKeeper(
 		storeKey:   storeKey,
 		cdc:        cdc,
 		paramstore: ps,
-		EvmKeeper:  evmKeeper,
+		evmKeeper:  evmKeeper,
+		bankKeeper: bankKeeper,
 	}
 }
 
