@@ -1,13 +1,14 @@
+// SPDX-License-Identifier: MIT
+
 pragma solidity ^0.8.16;
 
-contract Token {
-    event RandomEvent(string message, address sender);
+import "./turnstile.sol";
 
-    function emitEvent() public {
-        emit RandomEvent("updated event", msg.sender);
-    }
+contract CSRTest {
+    event CreateEvent(string message, address sender);
 
-    constructor() {
-        emitEvent();
+    constructor(address turnstileContract) {
+        Turnstile(turnstileContract).register(msg.sender);
+        emit CreateEvent("contract created", msg.sender);
     }
 }
