@@ -13,11 +13,13 @@ import (
 
 type (
 	Keeper struct {
-		cdc        codec.BinaryCodec
-		storeKey   sdk.StoreKey
-		paramstore paramtypes.Subspace
-		evmKeeper  types.EVMKeeper
-		bankKeeper types.BankKeeper
+		cdc        	  codec.BinaryCodec
+		storeKey   	  sdk.StoreKey
+		paramstore 	  paramtypes.Subspace
+		evmKeeper  	  types.EVMKeeper
+		bankKeeper 	  types.BankKeeper
+		accountKeeper types.AccountKeeper
+		erc20Keeper   types.ERC20Keeper
 	}
 )
 
@@ -27,7 +29,8 @@ func NewKeeper(
 	ps paramtypes.Subspace,
 	evmKeeper types.EVMKeeper,
 	bankKeeper types.BankKeeper,
-
+	acccountKeeper types.AccountKeeper,
+	erc20Keeper types.ERC20Keeper,
 ) Keeper {
 	// set KeyTable if it has not already been set
 	if !ps.HasKeyTable() {
@@ -40,6 +43,8 @@ func NewKeeper(
 		paramstore: ps,
 		evmKeeper:  evmKeeper,
 		bankKeeper: bankKeeper,
+		accountKeeper: acccountKeeper,
+		erc20Keeper: erc20Keeper,
 	}
 }
 

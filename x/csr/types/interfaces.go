@@ -14,6 +14,7 @@ import (
 // AccountKeeper defines the expected interface needed to retrieve account info.
 type AccountKeeper interface {
 	GetModuleAddress(moduleName string) sdk.AccAddress
+	GetSequence(ctx sdk.Context, addr sdk.AccAddress) (uint64, error)
 }
 
 // BankKeeper defines the expected interface needed to retrieve account balances.
@@ -31,4 +32,9 @@ type EVMKeeper interface {
 	GetParams(ctx sdk.Context) evmtypes.Params
 	GetAccountWithoutBalance(ctx sdk.Context, addr common.Address) *statedb.Account
 	ApplyMessage(ctx sdk.Context, msg core.Message, tracer vm.EVMLogger, commit bool) (*evmtypes.MsgEthereumTxResponse, error)
+}
+
+type ERC20Keeper interface {
+	CallEVMWithData(ctx sdk.Context, from common.Address,
+		 contract *common.Address, data []byte, commit bool) (*evmtypes.MsgEthereumTxResponse, error)
 }

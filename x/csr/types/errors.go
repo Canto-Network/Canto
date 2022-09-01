@@ -16,4 +16,5 @@ var (
 
 	// keeper errors
 	ErrAddressDerivation           = sdkerrors.Register(ModuleName, 1004, "csr::Keeper")
+	ErrContractDeployments         = sdkerrors.Register(ModuleName, 1005, "csr::Keeper")
 )
