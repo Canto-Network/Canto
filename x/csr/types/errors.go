@@ -13,4 +13,7 @@ var (
 	ErrInvalidSmartContractAddress = sdkerrors.Register(ModuleName, 1002, "csr::CSR")
 
 	ErrInvalidParams = sdkerrors.Register(ModuleName, 1003, "csr::Params")
+
+	// keeper errors
+	ErrAddressDerivation           = sdkerrors.Register(ModuleName, 1004, "csr::Keeper")
 )
