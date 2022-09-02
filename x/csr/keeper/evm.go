@@ -15,11 +15,11 @@ import (
 func (k Keeper) DeployContract(
 	ctx sdk.Context,
 	contract evmtypes.CompiledContract,
-	args []byte,
+	args ...interface{},
 ) (common.Address, error) {
 	// pack constructor arguments according to compiled contract's abi
 	// method name is nil in this case, we are calling the constructor
-	ctorArgs, err := contract.ABI.Pack("", args)
+	ctorArgs, err := contract.ABI.Pack("", args...)
 	if err != nil {
 		return common.Address{}, sdkerrors.Wrapf(types.ErrContractDeployments,
 			"CSR::Keeper::DeployContract: error packing data: %s", err.Error())
@@ -58,24 +58,19 @@ func (k Keeper) CallMethod(
 	method string,
 	contract evmtypes.CompiledContract,
 	contractAddr *common.Address,
-	args ...[32]byte,
+	args ...interface{},
 ) (*evmtypes.MsgEthereumTxResponse, error) {
 	// pack method args
-	var err error
-	var methodArgs []byte
-	if len(args) == 0 {
-		methodArgs, err = contract.ABI.Pack(method)
-	} else {
-		methodArgs, err = contract.ABI.Pack(method, [32]uint8(args[0]))
-	}
-
+	
+	methodArgs, err := contract.ABI.Pack(method, args...)
+	
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrContractDeployments, "CSR:Keeper::DeployContract: method call incorrect: %s", err.Error())
 	}
 	// call method
 	resp, err := k.erc20Keeper.CallEVMWithData(ctx, types.ModuleAddress, contractAddr, methodArgs, true)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrContractDeployments, "CSR:Keeper::CallMethod: error applying message: %s", err.Error())
+		return nil, sdkerrors.Wrapf(types.ErrContractDeployments, "CSR:Keeper: :CallMethod: error applying message: %s", err.Error())
 	}
 
 	return resp, nil
