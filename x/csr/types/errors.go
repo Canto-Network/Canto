@@ -12,5 +12,7 @@ var (
 	ErrDuplicateSmartContracts     = sdkerrors.Register(ModuleName, 1001, "csr::CSR")
 	ErrInvalidSmartContractAddress = sdkerrors.Register(ModuleName, 1002, "csr::CSR")
 
+	ErrPrevRegisteredSmartContract = sdkerrors.Register(ModuleName, 1004, "csr::CSR")
+
 	ErrInvalidParams = sdkerrors.Register(ModuleName, 1003, "csr::Params")
 )

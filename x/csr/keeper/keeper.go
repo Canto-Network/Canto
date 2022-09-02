@@ -16,8 +16,11 @@ type (
 		cdc        codec.BinaryCodec
 		storeKey   sdk.StoreKey
 		paramstore paramtypes.Subspace
-		evmKeeper  types.EVMKeeper
-		bankKeeper types.BankKeeper
+
+		accountKeeper    types.AccountKeeper
+		evmKeeper        types.EVMKeeper
+		bankKeeper       types.BankKeeper
+		feeCollectorName string
 	}
 )
 
@@ -25,9 +28,10 @@ func NewKeeper(
 	cdc codec.BinaryCodec,
 	storeKey sdk.StoreKey,
 	ps paramtypes.Subspace,
+	accountKeeper types.AccountKeeper,
 	evmKeeper types.EVMKeeper,
 	bankKeeper types.BankKeeper,
-
+	feeCollectorName string,
 ) Keeper {
 	// set KeyTable if it has not already been set
 	if !ps.HasKeyTable() {
@@ -35,11 +39,13 @@ func NewKeeper(
 	}
 
 	return Keeper{
-		storeKey:   storeKey,
-		cdc:        cdc,
-		paramstore: ps,
-		evmKeeper:  evmKeeper,
-		bankKeeper: bankKeeper,
+		storeKey:         storeKey,
+		cdc:              cdc,
+		paramstore:       ps,
+		accountKeeper:    accountKeeper,
+		evmKeeper:        evmKeeper,
+		bankKeeper:       bankKeeper,
+		feeCollectorName: feeCollectorName,
 	}
 }
 

@@ -38,7 +38,7 @@ func (csr CSR) Validate() error {
 	// Ensure that there is at least one smart contract in the CSR Pool
 	numSmartContracts := len(csr.Contracts)
 	if numSmartContracts < 1 {
-		return sdkerrors.Wrapf(ErrSmartContractSupply, "CSRPool::Validate # of smart contracts must be greater than 0 got: %d", numSmartContracts)
+		return sdkerrors.Wrapf(ErrSmartContractSupply, "CSR::Validate # of smart contracts must be greater than 0 got: %d", numSmartContracts)
 	}
 
 	// Ensure that the account address entered is a valid canto address
