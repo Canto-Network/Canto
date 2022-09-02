@@ -46,9 +46,7 @@ func (suite *KeeperTestSuite) TestContractDeployment() {
 					acc := s.app.EvmKeeper.GetAccountWithoutBalance(suite.ctx, addr)
 					suite.Require().True(acc.IsContract())
 					// now call deploy1 on testContract and receive address
-					suite.Commit()
 					_, err := suite.app.CSRKeeper.CallMethod(suite.ctx, "deploy1", contract, &addr)
-					suite.Commit()
 					// now return ret and expect it to be an address
 					if err != nil {
 						return err, common.Address{}
@@ -62,7 +60,6 @@ func (suite *KeeperTestSuite) TestContractDeployment() {
 					// expected return, is CREATE address
 					expectAddr := crypto.CreateAddress(contract, nonce-1)
 					acc := suite.app.EvmKeeper.GetAccountWithoutBalance(suite.ctx, expectAddr)
-					fmt.Println("acc: ", acc)
 					fmt.Println(crypto.Keccak256(nil))
 					return acc != nil
 				},
@@ -78,7 +75,6 @@ func (suite *KeeperTestSuite) TestContractDeployment() {
 					addr := suite.DeployContract()
 					acc := suite.app.EvmKeeper.GetAccountWithoutBalance(suite.ctx, addr)
 					suite.Require().True(acc.IsContract())
-					suite.Commit()
 					//  now return ret and expect it to be an address
 					salt := [32]byte{0x01}
 					_, err := suite.app.CSRKeeper.CallMethod(suite.ctx, "deploy2", contract, &addr, salt)
@@ -103,7 +99,6 @@ func (suite *KeeperTestSuite) TestContractDeployment() {
 	for _, tc := range testCases {
 		// setup test
 		err, addr := tc.args.setup()
-		suite.Commit()
 		suite.Require().NoError(err)
 		if tc.expectPass {
 			suite.Require().True(tc.args.expectReturn(addr))
