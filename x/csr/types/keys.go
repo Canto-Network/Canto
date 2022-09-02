@@ -14,6 +14,7 @@ const (
 
 	// RouterKey is the message route for slashing
 	RouterKey = ModuleName
+	// ModuleAcct will be the account from which all contracts are deployed from
 )
 
 var ModuleAddress common.Address

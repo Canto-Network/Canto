@@ -20,6 +20,7 @@ type (
 		accountKeeper    types.AccountKeeper
 		evmKeeper        types.EVMKeeper
 		bankKeeper       types.BankKeeper
+		erc20Keeper      types.ERC20Keeper
 		feeCollectorName string
 	}
 )
@@ -31,6 +32,7 @@ func NewKeeper(
 	accountKeeper types.AccountKeeper,
 	evmKeeper types.EVMKeeper,
 	bankKeeper types.BankKeeper,
+	erc20Keeper types.ERC20Keeper,
 	feeCollectorName string,
 ) Keeper {
 	// set KeyTable if it has not already been set
@@ -45,6 +47,7 @@ func NewKeeper(
 		accountKeeper:    accountKeeper,
 		evmKeeper:        evmKeeper,
 		bankKeeper:       bankKeeper,
+		erc20Keeper:      erc20Keeper,
 		feeCollectorName: feeCollectorName,
 	}
 }
