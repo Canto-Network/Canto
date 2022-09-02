@@ -60,7 +60,6 @@ func (suite *KeeperTestSuite) TestContractDeployment() {
 					// expected return, is CREATE address
 					expectAddr := crypto.CreateAddress(contract, nonce-1)
 					acc := suite.app.EvmKeeper.GetAccountWithoutBalance(suite.ctx, expectAddr)
-					fmt.Println(crypto.Keccak256(nil))
 					return acc != nil
 				},
 			},
@@ -174,8 +173,6 @@ func (suite *KeeperTestSuite) TestAddressDerivation() {
 		if tc.expectPass {
 			err, addr := suite.app.CSRKeeper.DeriveAddress(suite.ctx, types.ModuleAddress, tc.args.nonces, tc.args.salts)
 			suite.Require().NoError(err)
-			fmt.Println(addr)
-			fmt.Println(expectAddr)
 			suite.Require().True(addr == expectAddr)
 		} else {
 			err, _ := suite.app.CSRKeeper.DeriveAddress(suite.ctx, types.ModuleAddress, tc.args.nonces, tc.args.salts)
