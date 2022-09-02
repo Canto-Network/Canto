@@ -13,18 +13,18 @@ import (
 
 // method to determine contract address using standard contract creation, using only
 // bytes and nonce of sender. 
-func (k Keeper) DeriveAddress(ctx sdk.Context, initDeployer common.Address, nonces []uint64, salts [][32]byte) (error, bool) {
+func (k Keeper) DeriveAddress(ctx sdk.Context, initDeployer common.Address, nonces []uint64, salts [][32]byte) (error, common.Address) {
 	// fail if the length of the nonces / salts / initcodes
 	if len(nonces) != len(salts) {
 		return sdkerrors.Wrapf(types.ErrAddressDerivation, 
 			"::deriveAddress: invalid length: nonces: %d, salts:%d", 
 			len(nonces), len(salts)), 
-			false
+			common.Address{}
 	}
 
 	derivedContract := initDeployer
 	// now derive addresses using either CREATE2 or CreateAddress
-	for i:=0; i < len(nonces); i++ {
+	for i := 0; i < len(nonces); i++ {
 		// there is no salt used to derive this address
 		if salts[i] ==  [32]byte{} {
 			derivedContract = crypto.CreateAddress(derivedContract, nonces[i])
@@ -37,12 +37,12 @@ func (k Keeper) DeriveAddress(ctx sdk.Context, initDeployer common.Address, nonc
 				return sdkerrors.Wrapf(types.ErrAddressDerivation, 
 					"::deriveAddress: empty code hash: %s", 
 					common.Bytes2Hex(derivedContract.Bytes())),
-					false
+					common.Address{}
 			}
 			// set derived address to the contract address derived through CREATE2
 			derivedContract = crypto.CreateAddress2(derivedContract, salts[i], acct.CodeHash[:32])
 		}
 	}
 
-	return nil, true
+	return nil, derivedContract
 }

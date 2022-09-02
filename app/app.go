@@ -217,6 +217,7 @@ var (
 		evmtypes.ModuleName:            {authtypes.Minter, authtypes.Burner}, // used for secure addition and subtraction of balance using module account
 		inflationtypes.ModuleName:      {authtypes.Minter},
 		erc20types.ModuleName:          {authtypes.Minter, authtypes.Burner},
+		csrtypes.ModuleName:            {authtypes.Minter, authtypes.Burner},
 		govshuttletypes.ModuleName:     {authtypes.Minter, authtypes.Burner},
 	}
 
@@ -617,7 +618,7 @@ func NewCanto(
 		recovery.NewAppModule(*app.RecoveryKeeper),
 		fees.NewAppModule(app.FeesKeeper, app.AccountKeeper),
 		govshuttle.NewAppModule(app.GovshuttleKeeper, app.AccountKeeper),
-		csr.NewAppModule(app.CSRKeeper),
+		csr.NewAppModule(app.CSRKeeper, app.AccountKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that

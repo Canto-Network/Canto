@@ -15,7 +15,7 @@ import (
 func (k Keeper) DeployContract(
 	ctx sdk.Context,
 	contract evmtypes.CompiledContract,
-	args ...interface{},
+	args []byte,
 ) (common.Address, error) {
 	// pack constructor arguments according to compiled contract's abi
 	// method name is nil in this case, we are calling the constructor
@@ -57,22 +57,25 @@ func (k Keeper) CallMethod(
 	ctx sdk.Context,
 	method string,
 	contract evmtypes.CompiledContract,
-	ret *interface{},
-	args ...interface{},
+	contractAddr *common.Address,
+	args ...[32]byte,
 ) (*evmtypes.MsgEthereumTxResponse, error) {
 	// pack method args
-	methodArgs, err := contract.ABI.Pack(method, args)
+	var err error
+	var methodArgs []byte
+	if len(args) == 0 {
+		methodArgs, err = contract.ABI.Pack(method)
+	} else {
+		methodArgs, err = contract.ABI.Pack(method, [32]uint8(args[0]))
+	}
+
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrContractDeployments, "::DeployContract: method call incorrect: %s", err.Error())
 	}
 	// call method
-	resp, err := k.erc20Keeper.CallEVMWithData(ctx, types.ModuleAddress, nil, methodArgs, true)
+	resp, err := k.erc20Keeper.CallEVMWithData(ctx, types.ModuleAddress, contractAddr, methodArgs, true)
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrContractDeployments, "::CallMethod: error applying message: %s", err.Error())
-	}
-	// now unpack data into retType
-	if err = contract.ABI.UnpackIntoInterface(ret, method, resp.Ret); err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrAddressDerivation, "::CallMethod: error retrieving returned value: %s", err.Error())
 	}
 
 	return resp, nil
