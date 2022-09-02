@@ -61,9 +61,9 @@ func (k Keeper) CallMethod(
 	args ...interface{},
 ) (*evmtypes.MsgEthereumTxResponse, error) {
 	// pack method args
-	
+
 	methodArgs, err := contract.ABI.Pack(method, args...)
-	
+
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrContractDeployments, "CSR:Keeper::DeployContract: method call incorrect: %s", err.Error())
 	}

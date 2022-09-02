@@ -19,11 +19,9 @@ const (
 
 var ModuleAddress common.Address
 
-// instantiate new new EVM Account for module, and register w authkeeper
-func init() { 
+func init() {
 	ModuleAddress = common.BytesToAddress(authtypes.NewModuleAddress(ModuleName).Bytes())
 }
-
 
 const (
 	// nft id -> csr

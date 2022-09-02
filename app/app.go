@@ -475,7 +475,8 @@ func NewCanto(
 	app.CSRKeeper = csrkeeper.NewKeeper(
 		appCodec, keys[csrtypes.StoreKey],
 		app.GetSubspace(csrtypes.ModuleName),
-		app.EvmKeeper, app.BankKeeper, app.AccountKeeper, app.Erc20Keeper,
+		app.AccountKeeper, app.EvmKeeper, app.BankKeeper, app.Erc20Keeper,
+		authtypes.FeeCollectorName,
 	)
 
 	epochsKeeper := epochskeeper.NewKeeper(appCodec, keys[epochstypes.StoreKey])

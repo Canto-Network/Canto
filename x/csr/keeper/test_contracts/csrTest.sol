@@ -2,13 +2,16 @@
 
 pragma solidity ^0.8.16;
 
-import "./turnstile.sol";
+import "../../../../contracts/turnstile.sol";
 
 contract CSRTest {
     event CreateEvent(string message, address sender);
 
-    constructor(address turnstileContract) {
-        Turnstile(turnstileContract).register(msg.sender);
+    function register(address turnstile) public {
+        Turnstile(turnstile).register(msg.sender);
+    }
+
+    constructor() {
         emit CreateEvent("contract created", msg.sender);
     }
 }
