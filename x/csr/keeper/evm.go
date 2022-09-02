@@ -1,8 +1,6 @@
 package keeper
 
 import (
-	"fmt"
-
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -10,51 +8,6 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 )
-
-// ABIEvents is used to unmarshal data from evm transactions
-// EventHashes is used to match the event signature to the correct event for process
-
-// Register the CSR in the store given the data from the evm transaction
-func (k Keeper) RegisterCSREvent(data []byte) error {
-	response, err := turnstileContract.Unpack(types.TurnstileEventRegisterCSR, data)
-	if err != nil {
-		return err
-	}
-
-	event := types.RegisterCSREvent{
-		SmartContractAddress: response[0].(common.Address),
-		Receiver:             response[1].(common.Address),
-	}
-	fmt.Println(event)
-
-	// HANDLE LOGIC HERE
-
-	return nil
-}
-
-// Update a CSR existing in the store given data from the evm transaction
-func (k Keeper) UpdateCSREvent(data []byte) error {
-	response, err := turnstileContract.Unpack(types.TurnstileEventUpdateCSR, data)
-	if err != nil {
-		return err
-	}
-
-	event := types.UpdateCSREvent{
-		SmartContractAddress: response[0].(common.Address),
-		Nft_id:               response[1].(uint64),
-	}
-	fmt.Println(event)
-
-	// HANDLE LOGIC HERE
-
-	return nil
-}
-
-// Retroactively register contracts that were previously deployed (non-CSR enabled smart contracts)
-// and add the the CSR store
-func (k Keeper) RetroactiveRegisterEvent() error {
-	return nil
-}
 
 // function to deploy an arbitrary smart-contract, takes as argument, the compiled
 // contract object, as well as an arbitrary length array of arguments to the deployments
