@@ -9,7 +9,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-//  
 
 // method to determine contract address using standard contract creation, using only
 // bytes and nonce of sender. 
