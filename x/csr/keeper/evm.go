@@ -22,7 +22,7 @@ func (k Keeper) DeployContract(
 	ctorArgs, err := contract.ABI.Pack("", args)
 	if err != nil {
 		return common.Address{}, sdkerrors.Wrapf(types.ErrContractDeployments,
-			"::DeployContract: error packing data: %s", err.Error())
+			"CSR::Keeper::DeployContract: error packing data: %s", err.Error())
 	}
 	// pack method data into byte string, enough for bin and constructor arguments
 	data := make([]byte, len(contract.Bin)+len(ctorArgs))
@@ -35,7 +35,7 @@ func (k Keeper) DeployContract(
 	if err != nil {
 		return common.Address{},
 			sdkerrors.Wrapf(types.ErrContractDeployments,
-				"::DeployContract: error retrieving nonce: %s", err.Error())
+				"CSR:Keeper::DeployContract: error retrieving nonce: %s", err.Error())
 	}
 
 	// deploy contract using erc20 callEVMWithData, applies contract deployments to
@@ -44,7 +44,7 @@ func (k Keeper) DeployContract(
 	if err != nil {
 		return common.Address{},
 			sdkerrors.Wrapf(types.ErrAddressDerivation,
-				"::DeployContract: error retrieving nonce: %s", err.Error())
+				"CSR:Keeper::DeployContract: error retrieving nonce: %s", err.Error())
 	}
 
 	// determine how to derive contract address, is to be derived from nonce
@@ -70,12 +70,12 @@ func (k Keeper) CallMethod(
 	}
 
 	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrContractDeployments, "::DeployContract: method call incorrect: %s", err.Error())
+		return nil, sdkerrors.Wrapf(types.ErrContractDeployments, "CSR:Keeper::DeployContract: method call incorrect: %s", err.Error())
 	}
 	// call method
 	resp, err := k.erc20Keeper.CallEVMWithData(ctx, types.ModuleAddress, contractAddr, methodArgs, true)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrContractDeployments, "::CallMethod: error applying message: %s", err.Error())
+		return nil, sdkerrors.Wrapf(types.ErrContractDeployments, "CSR:Keeper::CallMethod: error applying message: %s", err.Error())
 	}
 
 	return resp, nil

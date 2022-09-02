@@ -35,7 +35,7 @@ func (k Keeper) DeriveAddress(ctx sdk.Context, initDeployer common.Address, nonc
 			// fail if there is no code at this address
 			if bytes.Equal(acct.CodeHash,crypto.Keccak256(nil)) {
 				return sdkerrors.Wrapf(types.ErrAddressDerivation, 
-					"::deriveAddress: empty code hash: %s", 
+					"CSR::Keeper::deriveAddress: empty code hash: %s", 
 					common.Bytes2Hex(derivedContract.Bytes())),
 					common.Address{}
 			}
