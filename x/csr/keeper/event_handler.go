@@ -21,6 +21,12 @@ func (k Keeper) RegisterCSREvent(data []byte) error {
 	}
 
 	// HANDLE LOGIC HERE
+	// validation
+	// mint new nft
+	// create new beneficiary acount
+
+	// create csr
+	// add csrt to store
 
 	return nil
 }
