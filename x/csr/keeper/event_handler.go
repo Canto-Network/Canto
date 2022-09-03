@@ -29,7 +29,8 @@ func (k Keeper) RegisterCSREvent(ctx sdk.Context, data []byte) error {
 	// Check if the user is attempting to register a non-smart contract address
 	account := k.evmKeeper.GetAccount(ctx, event.SmartContractAddress)
 	if !account.IsContract() {
-		return sdkerrors.Wrapf(ErrRegisterEOA, "EventHandler::RegisterCSREvent user is attempting to register a non-smart contract address")
+		return sdkerrors.Wrapf(ErrRegisterEOA,
+			"EventHandler::RegisterCSREvent user is attempting to register a non-smart contract address")
 	}
 
 	// **** Mint a new NFT ****
