@@ -6,6 +6,7 @@ import (
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ethereum/go-ethereum/common"
 )
 
 // Returns the CSR object given an NFT, returns nil if the NFT id has no
@@ -88,6 +89,25 @@ func (k Keeper) SetCSROwner(ctx sdk.Context, id uint64, account string) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixOwner)
 	key := UInt64ToBytes(id)
 	store.Set(key, []byte(account))
+}
+
+// sets the deployed Turnstile Address to state
+func (k Keeper) SetTurnstile(ctx sdk.Context, turnstile common.Address) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixAddrs)
+	store.Set(types.TurnstileKey, turnstile.Bytes())
+}
+
+// retrieves the deployed Turnstile Address from state
+// returns the address and a boolean representing the success of the retrieval
+func (k Keeper) GetTurnstile(ctx sdk.Context) (common.Address, bool) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixAddrs)
+	// retrieve state object at TurnstileKey
+	bz := store.Get(types.TurnstileKey)
+	if len(bz) == 0 {
+		return common.Address{}, false
+	}
+	// if something was found, convert byte to address and return true
+	return common.BytesToAddress(bz), true
 }
 
 // Converts a uint64 to a []byte

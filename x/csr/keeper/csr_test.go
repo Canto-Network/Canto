@@ -52,6 +52,17 @@ func (suite *KeeperTestSuite) TestGetNFTByContract() {
 	}
 }
 
+func (suite *KeeperTestSuite) TestSetGetTurnstile() {
+	// Set Turnstile address and retrieve it
+	addr := tests.GenerateAddress()
+	suite.app.CSRKeeper.SetTurnstile(suite.ctx, addr)
+	suite.Commit()
+	// retrieve addr
+	expectAddr, found := suite.app.CSRKeeper.GetTurnstile(suite.ctx)
+	suite.Require().True(found) 
+	suite.Require().Equal(addr, expectAddr)
+}
+
 // Creates a bunch of CSRs and then assigns ownership of some to a single account
 func (suite *KeeperTestSuite) TestGetCSRsByOwner() {
 	owner := sdk.AccAddress(tests.GenerateAddress().Bytes()).String()

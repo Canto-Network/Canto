@@ -11,6 +11,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
+	_ "github.com/Canto-Network/Canto/v2/contracts"
 )
 
 // embed test contracts in test suite
@@ -179,6 +180,21 @@ func (suite *KeeperTestSuite) TestAddressDerivation() {
 			suite.Require().Error(err)
 		}
 	}
+}
+
+// Test deployment of the Turnstile Contract
+func (suite *KeeperTestSuite) TestDeployTurnstile() {
+	// first deploy Turnstile
+	addr, err := suite.app.CSRKeeper.DeployTurnstile(suite.ctx) 
+	suite.Require().NoError(err)
+	// now find the account in state indexed by addr
+	acc := suite.app.EvmKeeper.GetAccountWithoutBalance(suite.ctx, addr)
+	// code hash must not be nil
+	suite.Require().NotEqual(acc.CodeHash, crypto.Keccak256(nil))
+	// now index into state with code hash, 
+	code := suite.app.EvmKeeper.GetCode(suite.ctx, common.BytesToHash(acc.CodeHash))
+	// Turnstile code exists at address
+	suite.Require().NotNil(code)
 }
 
 func init() {

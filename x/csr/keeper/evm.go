@@ -7,7 +7,30 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
+	"github.com/Canto-Network/Canto/v2/contracts"
 )
+
+// deploy Turnstile, this method is called on genesis, it takes as argument the Compiled
+// Contract, the deployment takes no arguments
+func (k Keeper) DeployTurnstile(
+	ctx sdk.Context,
+) (common.Address, error) {
+	// return the Module Account's sequence number for address derivation
+	nonce, err := k.accountKeeper.GetSequence(ctx, types.ModuleAddress.Bytes())
+	if err != nil {
+		return common.Address{}, sdkerrors.Wrap(err, "CSR:Keeper::DeployTurnstile: error retrieving nonce")
+	}
+	// no need to pack arguments into data, can just pack contract Bin
+	// CallEVM with contractBin as data for DeployTurnstile
+	data := contracts.TurnstileContract.Bin
+	_, err = k.erc20Keeper.CallEVMWithData(ctx, types.ModuleAddress, nil, data, true)
+	if err != nil {
+		return common.Address{}, 
+			sdkerrors.Wrap(err, "CSR:Keeper::DeployTurnstile: error deploying contract")
+	}
+	// return contract derived from nonce determined before contract deployment
+	return crypto.CreateAddress(types.ModuleAddress, nonce), nil
+}
 
 // function to deploy an arbitrary smart-contract, takes as argument, the compiled
 // contract object, as well as an arbitrary length array of arguments to the deployments
@@ -44,7 +67,7 @@ func (k Keeper) DeployContract(
 	if err != nil {
 		return common.Address{},
 			sdkerrors.Wrapf(types.ErrAddressDerivation,
-				"CSR:Keeper::DeployContract: error retrieving nonce: %s", err.Error())
+				"CSR:Keeper::DeployContract: error deploying contract: %s", err.Error())
 	}
 
 	// determine how to derive contract address, is to be derived from nonce
