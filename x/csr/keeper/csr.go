@@ -6,6 +6,7 @@ import (
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/tendermint/tendermint/crypto/ed25519"
 )
 
 // Returns the CSR object given an NFT, returns nil if the NFT id has no
@@ -88,6 +89,28 @@ func (k Keeper) SetCSROwner(ctx sdk.Context, id uint64, account string) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixOwner)
 	key := UInt64ToBytes(id)
 	store.Set(key, []byte(account))
+}
+
+func (k Keeper) CreateAndStoreCSR(ctx sdk.Context, contracts []string) error {
+	// mint the new NFT
+
+	// Create a new beneficiary account
+	privateKey := ed25519.GenPrivKey().PubKey()
+	newAccount := sdk.AccAddress(privateKey.Address())
+	k.accountKeeper.NewAccountWithAddress(ctx, newAccount)
+
+	// put into store
+	csr := types.NewCSR(
+		newAccount,
+		contracts,
+		0, // update this to the new nft id
+		newAccount,
+	)
+	if err := csr.Validate(); err != nil {
+		return err
+	}
+	k.SetCSR(ctx, csr)
+	return nil
 }
 
 // Converts a uint64 to a []byte

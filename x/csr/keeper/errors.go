@@ -9,6 +9,7 @@ import (
 
 // x/csr module sentinel errors
 var (
-	ErrPrevRegisteredSmartContract = sdkerrors.Register(types.ModuleName, 2000, "csr::CSR")
-	ErrFeeCollectorDistribution    = sdkerrors.Register(types.ModuleName, 2001, "csr::EVMHOOK")
+	ErrPrevRegisteredSmartContract = sdkerrors.Register(types.ModuleName, 2000, "csr::EventHandler")
+	ErrFeeCollectorDistribution    = sdkerrors.Register(types.ModuleName, 2001, "csr::EVMHook")
+	ErrRegisterEOA                 = sdkerrors.Register(types.ModuleName, 2002, "csr::EventHandler")
 )
