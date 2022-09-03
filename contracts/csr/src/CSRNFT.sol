@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import "../lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
+import {ERC721} from "../lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 
 contract CSRNFT is ERC721 {
 
@@ -78,11 +78,12 @@ contract CSRNFT is ERC721 {
       * @param owner_, address to be minted an nft
       * @return nftId, the nftId minted to owner, registered as uint64
     */     
-    function mintCSR(address owner_) isMinter(msg.sender) public returns(uint64) {
+    function mintCSR(address owner_) isMinter(msg.sender) public returns(uint256) {
         // increment nft number
         nfts++;
         // mint this nft to the user
         super._safeMint(owner_, nfts, "");
+        return nfts;
     }
 }
 
