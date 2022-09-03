@@ -11,7 +11,6 @@ var (
 	//go:embed compiled_contracts/Turnstile.json
 	TurnstileJSON     []byte
 	TurnstileContract evmtypes.CompiledContract
-
 	// TODO: Need to add the CSR NFT code here once written
 )
 

@@ -159,7 +159,19 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 func (AppModule) ConsensusVersion() uint64 { return 2 }
 
 // BeginBlock executes all ABCI BeginBlock logic respective to the capability module.
-func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
+func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
+	// check in begin block whether the Turnstile has been deployed, if not, deploy it and set it to state
+	if _, found := am.keeper.GetTurnstile(ctx); !found {
+		// deploy turnstile
+		addr, err := am.keeper.DeployTurnstile(ctx)
+		// panic on errors, (Turnstile existence is invariant)
+		if err != nil {
+			panic(err)
+		}
+		// set the Turnstile address to state 
+		am.keeper.SetTurnstile(ctx, addr)
+	}
+}
 
 // EndBlock executes all ABCI EndBlock logic respective to the capability module. It
 // returns no validator updates.

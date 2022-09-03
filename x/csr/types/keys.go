@@ -14,10 +14,13 @@ const (
 
 	// RouterKey is the message route for slashing
 	RouterKey = ModuleName
-	// ModuleAcct will be the account from which all contracts are deployed from
 )
 
+// ModuleAcct will be the account from which all contracts are deployed from
 var ModuleAddress common.Address
+
+// key for turnstile address once deployed
+var TurnstileKey = []byte("turnstile")
 
 func init() {
 	ModuleAddress = common.BytesToAddress(authtypes.NewModuleAddress(ModuleName).Bytes())
@@ -30,11 +33,14 @@ const (
 	prefixOwner
 	// contract -> nft id
 	prefixContract
+	// prefix prefix addresses of CSRNFT and Turnstile
+	prefixAddrs
 )
 
 // KVStore key prefixes
 var (
-	KeyPrefixCSR      = []byte{prefixCSR}
-	KeyPrefixOwner    = []byte{prefixOwner}
-	KeyPrefixContract = []byte{prefixContract}
+	KeyPrefixCSR       = []byte{prefixCSR}
+	KeyPrefixOwner     = []byte{prefixOwner}
+	KeyPrefixContract  = []byte{prefixContract}
+	KeyPrefixAddrs = []byte{prefixAddrs}
 )

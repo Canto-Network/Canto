@@ -1,9 +1,9 @@
 package csr
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/Canto-Network/Canto/v2/x/csr/keeper"
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 )
 
