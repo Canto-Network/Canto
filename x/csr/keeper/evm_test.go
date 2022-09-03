@@ -3,15 +3,14 @@ package keeper_test
 import (
 	_ "embed"
 	"encoding/json"
-	"fmt"
 	"log"
 
+	_ "github.com/Canto-Network/Canto/v2/contracts"
 	_ "github.com/Canto-Network/Canto/v2/x/csr/keeper"
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
-	_ "github.com/Canto-Network/Canto/v2/contracts"
 )
 
 // embed test contracts in test suite
@@ -168,7 +167,6 @@ func (suite *KeeperTestSuite) TestAddressDerivation() {
 
 	for _, tc := range testCases {
 		//  run setup test
-		fmt.Printf("Running Test: %s \n", tc.name)
 		expectAddr := tc.args.setup()
 
 		if tc.expectPass {
@@ -185,13 +183,13 @@ func (suite *KeeperTestSuite) TestAddressDerivation() {
 // Test deployment of the Turnstile Contract
 func (suite *KeeperTestSuite) TestDeployTurnstile() {
 	// first deploy Turnstile
-	addr, err := suite.app.CSRKeeper.DeployTurnstile(suite.ctx) 
+	addr, err := suite.app.CSRKeeper.DeployTurnstile(suite.ctx)
 	suite.Require().NoError(err)
 	// now find the account in state indexed by addr
 	acc := suite.app.EvmKeeper.GetAccountWithoutBalance(suite.ctx, addr)
 	// code hash must not be nil
 	suite.Require().NotEqual(acc.CodeHash, crypto.Keccak256(nil))
-	// now index into state with code hash, 
+	// now index into state with code hash,
 	code := suite.app.EvmKeeper.GetCode(suite.ctx, common.BytesToHash(acc.CodeHash))
 	// Turnstile code exists at address
 	suite.Require().NotNil(code)

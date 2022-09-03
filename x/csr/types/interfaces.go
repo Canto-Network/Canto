@@ -6,6 +6,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	"github.com/evmos/ethermint/x/evm/statedb"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
@@ -13,8 +14,10 @@ import (
 
 // AccountKeeper defines the expected interface needed to retrieve account info.
 type AccountKeeper interface {
+	NewAccountWithAddress(ctx sdk.Context, addr sdk.AccAddress) types.AccountI
 	GetModuleAddress(moduleName string) sdk.AccAddress
 	GetSequence(ctx sdk.Context, addr sdk.AccAddress) (uint64, error)
+	SetAccount(ctx sdk.Context, acc types.AccountI)
 }
 
 // BankKeeper defines the expected interface needed to retrieve account balances.
@@ -30,11 +33,12 @@ type BankKeeper interface {
 type EVMKeeper interface {
 	EVMConfig(ctx sdk.Context) (*evmtypes.EVMConfig, error)
 	GetParams(ctx sdk.Context) evmtypes.Params
+	GetAccount(ctx sdk.Context, addr common.Address) *statedb.Account
 	GetAccountWithoutBalance(ctx sdk.Context, addr common.Address) *statedb.Account
 	ApplyMessage(ctx sdk.Context, msg core.Message, tracer vm.EVMLogger, commit bool) (*evmtypes.MsgEthereumTxResponse, error)
 }
 
 type ERC20Keeper interface {
 	CallEVMWithData(ctx sdk.Context, from common.Address,
-		 contract *common.Address, data []byte, commit bool) (*evmtypes.MsgEthereumTxResponse, error)
+		contract *common.Address, data []byte, commit bool) (*evmtypes.MsgEthereumTxResponse, error)
 }

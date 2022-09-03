@@ -17,8 +17,6 @@ var (
 	ErrInvalidParams = sdkerrors.Register(ModuleName, 1003, "csr::Params")
 
 	// keeper errors
-	ErrAddressDerivation   = sdkerrors.Register(ModuleName, 1004, "csr::Keeper")
-	ErrContractDeployments = sdkerrors.Register(ModuleName, 1008, "csr::Keeper")
 	ErrAddressDerivation   = sdkerrors.Register(ModuleName, 1005, "csr::Keeper")
 	ErrContractDeployments = sdkerrors.Register(ModuleName, 1007, "csr::Keeper")
 )

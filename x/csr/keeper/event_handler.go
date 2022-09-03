@@ -1,9 +1,8 @@
 package keeper
 
 import (
-	"fmt"
-
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/tendermint/tendermint/crypto/ed25519"
 
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -33,13 +32,27 @@ func (k Keeper) RegisterCSREvent(ctx sdk.Context, data []byte) error {
 		return sdkerrors.Wrapf(ErrRegisterEOA, "EventHandler::RegisterCSREvent user is attempting to register a non-smart contract address")
 	}
 
-	fmt.Println(event)
-	// HANDLE LOGIC HERE
-	// mint new nft
-	// create new beneficiary acount
+	// **** Mint a new NFT ****
 
-	// create csr
-	// add csrt to store
+	// Create a new beneficiary account
+	privateKey := ed25519.GenPrivKey().PubKey()
+	address := sdk.AccAddress(privateKey.Address())
+	beneficiary := k.accountKeeper.NewAccountWithAddress(ctx, address)
+	k.accountKeeper.SetAccount(ctx, beneficiary)
+
+	// Create CSR object and validate
+	csr := types.NewCSR(
+		sdk.AccAddress(event.Receiver.Bytes()),
+		[]string{event.SmartContractAddress.String()},
+		0, // update this to the new nft id
+		address,
+	)
+	if err := csr.Validate(); err != nil {
+		return err
+	}
+
+	// Set the CSR in the store
+	k.SetCSR(ctx, csr)
 
 	return nil
 }
