@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/Canto-Network/Canto/v2/x/csr/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -15,7 +14,7 @@ import (
 func (k Keeper) DeriveAddress(ctx sdk.Context, initDeployer common.Address, nonces []uint64, salts [][32]byte) (error, common.Address) {
 	// fail if the length of the nonces / salts / initcodes
 	if len(nonces) != len(salts) {
-		return sdkerrors.Wrapf(types.ErrAddressDerivation, 
+		return sdkerrors.Wrapf(ErrAddressDerivation, 
 			"CSR:Keeper::deriveAddress: invalid length: nonces: %d, salts:%d", 
 			len(nonces), len(salts)), 
 			common.Address{}
@@ -33,7 +32,7 @@ func (k Keeper) DeriveAddress(ctx sdk.Context, initDeployer common.Address, nonc
 			acct := k.evmKeeper.GetAccountWithoutBalance(ctx, derivedContract)
 			// fail if there is no code at this address
 			if bytes.Equal(acct.CodeHash,crypto.Keccak256(nil)) {
-				return sdkerrors.Wrapf(types.ErrAddressDerivation, 
+				return sdkerrors.Wrapf(ErrAddressDerivation, 
 					"CSR:Keeper::deriveAddress: empty code hash: %s", 
 					common.Bytes2Hex(derivedContract.Bytes())),
 					common.Address{}

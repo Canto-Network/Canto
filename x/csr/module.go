@@ -163,13 +163,21 @@ func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 	// check in begin block whether the Turnstile has been deployed, if not, deploy it and set it to state
 	if _, found := am.keeper.GetTurnstile(ctx); !found {
 		// deploy turnstile
-		addr, err := am.keeper.DeployTurnstile(ctx)
+		turnstile, err := am.keeper.DeployTurnstile(ctx)
 		// panic on errors, (Turnstile existence is invariant)
 		if err != nil {
 			panic(err)
 		}
-		// set the Turnstile address to state 
-		am.keeper.SetTurnstile(ctx, addr)
+		// deploy csrnft
+		csrnft, err := am.keeper.DeployCSRNFT(ctx, "CSRNFT", "csrnft")
+		// panic on errors
+		if err != nil {
+			panic(err)
+		}
+		// set the Turnstile address to state
+		am.keeper.SetTurnstile(ctx, turnstile)
+		// set csrnft address to state
+		am.keeper.SetCSRNFT(ctx, csrnft)
 	}
 }
 

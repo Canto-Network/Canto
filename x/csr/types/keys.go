@@ -22,6 +22,9 @@ var ModuleAddress common.Address
 // key for turnstile address once deployed
 var TurnstileKey = []byte("turnstile")
 
+// key for csrnft address once deployed
+var CSRNFTKey = []byte("csrnft")
+
 func init() {
 	ModuleAddress = common.BytesToAddress(authtypes.NewModuleAddress(ModuleName).Bytes())
 }
@@ -39,8 +42,8 @@ const (
 
 // KVStore key prefixes
 var (
-	KeyPrefixCSR       = []byte{prefixCSR}
-	KeyPrefixOwner     = []byte{prefixOwner}
-	KeyPrefixContract  = []byte{prefixContract}
-	KeyPrefixAddrs = []byte{prefixAddrs}
+	KeyPrefixCSR      = []byte{prefixCSR}
+	KeyPrefixOwner    = []byte{prefixOwner}
+	KeyPrefixContract = []byte{prefixContract}
+	KeyPrefixAddrs    = []byte{prefixAddrs}
 )

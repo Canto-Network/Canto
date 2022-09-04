@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/Canto-Network/Canto/v2/contracts"
+	_ "github.com/Canto-Network/Canto/v2/contracts"
 	_ "github.com/Canto-Network/Canto/v2/x/csr/keeper"
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/evmos/ethermint/tests"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
-	_ "github.com/Canto-Network/Canto/v2/contracts"
 )
 
 // embed test contracts in test suite
@@ -185,16 +187,42 @@ func (suite *KeeperTestSuite) TestAddressDerivation() {
 // Test deployment of the Turnstile Contract
 func (suite *KeeperTestSuite) TestDeployTurnstile() {
 	// first deploy Turnstile
-	addr, err := suite.app.CSRKeeper.DeployTurnstile(suite.ctx) 
+	addr, err := suite.app.CSRKeeper.DeployTurnstile(suite.ctx)
 	suite.Require().NoError(err)
 	// now find the account in state indexed by addr
 	acc := suite.app.EvmKeeper.GetAccountWithoutBalance(suite.ctx, addr)
 	// code hash must not be nil
 	suite.Require().NotEqual(acc.CodeHash, crypto.Keccak256(nil))
-	// now index into state with code hash, 
+	// now index into state with code hash,
 	code := suite.app.EvmKeeper.GetCode(suite.ctx, common.BytesToHash(acc.CodeHash))
-	// Turnstile code exists at address
-	suite.Require().NotNil(code)
+	// offset to remove constructor from contract bytecode
+	offset := len(contracts.TurnstileContract.Bin) - len(code)
+	suite.Require().Equal(code, []byte(contracts.TurnstileContract.Bin)[offset:])
+}
+
+// Test deployment of CSRNFT Contract
+func (suite *KeeperTestSuite) TestDeployCSRNFT() {
+	// deploy CSRNFT
+	addr, err := suite.app.CSRKeeper.DeployCSRNFT(suite.ctx, "CSRNFT", "CSRNFT")
+	suite.Require().NoError(err)
+	acc := suite.app.EvmKeeper.GetAccountWithoutBalance(suite.ctx, addr)
+	suite.Require().True(acc.IsContract())
+	code := suite.app.EvmKeeper.GetCode(suite.ctx, common.BytesToHash(acc.CodeHash))
+	offset := len(contracts.CSRNFTContract.Bin) - len(code)
+	suite.Require().Equal(code, []byte(contracts.CSRNFTContract.Bin)[offset:])
+}
+
+// Test calling MintCSR on CSRNFT
+func (suite *KeeperTestSuite) TestMintCSR() {
+	// check that the CSRNFT has been deployed correctly
+	suite.Commit()
+	// begin block has been called
+	_, found := suite.app.CSRKeeper.GetCSRNFT(suite.ctx)
+	suite.Require().True(found)
+	receiverAddr := tests.GenerateAddress()
+	nft, err := suite.app.CSRKeeper.MintCSR(suite.ctx, receiverAddr)
+	suite.Require().NoError(err) 
+	suite.Require().Equal(nft, uint64(1))
 }
 
 func init() {
