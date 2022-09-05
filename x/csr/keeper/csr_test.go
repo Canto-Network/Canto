@@ -59,8 +59,17 @@ func (suite *KeeperTestSuite) TestSetGetTurnstile() {
 	suite.Commit()
 	// retrieve addr
 	expectAddr, found := suite.app.CSRKeeper.GetTurnstile(suite.ctx)
-	suite.Require().True(found) 
+	suite.Require().True(found)
 	suite.Require().Equal(addr, expectAddr)
+}
+
+func (suite *KeeperTestSuite) TestSetGetCSRNFT() {
+	addr := tests.GenerateAddress()
+	suite.app.CSRKeeper.SetCSRNFT(suite.ctx, addr)
+	// retrieve addr
+	expectAddr, found := suite.app.CSRKeeper.GetCSRNFT(suite.ctx)
+	suite.Require().True(found)
+	suite.Require().Equal(expectAddr, addr)
 }
 
 // Creates a bunch of CSRs and then assigns ownership of some to a single account

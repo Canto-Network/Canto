@@ -5,6 +5,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
+
 var (
 	DefaultEnableCSR                   = false
 	DefaultCSRShares                   = sdk.NewDecWithPrec(50, 2)

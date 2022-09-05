@@ -1,35 +1,67 @@
 package keeper
 
 import (
+	"github.com/Canto-Network/Canto/v2/contracts"
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
-	"github.com/Canto-Network/Canto/v2/contracts"
 )
 
-// deploy Turnstile, this method is called on genesis, it takes as argument the Compiled
-// Contract, the deployment takes no arguments
+// mintCSR, this method is called in the process of CSR registration, mints a CSR to
+// the account intending to register their CSR
+func (k Keeper) MintCSR(
+	ctx sdk.Context,
+	receiver common.Address,
+) (uint64, error) {
+	// first retrieve CSR contract from state, fail if it hasn't been deployed
+	csrNft, found := k.GetCSRNFT(ctx)
+	if !found {
+		return 0, sdkerrors.Wrapf(ErrCSRNFTNotDeployed, "CSR::Keeper: MintCSR: CSRNFT.sol not deployed")
+	}
+	resp, err := k.CallMethod(ctx, "mintCSR", contracts.CSRNFTContract, &csrNft, receiver)
+	if err != nil {
+		return 0, sdkerrors.Wrapf(ErrMethodCall, "CSR::Keeper: MintCSR: error calling Mint on CSR: %s", err.Error())
+	}
+	var ret types.CSRUint64Response
+
+	// unwrap the resp data
+	if err = contracts.CSRNFTContract.ABI.UnpackIntoInterface(&ret, "mintCSR", resp.Ret); err != nil {
+		return 0, sdkerrors.Wrapf(ErrUnpackData, "CSR::Keeper: MintCSR: error unpacking data: %s", err.Error())
+	}
+
+	return ret.Value, nil
+}
+
+// deploy CSRNFT, this method is called in begin block, it takes as arguments the name and symbol of the CSRNFT
+func (k Keeper) DeployCSRNFT(
+	ctx sdk.Context,
+	name,
+	symbol string,
+) (common.Address, error) {
+	// deploy CSRNFT with name, symbol constructor args
+	addr, err := k.DeployContract(ctx, contracts.CSRNFTContract, name, symbol)
+	if err != nil {
+		return common.Address{}, sdkerrors.Wrapf(ErrContractDeployments,
+			"CSR::Keeper: DeployCSRNFT: error deploying CSRNFT: %s", err.Error())
+	}
+	return addr, nil
+}
+
+// deploy Turnstile, this method is called in begin block, it takes as argument the, the deployment takes no arguments
 func (k Keeper) DeployTurnstile(
 	ctx sdk.Context,
 ) (common.Address, error) {
-	// return the Module Account's sequence number for address derivation
-	nonce, err := k.accountKeeper.GetSequence(ctx, types.ModuleAddress.Bytes())
+	// divert deployment call to DeployContract, no constructor arguments are needed for Turnstile
+	addr, err := k.DeployContract(ctx, contracts.TurnstileContract)
 	if err != nil {
-		return common.Address{}, sdkerrors.Wrap(err, "CSR:Keeper::DeployTurnstile: error retrieving nonce")
+		return common.Address{}, sdkerrors.Wrapf(ErrContractDeployments,
+			"CSR::Keeper: DeployTurnstile: error deploying Turnstile: %s", err.Error())
 	}
-	// no need to pack arguments into data, can just pack contract Bin
-	// CallEVM with contractBin as data for DeployTurnstile
-	data := contracts.TurnstileContract.Bin
-	_, err = k.erc20Keeper.CallEVMWithData(ctx, types.ModuleAddress, nil, data, true)
-	if err != nil {
-		return common.Address{}, 
-			sdkerrors.Wrap(err, "CSR:Keeper::DeployTurnstile: error deploying contract")
-	}
-	// return contract derived from nonce determined before contract deployment
-	return crypto.CreateAddress(types.ModuleAddress, nonce), nil
+	// return deployed address of contract
+	return addr, nil
 }
 
 // function to deploy an arbitrary smart-contract, takes as argument, the compiled
@@ -44,7 +76,7 @@ func (k Keeper) DeployContract(
 	// method name is nil in this case, we are calling the constructor
 	ctorArgs, err := contract.ABI.Pack("", args...)
 	if err != nil {
-		return common.Address{}, sdkerrors.Wrapf(types.ErrContractDeployments,
+		return common.Address{}, sdkerrors.Wrapf(ErrContractDeployments,
 			"CSR::Keeper::DeployContract: error packing data: %s", err.Error())
 	}
 	// pack method data into byte string, enough for bin and constructor arguments
@@ -57,7 +89,7 @@ func (k Keeper) DeployContract(
 	nonce, err := k.accountKeeper.GetSequence(ctx, types.ModuleAddress.Bytes())
 	if err != nil {
 		return common.Address{},
-			sdkerrors.Wrapf(types.ErrContractDeployments,
+			sdkerrors.Wrapf(ErrContractDeployments,
 				"CSR:Keeper::DeployContract: error retrieving nonce: %s", err.Error())
 	}
 
@@ -66,7 +98,7 @@ func (k Keeper) DeployContract(
 	_, err = k.erc20Keeper.CallEVMWithData(ctx, types.ModuleAddress, nil, data, true)
 	if err != nil {
 		return common.Address{},
-			sdkerrors.Wrapf(types.ErrAddressDerivation,
+			sdkerrors.Wrapf(ErrAddressDerivation,
 				"CSR:Keeper::DeployContract: error deploying contract: %s", err.Error())
 	}
 
@@ -88,12 +120,12 @@ func (k Keeper) CallMethod(
 	methodArgs, err := contract.ABI.Pack(method, args...)
 
 	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrContractDeployments, "CSR:Keeper::DeployContract: method call incorrect: %s", err.Error())
+		return nil, sdkerrors.Wrapf(ErrContractDeployments, "CSR:Keeper::DeployContract: method call incorrect: %s", err.Error())
 	}
 	// call method
 	resp, err := k.erc20Keeper.CallEVMWithData(ctx, types.ModuleAddress, contractAddr, methodArgs, true)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrContractDeployments, "CSR:Keeper: :CallMethod: error applying message: %s", err.Error())
+		return nil, sdkerrors.Wrapf(ErrContractDeployments, "CSR:Keeper: :CallMethod: error applying message: %s", err.Error())
 	}
 
 	return resp, nil

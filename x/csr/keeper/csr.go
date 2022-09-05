@@ -110,6 +110,22 @@ func (k Keeper) GetTurnstile(ctx sdk.Context) (common.Address, bool) {
 	return common.BytesToAddress(bz), true
 }
 
+// sets the deployed CSRNFT to state
+func (k Keeper) SetCSRNFT(ctx sdk.Context, csrnft common.Address) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixAddrs)
+	store.Set(types.CSRNFTKey, csrnft.Bytes())
+}
+
+// gets the deployed CSRNFT address to state
+func (k Keeper) GetCSRNFT(ctx sdk.Context) (common.Address, bool) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixAddrs)
+	bz := store.Get(types.CSRNFTKey)
+	if len(bz) == 0 {
+		return common.Address{}, false
+	}
+	return common.BytesToAddress(bz), true
+}
+
 // Converts a uint64 to a []byte
 func UInt64ToBytes(number uint64) []byte {
 	bz := make([]byte, 8)
