@@ -93,7 +93,7 @@ func (h Hooks) processEvents(ctx sdk.Context, receipt *ethtypes.Receipt) error {
 			eventID := log.Topics[0]
 			event, err := turnstileContract.EventByID(eventID)
 			if err != nil {
-				continue
+				return err
 			}
 
 			// switch and process based on the turnstile event type
