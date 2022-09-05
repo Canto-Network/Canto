@@ -12,8 +12,8 @@ var (
 	TurnstileJSON     []byte
 	TurnstileContract evmtypes.CompiledContract
 	//go:embed compiled_contracts/CSRNFT.json
-	CSRNFTJSON        []byte
-	CSRNFTContract    evmtypes.CompiledContract
+	CSRNFTJSON     []byte
+	CSRNFTContract evmtypes.CompiledContract
 )
 
 func init() {

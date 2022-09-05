@@ -36,5 +36,5 @@ type EVMKeeper interface {
 
 type ERC20Keeper interface {
 	CallEVMWithData(ctx sdk.Context, from common.Address,
-		 contract *common.Address, data []byte, commit bool) (*evmtypes.MsgEthereumTxResponse, error)
+		contract *common.Address, data []byte, commit bool) (*evmtypes.MsgEthereumTxResponse, error)
 }

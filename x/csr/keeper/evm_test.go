@@ -221,7 +221,7 @@ func (suite *KeeperTestSuite) TestMintCSR() {
 	suite.Require().True(found)
 	receiverAddr := tests.GenerateAddress()
 	nft, err := suite.app.CSRKeeper.MintCSR(suite.ctx, receiverAddr)
-	suite.Require().NoError(err) 
+	suite.Require().NoError(err)
 	suite.Require().Equal(nft, uint64(1))
 }
 

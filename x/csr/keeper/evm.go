@@ -45,7 +45,7 @@ func (k Keeper) DeployCSRNFT(
 	addr, err := k.DeployContract(ctx, contracts.CSRNFTContract, name, symbol)
 	if err != nil {
 		return common.Address{}, sdkerrors.Wrapf(ErrContractDeployments,
-			"CSR::Keeper: DeployCSRNFT: error deploying Turnstile: %s", err.Error())
+			"CSR::Keeper: DeployCSRNFT: error deploying CSRNFT: %s", err.Error())
 	}
 	return addr, nil
 }
