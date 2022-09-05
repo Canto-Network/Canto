@@ -112,18 +112,18 @@ func (k Keeper) WithdrawalEvent(ctx sdk.Context, data []byte) error {
 	// receiver exists, retrieve the cosmos address and send from pool to receiver
 	receiver := sdk.AccAddress(event.Receiver.Bytes())
 	// convert poolAddress from bech32 account to account
-	poolAddr := sdk.MustAccAddressFromBech32(csr.Account)
+	beneficiary := sdk.MustAccAddressFromBech32(csr.Account)
 	// receive balance of coins in pool
 	// retrieve evm denom
 	evmParams := k.evmKeeper.GetParams(ctx)
-	rewards := k.bankKeeper.GetBalance(ctx, poolAddr, evmParams.EvmDenom)
+	rewards := k.bankKeeper.GetBalance(ctx, beneficiary, evmParams.EvmDenom)
 	// if there are no rewards, return
 	if rewards.IsZero() {
 		return nil
 	}
 
 	// now send rewards coins from pool to receiver
-	err = k.bankKeeper.SendCoins(ctx, poolAddr, receiver, sdk.Coins{rewards})
+	err = k.bankKeeper.SendCoins(ctx, beneficiary, receiver, sdk.Coins{rewards})
 	if err != nil {
 		return sdkerrors.Wrapf(err, "EventHandler::WithdrawalEvent: error sending coins")
 	}
