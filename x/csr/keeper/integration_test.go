@@ -106,9 +106,9 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 			s.Commit()
 
 			// CSR object should have been created and set in store
-			csr, found := s.app.CSRKeeper.GetCSR(s.ctx, 0)
+			csr, found := s.app.CSRKeeper.GetCSR(s.ctx, 1)
 			Expect(found).To(Equal(true))
-			Expect(csr.Id).To(Equal(uint64(0)))
+			Expect(csr.Id).To(Equal(uint64(1)))
 			Expect(csr.Owner).To(Equal(userAddress.String()))
 			Expect(csr.Account).ToNot(Equal(nil))
 		})
@@ -125,9 +125,30 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 			s.Commit()
 
 			// CSR object should have been created and set in store
-			csr, found := s.app.CSRKeeper.GetCSR(s.ctx, 0)
+			csr, found := s.app.CSRKeeper.GetCSR(s.ctx, 1)
 			Expect(found).To(Equal(true))
 			Expect(len(csr.Contracts)).To(Equal(1))
+		})
+
+		It("it should register multiple NFTs", func() {
+			// Register event embedded in an test smart contract
+			json.Unmarshal(csrTestContractJson, &testContract)
+
+			contractAddress2 := deployContract(deployerKey, contractCode)
+
+			data, _ := testContract.ABI.Pack("register", turnstileAddress, common.BytesToAddress(userAddress.Bytes()))
+			gasPrice := big.NewInt(1000000000)
+
+			// This call will make the turnstile address register the test contract to itself
+			contractInteract(userKey, &contractAddress2, gasPrice, nil, nil, data, nil)
+			s.Commit()
+
+			// CSR object should have been created and set in store
+			csr, found := s.app.CSRKeeper.GetCSR(s.ctx, 2)
+			Expect(found).To(Equal(true))
+			Expect(csr.Id).To(Equal(uint64(2)))
+			Expect(csr.Owner).To(Equal(userAddress.String()))
+			Expect(csr.Account).ToNot(Equal(nil))
 		})
 	})
 
