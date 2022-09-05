@@ -44,9 +44,9 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 
 	// Check and process turnstile events if applicable
 	// If a tx has turnstile events, then no fees will get distributed
-	hasTurnstileEvent := h.processEvents(ctx, receipt)
-	if hasTurnstileEvent {
-		return nil
+	errEvents := h.processEvents(ctx, receipt)
+	if errEvents != nil {
+		return errEvents
 	}
 
 	// Grab the nft the smart contract corresponds to, if it has no nft -> return
@@ -75,33 +75,42 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 }
 
 // returns true if there were any events emitted from the turnstile
-func (h Hooks) processEvents(ctx sdk.Context, receipt *ethtypes.Receipt) bool {
-	// Iterate through all logs in the receipt and check for events emitted by
-	// the turnstile contract
-	seenTurnstileEvent := false
-	for _, log := range receipt.Logs {
-		// Check if the address where the event was omitted is the turnstile contract
-		// if log.Address != contracts.TurnstileContractAddress {
-		// 	continue
-		// }
-
-		eventID := log.Topics[0]
-		event, err := turnstileContract.EventByID(eventID)
-		if err != nil {
-			continue
-		}
-
-		// switch and process based on the event type
-		switch event.Name {
-		case types.TurnstileEventRegisterCSR:
-			h.k.RegisterCSREvent(ctx, log.Data)
-		case types.TurnstileEventUpdateCSR:
-			h.k.UpdateCSREvent(ctx, log.Data)
-		case types.TurnstileEventRetroactiveRegister:
-			continue
-		}
-		seenTurnstileEvent = true
-		// }
+func (h Hooks) processEvents(ctx sdk.Context, receipt *ethtypes.Receipt) error {
+	// Get the turnstile and NFT address which are used to check events
+	turnstileAddress, found := h.k.GetTurnstile(ctx)
+	if !found {
+		return sdkerrors.Wrapf(ErrContractDeployments, "Keeper::ProcessEvents the turnstile contract has not been found.")
 	}
-	return seenTurnstileEvent
+	nftAddress, found := h.k.GetCSRNFT(ctx)
+	if !found {
+		return sdkerrors.Wrapf(ErrCSRNFTNotDeployed, "Keeper::ProcessEvents the nft contract has not been found.")
+	}
+
+	for _, log := range receipt.Logs {
+		// Check if the address matches the NFT or turnstile contracts
+		switch log.Address {
+		case turnstileAddress:
+			eventID := log.Topics[0]
+			event, err := turnstileContract.EventByID(eventID)
+			if err != nil {
+				return err
+			}
+
+			// switch and process based on the turnstile event type
+			switch event.Name {
+			case types.TurnstileEventRegisterCSR:
+				err = h.k.RegisterCSREvent(ctx, log.Data)
+			case types.TurnstileEventUpdateCSR:
+				err = h.k.UpdateCSREvent(ctx, log.Data)
+			case types.TurnstileEventRetroactiveRegister:
+				continue
+			}
+			if err != nil {
+				return err
+			}
+		case nftAddress:
+			continue
+		}
+	}
+	return nil
 }

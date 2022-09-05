@@ -33,8 +33,6 @@ func (k Keeper) RegisterCSREvent(ctx sdk.Context, data []byte) error {
 			"EventHandler::RegisterCSREvent user is attempting to register a non-smart contract address")
 	}
 
-	// **** Mint a new NFT ****
-
 	// Create a new beneficiary account
 	privateKey := ed25519.GenPrivKey().PubKey()
 	address := sdk.AccAddress(privateKey.Address())
@@ -45,12 +43,19 @@ func (k Keeper) RegisterCSREvent(ctx sdk.Context, data []byte) error {
 	csr := types.NewCSR(
 		sdk.AccAddress(event.Receiver.Bytes()),
 		[]string{event.SmartContractAddress.String()},
-		0, // update this to the new nft id
+		0, // Init the NFT to 0 before validation
 		address,
 	)
 	if err := csr.Validate(); err != nil {
 		return err
 	}
+
+	// Mint the NFT after all validation has been done
+	nft, err := k.MintCSR(ctx, event.Receiver)
+	if err != nil {
+		return err
+	}
+	csr.Id = nft
 
 	// Set the CSR in the store
 	k.SetCSR(ctx, csr)
