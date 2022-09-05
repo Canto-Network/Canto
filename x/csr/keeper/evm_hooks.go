@@ -17,9 +17,11 @@ type Hooks struct {
 	k Keeper
 }
 
-var _ evmtypes.EvmHooks = Hooks{}
-
-var TurnstileContract abi.ABI = contracts.TurnstileContract.ABI
+var (
+	_                 evmtypes.EvmHooks = Hooks{}
+	TurnstileContract abi.ABI           = contracts.TurnstileContract.ABI
+	csrNftContract    abi.ABI           = contracts.CSRNFTContract.ABI
+)
 
 // Hooks return the wrapper hooks struct for the Keeper
 func (k Keeper) Hooks() Hooks {
@@ -88,10 +90,10 @@ func (h Hooks) processEvents(ctx sdk.Context, receipt *ethtypes.Receipt) error {
 
 	for _, log := range receipt.Logs {
 		// Check if the address matches the NFT or turnstile contracts
+		eventID := log.Topics[0]
 		switch log.Address {
 		case turnstileAddress:
-			eventID := log.Topics[0]
-			event, err := TurnstileContract.EventByID(eventID)
+			event, err := turnstileContract.EventByID(eventID)
 			if err != nil {
 				return err
 			}
@@ -109,7 +111,21 @@ func (h Hooks) processEvents(ctx sdk.Context, receipt *ethtypes.Receipt) error {
 				return err
 			}
 		case nftAddress:
-			continue
+			// retrieve the event emitted from CSR NFT
+			event, err := csrNftContract.EventByID(eventID)
+			if err != nil {
+				return err
+			}
+
+			// only the Withdrawal Event can be emitted from CSRNFT,
+			switch event.Name {
+			case types.WithdrawalEvent:
+				// handle withdrawal
+				err = h.k.WithdrawalEvent(ctx, log.Data)
+			}
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
