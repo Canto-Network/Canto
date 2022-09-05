@@ -19,7 +19,7 @@ type Hooks struct {
 
 var _ evmtypes.EvmHooks = Hooks{}
 
-var turnstileContract abi.ABI = contracts.TurnstileContract.ABI
+var TurnstileContract abi.ABI = contracts.TurnstileContract.ABI
 
 // Hooks return the wrapper hooks struct for the Keeper
 func (k Keeper) Hooks() Hooks {
@@ -91,7 +91,7 @@ func (h Hooks) processEvents(ctx sdk.Context, receipt *ethtypes.Receipt) error {
 		switch log.Address {
 		case turnstileAddress:
 			eventID := log.Topics[0]
-			event, err := turnstileContract.EventByID(eventID)
+			event, err := TurnstileContract.EventByID(eventID)
 			if err != nil {
 				return err
 			}

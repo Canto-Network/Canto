@@ -17,5 +17,5 @@ type RegisterCSREvent struct {
 
 type UpdateCSREvent struct {
 	SmartContractAddress common.Address
-	Nft_id               uint64
+	Id                   uint64
 }

@@ -17,4 +17,5 @@ var (
 	ErrMethodCall                  = sdkerrors.Register(types.ModuleName, 2005, "csr::Keeper")
 	ErrUnpackData                  = sdkerrors.Register(types.ModuleName, 2006, "csr:Keeper")
 	ErrRegisterEOA                 = sdkerrors.Register(types.ModuleName, 2007, "csr::EventHandler")
+	ErrNFTNotFound                 = sdkerrors.Register(types.ModuleName, 2008, "csr::EventHandler")
 )
