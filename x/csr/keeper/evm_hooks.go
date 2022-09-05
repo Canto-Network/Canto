@@ -123,6 +123,9 @@ func (h Hooks) processEvents(ctx sdk.Context, receipt *ethtypes.Receipt) error {
 				// handle withdrawal
 				err = h.k.WithdrawalEvent(ctx, log.Data)
 			}
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
