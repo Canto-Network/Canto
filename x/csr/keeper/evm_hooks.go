@@ -19,7 +19,7 @@ type Hooks struct {
 
 var (
 	_                 evmtypes.EvmHooks = Hooks{}
-	turnstileContract abi.ABI           = contracts.TurnstileContract.ABI
+	TurnstileContract abi.ABI           = contracts.TurnstileContract.ABI
 	csrNftContract    abi.ABI           = contracts.CSRNFTContract.ABI
 )
 

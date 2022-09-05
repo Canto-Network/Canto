@@ -19,4 +19,5 @@ var (
 	ErrRegisterEOA                 = sdkerrors.Register(types.ModuleName, 2007, "csr::EventHandler")
 	ErrNonexistentAcct             = sdkerrors.Register(types.ModuleName, 2008, "csr::EventHandler")
 	ErrNonexistentCSR              = sdkerrors.Register(types.ModuleName, 2009, "csr::EventHandler")
+	ErrNFTNotFound                 = sdkerrors.Register(types.ModuleName, 2010, "csr::EventHandler")
 )
