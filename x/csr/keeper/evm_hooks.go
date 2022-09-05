@@ -44,7 +44,7 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 
 	// Check and process turnstile events if applicable
 	// If a tx has turnstile events, then no fees will get distributed
-	hasTurnstileEvent := h.processEvents(receipt)
+	hasTurnstileEvent := h.processEvents(ctx, receipt)
 	if hasTurnstileEvent {
 		return nil
 	}
@@ -68,14 +68,14 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 	err := h.k.bankKeeper.SendCoinsFromModuleToAccount(ctx, h.k.feeCollectorName, sdk.AccAddress(beneficiary), csrFees)
 
 	if err != nil {
-		return sdkerrors.Wrapf(ErrFeeCollectorDistribution, "EVMHOOK::PostTxProcessing failed to distribute fees from module account to nft beneficiary")
+		return sdkerrors.Wrapf(ErrFeeCollectorDistribution, "EVMHook::PostTxProcessing failed to distribute fees from module account to nft beneficiary")
 	}
 
 	return nil
 }
 
 // returns true if there were any events emitted from the turnstile
-func (h Hooks) processEvents(receipt *ethtypes.Receipt) bool {
+func (h Hooks) processEvents(ctx sdk.Context, receipt *ethtypes.Receipt) bool {
 	// Iterate through all logs in the receipt and check for events emitted by
 	// the turnstile contract
 	seenTurnstileEvent := false
@@ -94,9 +94,9 @@ func (h Hooks) processEvents(receipt *ethtypes.Receipt) bool {
 		// switch and process based on the event type
 		switch event.Name {
 		case types.TurnstileEventRegisterCSR:
-			h.k.RegisterCSREvent(log.Data)
+			h.k.RegisterCSREvent(ctx, log.Data)
 		case types.TurnstileEventUpdateCSR:
-			h.k.UpdateCSREvent(log.Data)
+			h.k.UpdateCSREvent(ctx, log.Data)
 		case types.TurnstileEventRetroactiveRegister:
 			continue
 		}
