@@ -46,7 +46,7 @@ func (k Keeper) RegisterCSREvent(ctx sdk.Context, data []byte) error {
 		0, // Init the NFT to 0 before validation
 		address,
 	)
-	
+
 	if err := csr.Validate(); err != nil {
 		return err
 	}

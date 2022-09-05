@@ -16,10 +16,11 @@ import (
 type Hooks struct {
 	k Keeper
 }
+
 var (
-	_ evmtypes.EvmHooks = Hooks{}
-	turnstileContract abi.ABI = contracts.TurnstileContract.ABI
-	csrNftContract abi.ABI = contracts.CSRNFTContract.ABI
+	_                 evmtypes.EvmHooks = Hooks{}
+	turnstileContract abi.ABI           = contracts.TurnstileContract.ABI
+	csrNftContract    abi.ABI           = contracts.CSRNFTContract.ABI
 )
 
 // Hooks return the wrapper hooks struct for the Keeper
@@ -116,7 +117,7 @@ func (h Hooks) processEvents(ctx sdk.Context, receipt *ethtypes.Receipt) error {
 				return err
 			}
 
-			// only the Withdrawal Event can be emitted from CSRNFT, 
+			// only the Withdrawal Event can be emitted from CSRNFT,
 			switch event.Name {
 			case types.WithdrawalEvent:
 				// handle withdrawal
