@@ -5,7 +5,7 @@ pragma solidity ^0.8.16;
 contract Turnstile {
     // UpdateEvent is emitted when a user wants to add new smart contracts
     // to the same cst NFT.
-    event UpdateCSREvent(address smartContractAddress, uint64 nft_id);
+    event UpdateCSREvent(address smartContractAddress, uint64 id);
     // RegisterEvent is emitted when a user wants to create a new CSR nft
     event RegisterCSREvent(address smartContractAddress, address receiver);
     // RetroactiveRegisterEvent is emitted when a user wants to retroactively register a smart
@@ -15,12 +15,12 @@ contract Turnstile {
         address deployer,
         uint64[][] nonces,
         bytes[] salt,
-        uint64 nft_id
+        uint64 id
     );
 
     // register the smart contract to an existing CSR nft
-    function register(uint64 nft_id) public {
-        emit UpdateCSREvent(msg.sender, nft_id);
+    function register(uint64 id) public {
+        emit UpdateCSREvent(msg.sender, id);
     }
 
     // register and mint a new CSR nft that will be transferred to the to address entered
@@ -48,14 +48,14 @@ contract Turnstile {
         address deployer,
         uint64[][] memory nonces,
         bytes[] memory salt,
-        uint64 nft_id
+        uint64 id
     ) public {
         emit RetroactiveRegisterEvent(
             contracts,
             deployer,
             nonces,
             salt,
-            nft_id
+            id
         );
     }
 }
