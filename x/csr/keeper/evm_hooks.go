@@ -67,10 +67,10 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 	evmDenom := h.k.evmKeeper.GetParams(ctx).EvmDenom
 	csrFees := sdk.Coins{{Denom: evmDenom, Amount: developerFee.TruncateInt()}}
 
-	err := h.k.bankKeeper.SendCoinsFromModuleToAccount(ctx, h.k.feeCollectorName, sdk.AccAddress(beneficiary), csrFees)
+	err := h.k.bankKeeper.SendCoinsFromModuleToAccount(ctx, h.k.FeeCollectorName, sdk.AccAddress(beneficiary), csrFees)
 
 	if err != nil {
-		return sdkerrors.Wrapf(ErrFeeCollectorDistribution, "EVMHook::PostTxProcessing failed to distribute fees from module account to nft beneficiary")
+		return sdkerrors.Wrapf(ErrFeeCollectorDistribution, "EVMHook::PostTxProcessing failed to distribute fees from module account to nft beneficiary, %d", err)
 	}
 
 	return nil
@@ -93,7 +93,7 @@ func (h Hooks) processEvents(ctx sdk.Context, receipt *ethtypes.Receipt) error {
 		eventID := log.Topics[0]
 		switch log.Address {
 		case turnstileAddress:
-			event, err := turnstileContract.EventByID(eventID)
+			event, err := TurnstileContract.EventByID(eventID)
 			if err != nil {
 				return err
 			}

@@ -101,7 +101,7 @@ func GenerateCSRs(number int) []types.CSR {
 		contracts := []string{tests.GenerateAddress().String(), tests.GenerateAddress().String(),
 			tests.GenerateAddress().String(), tests.GenerateAddress().String()}
 		id := uint64(index)
-		account := sdk.AccAddress(tests.GenerateAddress().Bytes())
+		account := s.app.CSRKeeper.CreateNewAccount(s.ctx)
 
 		csr := types.NewCSR(
 			owner,

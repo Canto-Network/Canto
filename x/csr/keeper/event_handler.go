@@ -30,6 +30,11 @@ func (k Keeper) RegisterCSREvent(ctx sdk.Context, data []byte) error {
 	// Create a new beneficiary account
 	address := k.CreateNewAccount(ctx)
 
+	// Check that the receiver account  exists
+	if acct := k.evmKeeper.GetAccount(ctx, event.Receiver); acct == nil {
+		return sdkerrors.Wrapf(ErrNonexistentAcct, "EventHandler::WithdrawalEvent: account does not exist: %s", event.Receiver)
+	}
+
 	// Create CSR object and validate
 	csr := types.NewCSR(
 		sdk.AccAddress(event.Receiver.Bytes()),
@@ -150,9 +155,9 @@ func (k Keeper) ValidateContract(ctx sdk.Context, contract common.Address) error
 
 	// Check if the user is attempting to register a non-smart contract address
 	account := k.evmKeeper.GetAccount(ctx, contract)
-	if !account.IsContract() {
+	if account == nil || !account.IsContract() {
 		return sdkerrors.Wrapf(ErrRegisterEOA,
-			"EventHandler::RegisterCSREvent user is attempting to register a non-smart contract address")
+			"EventHandler::RegisterCSREvent user is attempting to register a nil or non-smart contract address")
 	}
 	return nil
 }
