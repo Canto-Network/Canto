@@ -110,9 +110,9 @@ func (k Keeper) WithdrawalEvent(ctx sdk.Context, data []byte) error {
 	}
 
 	// retrieve CSR from state by NFT ID
-	csr, found := k.GetCSR(ctx, event.Id)
+	csr, found := k.GetCSR(ctx, event.Id.Uint64())
 	if !found {
-		return sdkerrors.Wrapf(ErrNonexistentCSR, "EventHandler::WithdrawalEvent: non-existent CSR-ID: %d", csr.Id)
+		return sdkerrors.Wrapf(ErrNonexistentCSR, "EventHandler::WithdrawalEvent: non-existent CSR-ID: %d", event.Id.Uint64())
 	}
 
 	// check that the receiver account  exists
