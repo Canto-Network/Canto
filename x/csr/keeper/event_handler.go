@@ -122,12 +122,13 @@ func (k Keeper) WithdrawalEvent(ctx sdk.Context, data []byte) error {
 
 	// receiver exists, retrieve the cosmos address and send from pool to receiver
 	receiver := sdk.AccAddress(event.Receiver.Bytes())
-	// convert poolAddress from bech32 account to account
-	beneficiary := sdk.MustAccAddressFromBech32(csr.Account)
+	// convert csr from bech32 account to account
+	beneficiary := sdk.AccAddress(csr.Account)
 	// receive balance of coins in pool
 	// retrieve evm denom
 	evmParams := k.evmKeeper.GetParams(ctx)
 	rewards := k.bankKeeper.GetBalance(ctx, beneficiary, evmParams.EvmDenom)
+
 	// if there are no rewards, return
 	if rewards.IsZero() {
 		return nil
@@ -150,14 +151,14 @@ func (k Keeper) ValidateContract(ctx sdk.Context, contract common.Address) error
 	nftID, found := k.GetNFTByContract(ctx, contract.String())
 	if found {
 		return sdkerrors.Wrapf(ErrPrevRegisteredSmartContract,
-			"EventHandler::RegisterCSREvent this smart contract is already registered to an existing NFT: %d", nftID)
+			"EventHandler::ValidateContract this smart contract is already registered to an existing NFT: %d", nftID)
 	}
 
 	// Check if the user is attempting to register a non-smart contract address
 	account := k.evmKeeper.GetAccount(ctx, contract)
 	if account == nil || !account.IsContract() {
 		return sdkerrors.Wrapf(ErrRegisterEOA,
-			"EventHandler::RegisterCSREvent user is attempting to register a nil or non-smart contract address")
+			"EventHandler::ValidateContract user is attempting to register a nil or non-smart contract address")
 	}
 	return nil
 }
