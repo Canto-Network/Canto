@@ -32,7 +32,7 @@ func (k Keeper) RegisterCSREvent(ctx sdk.Context, data []byte) error {
 
 	// Check that the receiver account  exists
 	if acct := k.evmKeeper.GetAccount(ctx, event.Receiver); acct == nil {
-		return sdkerrors.Wrapf(ErrNonexistentAcct, "EventHandler::WithdrawalEvent: account does not exist: %s", event.Receiver)
+		return sdkerrors.Wrapf(ErrNonexistentAcct, "EventHandler::RegisterEvent: account does not exist: %s", event.Receiver)
 	}
 
 	// Create CSR object and validate

@@ -56,7 +56,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 
 	type result struct {
 		shouldReceiveFunds bool
-		gasUsed            uint64 // cumulative tracking for a particular csr
+		gasUsed            uint64 // cumulative tracking for a particular nft
 	}
 
 	testCases := []struct {
