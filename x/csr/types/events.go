@@ -1,6 +1,7 @@
 package types
 
 import (
+	"math/big"
 	"github.com/ethereum/go-ethereum/common"
 )
 
@@ -24,5 +25,5 @@ type UpdateCSREvent struct {
 type Withdrawal struct {
 	Withdrawer common.Address
 	Receiver   common.Address
-	Id         uint64
+	Id         *big.Int
 }
