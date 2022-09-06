@@ -18,12 +18,11 @@ import (
 
 // if smart contract address is not a smart contract - fail
 // if smart contract has already been registered - fail
-// if smart contract has not yet been registered and is a contract - pass 
-// check that csr has been set in state 
+// if smart contract has not yet been registered and is a contract - pass
+// check that csr has been set in state
 func (suite *KeeperTestSuite) TestRegisterEvent() {
 
 }
-
 
 // test failure in the case that a withdrawal event has been received for a CSR that does not exist
 // test failure in the case that a withdrawal event has been received with a recipient that does not exist
@@ -157,7 +156,7 @@ func (suite *KeeperTestSuite) TestWithdrawalEvent() {
 }
 
 func generateRegisterEventData(contract, receiver common.Address) (data []byte, err error) {
-	return generateEventData("RegisterCSREvenet", contracts.TurnstileContract, contract, receiver)
+	return generateEventData("RegisterCSREvent", contracts.TurnstileContract, contract, receiver)
 }
 
 // generate Withdrawal event log data
