@@ -67,7 +67,7 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 	evmDenom := h.k.evmKeeper.GetParams(ctx).EvmDenom
 	csrFees := sdk.Coins{{Denom: evmDenom, Amount: developerFee.TruncateInt()}}
 
-	err := h.k.bankKeeper.SendCoinsFromModuleToAccount(ctx, h.k.FeeCollectorName, sdk.AccAddress(beneficiary), csrFees)
+	err := h.k.bankKeeper.SendCoinsFromModuleToAccount(ctx, h.k.FeeCollectorName, sdk.MustAccAddressFromBech32(beneficiary), csrFees)
 
 	if err != nil {
 		return sdkerrors.Wrapf(ErrFeeCollectorDistribution, "EVMHook::PostTxProcessing failed to distribute fees from module account to nft beneficiary, %d", err)
