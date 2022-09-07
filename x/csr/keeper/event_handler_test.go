@@ -167,8 +167,7 @@ func (suite *KeeperTestSuite) TestUpdateEvent() {
 			false,
 			func() {
 				csr := types.CSR{
-					Owner:     sdk.AccAddress(smartContractAddress.Bytes()).String(),
-					Account:   sdk.AccAddress(smartContractAddress.Bytes()).String(),
+					Beneficiary:   sdk.AccAddress(smartContractAddress.Bytes()).String(),
 					Id:        1,
 					Contracts: []string{smartContractAddress.Hex()},
 				}
