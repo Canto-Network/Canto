@@ -38,7 +38,6 @@ func (suite *CSRTestSuite) TestCSR() {
 		{
 			"Create CSR object - pass",
 			CSR{
-				Owner:     suite.owner,
 				Contracts: suite.contracts,
 				Id:        suite.id,
 				Account:   suite.account,
@@ -48,7 +47,6 @@ func (suite *CSRTestSuite) TestCSR() {
 		{
 			"Create CSR object with 0 smart contracts - fail",
 			CSR{
-				Owner:     suite.owner,
 				Contracts: []string{},
 				Id:        suite.id,
 				Account:   suite.account,
@@ -58,7 +56,6 @@ func (suite *CSRTestSuite) TestCSR() {
 		{
 			"Create CSR object with invalid owner address - fail",
 			CSR{
-				Owner:     "",
 				Contracts: suite.contracts,
 				Id:        suite.id,
 				Account:   suite.account,
@@ -68,7 +65,6 @@ func (suite *CSRTestSuite) TestCSR() {
 		{
 			"Create CSR object with invalid account address - fail",
 			CSR{
-				Owner:     suite.owner,
 				Contracts: suite.contracts,
 				Id:        suite.id,
 				Account:   "",
@@ -78,7 +74,6 @@ func (suite *CSRTestSuite) TestCSR() {
 		{
 			"Create CSR object with invalid smart contract addresses - fail",
 			CSR{
-				Owner:     suite.owner,
 				Contracts: append(suite.contracts, ""),
 				Id:        suite.id,
 				Account:   suite.account,
