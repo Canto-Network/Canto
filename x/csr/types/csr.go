@@ -9,9 +9,9 @@ import (
 // Creates a new instance of the CSR object
 func NewCSR(owner sdk.AccAddress, contracts []string, id uint64, account sdk.AccAddress) CSR {
 	return CSR{
-		Contracts: contracts,
-		Id:        id,
-		Account:   account.String(),
+		Contracts:   contracts,
+		Id:          id,
+		Beneficiary: account.String(),
 	}
 }
 
@@ -35,7 +35,7 @@ func (csr CSR) Validate() error {
 	}
 
 	// Ensure that the account address entered is a valid canto address
-	account := csr.Account
+	account := csr.Beneficiary
 	if _, err := sdk.AccAddressFromBech32(account); err != nil {
 		return err
 	}
