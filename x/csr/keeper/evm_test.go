@@ -98,13 +98,15 @@ func (suite *KeeperTestSuite) TestContractDeployment() {
 
 	for _, tc := range testCases {
 		// setup test
-		err, addr := tc.args.setup()
-		suite.Require().NoError(err)
-		if tc.expectPass {
-			suite.Require().True(tc.args.expectReturn(addr))
-		} else {
-			suite.Require().False(tc.args.expectReturn(addr))
-		}
+		suite.Run(tc.name, func() {
+			err, addr := tc.args.setup()
+			suite.Require().NoError(err)
+			if tc.expectPass {
+				suite.Require().True(tc.args.expectReturn(addr))
+			} else {
+				suite.Require().False(tc.args.expectReturn(addr))
+			}
+		})
 	}
 }
 
