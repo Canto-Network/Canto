@@ -92,6 +92,7 @@ func (h Hooks) processEvents(ctx sdk.Context, receipt *ethtypes.Receipt) error {
 		if len(log.Topics) == 0 {
 			continue
 		}
+
 		// Check if the address matches the NFT or turnstile contracts
 		eventID := log.Topics[0]
 		switch log.Address {
