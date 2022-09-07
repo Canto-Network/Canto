@@ -42,7 +42,7 @@ func (suite *KeeperTestSuite) TestRegisterEvent() {
 		setup      func()
 	}{
 		{
-			"if smart contract address is not an account - fail",
+			"if smart contract address is not an account in statedb - fail",
 			testArgs{
 				tests.GenerateAddress(),
 				tests.GenerateAddress(),
