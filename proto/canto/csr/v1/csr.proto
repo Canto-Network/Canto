@@ -2,23 +2,17 @@ syntax = "proto3";
 package canto.csr.v1;
 
 import "gogoproto/gogo.proto";
-import "cosmos_proto/cosmos.proto";
 
 option go_package = "github.com/Canto-Network/Canto/v2/x/csr/types";
 
-// The CSR struct is a wrapper to all of the metadata associated with a given Contract Secured Revenue registration. It maintains the pool 
-// where all of the fees are being sent to, the deployer that is responsible for all deployments, and the set of dApps (smart contracts) 
-// that are registered with this pool.
+// The CSR struct is a wrapper to all of the metadata associated with a given CST NFT
 message CSR {
-    option (gogoproto.equal) = true;
-    // The owner keeps track of the user that deploys all of the dApps, same user that initially owns the NFT
-    string owner = 1;
     // Contracts is the list of all EVM address that are registered to this pool (EVM addresses)
-    repeated string contracts = 2;
+    repeated string contracts = 1;
     // The NFT id which this CSR corresponds to
-    uint64 id = 3;
+    uint64 id = 2;
     // The account which will be accumulating rewards for this CSR (bech32 Canto address)
-    string account = 4;
+    string beneficiary = 3;
 }
 
 // Keeps track of all of the CSRs, primarily used to (un)marshal data

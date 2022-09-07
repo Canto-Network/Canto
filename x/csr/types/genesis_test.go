@@ -24,13 +24,11 @@ func TestGenesisStateSuite(t *testing.T) {
 func (suite *GensisStateSuite) SetupTest() {
 	suite.params = types.DefaultParams()
 
-	owner := sdk.AccAddress(tests.GenerateAddress().Bytes())
 	contracts := []string{tests.GenerateAddress().String(), tests.GenerateAddress().String(),
 		tests.GenerateAddress().String(), tests.GenerateAddress().String()}
 	id := 0
 	account := sdk.AccAddress(tests.GenerateAddress().Bytes())
 	csr := types.NewCSR(
-		owner,
 		contracts,
 		uint64(id),
 		account,

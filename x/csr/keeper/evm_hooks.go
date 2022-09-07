@@ -59,7 +59,7 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 
 	// Grab the account which will be receiving the tx fees
 	csr, _ := h.k.GetCSR(ctx, id)
-	beneficiary := csr.Account
+	beneficiary := csr.Beneficiary
 
 	// Calculate fees to be distributed
 	fee := sdk.NewIntFromUint64(receipt.GasUsed).Mul(sdk.NewIntFromBigInt(msg.GasPrice()))
@@ -92,6 +92,7 @@ func (h Hooks) processEvents(ctx sdk.Context, receipt *ethtypes.Receipt) error {
 		if len(log.Topics) == 0 {
 			continue
 		}
+
 		// Check if the address matches the NFT or turnstile contracts
 		eventID := log.Topics[0]
 		switch log.Address {

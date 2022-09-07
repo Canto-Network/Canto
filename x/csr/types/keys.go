@@ -32,8 +32,6 @@ func init() {
 const (
 	// nft id -> csr
 	prefixCSR = iota + 1
-	// nft id -> owner
-	prefixOwner
 	// contract -> nft id
 	prefixContract
 	// prefix prefix addresses of CSRNFT and Turnstile
@@ -43,7 +41,6 @@ const (
 // KVStore key prefixes
 var (
 	KeyPrefixCSR      = []byte{prefixCSR}
-	KeyPrefixOwner    = []byte{prefixOwner}
 	KeyPrefixContract = []byte{prefixContract}
 	KeyPrefixAddrs    = []byte{prefixAddrs}
 )

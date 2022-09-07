@@ -95,8 +95,8 @@ func (suite *KeeperTestSuite) TestWithdrawalEvent() {
 				acct := suite.app.CSRKeeper.CreateNewAccount(suite.ctx)
 				// first set CSR to state
 				csr := types.CSR{
-					Id:      id,
-					Account: acct.String(),
+					Id:          id,
+					Beneficiary: acct.String(),
 				}
 				suite.app.CSRKeeper.SetCSR(suite.ctx, csr)
 				// generate event
@@ -128,8 +128,8 @@ func (suite *KeeperTestSuite) TestWithdrawalEvent() {
 				suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, sdk.AccAddress(receiver.Bytes()), coins)
 				// set CSR to state
 				csr := types.CSR{
-					Id:      id,
-					Account: acct.String(),
+					Id:          id,
+					Beneficiary: acct.String(),
 				}
 				suite.app.CSRKeeper.SetCSR(suite.ctx, csr)
 				// generate event

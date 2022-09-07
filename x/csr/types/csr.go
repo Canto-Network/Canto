@@ -7,23 +7,16 @@ import (
 )
 
 // Creates a new instance of the CSR object
-func NewCSR(owner sdk.AccAddress, contracts []string, id uint64, account sdk.AccAddress) CSR {
+func NewCSR(contracts []string, id uint64, account sdk.AccAddress) CSR {
 	return CSR{
-		Owner:     owner.String(),
-		Contracts: contracts,
-		Id:        id,
-		Account:   account.String(),
+		Contracts:   contracts,
+		Id:          id,
+		Beneficiary: account.String(),
 	}
 }
 
 // Validate performs stateless validation of a CSR object
 func (csr CSR) Validate() error {
-	// Check if the address of the owner is valid
-	owner := csr.Owner
-	if _, err := sdk.AccAddressFromBech32(owner); err != nil {
-		return err
-	}
-
 	seenSmartContracts := make(map[string]bool)
 	for _, smartContract := range csr.Contracts {
 		if err := ethermint.ValidateNonZeroAddress(smartContract); err != nil {
@@ -42,7 +35,7 @@ func (csr CSR) Validate() error {
 	}
 
 	// Ensure that the account address entered is a valid canto address
-	account := csr.Account
+	account := csr.Beneficiary
 	if _, err := sdk.AccAddressFromBech32(account); err != nil {
 		return err
 	}

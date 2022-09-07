@@ -109,8 +109,7 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 			csr, found := s.app.CSRKeeper.GetCSR(s.ctx, 1)
 			Expect(found).To(Equal(true))
 			Expect(csr.Id).To(Equal(uint64(1)))
-			Expect(csr.Owner).To(Equal(userAddress.String()))
-			Expect(csr.Account).ToNot(Equal(nil))
+			Expect(csr.Beneficiary).ToNot(Equal(nil))
 		})
 
 		It("it should not register the same smart contract", func() {
@@ -147,8 +146,7 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 			csr, found := s.app.CSRKeeper.GetCSR(s.ctx, 2)
 			Expect(found).To(Equal(true))
 			Expect(csr.Id).To(Equal(uint64(2)))
-			Expect(csr.Owner).To(Equal(userAddress.String()))
-			Expect(csr.Account).ToNot(Equal(nil))
+			Expect(csr.Beneficiary).ToNot(Equal(nil))
 		})
 
 		It("it should register new contracts to existing NFTs", func() {
@@ -168,9 +166,8 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 			csr, found := s.app.CSRKeeper.GetCSR(s.ctx, 1)
 			Expect(found).To(Equal(true))
 			Expect(csr.Id).To(Equal(uint64(1)))
-			Expect(csr.Owner).To(Equal(userAddress.String()))
 			Expect(len(csr.Contracts)).To(Equal(2))
-			Expect(csr.Account).ToNot(Equal(nil))
+			Expect(csr.Beneficiary).ToNot(Equal(nil))
 		})
 	})
 
