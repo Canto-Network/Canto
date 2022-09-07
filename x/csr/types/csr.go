@@ -20,7 +20,7 @@ func NewCSR(owner sdk.AccAddress, contracts []string, id uint64, account sdk.Acc
 func (csr CSR) Validate() error {
 	// Check if the address of the owner is valid
 	owner := csr.Owner
-		if _, err := sdk.AccAddressFromBech32(owner); err != nil {
+	if _, err := sdk.AccAddressFromBech32(owner); err != nil {
 		return err
 	}
 
