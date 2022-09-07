@@ -123,7 +123,7 @@ func (k Keeper) WithdrawalEvent(ctx sdk.Context, data []byte) error {
 	// receiver exists, retrieve the cosmos address and send from pool to receiver
 	receiver := sdk.AccAddress(event.Receiver.Bytes())
 	// convert csr from bech32 account to account
-	beneficiary := sdk.MustAccAddressFromBech32(csr.Account)
+	beneficiary := sdk.MustAccAddressFromBech32(csr.Beneficiary)
 	// receive balance of coins in pool
 	// retrieve evm denom
 	evmParams := k.evmKeeper.GetParams(ctx)

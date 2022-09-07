@@ -23,7 +23,7 @@ func (suite *KeeperTestSuite) TestCSRSetGet() {
 		suite.Require().True(found)
 		suite.Require().Equal(result.Contracts, csr.Contracts)
 		suite.Require().Equal(result.Id, id)
-		suite.Require().Equal(result.Account, csr.Account)
+		suite.Require().Equal(result.Beneficiary, csr.Beneficiary)
 	}
 }
 
