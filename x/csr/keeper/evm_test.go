@@ -168,16 +168,18 @@ func (suite *KeeperTestSuite) TestAddressDerivation() {
 
 	for _, tc := range testCases {
 		//  run setup test
-		expectAddr := tc.args.setup()
+		suite.Run(tc.name, func() {
+			expectAddr := tc.args.setup()
 
-		if tc.expectPass {
-			err, addr := suite.app.CSRKeeper.DeriveAddress(suite.ctx, types.ModuleAddress, tc.args.nonces, tc.args.salts)
-			suite.Require().NoError(err)
-			suite.Require().True(addr == expectAddr)
-		} else {
-			err, _ := suite.app.CSRKeeper.DeriveAddress(suite.ctx, types.ModuleAddress, tc.args.nonces, tc.args.salts)
-			suite.Require().Error(err)
-		}
+			if tc.expectPass {
+				err, addr := suite.app.CSRKeeper.DeriveAddress(suite.ctx, types.ModuleAddress, tc.args.nonces, tc.args.salts)
+				suite.Require().NoError(err)
+				suite.Require().True(addr == expectAddr)
+			} else {
+				err, _ := suite.app.CSRKeeper.DeriveAddress(suite.ctx, types.ModuleAddress, tc.args.nonces, tc.args.salts)
+				suite.Require().Error(err)
+			}
+		})
 	}
 }
 

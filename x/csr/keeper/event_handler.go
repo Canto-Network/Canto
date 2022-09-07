@@ -68,7 +68,6 @@ func (k Keeper) UpdateCSREvent(ctx sdk.Context, data []byte) error {
 	if err != nil {
 		return err
 	}
-
 	// Validate that the contract entered can be registered
 	err = k.ValidateContract(ctx, event.SmartContractAddress)
 	if err != nil {
@@ -80,7 +79,6 @@ func (k Keeper) UpdateCSREvent(ctx sdk.Context, data []byte) error {
 	if !found {
 		return sdkerrors.Wrapf(ErrNFTNotFound, "EventHandler::UpdateCSREvent the nft entered does not currently exist")
 	}
-
 	// Add the new smart contract to the CSR NFT and validate
 	csr.Contracts = append(csr.Contracts, event.SmartContractAddress.String())
 	err = csr.Validate()

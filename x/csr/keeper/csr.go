@@ -64,7 +64,6 @@ func (k Keeper) GetCSRsByOwner(ctx sdk.Context, account string) []uint64 {
 func (k Keeper) SetCSR(ctx sdk.Context, csr types.CSR) {
 	// Marshal the CSR object into a byte string
 	bz, _ := csr.Marshal()
-
 	// Convert the NFT id to bytes so we can store properly
 	nftId := UInt64ToBytes(csr.Id)
 

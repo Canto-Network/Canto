@@ -87,12 +87,14 @@ func (suite *CSRTestSuite) TestCSR() {
 		},
 	}
 	for _, tc := range testCases {
-		err := tc.csr.Validate()
+		suite.Run(tc.msg, func() {
+			err := tc.csr.Validate()
 
-		if tc.expectPass {
-			suite.Require().NoError(err, tc.msg)
-		} else {
-			suite.Require().Error(err, tc.msg)
-		}
+			if tc.expectPass {
+				suite.Require().NoError(err, tc.msg)
+			} else {
+				suite.Require().Error(err, tc.msg)
+			}
+		})
 	}
 }
