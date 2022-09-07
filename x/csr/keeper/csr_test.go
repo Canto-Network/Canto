@@ -21,7 +21,6 @@ func (suite *KeeperTestSuite) TestCSRSetGet() {
 
 		// Validation
 		suite.Require().True(found)
-		suite.Require().Equal(result.Owner, csr.Owner)
 		suite.Require().Equal(result.Contracts, csr.Contracts)
 		suite.Require().Equal(result.Id, id)
 		suite.Require().Equal(result.Account, csr.Account)
@@ -70,26 +69,6 @@ func (suite *KeeperTestSuite) TestSetGetCSRNFT() {
 	expectAddr, found := suite.app.CSRKeeper.GetCSRNFT(suite.ctx)
 	suite.Require().True(found)
 	suite.Require().Equal(expectAddr, addr)
-}
-
-// Creates a bunch of CSRs and then assigns ownership of some to a single account
-func (suite *KeeperTestSuite) TestGetCSRsByOwner() {
-	owner := sdk.AccAddress(tests.GenerateAddress().Bytes()).String()
-	csrs := GenerateCSRs(10)
-
-	csrs[0].Owner = owner
-	csrs[3].Owner = owner
-	csrs[4].Owner = owner
-	csrs[6].Owner = owner
-	csrs[7].Owner = owner
-
-	for _, csr := range csrs {
-		suite.app.CSRKeeper.SetCSR(suite.ctx, csr)
-	}
-
-	csrsForOwner := suite.app.CSRKeeper.GetCSRsByOwner(suite.ctx, owner)
-	suite.Require().Equal(5, len(csrsForOwner))
-	suite.Require().Equal([]uint64{0, 3, 4, 6, 7}, csrsForOwner)
 }
 
 // Generates an array of CSRs for testing purposes
