@@ -741,7 +741,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 				csr, found := suite.app.CSRKeeper.GetCSR(suite.ctx, nft)
 				suite.Require().True(found)
 
-				beneficiary := csr.Account
+				beneficiary := csr.Beneficiary
 				cosmosBalance := suite.app.BankKeeper.GetAllBalances(suite.ctx, sdk.MustAccAddressFromBech32(beneficiary))
 
 				fee := sdk.NewIntFromUint64(tc.test.gasUsed).Mul(sdk.NewIntFromBigInt(msg.GasPrice()))
