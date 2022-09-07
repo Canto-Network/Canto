@@ -11,7 +11,6 @@ import (
 
 type CSRTestSuite struct {
 	suite.Suite
-	owner     string
 	contracts []string
 	id        uint64
 	account   string
@@ -22,7 +21,6 @@ func TestCSRSuite(t *testing.T) {
 }
 
 func (suite *CSRTestSuite) SetupTest() {
-	suite.owner = sdk.AccAddress(tests.GenerateAddress().Bytes()).String()
 	suite.contracts = []string{tests.GenerateAddress().String(), tests.GenerateAddress().String(),
 		tests.GenerateAddress().String(), tests.GenerateAddress().String()}
 	suite.id = 0
@@ -48,15 +46,6 @@ func (suite *CSRTestSuite) TestCSR() {
 			"Create CSR object with 0 smart contracts - fail",
 			CSR{
 				Contracts:   []string{},
-				Id:          suite.id,
-				Beneficiary: suite.account,
-			},
-			false,
-		},
-		{
-			"Create CSR object with invalid owner address - fail",
-			CSR{
-				Contracts:   suite.contracts,
 				Id:          suite.id,
 				Beneficiary: suite.account,
 			},

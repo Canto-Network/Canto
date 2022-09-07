@@ -7,7 +7,7 @@ import (
 )
 
 // Creates a new instance of the CSR object
-func NewCSR(owner sdk.AccAddress, contracts []string, id uint64, account sdk.AccAddress) CSR {
+func NewCSR(contracts []string, id uint64, account sdk.AccAddress) CSR {
 	return CSR{
 		Contracts:   contracts,
 		Id:          id,

@@ -38,8 +38,7 @@ func (k Keeper) GetNFTByContract(ctx sdk.Context, address string) (uint64, bool)
 
 // Set CSR will place a new or update CSR type into the store with the
 // key being the NFT id and the value being the marshalled CSR object
-// This will also allow mapping the owner to NFT id and contract to NFT id
-// for fast read and writes.
+// We also map the smart contract to the correct NFT for easy reads/writes
 func (k Keeper) SetCSR(ctx sdk.Context, csr types.CSR) {
 	// Marshal the CSR object into a byte string
 	bz, _ := csr.Marshal()

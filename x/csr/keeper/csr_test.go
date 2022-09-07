@@ -2,7 +2,6 @@ package keeper_test
 
 import (
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/evmos/ethermint/tests"
 )
 
@@ -76,14 +75,12 @@ func GenerateCSRs(number int) []types.CSR {
 	csrs := make([]types.CSR, 0)
 
 	for index := 0; index < number; index++ {
-		owner := sdk.AccAddress(tests.GenerateAddress().Bytes())
 		contracts := []string{tests.GenerateAddress().String(), tests.GenerateAddress().String(),
 			tests.GenerateAddress().String(), tests.GenerateAddress().String()}
 		id := uint64(index)
 		account := s.app.CSRKeeper.CreateNewAccount(s.ctx)
 
 		csr := types.NewCSR(
-			owner,
 			contracts,
 			id,
 			account,
