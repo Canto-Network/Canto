@@ -20,8 +20,11 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 	suite.SetupTest()
 	suite.Commit()
 
-	// Deploy a test contract (which is just another turnstile)
+	// Deploy test contracts (which are turnstiles)
 	testContract, _ := suite.app.CSRKeeper.DeployTurnstile(suite.ctx)
+	testContract2, _ := suite.app.CSRKeeper.DeployTurnstile(suite.ctx)
+	testContract3, _ := suite.app.CSRKeeper.DeployTurnstile(suite.ctx)
+	testContract4, _ := suite.app.CSRKeeper.DeployTurnstile(suite.ctx)
 	suite.Commit()
 
 	// Send some initial funds to the fee module account
@@ -47,15 +50,19 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 
 	turnstileAddress, found := suite.app.CSRKeeper.GetTurnstile(suite.ctx)
 	suite.Require().True(found)
+	csrNFTAddress, found := suite.app.CSRKeeper.GetCSRNFT(suite.ctx)
+	suite.Require().True(found)
+
 	turnstile := contracts.TurnstileContract.ABI
-	// nft := contracts.CSRNFTContract.ABI
+	nft := contracts.CSRNFTContract.ABI
 
 	RegisterCSREvent := turnstile.Events["RegisterCSREvent"]
-	// UpdateCSREvent := turnstile.Events["UpdateCSREvent"]
-	// WithdrawalEvent := nft.Events["Withdrawal"]
+	UpdateCSREvent := turnstile.Events["UpdateCSREvent"]
+	WithdrawalEvent := nft.Events["Withdrawal"]
 
 	type result struct {
 		shouldReceiveFunds bool
+		expectErr          bool
 		gasUsed            uint64 // cumulative tracking for a particular nft
 	}
 
@@ -89,6 +96,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			},
 			result{
 				false,
+				false,
 				0,
 			},
 		},
@@ -115,6 +123,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 				}
 			},
 			result{
+				false,
 				false,
 				0,
 			},
@@ -145,6 +154,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			},
 			result{
 				true,
+				false,
 				1,
 			},
 		},
@@ -175,11 +185,12 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			},
 			result{
 				true,
+				false,
 				11,
 			},
 		},
 		{
-			"Unregistered CSR contract (register contract not in state db) event  in logs)",
+			"Unregistered CSR contract (register contract not in state db) event in logs)",
 			func() {
 				account := tests.GenerateAddress()
 
@@ -212,6 +223,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			},
 			result{
 				false,
+				true,
 				0,
 			},
 		},
@@ -249,6 +261,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			},
 			result{
 				false,
+				true,
 				0,
 			},
 		},
@@ -287,7 +300,422 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			},
 			result{
 				false,
+				false,
 				0,
+			},
+		},
+		{
+			"Register test CSR contract (no events)",
+			func() {
+				msg = ethtypes.NewMessage(
+					types.ModuleAddress,
+					&testContract,
+					0,
+					big.NewInt(0), // amount
+					uint64(0),     // gasLimit
+					gasPrice,      // gasPrice
+					big.NewInt(0), // gasFeeCap
+					big.NewInt(0), // gasTipCap
+					[]byte{},
+					ethtypes.AccessList{}, // AccessList
+					true,                  // checkNonce
+				)
+
+				receipt = &ethtypes.Receipt{
+					Logs:    []*ethtypes.Log{},
+					GasUsed: 10,
+				}
+			},
+			result{
+				true,
+				false,
+				10,
+			},
+		},
+		{
+			"Register test CSR contract (register duplicate smart contract event) -> might be similar to a factory deployment",
+			func() {
+				sdkAccount := suite.app.CSRKeeper.CreateNewAccount(suite.ctx)
+				account := common.BytesToAddress(sdkAccount.Bytes())
+
+				address := tests.GenerateAddress()
+				msg = ethtypes.NewMessage(
+					types.ModuleAddress,
+					&address,
+					0,
+					big.NewInt(0), // amount
+					uint64(0),     // gasLimit
+					gasPrice,      // gasPrice
+					big.NewInt(0), // gasFeeCap
+					big.NewInt(0), // gasTipCap
+					[]byte{},
+					ethtypes.AccessList{}, // AccessList
+					true,                  // checkNonce
+				)
+
+				topics := []common.Hash{RegisterCSREvent.ID, testContract.Hash(), account.Hash()}
+				data, _ := RegisterCSREvent.Inputs.Pack(testContract, account)
+				log := ethtypes.Log{
+					Address: turnstileAddress,
+					Topics:  topics,
+					Data:    data,
+				}
+				receipt = &ethtypes.Receipt{
+					Logs:    []*ethtypes.Log{&log},
+					GasUsed: 10,
+				}
+			},
+			result{
+				false,
+				true,
+				10,
+			},
+		},
+		{
+			"Register test CSR contract (register smart contract event) -> might be similar to a factory deployment",
+			func() {
+				sdkAccount := suite.app.CSRKeeper.CreateNewAccount(suite.ctx)
+				account := common.BytesToAddress(sdkAccount.Bytes())
+
+				msg = ethtypes.NewMessage(
+					types.ModuleAddress,
+					&testContract,
+					0,
+					big.NewInt(0), // amount
+					uint64(0),     // gasLimit
+					gasPrice,      // gasPrice
+					big.NewInt(0), // gasFeeCap
+					big.NewInt(0), // gasTipCap
+					[]byte{},
+					ethtypes.AccessList{}, // AccessList
+					true,                  // checkNonce
+				)
+
+				topics := []common.Hash{RegisterCSREvent.ID, testContract2.Hash(), account.Hash()}
+				data, _ := RegisterCSREvent.Inputs.Pack(testContract2, account)
+				log := ethtypes.Log{
+					Address: turnstileAddress,
+					Topics:  topics,
+					Data:    data,
+				}
+				receipt = &ethtypes.Receipt{
+					Logs:    []*ethtypes.Log{&log},
+					GasUsed: 13,
+				}
+			},
+			result{
+				true,
+				false,
+				23,
+			},
+		},
+		{
+			"Check if smart contract was registered via factory method from above",
+			func() {
+				msg = ethtypes.NewMessage(
+					types.ModuleAddress,
+					&testContract2,
+					0,
+					big.NewInt(0), // amount
+					uint64(0),     // gasLimit
+					gasPrice,      // gasPrice
+					big.NewInt(0), // gasFeeCap
+					big.NewInt(0), // gasTipCap
+					[]byte{},
+					ethtypes.AccessList{}, // AccessList
+					true,                  // checkNonce
+				)
+
+				receipt = &ethtypes.Receipt{
+					Logs:    []*ethtypes.Log{},
+					GasUsed: 10,
+				}
+			},
+			result{
+				true,
+				false,
+				10,
+			},
+		},
+		{
+			"Registered Smart contract with an invalid update event (invalid contract)",
+			func() {
+				addr := tests.GenerateAddress()
+
+				msg = ethtypes.NewMessage(
+					types.ModuleAddress,
+					&testContract2,
+					0,
+					big.NewInt(0), // amount
+					uint64(0),     // gasLimit
+					gasPrice,      // gasPrice
+					big.NewInt(0), // gasFeeCap
+					big.NewInt(0), // gasTipCap
+					[]byte{},
+					ethtypes.AccessList{}, // AccessList
+					true,                  // checkNonce
+				)
+
+				topics := []common.Hash{UpdateCSREvent.ID}
+				data, _ := UpdateCSREvent.Inputs.Pack(addr, uint64(100))
+				log := ethtypes.Log{
+					Address: turnstileAddress,
+					Topics:  topics,
+					Data:    data,
+				}
+				receipt = &ethtypes.Receipt{
+					Logs:    []*ethtypes.Log{&log},
+					GasUsed: 0,
+				}
+			},
+			result{
+				true,
+				true,
+				10,
+			},
+		},
+		{
+			"Registered Smart contract with an invalid update event (invalid nft)",
+			func() {
+				msg = ethtypes.NewMessage(
+					types.ModuleAddress,
+					&testContract2,
+					0,
+					big.NewInt(0), // amount
+					uint64(0),     // gasLimit
+					gasPrice,      // gasPrice
+					big.NewInt(0), // gasFeeCap
+					big.NewInt(0), // gasTipCap
+					[]byte{},
+					ethtypes.AccessList{}, // AccessList
+					true,                  // checkNonce
+				)
+
+				topics := []common.Hash{UpdateCSREvent.ID}
+				data, _ := UpdateCSREvent.Inputs.Pack(testContract3, uint64(100))
+				log := ethtypes.Log{
+					Address: turnstileAddress,
+					Topics:  topics,
+					Data:    data,
+				}
+				receipt = &ethtypes.Receipt{
+					Logs:    []*ethtypes.Log{&log},
+					GasUsed: 0,
+				}
+			},
+			result{
+				true,
+				true,
+				10,
+			},
+		},
+		{
+			"Registered Smart contract with an valid update event",
+			func() {
+				msg = ethtypes.NewMessage(
+					types.ModuleAddress,
+					&testContract2,
+					0,
+					big.NewInt(0), // amount
+					uint64(0),     // gasLimit
+					gasPrice,      // gasPrice
+					big.NewInt(0), // gasFeeCap
+					big.NewInt(0), // gasTipCap
+					[]byte{},
+					ethtypes.AccessList{}, // AccessList
+					true,                  // checkNonce
+				)
+
+				topics := []common.Hash{UpdateCSREvent.ID}
+				data, _ := UpdateCSREvent.Inputs.Pack(testContract3, uint64(1))
+				log := ethtypes.Log{
+					Address: turnstileAddress,
+					Topics:  topics,
+					Data:    data,
+				}
+				receipt = &ethtypes.Receipt{
+					Logs:    []*ethtypes.Log{&log},
+					GasUsed: 5,
+				}
+			},
+			result{
+				true,
+				false,
+				15,
+			},
+		},
+		{
+			"Unregistered Smart contract with an invalid update event (invalid contract)",
+			func() {
+				address := tests.GenerateAddress()
+				msg = ethtypes.NewMessage(
+					types.ModuleAddress,
+					&address,
+					0,
+					big.NewInt(0), // amount
+					uint64(0),     // gasLimit
+					gasPrice,      // gasPrice
+					big.NewInt(0), // gasFeeCap
+					big.NewInt(0), // gasTipCap
+					[]byte{},
+					ethtypes.AccessList{}, // AccessList
+					true,                  // checkNonce
+				)
+
+				topics := []common.Hash{UpdateCSREvent.ID}
+				data, _ := UpdateCSREvent.Inputs.Pack(address, uint64(1))
+				log := ethtypes.Log{
+					Address: turnstileAddress,
+					Topics:  topics,
+					Data:    data,
+				}
+				receipt = &ethtypes.Receipt{
+					Logs:    []*ethtypes.Log{&log},
+					GasUsed: 0,
+				}
+			},
+			result{
+				false,
+				true,
+				0,
+			},
+		},
+		{
+			"Unregistered Smart contract with an invalid update event (duplicate contract)",
+			func() {
+				address := tests.GenerateAddress()
+				msg = ethtypes.NewMessage(
+					types.ModuleAddress,
+					&address,
+					0,
+					big.NewInt(0), // amount
+					uint64(0),     // gasLimit
+					gasPrice,      // gasPrice
+					big.NewInt(0), // gasFeeCap
+					big.NewInt(0), // gasTipCap
+					[]byte{},
+					ethtypes.AccessList{}, // AccessList
+					true,                  // checkNonce
+				)
+
+				topics := []common.Hash{UpdateCSREvent.ID}
+				data, _ := UpdateCSREvent.Inputs.Pack(testContract3, uint64(1))
+				log := ethtypes.Log{
+					Address: turnstileAddress,
+					Topics:  topics,
+					Data:    data,
+				}
+				receipt = &ethtypes.Receipt{
+					Logs:    []*ethtypes.Log{&log},
+					GasUsed: 0,
+				}
+			},
+			result{
+				false,
+				true,
+				0,
+			},
+		},
+		{
+			"Unregistered Smart contract with an valid update event",
+			func() {
+				address := tests.GenerateAddress()
+				msg = ethtypes.NewMessage(
+					types.ModuleAddress,
+					&address,
+					0,
+					big.NewInt(0), // amount
+					uint64(0),     // gasLimit
+					gasPrice,      // gasPrice
+					big.NewInt(0), // gasFeeCap
+					big.NewInt(0), // gasTipCap
+					[]byte{},
+					ethtypes.AccessList{}, // AccessList
+					true,                  // checkNonce
+				)
+
+				topics := []common.Hash{UpdateCSREvent.ID}
+				data, _ := UpdateCSREvent.Inputs.Pack(testContract4, uint64(1))
+				log := ethtypes.Log{
+					Address: turnstileAddress,
+					Topics:  topics,
+					Data:    data,
+				}
+				receipt = &ethtypes.Receipt{
+					Logs:    []*ethtypes.Log{&log},
+					GasUsed: 0,
+				}
+			},
+			result{
+				false,
+				false,
+				0,
+			},
+		},
+		{
+			"Registered Smart Contract test3",
+			func() {
+				msg = ethtypes.NewMessage(
+					types.ModuleAddress,
+					&testContract3,
+					0,
+					big.NewInt(0), // amount
+					uint64(0),     // gasLimit
+					gasPrice,      // gasPrice
+					big.NewInt(0), // gasFeeCap
+					big.NewInt(0), // gasTipCap
+					[]byte{},
+					ethtypes.AccessList{}, // AccessList
+					true,                  // checkNonce
+				)
+
+				receipt = &ethtypes.Receipt{
+					Logs:    []*ethtypes.Log{},
+					GasUsed: 7,
+				}
+			},
+			result{
+				true,
+				false,
+				30,
+			},
+		},
+		{
+			"Unregistered Smart Contract with valid Withdraw event",
+			func() {
+				withdrawer := common.BytesToAddress(suite.app.CSRKeeper.CreateNewAccount(suite.ctx).Bytes())
+				receiver := common.BytesToAddress(suite.app.CSRKeeper.CreateNewAccount(suite.ctx).Bytes())
+
+				msg = ethtypes.NewMessage(
+					types.ModuleAddress,
+					&testContract,
+					0,
+					big.NewInt(0), // amount
+					uint64(0),     // gasLimit
+					gasPrice,      // gasPrice
+					big.NewInt(0), // gasFeeCap
+					big.NewInt(0), // gasTipCap
+					[]byte{},
+					ethtypes.AccessList{}, // AccessList
+					true,                  // checkNonce
+				)
+
+				topics := []common.Hash{WithdrawalEvent.ID}
+				data, _ := WithdrawalEvent.Inputs.Pack(withdrawer, receiver, big.NewInt(1))
+				log := ethtypes.Log{
+					Address: csrNFTAddress,
+					Topics:  topics,
+					Data:    data,
+				}
+				receipt = &ethtypes.Receipt{
+					Logs:    []*ethtypes.Log{&log},
+					GasUsed: 1,
+				}
+			},
+			result{
+				true,
+				false,
+				1,
 			},
 		},
 	}
@@ -298,7 +726,12 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			tc.setUpMsg()
 
 			err := suite.app.CSRKeeper.Hooks().PostTxProcessing(suite.ctx, msg, receipt)
-			suite.Require().NoError(err)
+			if !tc.test.expectErr {
+				suite.Require().NoError(err)
+			} else {
+				suite.Require().Error(err)
+				return
+			}
 
 			if tc.test.shouldReceiveFunds {
 				contract := msg.To()
@@ -309,7 +742,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 				suite.Require().True(found)
 
 				beneficiary := csr.Account
-				cosmosBalance := suite.app.BankKeeper.GetAllBalances(suite.ctx, sdk.AccAddress(beneficiary))
+				cosmosBalance := suite.app.BankKeeper.GetAllBalances(suite.ctx, sdk.MustAccAddressFromBech32(beneficiary))
 
 				fee := sdk.NewIntFromUint64(tc.test.gasUsed).Mul(sdk.NewIntFromBigInt(msg.GasPrice()))
 				developerFee := sdk.NewDecFromInt(fee).Mul(suite.app.CSRKeeper.GetParams(suite.ctx).CsrShares)
