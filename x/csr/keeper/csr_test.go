@@ -61,15 +61,6 @@ func (suite *KeeperTestSuite) TestSetGetTurnstile() {
 	suite.Require().Equal(addr, expectAddr)
 }
 
-func (suite *KeeperTestSuite) TestSetGetCSRNFT() {
-	addr := tests.GenerateAddress()
-	suite.app.CSRKeeper.SetCSRNFT(suite.ctx, addr)
-	// retrieve addr
-	expectAddr, found := suite.app.CSRKeeper.GetCSRNFT(suite.ctx)
-	suite.Require().True(found)
-	suite.Require().Equal(expectAddr, addr)
-}
-
 // Generates an array of CSRs for testing purposes
 func GenerateCSRs(number int) []types.CSR {
 	csrs := make([]types.CSR, 0)

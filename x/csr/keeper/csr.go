@@ -57,14 +57,7 @@ func (k Keeper) SetCSR(ctx sdk.Context, csr types.CSR) {
 	}
 }
 
-// sets the deployed Turnstile Address to state
-func (k Keeper) SetTurnstile(ctx sdk.Context, turnstile common.Address) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixAddrs)
-	store.Set(types.TurnstileKey, turnstile.Bytes())
-}
-
-// retrieves the deployed Turnstile Address from state
-// returns the address and a boolean representing the success of the retrieval
+// retrieves the deployed Turnstile Address from state if found
 func (k Keeper) GetTurnstile(ctx sdk.Context) (common.Address, bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixAddrs)
 	// retrieve state object at TurnstileKey
@@ -76,20 +69,10 @@ func (k Keeper) GetTurnstile(ctx sdk.Context) (common.Address, bool) {
 	return common.BytesToAddress(bz), true
 }
 
-// sets the deployed CSRNFT to state
-func (k Keeper) SetCSRNFT(ctx sdk.Context, csrnft common.Address) {
+// sets the deployed Turnstile Address to state
+func (k Keeper) SetTurnstile(ctx sdk.Context, turnstile common.Address) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixAddrs)
-	store.Set(types.CSRNFTKey, csrnft.Bytes())
-}
-
-// gets the deployed CSRNFT address to state
-func (k Keeper) GetCSRNFT(ctx sdk.Context) (common.Address, bool) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixAddrs)
-	bz := store.Get(types.CSRNFTKey)
-	if len(bz) == 0 {
-		return common.Address{}, false
-	}
-	return common.BytesToAddress(bz), true
+	store.Set(types.TurnstileKey, turnstile.Bytes())
 }
 
 // Converts a uint64 to a []byte
