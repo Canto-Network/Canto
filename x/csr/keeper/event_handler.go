@@ -85,12 +85,6 @@ func (k Keeper) UpdateEvent(ctx sdk.Context, data []byte) error {
 	return nil
 }
 
-// Retroactively register contracts that were previously deployed (non-CSR enabled smart contracts)
-// and add the the CSR store
-func (k Keeper) RetroactiveRegisterEvent() error {
-	return nil
-}
-
 // ValidateContract checks if the smart contract can be registered to a CSR. It checks
 // if the address is a smart contract address and whether it has been registered to an
 // existing csr

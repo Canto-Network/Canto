@@ -1,16 +1,12 @@
 package types
 
 import (
-	"math/big"
-
 	"github.com/ethereum/go-ethereum/common"
 )
 
 const (
-	TurnstileEventRegister            = "Register"
-	TurnstileEventUpdate              = "Attach"
-	TurnstileEventRetroactiveRegister = "RetroactiveRegisterEvent"
-	WithdrawalEvent                   = "Withdrawal"
+	TurnstileEventRegister = "Register"
+	TurnstileEventUpdate   = "Attach"
 )
 
 type RegisterCSREvent struct {
@@ -22,10 +18,4 @@ type RegisterCSREvent struct {
 type UpdateCSREvent struct {
 	SmartContractAddress common.Address
 	Id                   uint64
-}
-
-type Withdrawal struct {
-	Withdrawer common.Address
-	Receiver   common.Address
-	Id         *big.Int
 }
