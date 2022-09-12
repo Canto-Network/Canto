@@ -7,10 +7,8 @@ import (
 
 	"github.com/Canto-Network/Canto/v2/contracts"
 	_ "github.com/Canto-Network/Canto/v2/x/csr/keeper"
-	"github.com/Canto-Network/Canto/v2/x/csr/types"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/evmos/ethermint/tests"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 )
 
@@ -110,81 +108,6 @@ func (suite *KeeperTestSuite) TestContractDeployment() {
 	}
 }
 
-// Test Address derivation with CREATE / CREATE2
-func (suite *KeeperTestSuite) TestAddressDerivation() {
-	type testArgs struct {
-		setup  func() common.Address
-		nonces []uint64
-		salts  [][32]byte
-	}
-
-	testCases := []struct {
-		name       string
-		args       testArgs
-		expectPass bool
-	}{
-		{
-			"len of nonces / salts incorrect - fail",
-			testArgs{
-				func() common.Address {
-					return common.Address{}
-				},
-				[]uint64{
-					1,
-				},
-				[][32]byte{
-					{},
-					{},
-				},
-			},
-			false,
-		},
-		{
-			"contract deployed through create address - pass",
-			testArgs{
-				func() common.Address {
-					addr := suite.DeployContract()
-					// retrieve account at this address
-					acc := suite.app.EvmKeeper.GetAccount(s.ctx, addr)
-					// contract exists
-					suite.Require().NotNil(acc.IsContract())
-					//  now deploy contract from this address
-					_, err := suite.app.CSRKeeper.CallMethod(suite.ctx, "deploy1", contract, &addr)
-					suite.Require().NoError(err)
-					suite.Commit()
-					// return address of contract and 1, nonce when second contract was deployed
-					return crypto.CreateAddress(addr, 1)
-				},
-				[]uint64{
-					0,
-					1,
-				},
-				[][32]byte{
-					{},
-					{},
-				},
-			},
-			true,
-		},
-	}
-
-	for _, tc := range testCases {
-		//  run setup test
-		suite.Run(tc.name, func() {
-			expectAddr := tc.args.setup()
-
-			if tc.expectPass {
-				err, addr := suite.app.CSRKeeper.DeriveAddress(suite.ctx, types.ModuleAddress, tc.args.nonces, tc.args.salts)
-				suite.Require().NoError(err)
-				suite.Require().True(addr == expectAddr)
-			} else {
-				err, _ := suite.app.CSRKeeper.DeriveAddress(suite.ctx, types.ModuleAddress, tc.args.nonces, tc.args.salts)
-				suite.Require().Error(err)
-			}
-		})
-	}
-}
-
 // Test deployment of the Turnstile Contract
 func (suite *KeeperTestSuite) TestDeployTurnstile() {
 	// first deploy Turnstile
@@ -199,31 +122,6 @@ func (suite *KeeperTestSuite) TestDeployTurnstile() {
 	// offset to remove constructor from contract bytecode
 	offset := len(contracts.TurnstileContract.Bin) - len(code)
 	suite.Require().Equal(code, []byte(contracts.TurnstileContract.Bin)[offset:])
-}
-
-// Test deployment of CSRNFT Contract
-func (suite *KeeperTestSuite) TestDeployCSRNFT() {
-	// deploy CSRNFT
-	addr, err := suite.app.CSRKeeper.DeployCSRNFT(suite.ctx, "CSRNFT", "CSRNFT")
-	suite.Require().NoError(err)
-	acc := suite.app.EvmKeeper.GetAccountWithoutBalance(suite.ctx, addr)
-	suite.Require().True(acc.IsContract())
-	code := suite.app.EvmKeeper.GetCode(suite.ctx, common.BytesToHash(acc.CodeHash))
-	offset := len(contracts.CSRNFTContract.Bin) - len(code)
-	suite.Require().Equal(code, []byte(contracts.CSRNFTContract.Bin)[offset:])
-}
-
-// Test calling MintCSR on CSRNFT
-func (suite *KeeperTestSuite) TestMintCSR() {
-	// check that the CSRNFT has been deployed correctly
-	suite.Commit()
-	// begin block has been called
-	_, found := suite.app.CSRKeeper.GetCSRNFT(suite.ctx)
-	suite.Require().True(found)
-	receiverAddr := tests.GenerateAddress()
-	nft, err := suite.app.CSRKeeper.MintCSR(suite.ctx, receiverAddr)
-	suite.Require().NoError(err)
-	suite.Require().Equal(nft, uint64(1))
 }
 
 func init() {

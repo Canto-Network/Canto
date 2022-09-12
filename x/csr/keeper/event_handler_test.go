@@ -2,7 +2,6 @@ package keeper_test
 
 import (
 	"errors"
-	"math/big"
 	"strings"
 
 	"github.com/Canto-Network/Canto/v2/contracts"
@@ -12,7 +11,6 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/evmos/ethermint/tests"
-	_ "github.com/evmos/ethermint/tests"
 	"github.com/evmos/ethermint/x/evm/statedb"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 )
@@ -26,6 +24,7 @@ func (suite *KeeperTestSuite) TestRegisterEvent() {
 	type testArgs struct {
 		SmartContractAddress common.Address
 		Receiver             common.Address
+		ID                   uint64
 	}
 	suite.Commit()
 
@@ -46,6 +45,7 @@ func (suite *KeeperTestSuite) TestRegisterEvent() {
 			testArgs{
 				tests.GenerateAddress(),
 				tests.GenerateAddress(),
+				1,
 			},
 			false,
 			func() {},
@@ -55,6 +55,7 @@ func (suite *KeeperTestSuite) TestRegisterEvent() {
 			testArgs{
 				SmartContractAddress: smartContractAddress,
 				Receiver:             receiver,
+				ID:                   1,
 			},
 			false,
 			func() {
@@ -67,6 +68,7 @@ func (suite *KeeperTestSuite) TestRegisterEvent() {
 			testArgs{
 				SmartContractAddress: smartContractAddress,
 				Receiver:             receiver,
+				ID:                   1,
 			},
 			false,
 			func() {
@@ -84,6 +86,7 @@ func (suite *KeeperTestSuite) TestRegisterEvent() {
 			testArgs{
 				SmartContractAddress: turnstile,
 				Receiver:             receiver,
+				ID:                   1,
 			},
 			false,
 			func() {
@@ -95,6 +98,7 @@ func (suite *KeeperTestSuite) TestRegisterEvent() {
 			testArgs{
 				SmartContractAddress: turnstile,
 				Receiver:             receiver,
+				ID:                   2,
 			},
 			true,
 			func() {
@@ -108,14 +112,14 @@ func (suite *KeeperTestSuite) TestRegisterEvent() {
 		suite.Run(tc.name, func() {
 			// setup test
 			tc.setup()
-			data, err := generateRegisterEventData(tc.args.SmartContractAddress, tc.args.Receiver)
+			data, err := generateRegisterEventData(tc.args.SmartContractAddress, tc.args.Receiver, tc.args.ID)
 			suite.Require().NoError(err)
 			// process register CSREvent
-			err = suite.app.CSRKeeper.RegisterCSREvent(suite.ctx, data)
+			err = suite.app.CSRKeeper.RegisterEvent(suite.ctx, data)
 			if tc.expectPass {
 				suite.Require().NoError(err)
-				// check that the CSR exists at nftId 1
-				csr, found := suite.app.CSRKeeper.GetCSR(suite.ctx, 1)
+				// check that the CSR exists at nftId
+				csr, found := suite.app.CSRKeeper.GetCSR(suite.ctx, tc.args.ID)
 				suite.Require().True(found)
 				// contract address registered is correct
 				suite.Require().Equal(strings.Compare(tc.args.SmartContractAddress.Hex(), csr.Contracts[0]), 0)
@@ -167,9 +171,9 @@ func (suite *KeeperTestSuite) TestUpdateEvent() {
 			false,
 			func() {
 				csr := types.CSR{
-					Beneficiary:   sdk.AccAddress(smartContractAddress.Bytes()).String(),
-					Id:        1,
-					Contracts: []string{smartContractAddress.Hex()},
+					Beneficiary: sdk.AccAddress(smartContractAddress.Bytes()).String(),
+					Id:          1,
+					Contracts:   []string{smartContractAddress.Hex()},
 				}
 				// set csr to state
 				suite.app.CSRKeeper.SetCSR(suite.ctx, csr)
@@ -204,7 +208,7 @@ func (suite *KeeperTestSuite) TestUpdateEvent() {
 			data, err := generateUpdateEventData(tc.args.smartContractAddress, tc.args.nftId)
 			suite.Require().NoError(err)
 			// process event
-			err = suite.app.CSRKeeper.UpdateCSREvent(suite.ctx, data)
+			err = suite.app.CSRKeeper.UpdateEvent(suite.ctx, data)
 			if tc.expectPass {
 				suite.Require().NoError(err)
 				csr, found := suite.app.CSRKeeper.GetCSR(suite.ctx, 1)
@@ -219,151 +223,12 @@ func (suite *KeeperTestSuite) TestUpdateEvent() {
 
 }
 
-// test failure in the case that a withdrawal event has been received for a CSR that does not exist
-// test failure in the case that a withdrawal event has been received with a recipient that does not exist
-// test withdrawing zero return value
-// test withdrawing positive rewards value
-func (suite *KeeperTestSuite) TestWithdrawalEvent() {
-	type testArgs struct {
-		withdrawer    common.Address
-		receiver      common.Address
-		id            uint64
-		expectRewards sdk.Coins
-	}
-
-	testCases := []struct {
-		name       string
-		args       testArgs
-		expectPass bool
-		setup      func(withdrawer, receiver common.Address, id uint64) ([]byte, error)
-	}{
-		{
-			"A CSR that has not yet been committed to state - fail",
-			testArgs{
-				tests.GenerateAddress(),
-				tests.GenerateAddress(),
-				uint64(1),
-				sdk.Coins{},
-			},
-			false,
-			func(withdrawer, receiver common.Address, id uint64) ([]byte, error) {
-				return generateWithdrawEventData(withdrawer, receiver, id)
-			},
-		},
-		{
-			"An invalid evm address as receiver - fail",
-			testArgs{
-				tests.GenerateAddress(),
-				tests.GenerateAddress(),
-				uint64(1),
-				sdk.Coins{},
-			},
-			false,
-			func(withdrawer, receiver common.Address, id uint64) ([]byte, error) {
-				// first set CSR to state
-				csr := types.CSR{
-					Id: id,
-				}
-				suite.app.CSRKeeper.SetCSR(suite.ctx, csr)
-				// generate event
-				return generateWithdrawEventData(withdrawer, receiver, id)
-			},
-		},
-		{
-			"Withdrawing from a pool w zero rewards - pass",
-			testArgs{
-				tests.GenerateAddress(),
-				tests.GenerateAddress(),
-				uint64(1),
-				sdk.Coins{
-					{
-						Denom:  "acanto",
-						Amount: sdk.NewIntFromUint64(0),
-					},
-				},
-			},
-			true,
-			func(withdrawer, receiver common.Address, id uint64) ([]byte, error) {
-				// set the receiver account to state
-				suite.app.EvmKeeper.SetAccount(suite.ctx, receiver, *statedb.NewEmptyAccount())
-				// generate sdk Account
-				acct := suite.app.CSRKeeper.CreateNewAccount(suite.ctx)
-				// first set CSR to state
-				csr := types.CSR{
-					Id:          id,
-					Beneficiary: acct.String(),
-				}
-				suite.app.CSRKeeper.SetCSR(suite.ctx, csr)
-				// generate event
-				return generateWithdrawEventData(withdrawer, receiver, id)
-			},
-		},
-		{
-			"Withdrawing from a pool w non-zero rewards - pass",
-			testArgs{
-				tests.GenerateAddress(),
-				tests.GenerateAddress(),
-				uint64(1),
-				sdk.Coins{
-					{
-						Denom:  "acanto",
-						Amount: sdk.NewIntFromUint64(100),
-					},
-				},
-			},
-			true,
-			func(withdrawer, receiver common.Address, id uint64) ([]byte, error) {
-				// set the receiver account to state
-				suite.app.EvmKeeper.SetAccount(suite.ctx, receiver, *statedb.NewEmptyAccount())
-				// generate sdk Account
-				acct := suite.app.CSRKeeper.CreateNewAccount(suite.ctx)
-				// send funds to the beneficiary
-				coins := sdk.Coins{sdk.Coin{Denom: "acanto", Amount: sdk.NewInt(100)}}
-				suite.app.BankKeeper.MintCoins(suite.ctx, types.ModuleName, coins)
-				suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, acct, coins)
-				// set CSR to state
-				csr := types.CSR{
-					Id:          id,
-					Beneficiary: acct.String(),
-				}
-				suite.app.CSRKeeper.SetCSR(suite.ctx, csr)
-				// generate event
-				return generateWithdrawEventData(withdrawer, receiver, id)
-			},
-		},
-	}
-
-	for _, tc := range testCases {
-		// setup test
-		suite.Run(tc.name, func() {
-			data, err := tc.setup(tc.args.withdrawer, tc.args.receiver, tc.args.id)
-			// process Withdrawal Event
-			suite.Require().NoError(err)
-			err = suite.app.CSRKeeper.WithdrawalEvent(suite.ctx, data)
-			if tc.expectPass {
-				suite.Require().NoError(err)
-				// check rewards
-				rewards := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.AccAddress(tc.args.receiver.Bytes()), "acanto")
-				suite.Require().Equal(rewards.Amount.Uint64(), tc.args.expectRewards[0].Amount.Uint64())
-			} else {
-				suite.Require().Error(err)
-			}
-		})
-	}
-}
-
 func generateUpdateEventData(contract common.Address, nftId uint64) (data []byte, err error) {
-	return generateEventData("UpdateCSREvent", contracts.TurnstileContract, contract, nftId)
+	return generateEventData("Attach", contracts.TurnstileContract, contract, nftId)
 }
 
-func generateRegisterEventData(contract, receiver common.Address) (data []byte, err error) {
-	return generateEventData("RegisterCSREvent", contracts.TurnstileContract, contract, receiver)
-}
-
-// generate Withdrawal event log data
-func generateWithdrawEventData(withdrawer, receiver common.Address, id uint64) (data []byte, err error) {
-	intVal := &big.Int{}
-	return generateEventData("Withdrawal", contracts.CSRNFTContract, withdrawer, receiver, intVal.SetUint64(id))
+func generateRegisterEventData(contract, receiver common.Address, nftid uint64) (data []byte, err error) {
+	return generateEventData("Register", contracts.TurnstileContract, contract, receiver, nftid)
 }
 
 // generate event creates data field for arbitrary transaction
