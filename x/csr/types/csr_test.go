@@ -11,7 +11,6 @@ import (
 
 type CSRTestSuite struct {
 	suite.Suite
-	owner     string
 	contracts []string
 	id        uint64
 	account   string
@@ -22,7 +21,6 @@ func TestCSRSuite(t *testing.T) {
 }
 
 func (suite *CSRTestSuite) SetupTest() {
-	suite.owner = sdk.AccAddress(tests.GenerateAddress().Bytes()).String()
 	suite.contracts = []string{tests.GenerateAddress().String(), tests.GenerateAddress().String(),
 		tests.GenerateAddress().String(), tests.GenerateAddress().String()}
 	suite.id = 0
@@ -38,61 +36,49 @@ func (suite *CSRTestSuite) TestCSR() {
 		{
 			"Create CSR object - pass",
 			CSR{
-				Owner:     suite.owner,
-				Contracts: suite.contracts,
-				Id:        suite.id,
-				Account:   suite.account,
+				Contracts:   suite.contracts,
+				Id:          suite.id,
+				Beneficiary: suite.account,
 			},
 			true,
 		},
 		{
 			"Create CSR object with 0 smart contracts - fail",
 			CSR{
-				Owner:     suite.owner,
-				Contracts: []string{},
-				Id:        suite.id,
-				Account:   suite.account,
-			},
-			false,
-		},
-		{
-			"Create CSR object with invalid owner address - fail",
-			CSR{
-				Owner:     "",
-				Contracts: suite.contracts,
-				Id:        suite.id,
-				Account:   suite.account,
+				Contracts:   []string{},
+				Id:          suite.id,
+				Beneficiary: suite.account,
 			},
 			false,
 		},
 		{
 			"Create CSR object with invalid account address - fail",
 			CSR{
-				Owner:     suite.owner,
-				Contracts: suite.contracts,
-				Id:        suite.id,
-				Account:   "",
+				Contracts:   suite.contracts,
+				Id:          suite.id,
+				Beneficiary: "",
 			},
 			false,
 		},
 		{
 			"Create CSR object with invalid smart contract addresses - fail",
 			CSR{
-				Owner:     suite.owner,
-				Contracts: append(suite.contracts, ""),
-				Id:        suite.id,
-				Account:   suite.account,
+				Contracts:   append(suite.contracts, ""),
+				Id:          suite.id,
+				Beneficiary: suite.account,
 			},
 			false,
 		},
 	}
 	for _, tc := range testCases {
-		err := tc.csr.Validate()
+		suite.Run(tc.msg, func() {
+			err := tc.csr.Validate()
 
-		if tc.expectPass {
-			suite.Require().NoError(err, tc.msg)
-		} else {
-			suite.Require().Error(err, tc.msg)
-		}
+			if tc.expectPass {
+				suite.Require().NoError(err, tc.msg)
+			} else {
+				suite.Require().Error(err, tc.msg)
+			}
+		})
 	}
 }

@@ -168,16 +168,8 @@ func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 		if err != nil {
 			panic(err)
 		}
-		// deploy csrnft
-		csrnft, err := am.keeper.DeployCSRNFT(ctx, "CSRNFT", "csrnft")
-		// panic on errors
-		if err != nil {
-			panic(err)
-		}
 		// set the Turnstile address to state
 		am.keeper.SetTurnstile(ctx, turnstile)
-		// set csrnft address to state
-		am.keeper.SetCSRNFT(ctx, csrnft)
 	}
 }
 

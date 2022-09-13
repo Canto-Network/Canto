@@ -36,44 +36,18 @@ func (k Keeper) GetNFTByContract(ctx sdk.Context, address string) (uint64, bool)
 	return nftId, true
 }
 
-// Returns all of the CSRs an account is the owner of
-func (k Keeper) GetCSRsByOwner(ctx sdk.Context, account string) []uint64 {
-	csrs := make([]uint64, 0)
-	// retrieve store / iterator
-	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, types.KeyPrefixOwner)
-	defer iterator.Close()
-	// iterate over all contracts in storage and return them
-	for ; iterator.Valid(); iterator.Next() {
-		bz := iterator.Value()
-		owner := string(bz[:])
-
-		if owner == account {
-			nftId := BytesToUInt64(iterator.Key()[1:])
-			csrs = append(csrs, nftId)
-		}
-	}
-
-	return csrs
-}
-
 // Set CSR will place a new or update CSR type into the store with the
 // key being the NFT id and the value being the marshalled CSR object
-// This will also allow mapping the owner to NFT id and contract to NFT id
-// for fast read and writes.
+// We also map the smart contract to the correct NFT for easy reads/writes
 func (k Keeper) SetCSR(ctx sdk.Context, csr types.CSR) {
 	// Marshal the CSR object into a byte string
 	bz, _ := csr.Marshal()
-
 	// Convert the NFT id to bytes so we can store properly
 	nftId := UInt64ToBytes(csr.Id)
 
 	// Sets the id of the NFT to the CSR object itself
 	storeCSR := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixCSR)
 	storeCSR.Set(nftId, bz)
-
-	// Add a new key, value pair in the store mapping owner to nft id
-	k.SetCSROwner(ctx, csr.Id, csr.Owner)
 
 	// Add a new key, value pair in the store mapping the contract to NFT id
 	contracts := csr.Contracts
@@ -83,22 +57,7 @@ func (k Keeper) SetCSR(ctx sdk.Context, csr types.CSR) {
 	}
 }
 
-// Sets the owner of the CSR object (denoated by id) to a new account
-// ONLY CHANGES THE STORE NOT THE CSR
-func (k Keeper) SetCSROwner(ctx sdk.Context, id uint64, account string) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixOwner)
-	key := UInt64ToBytes(id)
-	store.Set(key, []byte(account))
-}
-
-// sets the deployed Turnstile Address to state
-func (k Keeper) SetTurnstile(ctx sdk.Context, turnstile common.Address) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixAddrs)
-	store.Set(types.TurnstileKey, turnstile.Bytes())
-}
-
-// retrieves the deployed Turnstile Address from state
-// returns the address and a boolean representing the success of the retrieval
+// retrieves the deployed Turnstile Address from state if found
 func (k Keeper) GetTurnstile(ctx sdk.Context) (common.Address, bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixAddrs)
 	// retrieve state object at TurnstileKey
@@ -110,20 +69,10 @@ func (k Keeper) GetTurnstile(ctx sdk.Context) (common.Address, bool) {
 	return common.BytesToAddress(bz), true
 }
 
-// sets the deployed CSRNFT to state
-func (k Keeper) SetCSRNFT(ctx sdk.Context, csrnft common.Address) {
+// sets the deployed Turnstile Address to state
+func (k Keeper) SetTurnstile(ctx sdk.Context, turnstile common.Address) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixAddrs)
-	store.Set(types.CSRNFTKey, csrnft.Bytes())
-}
-
-// gets the deployed CSRNFT address to state
-func (k Keeper) GetCSRNFT(ctx sdk.Context) (common.Address, bool) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixAddrs)
-	bz := store.Get(types.CSRNFTKey)
-	if len(bz) == 0 {
-		return common.Address{}, false
-	}
-	return common.BytesToAddress(bz), true
+	store.Set(types.TurnstileKey, turnstile.Bytes())
 }
 
 // Converts a uint64 to a []byte

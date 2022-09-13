@@ -20,4 +20,5 @@ var (
 	ErrNonexistentAcct             = sdkerrors.Register(types.ModuleName, 2008, "csr::EventHandler")
 	ErrNonexistentCSR              = sdkerrors.Register(types.ModuleName, 2009, "csr::EventHandler")
 	ErrNFTNotFound                 = sdkerrors.Register(types.ModuleName, 2010, "csr::EventHandler")
+	ErrDuplicateNFTID              = sdkerrors.Register(types.ModuleName, 2011, "csr::EventHandler")
 )

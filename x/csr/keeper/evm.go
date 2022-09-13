@@ -10,46 +10,6 @@ import (
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 )
 
-// mintCSR, this method is called in the process of CSR registration, mints a CSR to
-// the account intending to register their CSR
-func (k Keeper) MintCSR(
-	ctx sdk.Context,
-	receiver common.Address,
-) (uint64, error) {
-	// first retrieve CSR contract from state, fail if it hasn't been deployed
-	csrNft, found := k.GetCSRNFT(ctx)
-	if !found {
-		return 0, sdkerrors.Wrapf(ErrCSRNFTNotDeployed, "CSR::Keeper: MintCSR: CSRNFT.sol not deployed")
-	}
-	resp, err := k.CallMethod(ctx, "mintCSR", contracts.CSRNFTContract, &csrNft, receiver)
-	if err != nil {
-		return 0, sdkerrors.Wrapf(ErrMethodCall, "CSR::Keeper: MintCSR: error calling Mint on CSR: %s", err.Error())
-	}
-	var ret types.CSRUint64Response
-
-	// unwrap the resp data
-	if err = contracts.CSRNFTContract.ABI.UnpackIntoInterface(&ret, "mintCSR", resp.Ret); err != nil {
-		return 0, sdkerrors.Wrapf(ErrUnpackData, "CSR::Keeper: MintCSR: error unpacking data: %s", err.Error())
-	}
-
-	return ret.Value, nil
-}
-
-// deploy CSRNFT, this method is called in begin block, it takes as arguments the name and symbol of the CSRNFT
-func (k Keeper) DeployCSRNFT(
-	ctx sdk.Context,
-	name,
-	symbol string,
-) (common.Address, error) {
-	// deploy CSRNFT with name, symbol constructor args
-	addr, err := k.DeployContract(ctx, contracts.CSRNFTContract, name, symbol)
-	if err != nil {
-		return common.Address{}, sdkerrors.Wrapf(ErrContractDeployments,
-			"CSR::Keeper: DeployCSRNFT: error deploying CSRNFT: %s", err.Error())
-	}
-	return addr, nil
-}
-
 // deploy Turnstile, this method is called in begin block, it takes as argument the, the deployment takes no arguments
 func (k Keeper) DeployTurnstile(
 	ctx sdk.Context,
