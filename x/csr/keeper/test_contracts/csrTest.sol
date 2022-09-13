@@ -11,8 +11,8 @@ contract CSRTest {
         Turnstile(turnstile).register(to);
     }
 
-    function update(address turnstile, uint64 nftID) public {
-        Turnstile(turnstile).register(nftID);
+    function update(address turnstile, uint256 nftID) public {
+        Turnstile(turnstile).assign(nftID);
     }
 
     constructor() {

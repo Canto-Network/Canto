@@ -9,7 +9,6 @@ import (
 	"github.com/evmos/ethermint/tests"
 
 	"github.com/Canto-Network/Canto/v2/contracts"
-
 	csrTypes "github.com/Canto-Network/Canto/v2/x/csr/types"
 
 	"github.com/Canto-Network/Canto/v2/x/erc20/types"
@@ -56,10 +55,17 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 	RegisterCSREvent := turnstile.Events["Register"]
 	UpdateCSREvent := turnstile.Events["Attach"]
 
+	// Used to check the expected balance of each NFT
+	type nftCheck struct {
+		nftID   uint64
+		gasUsed uint64
+	}
+
 	type result struct {
 		shouldReceiveFunds bool
 		expectErr          bool
-		gasUsed            uint64 // cumulative tracking for a particular nft
+		cumulativeGasUsed  uint64 // cumulative tracking for a particular nft
+		nft                nftCheck
 	}
 
 	testCases := []struct {
@@ -94,6 +100,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 				false,
 				false,
 				0,
+				nftCheck{},
 			},
 		},
 		{
@@ -122,6 +129,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 				false,
 				false,
 				0,
+				nftCheck{},
 			},
 		},
 		{
@@ -145,13 +153,14 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 
 				receipt = &ethtypes.Receipt{
 					Logs:    []*ethtypes.Log{},
-					GasUsed: 1,
+					GasUsed: 10,
 				}
 			},
 			result{
 				true,
 				false,
-				1,
+				10,
+				nftCheck{nftID: 0, gasUsed: 10},
 			},
 		},
 		{
@@ -176,13 +185,14 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 				log := ethtypes.Log{}
 				receipt = &ethtypes.Receipt{
 					Logs:    []*ethtypes.Log{&log},
-					GasUsed: 10,
+					GasUsed: 13,
 				}
 			},
 			result{
 				true,
 				false,
-				11,
+				23,
+				nftCheck{nftID: 0, gasUsed: 23},
 			},
 		},
 		{
@@ -205,7 +215,8 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 				)
 
 				topics := []common.Hash{RegisterCSREvent.ID}
-				data, _ := RegisterCSREvent.Inputs.Pack(address, account, uint64(1))
+
+				data, _ := RegisterCSREvent.Inputs.Pack(address, account, big.NewInt(1))
 				log := ethtypes.Log{
 					Address: turnstileAddress,
 					Topics:  topics,
@@ -219,7 +230,8 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			result{
 				false,
 				true,
-				0,
+				23,
+				nftCheck{},
 			},
 		},
 		{
@@ -243,7 +255,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 				)
 
 				topics := []common.Hash{RegisterCSREvent.ID}
-				data, _ := RegisterCSREvent.Inputs.Pack(testContract, account, uint64(1))
+				data, _ := RegisterCSREvent.Inputs.Pack(testContract, account, big.NewInt(1))
 				log := ethtypes.Log{
 					Address: turnstileAddress,
 					Topics:  topics,
@@ -257,7 +269,8 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			result{
 				false,
 				true,
-				0,
+				23,
+				nftCheck{},
 			},
 		},
 		{
@@ -282,7 +295,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 				)
 
 				topics := []common.Hash{RegisterCSREvent.ID}
-				data, _ := RegisterCSREvent.Inputs.Pack(testContract, account, uint64(1))
+				data, _ := RegisterCSREvent.Inputs.Pack(testContract, account, big.NewInt(1))
 				log := ethtypes.Log{
 					Address: turnstileAddress,
 					Topics:  topics,
@@ -296,7 +309,8 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			result{
 				false,
 				false,
-				0,
+				23,
+				nftCheck{},
 			},
 		},
 		{
@@ -324,7 +338,8 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			result{
 				true,
 				false,
-				10,
+				33,
+				nftCheck{nftID: 1, gasUsed: 10},
 			},
 		},
 		{
@@ -349,7 +364,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 				)
 
 				topics := []common.Hash{RegisterCSREvent.ID}
-				data, _ := RegisterCSREvent.Inputs.Pack(testContract, account, uint64(1))
+				data, _ := RegisterCSREvent.Inputs.Pack(testContract, account, big.NewInt(1))
 				log := ethtypes.Log{
 					Address: turnstileAddress,
 					Topics:  topics,
@@ -363,7 +378,8 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			result{
 				false,
 				true,
-				10,
+				33,
+				nftCheck{},
 			},
 		},
 		{
@@ -387,7 +403,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 				)
 
 				topics := []common.Hash{RegisterCSREvent.ID}
-				data, _ := RegisterCSREvent.Inputs.Pack(testContract2, account, uint64(2))
+				data, _ := RegisterCSREvent.Inputs.Pack(testContract2, account, big.NewInt(2))
 				log := ethtypes.Log{
 					Address: turnstileAddress,
 					Topics:  topics,
@@ -401,7 +417,8 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			result{
 				true,
 				false,
-				23,
+				46,
+				nftCheck{nftID: 1, gasUsed: 23},
 			},
 		},
 		{
@@ -429,7 +446,8 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			result{
 				true,
 				false,
-				10,
+				56,
+				nftCheck{nftID: 2, gasUsed: 10},
 			},
 		},
 		{
@@ -452,7 +470,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 				)
 
 				topics := []common.Hash{UpdateCSREvent.ID}
-				data, _ := UpdateCSREvent.Inputs.Pack(address, uint64(1))
+				data, _ := UpdateCSREvent.Inputs.Pack(address, big.NewInt(1))
 				log := ethtypes.Log{
 					Address: turnstileAddress,
 					Topics:  topics,
@@ -466,7 +484,8 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			result{
 				true,
 				true,
-				10,
+				56,
+				nftCheck{},
 			},
 		},
 		{
@@ -487,7 +506,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 				)
 
 				topics := []common.Hash{UpdateCSREvent.ID}
-				data, _ := UpdateCSREvent.Inputs.Pack(testContract3, uint64(100))
+				data, _ := UpdateCSREvent.Inputs.Pack(testContract3, big.NewInt(100))
 				log := ethtypes.Log{
 					Address: turnstileAddress,
 					Topics:  topics,
@@ -501,7 +520,8 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			result{
 				true,
 				true,
-				10,
+				56,
+				nftCheck{},
 			},
 		},
 		{
@@ -522,7 +542,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 				)
 
 				topics := []common.Hash{UpdateCSREvent.ID}
-				data, _ := UpdateCSREvent.Inputs.Pack(testContract3, uint64(1))
+				data, _ := UpdateCSREvent.Inputs.Pack(testContract3, big.NewInt(1))
 				log := ethtypes.Log{
 					Address: turnstileAddress,
 					Topics:  topics,
@@ -536,7 +556,8 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			result{
 				true,
 				false,
-				15,
+				61,
+				nftCheck{nftID: 2, gasUsed: 15},
 			},
 		},
 		{
@@ -558,7 +579,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 				)
 
 				topics := []common.Hash{UpdateCSREvent.ID}
-				data, _ := UpdateCSREvent.Inputs.Pack(address, uint64(1))
+				data, _ := UpdateCSREvent.Inputs.Pack(address, big.NewInt(1))
 				log := ethtypes.Log{
 					Address: turnstileAddress,
 					Topics:  topics,
@@ -572,7 +593,8 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			result{
 				false,
 				true,
-				0,
+				61,
+				nftCheck{},
 			},
 		},
 		{
@@ -594,7 +616,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 				)
 
 				topics := []common.Hash{UpdateCSREvent.ID}
-				data, _ := UpdateCSREvent.Inputs.Pack(testContract3, uint64(1))
+				data, _ := UpdateCSREvent.Inputs.Pack(testContract3, big.NewInt(1))
 				log := ethtypes.Log{
 					Address: turnstileAddress,
 					Topics:  topics,
@@ -608,7 +630,8 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			result{
 				false,
 				true,
-				0,
+				61,
+				nftCheck{},
 			},
 		},
 		{
@@ -630,7 +653,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 				)
 
 				topics := []common.Hash{UpdateCSREvent.ID}
-				data, _ := UpdateCSREvent.Inputs.Pack(testContract4, uint64(1))
+				data, _ := UpdateCSREvent.Inputs.Pack(testContract4, big.NewInt(1))
 				log := ethtypes.Log{
 					Address: turnstileAddress,
 					Topics:  topics,
@@ -644,7 +667,8 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			result{
 				false,
 				false,
-				0,
+				61,
+				nftCheck{},
 			},
 		},
 		{
@@ -672,7 +696,37 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			result{
 				true,
 				false,
-				30,
+				68,
+				nftCheck{nftID: 1, gasUsed: 30},
+			},
+		},
+		{
+			"Registered Smart Contract (testContract4)", // -> should split fees to the turnstile address
+			func() {
+				msg = ethtypes.NewMessage(
+					types.ModuleAddress,
+					&testContract4,
+					0,
+					big.NewInt(0), // amount
+					uint64(0),     // gasLimit
+					gasPrice,      // gasPrice
+					big.NewInt(0), // gasFeeCap
+					big.NewInt(0), // gasTipCap
+					[]byte{},
+					ethtypes.AccessList{}, // AccessList
+					true,                  // checkNonce
+				)
+
+				receipt = &ethtypes.Receipt{
+					Logs:    []*ethtypes.Log{},
+					GasUsed: 7,
+				}
+			},
+			result{
+				true,
+				false,
+				75,
+				nftCheck{nftID: 1, gasUsed: 37},
 			},
 		},
 	}
@@ -691,20 +745,38 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			}
 
 			if tc.test.shouldReceiveFunds {
+				// Get the percentage of fees that should be going to the CSR nfts
+				csrShare := suite.app.CSRKeeper.GetParams(suite.ctx).CsrShares
+
+				// The contract should be mapped to some NFT
 				contract := msg.To()
 				nft, found := suite.app.CSRKeeper.GetNFTByContract(suite.ctx, contract.String())
 				suite.Require().True(found)
 
-				csr, found := suite.app.CSRKeeper.GetCSR(suite.ctx, nft)
+				// The test NFT should match the one found
+				testNFT := tc.test.nft.nftID
+				gasUsedByNFT := tc.test.nft.gasUsed
+				suite.Require().Equal(testNFT, nft)
+
+				// The CSR object should be found
+				_, found = suite.app.CSRKeeper.GetCSR(suite.ctx, nft)
 				suite.Require().True(found)
 
-				beneficiary := csr.Beneficiary
-				cosmosBalance := suite.app.BankKeeper.GetAllBalances(suite.ctx, sdk.MustAccAddressFromBech32(beneficiary))
+				// Checking the turnstile balance
+				turnstile := sdk.AccAddress(turnstileAddress.Bytes())
+				turnstileBalance := suite.app.BankKeeper.GetAllBalances(suite.ctx, turnstile)
 
-				fee := sdk.NewIntFromUint64(tc.test.gasUsed).Mul(sdk.NewIntFromBigInt(msg.GasPrice()))
-				developerFee := sdk.NewDecFromInt(fee).Mul(suite.app.CSRKeeper.GetParams(suite.ctx).CsrShares)
-				expected := developerFee.TruncateInt()
-				suite.Require().Equal(expected, cosmosBalance.AmountOf(evmDenom))
+				// Ensuring the turnstile and expected turnstile balances match
+				expectedTurnstileBalance := calculateExpectedFee(tc.test.cumulativeGasUsed, gasPrice, csrShare)
+				suite.Require().Equal(expectedTurnstileBalance, turnstileBalance.AmountOf(evmDenom))
+
+				// Get the balance of the revenue accumulated at a given NFT
+				nftRevenue, err := getNFTRevenue(suite, &turnstileAddress, testNFT)
+				suite.Require().NoError(err)
+
+				// Check that the expected NFT balance matches the actual balance
+				nftFee := calculateExpectedFee(gasUsedByNFT, gasPrice, csrShare)
+				suite.Require().Equal(nftFee.BigInt(), nftRevenue)
 			} else {
 				contract := msg.To()
 				_, found := suite.app.CSRKeeper.GetNFTByContract(suite.ctx, contract.String())
@@ -713,4 +785,30 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 		})
 	}
 
+}
+
+// Helper function that will calculate how much revenue a NFT or the Turnstile should accumulate
+// Calculation is done by the following: int(gasUsed * gasPrice * csrShares)
+func calculateExpectedFee(gasUsed uint64, gasPrice *big.Int, csrShare sdk.Dec) sdk.Int {
+	fee := sdk.NewIntFromUint64(gasUsed).Mul(sdk.NewIntFromBigInt(gasPrice))
+	expectedTurnstileBalance := sdk.NewDecFromInt(fee).Mul(csrShare).TruncateInt()
+	return expectedTurnstileBalance
+}
+
+// Helper function that will get the transaction revenue for a given NFT
+func getNFTRevenue(suite *KeeperTestSuite, address *common.Address, nft uint64) (*big.Int, error) {
+	// Call to retrieve the amount of canto for a given NFT
+	resp, err := suite.app.CSRKeeper.CallMethod(suite.ctx, "revenue", contracts.TurnstileContract, types.ModuleAddress, address, big.NewInt(0), new(big.Int).SetUint64(nft))
+	if err != nil {
+		return nil, err
+	}
+
+	// Unpack the results into a big int
+	unpackedData, err := turnstileContract.Methods["revenue"].Outputs.Unpack(resp.Ret)
+	if err != nil {
+		return nil, err
+	}
+	nftRevenue := unpackedData[0].(*big.Int)
+
+	return nftRevenue, nil
 }

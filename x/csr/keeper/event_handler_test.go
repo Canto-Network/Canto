@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"errors"
+	"math/big"
 	"strings"
 
 	"github.com/Canto-Network/Canto/v2/contracts"
@@ -223,12 +224,16 @@ func (suite *KeeperTestSuite) TestUpdateEvent() {
 
 }
 
-func generateUpdateEventData(contract common.Address, nftId uint64) (data []byte, err error) {
-	return generateEventData("Attach", contracts.TurnstileContract, contract, nftId)
+func generateUpdateEventData(contract common.Address, nftID uint64) (data []byte, err error) {
+	bigInt := &big.Int{}
+	bigInt.SetUint64(nftID)
+	return generateEventData("Attach", contracts.TurnstileContract, contract, bigInt)
 }
 
-func generateRegisterEventData(contract, receiver common.Address, nftid uint64) (data []byte, err error) {
-	return generateEventData("Register", contracts.TurnstileContract, contract, receiver, nftid)
+func generateRegisterEventData(contract, receiver common.Address, nftID uint64) (data []byte, err error) {
+	bigInt := &big.Int{}
+	bigInt.SetUint64(nftID)
+	return generateEventData("Register", contracts.TurnstileContract, contract, receiver, bigInt)
 }
 
 // generate event creates data field for arbitrary transaction

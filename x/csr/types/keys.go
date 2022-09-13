@@ -22,9 +22,6 @@ var ModuleAddress common.Address
 // key for turnstile address once deployed
 var TurnstileKey = []byte("turnstile")
 
-// key for csrnft address once deployed
-var CSRNFTKey = []byte("csrnft")
-
 func init() {
 	ModuleAddress = common.BytesToAddress(authtypes.NewModuleAddress(ModuleName).Bytes())
 }
@@ -34,7 +31,7 @@ const (
 	prefixCSR = iota + 1
 	// contract -> nft id
 	prefixContract
-	// prefix prefix addresses of CSRNFT and Turnstile
+	// prefix prefix address of the Turnstile smart contract
 	prefixAddrs
 )
 
