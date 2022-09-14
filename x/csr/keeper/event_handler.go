@@ -43,11 +43,12 @@ func (k Keeper) RegisterEvent(ctx sdk.Context, data []byte) error {
 	}
 
 	// Set the NFTID in the store if it has not been registered yet
-	_, found := k.GetCSR(ctx, event.Id)
+	nftID := event.Id.Uint64()
+	_, found := k.GetCSR(ctx, nftID)
 	if found {
 		return sdkerrors.Wrapf(ErrDuplicateNFTID, "EventHandler::RegisterEvent: this NFT id has already been registered")
 	}
-	csr.Id = event.Id
+	csr.Id = nftID
 
 	// Set the CSR in the store
 	k.SetCSR(ctx, csr)
@@ -70,7 +71,8 @@ func (k Keeper) UpdateEvent(ctx sdk.Context, data []byte) error {
 	}
 
 	// Check if the NFT that is updated exists
-	csr, found := k.GetCSR(ctx, event.Id)
+	nftID := event.Id.Uint64()
+	csr, found := k.GetCSR(ctx, nftID)
 	if !found {
 		return sdkerrors.Wrapf(ErrNFTNotFound, "EventHandler::UpdateCSREvent the nft entered does not currently exist")
 	}

@@ -1,14 +1,21 @@
 package keeper
 
 import (
+	"math/big"
+
 	"github.com/Canto-Network/Canto/v2/contracts"
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ethereum/go-ethereum/common"
+	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
+
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 )
+
+// Default gas limit for eth txs on the turnstile
+var DefaultGasLimit uint64 = 25000000
 
 // deploy Turnstile, this method is called in begin block, it takes as argument the, the deployment takes no arguments
 func (k Keeper) DeployTurnstile(
@@ -55,7 +62,8 @@ func (k Keeper) DeployContract(
 
 	// deploy contract using erc20 callEVMWithData, applies contract deployments to
 	// current stateDb
-	_, err = k.erc20Keeper.CallEVMWithData(ctx, types.ModuleAddress, nil, data, true)
+	amount := big.NewInt(0)
+	_, err = k.CallEVM(ctx, types.ModuleAddress, nil, amount, data, true)
 	if err != nil {
 		return common.Address{},
 			sdkerrors.Wrapf(ErrAddressDerivation,
@@ -72,21 +80,64 @@ func (k Keeper) CallMethod(
 	ctx sdk.Context,
 	method string,
 	contract evmtypes.CompiledContract,
+	from common.Address,
 	contractAddr *common.Address,
+	amount *big.Int,
 	args ...interface{},
 ) (*evmtypes.MsgEthereumTxResponse, error) {
 	// pack method args
 
-	methodArgs, err := contract.ABI.Pack(method, args...)
+	data, err := contract.ABI.Pack(method, args...)
 
 	if err != nil {
 		return nil, sdkerrors.Wrapf(ErrContractDeployments, "CSR:Keeper::DeployContract: method call incorrect: %s", err.Error())
 	}
 	// call method
-	resp, err := k.erc20Keeper.CallEVMWithData(ctx, types.ModuleAddress, contractAddr, methodArgs, true)
+	resp, err := k.CallEVM(ctx, from, contractAddr, amount, data, true)
 	if err != nil {
 		return nil, sdkerrors.Wrapf(ErrContractDeployments, "CSR:Keeper: :CallMethod: error applying message: %s", err.Error())
 	}
 
 	return resp, nil
+}
+
+// CallEVM performs a smart contract method call using contract data and amount
+func (k Keeper) CallEVM(
+	ctx sdk.Context,
+	from common.Address,
+	contract *common.Address,
+	amount *big.Int,
+	data []byte,
+	commit bool,
+) (*evmtypes.MsgEthereumTxResponse, error) {
+	nonce, err := k.accountKeeper.GetSequence(ctx, from.Bytes())
+	if err != nil {
+		return nil, err
+	}
+
+	gasLimit := DefaultGasLimit
+
+	msg := ethtypes.NewMessage(
+		from,
+		contract,
+		nonce,
+		amount,        // amount
+		gasLimit,      // gasLimit
+		big.NewInt(0), // gasPrice
+		big.NewInt(0), // gasFeeCap
+		big.NewInt(0), // gasTipCap
+		data,
+		ethtypes.AccessList{}, // AccessList
+		!commit,               // isFake
+	)
+
+	res, err := k.evmKeeper.ApplyMessage(ctx, msg, evmtypes.NewNoOpTracer(), commit)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.Failed() {
+		return nil, sdkerrors.Wrap(evmtypes.ErrVMExecution, res.VmError)
+	}
+	return res, nil
 }

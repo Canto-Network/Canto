@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"math/big"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -45,9 +47,9 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 
 	// Check and process turnstile events if applicable
 	// If a tx has turnstile events, then no fees will get distributed
-	errEvents := h.processEvents(ctx, receipt)
-	if errEvents != nil {
-		return errEvents
+	err := h.processEvents(ctx, receipt)
+	if err != nil {
+		return err
 	}
 
 	// Grab the nft the smart contract corresponds to, if it has no nft -> return
@@ -58,18 +60,31 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 
 	// Grab the account which will be receiving the tx fees
 	csr, _ := h.k.GetCSR(ctx, id)
-	beneficiary := csr.Beneficiary
+	nftID := csr.Id
 
 	// Calculate fees to be distributed
 	fee := sdk.NewIntFromUint64(receipt.GasUsed).Mul(sdk.NewIntFromBigInt(msg.GasPrice()))
-	developerFee := sdk.NewDecFromInt(fee).Mul(params.CsrShares)
+	csrFee := sdk.NewDecFromInt(fee).Mul(params.CsrShares).TruncateInt()
 	evmDenom := h.k.evmKeeper.GetParams(ctx).EvmDenom
-	csrFees := sdk.Coins{{Denom: evmDenom, Amount: developerFee.TruncateInt()}}
+	csrFees := sdk.Coins{{Denom: evmDenom, Amount: csrFee}}
 
-	err := h.k.bankKeeper.SendCoinsFromModuleToAccount(ctx, h.k.FeeCollectorName, sdk.MustAccAddressFromBech32(beneficiary), csrFees)
-
+	// Send fees from fee collector to module account before distribution
+	err = h.k.bankKeeper.SendCoinsFromModuleToModule(ctx, h.k.FeeCollectorName, types.ModuleName, csrFees)
 	if err != nil {
-		return sdkerrors.Wrapf(ErrFeeCollectorDistribution, "EVMHook::PostTxProcessing failed to distribute fees from module account to nft beneficiary, %d", err)
+		return sdkerrors.Wrapf(ErrFeeDistribution, "EVMHook::PostTxProcessing failed to distribute fees from fee collector to module, %d", err)
+	}
+
+	// Get the turnstile which will receive funds for tx fees
+	turnstileAddress, found := h.k.GetTurnstile(ctx)
+	if !found {
+		return sdkerrors.Wrapf(ErrContractDeployments, "Keeper::ProcessEvents the turnstile contract has not been found.")
+	}
+
+	// Distribute fees to turnstile contract
+	amount := csrFee.BigInt()
+	_, err = h.k.CallMethod(ctx, "distributeFees", contracts.TurnstileContract, types.ModuleAddress, &turnstileAddress, amount, new(big.Int).SetUint64(nftID))
+	if err != nil {
+		return sdkerrors.Wrapf(ErrFeeDistribution, "EVMHook::PostTxProcessing failed to distribute fees from module account to turnstile, %d", err)
 	}
 
 	return nil

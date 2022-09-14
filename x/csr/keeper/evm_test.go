@@ -4,9 +4,11 @@ import (
 	_ "embed"
 	"encoding/json"
 	"log"
+	"math/big"
 
 	"github.com/Canto-Network/Canto/v2/contracts"
 	_ "github.com/Canto-Network/Canto/v2/x/csr/keeper"
+	"github.com/Canto-Network/Canto/v2/x/erc20/types"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
@@ -30,6 +32,8 @@ func (suite *KeeperTestSuite) TestContractDeployment() {
 		expectReturn func(contract common.Address) bool
 	}
 
+	amount := big.NewInt(0)
+
 	testCases := []struct {
 		name       string
 		args       testArgs
@@ -45,7 +49,7 @@ func (suite *KeeperTestSuite) TestContractDeployment() {
 					acc := s.app.EvmKeeper.GetAccountWithoutBalance(suite.ctx, addr)
 					suite.Require().True(acc.IsContract())
 					// now call deploy1 on testContract and receive address
-					_, err := suite.app.CSRKeeper.CallMethod(suite.ctx, "deploy1", contract, &addr)
+					_, err := suite.app.CSRKeeper.CallMethod(suite.ctx, "deploy1", contract, types.ModuleAddress, &addr, amount)
 					// now return ret and expect it to be an address
 					if err != nil {
 						return err, common.Address{}
@@ -75,7 +79,7 @@ func (suite *KeeperTestSuite) TestContractDeployment() {
 					suite.Require().True(acc.IsContract())
 					//  now return ret and expect it to be an address
 					salt := [32]byte{0x01}
-					_, err := suite.app.CSRKeeper.CallMethod(suite.ctx, "deploy2", contract, &addr, salt)
+					_, err := suite.app.CSRKeeper.CallMethod(suite.ctx, "deploy2", contract, types.ModuleAddress, &addr, amount, salt)
 					if err != nil {
 						return err, common.Address{}
 					}
