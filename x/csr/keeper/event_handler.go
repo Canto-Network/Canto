@@ -24,9 +24,6 @@ func (k Keeper) RegisterEvent(ctx sdk.Context, data []byte) error {
 		return err
 	}
 
-	// Create a new beneficiary account
-	address := k.CreateNewAccount(ctx)
-
 	// Check that the receiver account  exists
 	if acct := k.evmKeeper.GetAccount(ctx, event.Receiver); acct == nil {
 		return sdkerrors.Wrapf(ErrNonexistentAcct, "EventHandler::RegisterEvent: account does not exist: %s", event.Receiver)
@@ -36,7 +33,6 @@ func (k Keeper) RegisterEvent(ctx sdk.Context, data []byte) error {
 	csr := types.NewCSR(
 		[]string{event.SmartContractAddress.String()},
 		0, // Init the NFT to 0 before validation
-		address,
 	)
 	if err := csr.Validate(); err != nil {
 		return err

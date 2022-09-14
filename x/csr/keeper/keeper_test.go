@@ -10,6 +10,7 @@ import (
 
 	"github.com/Canto-Network/Canto/v2/app"
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -32,6 +33,7 @@ type KeeperTestSuite struct {
 	// use keeper for tests
 	ctx         sdk.Context
 	app         *app.Canto
+	queryClient types.QueryClient
 	consAddress sdk.ConsAddress
 	ethSigner   ethtypes.Signer
 	address     common.Address
@@ -97,6 +99,10 @@ func (suite *KeeperTestSuite) SetupApp() {
 		LastResultsHash:    tmhash.Sum([]byte("last_result")),
 	})
 
+	queryHelper := baseapp.NewQueryServerTestHelper(suite.ctx, suite.app.InterfaceRegistry())
+	types.RegisterQueryServer(queryHelper, suite.app.CSRKeeper)
+	suite.queryClient = types.NewQueryClient(queryHelper)
+
 	bigInt := &big.Int{}
 	bigInt.SetUint64(100)
 	s.app.FeeMarketKeeper.SetBaseFee(suite.ctx, bigInt)
@@ -148,4 +154,8 @@ func (suite *KeeperTestSuite) CommitAfter(t time.Duration) {
 
 	// update ctx
 	suite.ctx = suite.app.BaseApp.NewContext(false, header)
+
+	queryHelper := baseapp.NewQueryServerTestHelper(suite.ctx, suite.app.InterfaceRegistry())
+	types.RegisterQueryServer(queryHelper, suite.app.CSRKeeper)
+	suite.queryClient = types.NewQueryClient(queryHelper)
 }

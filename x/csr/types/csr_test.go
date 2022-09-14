@@ -36,36 +36,24 @@ func (suite *CSRTestSuite) TestCSR() {
 		{
 			"Create CSR object - pass",
 			CSR{
-				Contracts:   suite.contracts,
-				Id:          suite.id,
-				Beneficiary: suite.account,
+				Contracts: suite.contracts,
+				Id:        suite.id,
 			},
 			true,
 		},
 		{
 			"Create CSR object with 0 smart contracts - fail",
 			CSR{
-				Contracts:   []string{},
-				Id:          suite.id,
-				Beneficiary: suite.account,
-			},
-			false,
-		},
-		{
-			"Create CSR object with invalid account address - fail",
-			CSR{
-				Contracts:   suite.contracts,
-				Id:          suite.id,
-				Beneficiary: "",
+				Contracts: []string{},
+				Id:        suite.id,
 			},
 			false,
 		},
 		{
 			"Create CSR object with invalid smart contract addresses - fail",
 			CSR{
-				Contracts:   append(suite.contracts, ""),
-				Id:          suite.id,
-				Beneficiary: suite.account,
+				Contracts: append(suite.contracts, ""),
+				Id:        suite.id,
 			},
 			false,
 		},

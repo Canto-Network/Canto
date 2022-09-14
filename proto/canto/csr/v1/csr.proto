@@ -11,11 +11,4 @@ message CSR {
     repeated string contracts = 1;
     // The NFT id which this CSR corresponds to
     uint64 id = 2;
-    // The account which will be accumulating rewards for this CSR (bech32 Canto address)
-    string beneficiary = 3;
-}
-
-// Keeps track of all of the CSRs, primarily used to (un)marshal data
-message CSRs {
-    repeated CSR csrs = 1;
 }

@@ -12,6 +12,4 @@ func (suite *KeeperTestSuite) TestParams() {
 	suite.Require().False(params.EnableCsr)
 	// Default CSRShares are 50%
 	suite.Require().Equal(params.CsrShares, sdk.NewDecWithPrec(50, 2))
-	//Default Address Derivation Cost Create
-	suite.Require().Equal(params.AddressDerivationCostCreate, uint64(50))
 }

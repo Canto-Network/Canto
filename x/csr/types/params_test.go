@@ -20,7 +20,6 @@ func TestParamSetPairs(t *testing.T) {
 
 func TestParamsValidate(t *testing.T) {
 	csrShares := sdk.NewDecWithPrec(50, 2)
-	addressDerivationCostCreate := uint64(50)
 
 	testCases := []struct {
 		name   string
@@ -30,22 +29,22 @@ func TestParamsValidate(t *testing.T) {
 		{"Testing default parameters - pass", DefaultParams(), true},
 		{
 			"Testing another valid set of parameters - pass",
-			NewParams(true, csrShares, addressDerivationCostCreate),
+			NewParams(true, csrShares),
 			true,
 		},
 		{
 			"Testing disabling the CSR module - pass",
-			NewParams(false, csrShares, addressDerivationCostCreate),
+			NewParams(false, csrShares),
 			true,
 		},
 		{
 			"Testing all goes to csrShares - pass",
-			Params{true, sdk.NewDecFromInt(sdk.NewInt(1)), addressDerivationCostCreate},
+			Params{true, sdk.NewDecFromInt(sdk.NewInt(1))},
 			true,
 		},
 		{
 			"Testing all nothing goes to csrShares - pass",
-			Params{true, sdk.NewDecFromInt(sdk.NewInt(0)), addressDerivationCostCreate},
+			Params{true, sdk.NewDecFromInt(sdk.NewInt(0))},
 			true,
 		},
 		{
@@ -55,17 +54,17 @@ func TestParamsValidate(t *testing.T) {
 		},
 		{
 			"Testing CSR shares going over 100% - fail",
-			Params{true, sdk.NewDecFromInt(sdk.NewInt(2)), addressDerivationCostCreate},
+			Params{true, sdk.NewDecFromInt(sdk.NewInt(2))},
 			false,
 		},
 		{
 			"Testing CSR shares below 0 - fail",
-			Params{true, sdk.NewDecFromInt(sdk.NewInt(-1)), addressDerivationCostCreate},
+			Params{true, sdk.NewDecFromInt(sdk.NewInt(-1))},
 			false,
 		},
 		{
 			"Testing CSR shares below 0 - fail",
-			Params{true, sdk.NewDecFromInt(sdk.NewInt(-1)), addressDerivationCostCreate},
+			Params{true, sdk.NewDecFromInt(sdk.NewInt(-1))},
 			false,
 		},
 	}

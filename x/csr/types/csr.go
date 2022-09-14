@@ -1,17 +1,15 @@
 package types
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	ethermint "github.com/evmos/ethermint/types"
 )
 
 // Creates a new instance of the CSR object
-func NewCSR(contracts []string, id uint64, account sdk.AccAddress) CSR {
+func NewCSR(contracts []string, id uint64) CSR {
 	return CSR{
-		Contracts:   contracts,
-		Id:          id,
-		Beneficiary: account.String(),
+		Contracts: contracts,
+		Id:        id,
 	}
 }
 
@@ -32,12 +30,6 @@ func (csr CSR) Validate() error {
 	numSmartContracts := len(csr.Contracts)
 	if numSmartContracts < 1 {
 		return sdkerrors.Wrapf(ErrSmartContractSupply, "CSR::Validate # of smart contracts must be greater than 0 got: %d", numSmartContracts)
-	}
-
-	// Ensure that the account address entered is a valid canto address
-	account := csr.Beneficiary
-	if _, err := sdk.AccAddressFromBech32(account); err != nil {
-		return err
 	}
 	return nil
 }

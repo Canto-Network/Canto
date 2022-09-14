@@ -14,80 +14,64 @@ option go_package = "github.com/Canto-Network/Canto/v2/x/csr/types";
 service Query {
   // Parameters queries the parameters of the module.
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
-    option (google.api.http).get = "/canto/v2/csr/params";
+    option (google.api.http).get = "/canto/v1/csr/params";
   }
   // query all registered CSRs
   rpc CSRs(QueryCSRsRequest) returns (QueryCSRsResponse) {
-    option (google.api.http).get = "/canto/v2/csr/csrs"; 
+    option (google.api.http).get = "/canto/v1/csr/csrs"; 
   }
   // query a specific CSR by the nftId 
-  rpc CSR(QueryCSRRequest) returns (QueryCSRResponse) {
+  rpc CSRByNFT(QueryCSRByNFTRequest) returns (QueryCSRByNFTResponse) {
     // query by address
-    option (google.api.http).get = "/canto/v2/csr/csr/{nftId}";
+    option (google.api.http).get = "/canto/v1/csr/nft/{nftId}";
   }
-  // query a CSR by a specific owner (cantoAddress)
-  rpc OwnerToCSR(QueryOwnerCSRRequest) returns (QueryOwnerCSRResponse) { 
+  // query a CSR by smart contract address
+  rpc CSRByContract(QueryCSRByContractRequest) returns (QueryCSRByContractResponse) { 
     // query by deployer address 
-    option (google.api.http).get = "/canto/v2/csr/owner_csr/{deployer_address}";
-  }
-  // query a csr by the smart contract
-  rpc ContractToCSR(QueryContractCSRRequest) returns (QueryContractCSRResponse) {
-    // query contract by contract address
-    option (google.api.http).get = "/canto/v2/csr/contract_csr/{contract_address}";
+    option (google.api.http).get = "/canto/v1/csr/contract/{address}";
   }
 }
 
-// QueryParamsRequest is request type for the Query/Params RPC method.
+// QueryParamsRequest is the request type for the Query/Params RPC method.
 message QueryParamsRequest {}
 
-// QueryParamsResponse is response type for the Query/Params RPC method.
+// QueryParamsResponse is the response type for the Query/Params RPC method.
 message QueryParamsResponse {
   // params holds all the parameters of this module.
   Params params = 1 [ (gogoproto.nullable) = false];
 }
 
-// Query for all registered CSRs, no argument required 
-message QueryCSRsRequest {}
+// QueryCSRsRequest is the request type for the Query/CSRs RPC method.
+message QueryCSRsRequest {
+  // pagination defines an optional pagination for the request.
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
 
-// Response contains PoolAddresses of all registered CSRs
+// QueryCSRsResponse is the response type for the Query/CSRs RPC method.
 message QueryCSRsResponse {
   repeated CSR csrs = 1 [ (gogoproto.nullable) = false ];
   // pagination for response
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
-// request a specific CSR via the nftId which has been minted for the CSR
-message QueryCSRRequest { 
-  // query CSR via pool address, sdk.AccAddress of the pool in which funds will be accumulated
+// QueryCSRByNFTRequest is the request type for the Query/CSRByNFT RPC method.
+message QueryCSRByNFTRequest { 
   uint64 nftId = 1; 
 }
 
-// response for query of CSR by pool addr
-message QueryCSRResponse { 
-  // csr object queried by pool address
+// QueryCSRByNFTResponse is the response type for the Query/CSRByNFT RPC method.
+message QueryCSRByNFTResponse { 
+  // csr object queried by nft id
   CSR csr = 1 [ (gogoproto.nullable) = false];
 }
 
-// query all CSRs deployed by an address
-message QueryOwnerCSRRequest {
-  //query by deployer_address for all
-  string deployer_address = 1; 
-}
-// returns array of all CSRs registered by deployer 
-message QueryOwnerCSRResponse { 
-  repeated CSR csrs = 1 [ (gogoproto.nullable) = false ];
-  // pagination for response
-  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+// QueryCSRByContractRequest is the request type for the Query/CSRByContract RPC method.
+message QueryCSRByContractRequest {
+  string address = 1; 
 }
 
-// request the CSR that the provided smart contract belongs to
-message QueryContractCSRRequest {
-  // query takes the contract address 
-  string contract_address = 1;
-}
-
-// response of QueryContractCSRResponse
-message QueryContractCSRResponse {
-  // returns the CSR that contrains this contract
-  CSR csr = 1 [ (gogoproto.nullable) = false ];
+// QueryCSRByContractResponse is the response type for the Query/CSRByContract RPC method.
+message QueryCSRByContractResponse { 
+  // csr object queried by smart contract address
+  CSR csr = 1 [ (gogoproto.nullable) = false];
 }

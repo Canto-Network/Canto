@@ -1,21 +1,21 @@
 package cli
 
 import (
+	"context"
 	"fmt"
-	// "strings"
+	"strconv"
 
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	// "github.com/cosmos/cosmos-sdk/client/flags"
-	// sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/version"
 
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
 )
 
 // GetQueryCmd returns the cli query commands for this module
 func GetQueryCmd(queryRoute string) *cobra.Command {
-	// Group csr queries under a subcommand
 	cmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      fmt.Sprintf("Querying commands for the %s module", types.ModuleName),
@@ -24,8 +24,141 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	cmd.AddCommand(CmdQueryParams())
-	// this line is used by starport scaffolding # 1
+	cmd.AddCommand(
+		CmdQueryParams(),
+		CmdQueryCSRs(),
+		CmdQueryCSRByNFT(),
+		CmdQueryCSRByContract(),
+	)
 
+	return cmd
+}
+
+// CmdQueryParams implements a command that will return the current parameters of the
+// CSR module.
+func CmdQueryParams() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "params",
+		Short: "Query the current parameters of the CSR module",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			request := &types.QueryParamsRequest{}
+
+			response, err := queryClient.Params(context.Background(), request)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(&response.Params)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// CmdQueryCSRs implements a command that will return the CSRs from the CSR module
+func CmdQueryCSRs() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "csrs",
+		Short: "Query all registered contracts and NFTs for the CSR module",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			pageRequest, err := client.ReadPageRequest(cmd.Flags())
+			if err != nil {
+				return err
+			}
+
+			request := &types.QueryCSRsRequest{
+				Pagination: pageRequest,
+			}
+
+			response, err := queryClient.CSRs(context.Background(), request)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(response)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// CmdQueryCSRByNFT implements a command that will return a CSR given a NFT ID
+func CmdQueryCSRByNFT() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "nft [nftID]",
+		Args:    cobra.ExactArgs(1),
+		Short:   "Query the CSR associated with a given NFT ID",
+		Long:    "Query the CSR associated with a given NFT ID",
+		Example: fmt.Sprintf("%s query csr nft <address>", version.AppName),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			nftID, err := strconv.ParseUint(args[0], 10, 64)
+			if err != nil {
+				return err
+			}
+
+			request := &types.QueryCSRByNFTRequest{NftId: nftID}
+			// Query store
+			response, err := queryClient.CSRByNFT(context.Background(), request)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(response)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
+}
+
+// CmdQueryCSRByContract implements a cobra command that will return the CSR associated
+// given a smart contract address
+func CmdQueryCSRByContract() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "contract [address]",
+		Args:    cobra.ExactArgs(1),
+		Short:   "Query the CSR associated with a given smart contract adddress",
+		Long:    "Query the CSR associated with a given smart contract adddress",
+		Example: fmt.Sprintf("%s query csr contract <address>", version.AppName),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			request := &types.QueryCSRByContractRequest{Address: args[0]}
+
+			// Query store
+			response, err := queryClient.CSRByContract(context.Background(), request)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(response)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
 	return cmd
 }

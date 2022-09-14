@@ -7,13 +7,11 @@ import (
 )
 
 var (
-	DefaultEnableCSR                   = false
-	DefaultCSRShares                   = sdk.NewDecWithPrec(50, 2)
-	DefaultAddressDerivationCostCreate = uint64(50)
+	DefaultEnableCSR = false
+	DefaultCSRShares = sdk.NewDecWithPrec(50, 2)
 
-	ParamStoreKeyEnableCSR                   = []byte("EnableCSR")
-	ParamStoreKeyCSRShares                   = []byte("CSRShares")
-	ParamStoreKeyAddressDerivationCostCreate = []byte("AddressDerivationCostCreate")
+	ParamStoreKeyEnableCSR = []byte("EnableCSR")
+	ParamStoreKeyCSRShares = []byte("CSRShares")
 )
 
 // ParamKeyTable the param key table
@@ -22,17 +20,16 @@ func ParamKeyTable() paramtypes.KeyTable {
 }
 
 // NewParams creates a new Params instance
-func NewParams(enableCSR bool, csrShares sdk.Dec, addressDerivationCostCreate uint64) Params {
+func NewParams(enableCSR bool, csrShares sdk.Dec) Params {
 	return Params{
-		EnableCsr:                   enableCSR,
-		CsrShares:                   csrShares,
-		AddressDerivationCostCreate: addressDerivationCostCreate,
+		EnableCsr: enableCSR,
+		CsrShares: csrShares,
 	}
 }
 
 // DefaultParams returns a default set of parameters
 func DefaultParams() Params {
-	return NewParams(DefaultEnableCSR, DefaultCSRShares, DefaultAddressDerivationCostCreate)
+	return NewParams(DefaultEnableCSR, DefaultCSRShares)
 }
 
 // ParamSetPairs get the params.ParamSet
@@ -40,18 +37,7 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
 		paramtypes.NewParamSetPair(ParamStoreKeyEnableCSR, &p.EnableCsr, ValidateEnableCSR),
 		paramtypes.NewParamSetPair(ParamStoreKeyCSRShares, &p.CsrShares, ValidateShares),
-		paramtypes.NewParamSetPair(ParamStoreKeyAddressDerivationCostCreate, &p.AddressDerivationCostCreate, ValidateAddressDerivationCostCreate),
 	}
-}
-
-// Validates the cost of address derivation
-func ValidateAddressDerivationCostCreate(i interface{}) error {
-	_, ok := i.(uint64)
-	if !ok {
-		return sdkerrors.Wrapf(ErrInvalidParams, "Params::Validate::ValidateAddressDerivationCostCreate address derivation cost must be a uint.")
-	}
-
-	return nil
 }
 
 // Validates the boolean which enables CSR
@@ -94,5 +80,5 @@ func (p Params) Validate() error {
 	if err := ValidateShares(p.CsrShares); err != nil {
 		return err
 	}
-	return ValidateAddressDerivationCostCreate(p.AddressDerivationCostCreate)
+	return nil
 }
