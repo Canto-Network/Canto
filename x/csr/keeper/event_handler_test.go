@@ -8,7 +8,6 @@ import (
 	"github.com/Canto-Network/Canto/v2/contracts"
 	_ "github.com/Canto-Network/Canto/v2/x/csr/keeper"
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/evmos/ethermint/tests"
@@ -172,9 +171,8 @@ func (suite *KeeperTestSuite) TestUpdateEvent() {
 			false,
 			func() {
 				csr := types.CSR{
-					Beneficiary: sdk.AccAddress(smartContractAddress.Bytes()).String(),
-					Id:          1,
-					Contracts:   []string{smartContractAddress.Hex()},
+					Id:        1,
+					Contracts: []string{smartContractAddress.Hex()},
 				}
 				// set csr to state
 				suite.app.CSRKeeper.SetCSR(suite.ctx, csr)

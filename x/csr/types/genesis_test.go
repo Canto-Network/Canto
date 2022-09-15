@@ -6,8 +6,6 @@ import (
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
 	"github.com/stretchr/testify/suite"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/evmos/ethermint/tests"
 )
 
@@ -27,11 +25,9 @@ func (suite *GensisStateSuite) SetupTest() {
 	contracts := []string{tests.GenerateAddress().String(), tests.GenerateAddress().String(),
 		tests.GenerateAddress().String(), tests.GenerateAddress().String()}
 	id := 0
-	account := sdk.AccAddress(tests.GenerateAddress().Bytes())
 	csr := types.NewCSR(
 		contracts,
 		uint64(id),
-		account,
 	)
 	suite.csrs = []*types.CSR{&csr}
 }

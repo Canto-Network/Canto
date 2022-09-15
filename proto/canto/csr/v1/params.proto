@@ -2,7 +2,6 @@ syntax = "proto3";
 package canto.csr.v1;
 
 import "gogoproto/gogo.proto";
-import "cosmos_proto/cosmos.proto";
 
 option go_package = "github.com/Canto-Network/Canto/v2/x/csr/types";
 
@@ -15,6 +14,4 @@ message Params {
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];
-
-  uint64 address_derivation_cost_create = 3;
 }
