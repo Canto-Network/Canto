@@ -113,7 +113,7 @@ func (m *QueryParamsResponse) GetParams() Params {
 	return Params{}
 }
 
-// QueryCSRsRequest is the request type for all the Query/CSRs RPC method.
+// QueryCSRsRequest is the request type for the Query/CSRs RPC method.
 type QueryCSRsRequest struct {
 	// pagination defines an optional pagination for the request.
 	Pagination *query.PageRequest `protobuf:"bytes,1,opt,name=pagination,proto3" json:"pagination,omitempty"`
@@ -159,7 +159,7 @@ func (m *QueryCSRsRequest) GetPagination() *query.PageRequest {
 	return nil
 }
 
-// QueryCSRsResponse is the response type for all the Query/CSRs RPC method.
+// QueryCSRsResponse is the response type for the Query/CSRs RPC method.
 type QueryCSRsResponse struct {
 	Csrs []CSR `protobuf:"bytes,1,rep,name=csrs,proto3" json:"csrs"`
 	// pagination for response
@@ -213,7 +213,7 @@ func (m *QueryCSRsResponse) GetPagination() *query.PageResponse {
 	return nil
 }
 
-// QueryCSRByNFTRequest is the request type for all the Query/CSRByNFT RPC method.
+// QueryCSRByNFTRequest is the request type for the Query/CSRByNFT RPC method.
 type QueryCSRByNFTRequest struct {
 	NftId uint64 `protobuf:"varint,1,opt,name=nftId,proto3" json:"nftId,omitempty"`
 }
@@ -258,7 +258,7 @@ func (m *QueryCSRByNFTRequest) GetNftId() uint64 {
 	return 0
 }
 
-// QueryCSRByNFTResponse is the response type for all the Query/CSRByNFT RPC method.
+// QueryCSRByNFTResponse is the response type for the Query/CSRByNFT RPC method.
 type QueryCSRByNFTResponse struct {
 	// csr object queried by nft id
 	Csr CSR `protobuf:"bytes,1,opt,name=csr,proto3" json:"csr"`
@@ -304,7 +304,7 @@ func (m *QueryCSRByNFTResponse) GetCsr() CSR {
 	return CSR{}
 }
 
-// QueryCSRByContractRequest is the request type for all the Query/CSRByContract RPC method.
+// QueryCSRByContractRequest is the request type for the Query/CSRByContract RPC method.
 type QueryCSRByContractRequest struct {
 	Address string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
 }
@@ -349,7 +349,7 @@ func (m *QueryCSRByContractRequest) GetAddress() string {
 	return ""
 }
 
-// QueryCSRByContractResponse is the response type for all the Query/CSRByContract RPC method.
+// QueryCSRByContractResponse is the response type for the Query/CSRByContract RPC method.
 type QueryCSRByContractResponse struct {
 	// csr object queried by smart contract address
 	Csr CSR `protobuf:"bytes,1,opt,name=csr,proto3" json:"csr"`

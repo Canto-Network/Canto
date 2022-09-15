@@ -1,8 +1,6 @@
 syntax = "proto3";
 package canto.csr.v1;
 
-import "gogoproto/gogo.proto";
-
 option go_package = "github.com/Canto-Network/Canto/v2/x/csr/types";
 
 // The CSR struct is a wrapper to all of the metadata associated with a given CST NFT
