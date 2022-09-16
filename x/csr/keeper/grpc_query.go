@@ -64,12 +64,12 @@ func (k Keeper) CSRByNFT(c context.Context, request *types.QueryCSRByNFTRequest)
 
 	csr, found := k.GetCSR(ctx, request.NftId)
 	if !found {
-		return nil, status.Errorf(codes.NotFound, "no csr is associated with NFT %d", request.NftId)
+		return nil, status.Errorf(codes.NotFound, "no csr is associated with NFT ID %d", request.NftId)
 	}
 	return &types.QueryCSRByNFTResponse{Csr: *csr}, nil
 }
 
-// CSRByContract returns the CSR associated with a given smart contracted addres passed into the request. This will return nil if the smart contract
+// CSRByContract returns the CSR associated with a given smart contracted address passed into the request. This will return nil if the smart contract
 // address does not match up to any CSR
 func (k Keeper) CSRByContract(c context.Context, request *types.QueryCSRByContractRequest) (*types.QueryCSRByContractResponse, error) {
 	if request == nil {

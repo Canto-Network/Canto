@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"errors"
 	"math/big"
 	"testing"
 	"time"
@@ -9,19 +10,23 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/Canto-Network/Canto/v2/app"
+	"github.com/Canto-Network/Canto/v2/contracts"
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/evmos/ethermint/crypto/ethsecp256k1"
+	evmtypes "github.com/evmos/ethermint/x/evm/types"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/crypto/ed25519"
 	"github.com/tendermint/tendermint/crypto/tmhash"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	tmversion "github.com/tendermint/tendermint/proto/tendermint/version"
@@ -158,4 +163,45 @@ func (suite *KeeperTestSuite) CommitAfter(t time.Duration) {
 	queryHelper := baseapp.NewQueryServerTestHelper(suite.ctx, suite.app.InterfaceRegistry())
 	types.RegisterQueryServer(queryHelper, suite.app.CSRKeeper)
 	suite.queryClient = types.NewQueryClient(queryHelper)
+}
+
+// CreateNewAccount creates a new account and sets it in the account keeper.
+func (suite *KeeperTestSuite) CreateNewAccount(ctx sdk.Context) sdk.AccAddress {
+	pubKey := ed25519.GenPrivKey().PubKey()
+	address := sdk.AccAddress(pubKey.Address())
+	beneficiary := suite.app.AccountKeeper.NewAccountWithAddress(ctx, address)
+	suite.app.AccountKeeper.SetAccount(ctx, beneficiary)
+	return address
+}
+
+// GenerateUpdateEventData is a helper function that will generate the update event data given a smart contract address and nft id.
+func GenerateUpdateEventData(contract common.Address, nftID uint64) (data []byte, err error) {
+	bigInt := &big.Int{}
+	bigInt.SetUint64(nftID)
+	return GenerateEventData("Assign", contracts.TurnstileContract, contract, bigInt)
+}
+
+// GenerateRegisterEventData is a helper function that will generate the register event data given a smart contract address, receiver address and nft id.
+func GenerateRegisterEventData(contract, receiver common.Address, nftID uint64) (data []byte, err error) {
+	bigInt := &big.Int{}
+	bigInt.SetUint64(nftID)
+	return GenerateEventData("Register", contracts.TurnstileContract, contract, receiver, bigInt)
+}
+
+// GenerateEventData creates data field for an arbitrary transaction given a set of arguments an a method name. Returns the byte data
+// associated with the the inputed event data.
+func GenerateEventData(name string, contract evmtypes.CompiledContract, args ...interface{}) ([]byte, error) {
+	//  retrieve arguments from contract
+	var event abi.Event
+	event, ok := contract.ABI.Events[name]
+	if !ok {
+		return nil, errors.New("cannot find event")
+	}
+	// ok now pack arguments
+	data, err := event.Inputs.Pack(args...)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }

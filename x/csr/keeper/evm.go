@@ -17,23 +17,22 @@ import (
 // Default gas limit for eth txs on the turnstile
 var DefaultGasLimit uint64 = 25000000
 
-// deploy Turnstile, this method is called in begin block, it takes as argument the, the deployment takes no arguments
+// DeployTurnstile will deploy the Turnstile smart contract from the csr module account. This will allow the
+// CSR module to interact with the CSR NFTs in a permissionless way.
 func (k Keeper) DeployTurnstile(
 	ctx sdk.Context,
 ) (common.Address, error) {
-	// divert deployment call to DeployContract, no constructor arguments are needed for Turnstile
 	addr, err := k.DeployContract(ctx, contracts.TurnstileContract)
 	if err != nil {
 		return common.Address{}, sdkerrors.Wrapf(ErrContractDeployments,
 			"CSR::Keeper: DeployTurnstile: error deploying Turnstile: %s", err.Error())
 	}
-	// return deployed address of contract
 	return addr, nil
 }
 
-// function to deploy an arbitrary smart-contract, takes as argument, the compiled
-// contract object, as well as an arbitrary length array of arguments to the deployments
-// deploys the contract from the module account
+// DeployContract will deploy an arbitrary smart-contract. It takes the compiled contract object as
+// well as an arbitrary number of arguments which will be supplied to the contructor. All contracts deployed
+// are deployed by the module account.
 func (k Keeper) DeployContract(
 	ctx sdk.Context,
 	contract evmtypes.CompiledContract,
@@ -46,12 +45,16 @@ func (k Keeper) DeployContract(
 		return common.Address{}, sdkerrors.Wrapf(ErrContractDeployments,
 			"CSR::Keeper::DeployContract: error packing data: %s", err.Error())
 	}
+
 	// pack method data into byte string, enough for bin and constructor arguments
 	data := make([]byte, len(contract.Bin)+len(ctorArgs))
+
 	// copy bin into data, and append to data the constructor arguments
 	copy(data[:len(contract.Bin)], contract.Bin)
+
 	// copy constructor args last
 	copy(data[len(contract.Bin):], ctorArgs)
+
 	// retrieve sequence number first to derive address if not by CREATE2
 	nonce, err := k.accountKeeper.GetSequence(ctx, types.ModuleAddress.Bytes())
 	if err != nil {
@@ -60,8 +63,6 @@ func (k Keeper) DeployContract(
 				"CSR:Keeper::DeployContract: error retrieving nonce: %s", err.Error())
 	}
 
-	// deploy contract using erc20 callEVMWithData, applies contract deployments to
-	// current stateDb
 	amount := big.NewInt(0)
 	_, err = k.CallEVM(ctx, types.ModuleAddress, nil, amount, data, true)
 	if err != nil {
@@ -70,12 +71,14 @@ func (k Keeper) DeployContract(
 				"CSR:Keeper::DeployContract: error deploying contract: %s", err.Error())
 	}
 
-	// determine how to derive contract address, is to be derived from nonce
+	// Derive the newly created module smart contract using the module address and nonce
 	return crypto.CreateAddress(types.ModuleAddress, nonce), nil
 }
 
-// function to interact with a contract once it is deployed, requires function signature,
-// as well as arguments, pass pointer of argument type to CallMethod, and returned value from call is returned
+// CallMethod is a function to interact with a contract once it is deployed. It inputs the method name on the
+// smart contract, the compiled smart contract, the address from which the tx will be made, the contract address,
+// the amount to be supplied in msg.value, and finally an arbitrary number of arguments that should be supplied to the
+// function method.
 func (k Keeper) CallMethod(
 	ctx sdk.Context,
 	method string,
@@ -86,12 +89,11 @@ func (k Keeper) CallMethod(
 	args ...interface{},
 ) (*evmtypes.MsgEthereumTxResponse, error) {
 	// pack method args
-
 	data, err := contract.ABI.Pack(method, args...)
-
 	if err != nil {
 		return nil, sdkerrors.Wrapf(ErrContractDeployments, "CSR:Keeper::DeployContract: method call incorrect: %s", err.Error())
 	}
+
 	// call method
 	resp, err := k.CallEVM(ctx, from, contractAddr, amount, data, true)
 	if err != nil {
@@ -101,11 +103,12 @@ func (k Keeper) CallMethod(
 	return resp, nil
 }
 
-// CallEVM performs a smart contract method call using contract data and amount
+// CallEVM performs a EVM transaction given the from address, the to address, amount to be sent, data and
+// whether to commit the tx in the EVM keeper.
 func (k Keeper) CallEVM(
 	ctx sdk.Context,
 	from common.Address,
-	contract *common.Address,
+	to *common.Address,
 	amount *big.Int,
 	data []byte,
 	commit bool,
@@ -115,11 +118,13 @@ func (k Keeper) CallEVM(
 		return nil, err
 	}
 
+	// Default the gas limit to const
 	gasLimit := DefaultGasLimit
 
+	// Create the EVM msg
 	msg := ethtypes.NewMessage(
 		from,
-		contract,
+		to,
 		nonce,
 		amount,        // amount
 		gasLimit,      // gasLimit
@@ -131,6 +136,7 @@ func (k Keeper) CallEVM(
 		!commit,               // isFake
 	)
 
+	// Apply the msg to the EVM keeper
 	res, err := k.evmKeeper.ApplyMessage(ctx, msg, evmtypes.NewNoOpTracer(), commit)
 	if err != nil {
 		return nil, err

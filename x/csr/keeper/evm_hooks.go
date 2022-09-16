@@ -29,9 +29,14 @@ func (k Keeper) Hooks() Hooks {
 	return Hooks{k}
 }
 
-// PostTxProcessing implements EvmHooks.PostTxProcessing. After each successful
-// interaction with a registered contract, the contract deployer receives
-// a share from the transaction fees paid by the user.
+// PostTxProcessing implements EvmHooks.PostTxProcessing. The EVM hook allows users to utilize the Turnstile
+// Smart Contract to register and assign smart contracts that are deployed to a Contract Secured Revenue NFT and
+// distribute transaction fees for contracts that are already registered to some NFT. After each successful EVM
+// transaction, the PostTxProcessing hook will process all of the events from the log receipt of the EVM tx.
+// If any of the events originate from the Turnstile address, there will be an event handler that processes the two
+// Turnstile events – register and assign – accordingly. At the very end of the hook, the To address from the EVM
+// tx to will be read in. From there, the hook will check if that contract address belongs to any NFT currently in
+// the store. If so, the fees will be split and distributed to the Turnstile Address.
 func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *ethtypes.Receipt) error {
 	// Check if the csr module has been enabled
 	params := h.k.GetParams(ctx)
@@ -53,16 +58,12 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 	}
 
 	// Grab the nft the smart contract corresponds to, if it has no nft -> return
-	id, foundNFT := h.k.GetNFTByContract(ctx, contract.String())
+	nftID, foundNFT := h.k.GetNFTByContract(ctx, contract.String())
 	if !foundNFT {
 		return nil
 	}
 
-	// Grab the account which will be receiving the tx fees
-	csr, _ := h.k.GetCSR(ctx, id)
-	nftID := csr.Id
-
-	// Calculate fees to be distributed
+	// Calculate fees to be distributed = intFloor(GasUsed * GasPrice * csrShares)
 	fee := sdk.NewIntFromUint64(receipt.GasUsed).Mul(sdk.NewIntFromBigInt(msg.GasPrice()))
 	csrFee := sdk.NewDecFromInt(fee).Mul(params.CsrShares).TruncateInt()
 	evmDenom := h.k.evmKeeper.GetParams(ctx).EvmDenom
@@ -80,7 +81,7 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 		return sdkerrors.Wrapf(ErrContractDeployments, "Keeper::ProcessEvents the turnstile contract has not been found.")
 	}
 
-	// Distribute fees to turnstile contract
+	// Distribute fees to turnstile contract by NFT ID distributeFees(amount, nftID)
 	amount := csrFee.BigInt()
 	_, err = h.k.CallMethod(ctx, "distributeFees", contracts.TurnstileContract, types.ModuleAddress, &turnstileAddress, amount, new(big.Int).SetUint64(nftID))
 	if err != nil {
@@ -90,7 +91,7 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 	return nil
 }
 
-// returns an error if there was an issue processing any of the events (register, attach) from the turnstile address
+// returns an error if there was an issue processing any of the events (register, assign) from the turnstile address
 func (h Hooks) processEvents(ctx sdk.Context, receipt *ethtypes.Receipt) error {
 	// Get the turnstile which is used to check events
 	turnstileAddress, found := h.k.GetTurnstile(ctx)
@@ -103,7 +104,7 @@ func (h Hooks) processEvents(ctx sdk.Context, receipt *ethtypes.Receipt) error {
 			continue
 		}
 
-		// Check if the address matches the NFT or turnstile contracts
+		// Check if the address matches the turnstile contracts
 		eventID := log.Topics[0]
 		if log.Address == turnstileAddress {
 			event, err := TurnstileContract.EventByID(eventID)

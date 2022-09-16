@@ -13,7 +13,9 @@ func NewCSR(contracts []string, id uint64) CSR {
 	}
 }
 
-// Validate performs stateless validation of a CSR object
+// Validate performs stateless validation of a CSR object. This will check if
+// there are duplicate smart contracts entered in the CSR, whether each smart contract
+// is a valid eth address and check if the number of contracts is greater than 1.
 func (csr CSR) Validate() error {
 	seenSmartContracts := make(map[string]bool)
 	for _, smartContract := range csr.Contracts {
@@ -24,6 +26,7 @@ func (csr CSR) Validate() error {
 		if seenSmartContracts[smartContract] {
 			return sdkerrors.Wrapf(ErrDuplicateSmartContracts, "CSR::Validate there are duplicate smart contracts in this CSR.")
 		}
+		seenSmartContracts[smartContract] = true
 	}
 
 	// Ensure that there is at least one smart contract in the CSR Pool

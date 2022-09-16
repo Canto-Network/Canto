@@ -136,8 +136,6 @@ import (
 	govshuttlekeeper "github.com/Canto-Network/Canto/v2/x/govshuttle/keeper"
 	govshuttletypes "github.com/Canto-Network/Canto/v2/x/govshuttle/types"
 
-	// csr imports
-
 	"github.com/Canto-Network/Canto/v2/x/csr"
 	csrkeeper "github.com/Canto-Network/Canto/v2/x/csr/keeper"
 	csrtypes "github.com/Canto-Network/Canto/v2/x/csr/types"
@@ -200,7 +198,7 @@ var (
 		inflation.AppModuleBasic{},
 		erc20.AppModuleBasic{},
 		govshuttle.AppModuleBasic{},
-		csr.AppModuleBasic{}, // csr Module to Module Basics map
+		csr.AppModuleBasic{},
 		epochs.AppModuleBasic{},
 		recovery.AppModuleBasic{},
 		fees.AppModuleBasic{},
@@ -342,7 +340,6 @@ func NewCanto(
 		inflationtypes.StoreKey, erc20types.StoreKey,
 		epochstypes.StoreKey, vestingtypes.StoreKey, recoverytypes.StoreKey, //recoverytypes.StoreKe
 		feestypes.StoreKey,
-		// register CSR store key
 		csrtypes.StoreKey,
 	)
 
@@ -1048,7 +1045,6 @@ func initParamsKeeper(
 	paramsKeeper.Subspace(recoverytypes.ModuleName)
 	paramsKeeper.Subspace(feestypes.ModuleName)
 	paramsKeeper.Subspace(govshuttletypes.ModuleName)
-	// initialize params Subspace for CSR
 	paramsKeeper.Subspace(csrtypes.ModuleName)
 	return paramsKeeper
 }

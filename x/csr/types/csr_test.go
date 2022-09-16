@@ -27,6 +27,7 @@ func (suite *CSRTestSuite) SetupTest() {
 	suite.account = sdk.AccAddress(tests.GenerateAddress().Bytes()).String()
 }
 
+// TestCSR will do basic stateless validation testing on the CSR objects.
 func (suite *CSRTestSuite) TestCSR() {
 	testCases := []struct {
 		msg        string
@@ -57,11 +58,18 @@ func (suite *CSRTestSuite) TestCSR() {
 			},
 			false,
 		},
+		{
+			"Create CSR object with duplicate smart contract addresses - fail",
+			CSR{
+				Contracts: append(suite.contracts, suite.contracts...),
+				Id:        suite.id,
+			},
+			false,
+		},
 	}
 	for _, tc := range testCases {
 		suite.Run(tc.msg, func() {
 			err := tc.csr.Validate()
-
 			if tc.expectPass {
 				suite.Require().NoError(err, tc.msg)
 			} else {

@@ -11,10 +11,6 @@ var (
 	AminoCdc  = codec.NewAminoCodec(amino)
 )
 
-const (
-// amino names
-)
-
 // method required for x/csr msg GetSignBytes methods
 func init() {
 	RegisterLegacyAminoCodec(amino)

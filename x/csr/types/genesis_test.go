@@ -5,14 +5,11 @@ import (
 
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
 	"github.com/stretchr/testify/suite"
-
-	"github.com/evmos/ethermint/tests"
 )
 
 type GensisStateSuite struct {
 	suite.Suite
 	params types.Params
-	csrs   []*types.CSR
 }
 
 func TestGenesisStateSuite(t *testing.T) {
@@ -21,15 +18,6 @@ func TestGenesisStateSuite(t *testing.T) {
 
 func (suite *GensisStateSuite) SetupTest() {
 	suite.params = types.DefaultParams()
-
-	contracts := []string{tests.GenerateAddress().String(), tests.GenerateAddress().String(),
-		tests.GenerateAddress().String(), tests.GenerateAddress().String()}
-	id := 0
-	csr := types.NewCSR(
-		contracts,
-		uint64(id),
-	)
-	suite.csrs = []*types.CSR{&csr}
 }
 
 // Test all of the genesis states, when empty and when not

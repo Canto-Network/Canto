@@ -14,12 +14,22 @@ import (
 	"github.com/Canto-Network/Canto/v2/x/erc20/types"
 )
 
+// This test suite will run a simulation of sorts where transactions will have
+// 1. invalid register events
+// 2. valid register events
+// 3. invalid update events
+// 4. valid update events
+// 5. csr enabled smart contracts making transactions
+// 6. non-csr enabled smart contracts making transactions
+// And every permutation of the above mixed together (csr-disabled/enabled smart contracts with valid/invalid update/register).
+// This also tests the factory pattern for smart contracts and will validate that each of the fees are distributed correctly
+// amongst the NFTs they belong to.
 func (suite *KeeperTestSuite) TestCSRHook() {
 	// Set up the test suite
 	suite.SetupTest()
 	suite.Commit()
 
-	// Deploy test contracts (which are turnstiles)
+	// Deploy test contracts (which are turnstiles for simplicity)
 	testContract, _ := suite.app.CSRKeeper.DeployTurnstile(suite.ctx)
 	testContract2, _ := suite.app.CSRKeeper.DeployTurnstile(suite.ctx)
 	testContract3, _ := suite.app.CSRKeeper.DeployTurnstile(suite.ctx)
@@ -39,21 +49,22 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 		suite.app.CSRKeeper.SetCSR(suite.ctx, csr)
 	}
 
+	// Set the price of gas
 	price := int64(100)
-	gasPrice := big.NewInt(price) // gasPrice
+	gasPrice := big.NewInt(price)
 
+	// dynamically set the receipt and msg
 	var (
+		to      *common.Address
 		receipt *ethtypes.Receipt
-		msg     ethtypes.Message
 	)
 
 	turnstileAddress, found := suite.app.CSRKeeper.GetTurnstile(suite.ctx)
 	suite.Require().True(found)
 
 	turnstile := contracts.TurnstileContract.ABI
-
 	RegisterCSREvent := turnstile.Events["Register"]
-	UpdateCSREvent := turnstile.Events["Attach"]
+	UpdateCSREvent := turnstile.Events["Assign"]
 
 	// Used to check the expected balance of each NFT
 	type nftCheck struct {
@@ -64,7 +75,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 	type result struct {
 		shouldReceiveFunds bool
 		expectErr          bool
-		cumulativeGasUsed  uint64 // cumulative tracking for a particular nft
+		cumulativeGasUsed  uint64 // cumulative revenue tracking for the turnstile address (expected revenue across all NFTs)
 		nft                nftCheck
 	}
 
@@ -77,19 +88,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			"Unregistered CSR contract (single empty log)", //  -> this should effectively do nothing
 			func() {
 				newAddress := tests.GenerateAddress()
-				msg = ethtypes.NewMessage(
-					types.ModuleAddress,
-					&newAddress,
-					0,
-					big.NewInt(0), // amount
-					uint64(0),     // gasLimit
-					gasPrice,      // gasPrice
-					big.NewInt(0), // gasFeeCap
-					big.NewInt(0), // gasTipCap
-					[]byte{},
-					ethtypes.AccessList{}, // AccessList
-					true,                  // checkNonce
-				)
+				to = &newAddress
 
 				log := ethtypes.Log{}
 				receipt = &ethtypes.Receipt{
@@ -107,19 +106,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			"Unregistered CSR contract (empty logs)", // -> this should effectively do nothing
 			func() {
 				newAddress := tests.GenerateAddress()
-				msg = ethtypes.NewMessage(
-					types.ModuleAddress,
-					&newAddress,
-					0,
-					big.NewInt(0), // amount
-					uint64(0),     // gasLimit
-					gasPrice,      // gasPrice
-					big.NewInt(0), // gasFeeCap
-					big.NewInt(0), // gasTipCap
-					[]byte{},
-					ethtypes.AccessList{}, // AccessList
-					true,                  // checkNonce
-				)
+				to = &newAddress
 
 				receipt = &ethtypes.Receipt{
 					Logs: []*ethtypes.Log{},
@@ -135,21 +122,8 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 		{
 			"Registered CSR contract (empty log)", // -> this should split the gas fee to the turnstile address
 			func() {
-				contract := csrs[0].Contracts[0]
-				address := common.HexToAddress(contract)
-				msg = ethtypes.NewMessage(
-					types.ModuleAddress,
-					&address,
-					0,
-					big.NewInt(0), // amount
-					uint64(0),     // gasLimit
-					gasPrice,      // gasPrice
-					big.NewInt(0), // gasFeeCap
-					big.NewInt(0), // gasTipCap
-					[]byte{},
-					ethtypes.AccessList{}, // AccessList
-					true,                  // checkNonce
-				)
+				contract := common.HexToAddress(csrs[0].Contracts[0])
+				to = &contract
 
 				receipt = &ethtypes.Receipt{
 					Logs:    []*ethtypes.Log{},
@@ -166,21 +140,8 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 		{
 			"Registered CSR contract (single empty log)", // -> this should split the gas fee to the turnstile address
 			func() {
-				contract := csrs[0].Contracts[0]
-				address := common.HexToAddress(contract)
-				msg = ethtypes.NewMessage(
-					types.ModuleAddress,
-					&address,
-					0,
-					big.NewInt(0), // amount
-					uint64(0),     // gasLimit
-					gasPrice,      // gasPrice
-					big.NewInt(0), // gasFeeCap
-					big.NewInt(0), // gasTipCap
-					[]byte{},
-					ethtypes.AccessList{}, // AccessList
-					true,                  // checkNonce
-				)
+				contract := common.HexToAddress(csrs[0].Contracts[0])
+				to = &contract
 
 				log := ethtypes.Log{}
 				receipt = &ethtypes.Receipt{
@@ -198,24 +159,11 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 		{
 			"Unregistered CSR contract with register event with invalid smart contract", // -> this should through an error bc contract is not deployed
 			func() {
-				account := tests.GenerateAddress()
 				address := tests.GenerateAddress()
-				msg = ethtypes.NewMessage(
-					types.ModuleAddress,
-					&address,
-					0,
-					big.NewInt(0), // amount
-					uint64(0),     // gasLimit
-					gasPrice,      // gasPrice
-					big.NewInt(0), // gasFeeCap
-					big.NewInt(0), // gasTipCap
-					[]byte{},
-					ethtypes.AccessList{}, // AccessList
-					true,                  // checkNonce
-				)
+				to = &address
 
+				account := tests.GenerateAddress()
 				topics := []common.Hash{RegisterCSREvent.ID}
-
 				data, _ := RegisterCSREvent.Inputs.Pack(address, account, big.NewInt(1))
 				log := ethtypes.Log{
 					Address: turnstileAddress,
@@ -237,23 +185,11 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 		{
 			"Unregistered CSR contract with register event that has an invalid receiver address", // -> this should throw an error because the account sent to is not registered in evm db
 			func() {
-				account := tests.GenerateAddress()
 
 				address := tests.GenerateAddress()
-				msg = ethtypes.NewMessage(
-					types.ModuleAddress,
-					&address,
-					0,
-					big.NewInt(0), // amount
-					uint64(0),     // gasLimit
-					gasPrice,      // gasPrice
-					big.NewInt(0), // gasFeeCap
-					big.NewInt(0), // gasTipCap
-					[]byte{},
-					ethtypes.AccessList{}, // AccessList
-					true,                  // checkNonce
-				)
+				to = &address
 
+				account := tests.GenerateAddress()
 				topics := []common.Hash{RegisterCSREvent.ID}
 				data, _ := RegisterCSREvent.Inputs.Pack(testContract, account, big.NewInt(1))
 				log := ethtypes.Log{
@@ -276,24 +212,11 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 		{
 			"Unregistered CSR contract with valid register event", // -> this should not split fees but will create a new CSR
 			func() {
-				sdkAccount := suite.app.CSRKeeper.CreateNewAccount(suite.ctx)
-				account := common.BytesToAddress(sdkAccount.Bytes())
-
 				address := tests.GenerateAddress()
-				msg = ethtypes.NewMessage(
-					types.ModuleAddress,
-					&address,
-					0,
-					big.NewInt(0), // amount
-					uint64(0),     // gasLimit
-					gasPrice,      // gasPrice
-					big.NewInt(0), // gasFeeCap
-					big.NewInt(0), // gasTipCap
-					[]byte{},
-					ethtypes.AccessList{}, // AccessList
-					true,                  // checkNonce
-				)
+				to = &address
 
+				sdkAccount := suite.CreateNewAccount(suite.ctx)
+				account := common.BytesToAddress(sdkAccount.Bytes())
 				topics := []common.Hash{RegisterCSREvent.ID}
 				data, _ := RegisterCSREvent.Inputs.Pack(testContract, account, big.NewInt(1))
 				log := ethtypes.Log{
@@ -316,19 +239,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 		{
 			"Registered smart contract (testContract)", // -> this should split the gas fee to the turnstile address
 			func() {
-				msg = ethtypes.NewMessage(
-					types.ModuleAddress,
-					&testContract,
-					0,
-					big.NewInt(0), // amount
-					uint64(0),     // gasLimit
-					gasPrice,      // gasPrice
-					big.NewInt(0), // gasFeeCap
-					big.NewInt(0), // gasTipCap
-					[]byte{},
-					ethtypes.AccessList{}, // AccessList
-					true,                  // checkNonce
-				)
+				to = &testContract
 
 				receipt = &ethtypes.Receipt{
 					Logs:    []*ethtypes.Log{},
@@ -345,24 +256,11 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 		{
 			"Unregistered smart contract with register event that has a duplicated address", // -> this should return an error because the contract is already registered
 			func() {
-				sdkAccount := suite.app.CSRKeeper.CreateNewAccount(suite.ctx)
-				account := common.BytesToAddress(sdkAccount.Bytes())
-
 				address := tests.GenerateAddress()
-				msg = ethtypes.NewMessage(
-					types.ModuleAddress,
-					&address,
-					0,
-					big.NewInt(0), // amount
-					uint64(0),     // gasLimit
-					gasPrice,      // gasPrice
-					big.NewInt(0), // gasFeeCap
-					big.NewInt(0), // gasTipCap
-					[]byte{},
-					ethtypes.AccessList{}, // AccessList
-					true,                  // checkNonce
-				)
+				to = &address
 
+				sdkAccount := suite.CreateNewAccount(suite.ctx)
+				account := common.BytesToAddress(sdkAccount.Bytes())
 				topics := []common.Hash{RegisterCSREvent.ID}
 				data, _ := RegisterCSREvent.Inputs.Pack(testContract, account, big.NewInt(1))
 				log := ethtypes.Log{
@@ -385,23 +283,10 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 		{
 			"Registered smart contract (testContract) test CSR contract with a valid register event nested (testContract2)", // -> might be similar to a factory deployment, should split fees and then register
 			func() {
-				sdkAccount := suite.app.CSRKeeper.CreateNewAccount(suite.ctx)
+				to = &testContract
+
+				sdkAccount := suite.CreateNewAccount(suite.ctx)
 				account := common.BytesToAddress(sdkAccount.Bytes())
-
-				msg = ethtypes.NewMessage(
-					types.ModuleAddress,
-					&testContract,
-					0,
-					big.NewInt(0), // amount
-					uint64(0),     // gasLimit
-					gasPrice,      // gasPrice
-					big.NewInt(0), // gasFeeCap
-					big.NewInt(0), // gasTipCap
-					[]byte{},
-					ethtypes.AccessList{}, // AccessList
-					true,                  // checkNonce
-				)
-
 				topics := []common.Hash{RegisterCSREvent.ID}
 				data, _ := RegisterCSREvent.Inputs.Pack(testContract2, account, big.NewInt(2))
 				log := ethtypes.Log{
@@ -424,19 +309,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 		{
 			"Check if smart contract (testContract2) was registered via factory method from above", // -> should split fees to turnstile address
 			func() {
-				msg = ethtypes.NewMessage(
-					types.ModuleAddress,
-					&testContract2,
-					0,
-					big.NewInt(0), // amount
-					uint64(0),     // gasLimit
-					gasPrice,      // gasPrice
-					big.NewInt(0), // gasFeeCap
-					big.NewInt(0), // gasTipCap
-					[]byte{},
-					ethtypes.AccessList{}, // AccessList
-					true,                  // checkNonce
-				)
+				to = &testContract2
 
 				receipt = &ethtypes.Receipt{
 					Logs:    []*ethtypes.Log{},
@@ -453,22 +326,9 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 		{
 			"Registered Smart contract with an invalid update event (invalid contract)", // -> should return an error because smart contract was not deployed
 			func() {
+				to = &testContract2
+
 				address := tests.GenerateAddress()
-
-				msg = ethtypes.NewMessage(
-					types.ModuleAddress,
-					&testContract2,
-					0,
-					big.NewInt(0), // amount
-					uint64(0),     // gasLimit
-					gasPrice,      // gasPrice
-					big.NewInt(0), // gasFeeCap
-					big.NewInt(0), // gasTipCap
-					[]byte{},
-					ethtypes.AccessList{}, // AccessList
-					true,                  // checkNonce
-				)
-
 				topics := []common.Hash{UpdateCSREvent.ID}
 				data, _ := UpdateCSREvent.Inputs.Pack(address, big.NewInt(1))
 				log := ethtypes.Log{
@@ -491,19 +351,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 		{
 			"Registered Smart contract with an invalid update event (invalid nft)", // -> should return an error because the NFT does not exist
 			func() {
-				msg = ethtypes.NewMessage(
-					types.ModuleAddress,
-					&testContract2,
-					0,
-					big.NewInt(0), // amount
-					uint64(0),     // gasLimit
-					gasPrice,      // gasPrice
-					big.NewInt(0), // gasFeeCap
-					big.NewInt(0), // gasTipCap
-					[]byte{},
-					ethtypes.AccessList{}, // AccessList
-					true,                  // checkNonce
-				)
+				to = &testContract2
 
 				topics := []common.Hash{UpdateCSREvent.ID}
 				data, _ := UpdateCSREvent.Inputs.Pack(testContract3, big.NewInt(100))
@@ -527,19 +375,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 		{
 			"Registered Smart contract with an valid update event", //  -> should split fees and update the CSR NFT
 			func() {
-				msg = ethtypes.NewMessage(
-					types.ModuleAddress,
-					&testContract2,
-					0,
-					big.NewInt(0), // amount
-					uint64(0),     // gasLimit
-					gasPrice,      // gasPrice
-					big.NewInt(0), // gasFeeCap
-					big.NewInt(0), // gasTipCap
-					[]byte{},
-					ethtypes.AccessList{}, // AccessList
-					true,                  // checkNonce
-				)
+				to = &testContract2
 
 				topics := []common.Hash{UpdateCSREvent.ID}
 				data, _ := UpdateCSREvent.Inputs.Pack(testContract3, big.NewInt(1))
@@ -564,19 +400,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			"Unregistered Smart contract with an invalid update event (invalid contract)", // -> should return an error because smart contract has not been deployed
 			func() {
 				address := tests.GenerateAddress()
-				msg = ethtypes.NewMessage(
-					types.ModuleAddress,
-					&address,
-					0,
-					big.NewInt(0), // amount
-					uint64(0),     // gasLimit
-					gasPrice,      // gasPrice
-					big.NewInt(0), // gasFeeCap
-					big.NewInt(0), // gasTipCap
-					[]byte{},
-					ethtypes.AccessList{}, // AccessList
-					true,                  // checkNonce
-				)
+				to = &address
 
 				topics := []common.Hash{UpdateCSREvent.ID}
 				data, _ := UpdateCSREvent.Inputs.Pack(address, big.NewInt(1))
@@ -601,19 +425,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			"Unregistered Smart contract with an invalid update event (duplicate contract)", // -> should return an duplicate contract error
 			func() {
 				address := tests.GenerateAddress()
-				msg = ethtypes.NewMessage(
-					types.ModuleAddress,
-					&address,
-					0,
-					big.NewInt(0), // amount
-					uint64(0),     // gasLimit
-					gasPrice,      // gasPrice
-					big.NewInt(0), // gasFeeCap
-					big.NewInt(0), // gasTipCap
-					[]byte{},
-					ethtypes.AccessList{}, // AccessList
-					true,                  // checkNonce
-				)
+				to = &address
 
 				topics := []common.Hash{UpdateCSREvent.ID}
 				data, _ := UpdateCSREvent.Inputs.Pack(testContract3, big.NewInt(1))
@@ -638,19 +450,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			"Unregistered Smart contract with an valid update event", // -> should update the CSR NFT
 			func() {
 				address := tests.GenerateAddress()
-				msg = ethtypes.NewMessage(
-					types.ModuleAddress,
-					&address,
-					0,
-					big.NewInt(0), // amount
-					uint64(0),     // gasLimit
-					gasPrice,      // gasPrice
-					big.NewInt(0), // gasFeeCap
-					big.NewInt(0), // gasTipCap
-					[]byte{},
-					ethtypes.AccessList{}, // AccessList
-					true,                  // checkNonce
-				)
+				to = &address
 
 				topics := []common.Hash{UpdateCSREvent.ID}
 				data, _ := UpdateCSREvent.Inputs.Pack(testContract4, big.NewInt(1))
@@ -674,19 +474,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 		{
 			"Registered Smart Contract (testContract3)", // -> should split fees to the turnstile address
 			func() {
-				msg = ethtypes.NewMessage(
-					types.ModuleAddress,
-					&testContract3,
-					0,
-					big.NewInt(0), // amount
-					uint64(0),     // gasLimit
-					gasPrice,      // gasPrice
-					big.NewInt(0), // gasFeeCap
-					big.NewInt(0), // gasTipCap
-					[]byte{},
-					ethtypes.AccessList{}, // AccessList
-					true,                  // checkNonce
-				)
+				to = &testContract3
 
 				receipt = &ethtypes.Receipt{
 					Logs:    []*ethtypes.Log{},
@@ -703,19 +491,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 		{
 			"Registered Smart Contract (testContract4)", // -> should split fees to the turnstile address
 			func() {
-				msg = ethtypes.NewMessage(
-					types.ModuleAddress,
-					&testContract4,
-					0,
-					big.NewInt(0), // amount
-					uint64(0),     // gasLimit
-					gasPrice,      // gasPrice
-					big.NewInt(0), // gasFeeCap
-					big.NewInt(0), // gasTipCap
-					[]byte{},
-					ethtypes.AccessList{}, // AccessList
-					true,                  // checkNonce
-				)
+				to = &testContract4
 
 				receipt = &ethtypes.Receipt{
 					Logs:    []*ethtypes.Log{},
@@ -735,6 +511,20 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 		suite.Run(tc.name, func() {
 
 			tc.setUpMsg()
+
+			msg := ethtypes.NewMessage(
+				types.ModuleAddress,
+				to,
+				0,
+				big.NewInt(0), // amount
+				uint64(0),     // gasLimit
+				gasPrice,      // gasPrice
+				big.NewInt(0), // gasFeeCap
+				big.NewInt(0), // gasTipCap
+				[]byte{},
+				ethtypes.AccessList{}, // AccessList
+				true,                  // checkNonce
+			)
 
 			err := suite.app.CSRKeeper.Hooks().PostTxProcessing(suite.ctx, msg, receipt)
 			if !tc.test.expectErr {
@@ -770,7 +560,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 				expectedTurnstileBalance := calculateExpectedFee(tc.test.cumulativeGasUsed, gasPrice, csrShare)
 				suite.Require().Equal(expectedTurnstileBalance, turnstileBalance.AmountOf(evmDenom))
 
-				// Get the balance of the revenue accumulated at a given NFT
+				// Get the balance of the revenue accumulated at the given NFT
 				nftRevenue, err := getNFTRevenue(suite, &turnstileAddress, testNFT)
 				suite.Require().NoError(err)
 
