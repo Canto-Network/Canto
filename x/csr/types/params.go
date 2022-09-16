@@ -8,7 +8,7 @@ import (
 
 var (
 	DefaultEnableCSR = false
-	DefaultCSRShares = sdk.NewDecWithPrec(50, 2)
+	DefaultCSRShares = sdk.NewDecWithPrec(20, 2)
 
 	ParamStoreKeyEnableCSR = []byte("EnableCSR")
 	ParamStoreKeyCSRShares = []byte("CSRShares")
@@ -50,7 +50,7 @@ func ValidateEnableCSR(i interface{}) error {
 	return nil
 }
 
-// Validates the CSR param that is inputted
+// Validates the CSR share dec that is inputted
 func ValidateShares(i interface{}) error {
 	v, ok := i.(sdk.Dec)
 
@@ -77,8 +77,5 @@ func (p Params) Validate() error {
 	if err := ValidateEnableCSR(p.EnableCsr); err != nil {
 		return err
 	}
-	if err := ValidateShares(p.CsrShares); err != nil {
-		return err
-	}
-	return nil
+	return ValidateShares(p.CsrShares)
 }

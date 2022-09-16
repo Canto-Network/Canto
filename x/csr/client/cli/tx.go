@@ -9,11 +9,12 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 )
 
-// GetTxCmd returns the transaction commands for this module
+// GetTxCmd returns the transaction methods allowed for the CLI. However, currently all transaction or state transition
+// functionality is triggered through the Turnstile Smart Contract.
 func GetTxCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                        types.ModuleName,
-		Short:                      fmt.Sprintf("%s has no transaction commands (everything is done on the EVM)", types.ModuleName),
+		Short:                      fmt.Sprintf("%s has no transaction commands (everything transaction is triggered via the Turnstile Smart Contract)", types.ModuleName),
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,

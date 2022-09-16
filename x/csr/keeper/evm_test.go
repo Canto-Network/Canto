@@ -23,12 +23,11 @@ var (
 	contract evmtypes.CompiledContract
 )
 
-// first test contract deployments
-
+// Test contract deployments
 func (suite *KeeperTestSuite) TestContractDeployment() {
 	type testArgs struct {
 		methodName   string
-		setup        func() (error, common.Address)
+		setup        func() (common.Address, error)
 		expectReturn func(contract common.Address) bool
 	}
 
@@ -43,7 +42,7 @@ func (suite *KeeperTestSuite) TestContractDeployment() {
 			"module calls deploy1 on testDeploy contract",
 			testArgs{
 				"deploy1",
-				func() (error, common.Address) {
+				func() (common.Address, error) {
 					//  deploy test Contract
 					addr := suite.DeployContract()
 					acc := s.app.EvmKeeper.GetAccountWithoutBalance(suite.ctx, addr)
@@ -52,10 +51,10 @@ func (suite *KeeperTestSuite) TestContractDeployment() {
 					_, err := suite.app.CSRKeeper.CallMethod(suite.ctx, "deploy1", contract, types.ModuleAddress, &addr, amount)
 					// now return ret and expect it to be an address
 					if err != nil {
-						return err, common.Address{}
+						return common.Address{}, err
 					}
 
-					return nil, addr
+					return addr, nil
 				},
 				func(contract common.Address) bool {
 					// retrieve nonce of the contract
@@ -72,7 +71,7 @@ func (suite *KeeperTestSuite) TestContractDeployment() {
 			"module calls deploy2 with salt [32]byte{\"\"} on testDeploy contract",
 			testArgs{
 				"module calls deploy2 on testDeploy contract verify that contracts exist",
-				func() (error, common.Address) {
+				func() (common.Address, error) {
 					// deploy test Contract
 					addr := suite.DeployContract()
 					acc := suite.app.EvmKeeper.GetAccountWithoutBalance(suite.ctx, addr)
@@ -81,10 +80,10 @@ func (suite *KeeperTestSuite) TestContractDeployment() {
 					salt := [32]byte{0x01}
 					_, err := suite.app.CSRKeeper.CallMethod(suite.ctx, "deploy2", contract, types.ModuleAddress, &addr, amount, salt)
 					if err != nil {
-						return err, common.Address{}
+						return common.Address{}, err
 					}
 
-					return nil, addr
+					return addr, nil
 				},
 				func(contract common.Address) bool {
 					// generate createAddress2 with correct data
@@ -101,7 +100,7 @@ func (suite *KeeperTestSuite) TestContractDeployment() {
 	for _, tc := range testCases {
 		// setup test
 		suite.Run(tc.name, func() {
-			err, addr := tc.args.setup()
+			addr, err := tc.args.setup()
 			suite.Require().NoError(err)
 			if tc.expectPass {
 				suite.Require().True(tc.args.expectReturn(addr))
@@ -121,7 +120,7 @@ func (suite *KeeperTestSuite) TestDeployTurnstile() {
 	acc := suite.app.EvmKeeper.GetAccountWithoutBalance(suite.ctx, addr)
 	// code hash must not be nil
 	suite.Require().NotEqual(acc.CodeHash, crypto.Keccak256(nil))
-	// now index into state with code hash,
+	// now index into state with code hash
 	code := suite.app.EvmKeeper.GetCode(suite.ctx, common.BytesToHash(acc.CodeHash))
 	// offset to remove constructor from contract bytecode
 	offset := len(contracts.TurnstileContract.Bin) - len(code)
@@ -132,7 +131,6 @@ func init() {
 	// unmarshal json object into contract object
 	err := json.Unmarshal(testDeployJSON, &contract)
 	if err != nil {
-		// log error and quit
 		log.Fatalf("ERROR:: %s", err.Error())
 	}
 }
@@ -142,7 +140,6 @@ func (suite *KeeperTestSuite) DeployContract() common.Address {
 	// deploy compiled contract object and return address
 	addr, err := suite.app.CSRKeeper.DeployContract(suite.ctx, contract, bytecode)
 	if err != nil {
-		// log this failure
 		log.Fatalf("KeeperTestSuite::DeployContract:: Error: %s", err.Error())
 		return common.Address{}
 	}

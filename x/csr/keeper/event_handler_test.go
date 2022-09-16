@@ -1,18 +1,13 @@
 package keeper_test
 
 import (
-	"errors"
-	"math/big"
 	"strings"
 
-	"github.com/Canto-Network/Canto/v2/contracts"
 	_ "github.com/Canto-Network/Canto/v2/x/csr/keeper"
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
-	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/evmos/ethermint/tests"
 	"github.com/evmos/ethermint/x/evm/statedb"
-	evmtypes "github.com/evmos/ethermint/x/evm/types"
 )
 
 // if smart contract address is not a smart contract - fail
@@ -112,7 +107,7 @@ func (suite *KeeperTestSuite) TestRegisterEvent() {
 		suite.Run(tc.name, func() {
 			// setup test
 			tc.setup()
-			data, err := generateRegisterEventData(tc.args.SmartContractAddress, tc.args.Receiver, tc.args.ID)
+			data, err := GenerateRegisterEventData(tc.args.SmartContractAddress, tc.args.Receiver, tc.args.ID)
 			suite.Require().NoError(err)
 			// process register CSREvent
 			err = suite.app.CSRKeeper.RegisterEvent(suite.ctx, data)
@@ -204,7 +199,7 @@ func (suite *KeeperTestSuite) TestUpdateEvent() {
 		suite.Run(tc.name, func() {
 			// setup test
 			tc.setup()
-			data, err := generateUpdateEventData(tc.args.smartContractAddress, tc.args.nftId)
+			data, err := GenerateUpdateEventData(tc.args.smartContractAddress, tc.args.nftId)
 			suite.Require().NoError(err)
 			// process event
 			err = suite.app.CSRKeeper.UpdateEvent(suite.ctx, data)
@@ -220,35 +215,4 @@ func (suite *KeeperTestSuite) TestUpdateEvent() {
 		})
 	}
 
-}
-
-func generateUpdateEventData(contract common.Address, nftID uint64) (data []byte, err error) {
-	bigInt := &big.Int{}
-	bigInt.SetUint64(nftID)
-	return generateEventData("Attach", contracts.TurnstileContract, contract, bigInt)
-}
-
-func generateRegisterEventData(contract, receiver common.Address, nftID uint64) (data []byte, err error) {
-	bigInt := &big.Int{}
-	bigInt.SetUint64(nftID)
-	return generateEventData("Register", contracts.TurnstileContract, contract, receiver, bigInt)
-}
-
-// generate event creates data field for arbitrary transaction
-// given a set of arguments an a method name, return the abi-encoded bytes
-// of the packed event data, withdrawer, receiver, Id (not indexed)
-func generateEventData(name string, contract evmtypes.CompiledContract, args ...interface{}) ([]byte, error) {
-	//  retrieve arguments from contract
-	var event abi.Event
-	event, ok := contract.ABI.Events[name]
-	if !ok {
-		return nil, errors.New("cannot find event")
-	}
-	// ok now pack arguments
-	data, err := event.Inputs.Pack(args...)
-	if err != nil {
-		return nil, err
-	}
-
-	return data, nil
 }

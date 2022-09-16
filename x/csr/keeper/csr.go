@@ -9,8 +9,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 )
 
-// Returns the CSR object given an NFT, returns nil if the NFT id has no
-// corresponding CSR object
+// Returns a CSR object given an NFT ID. If the ID is invalid, i.e. it does not
+// exist, then GetCSR will return (nil, false). Otherwise (csr, true).
 func (k Keeper) GetCSR(ctx sdk.Context, nftId uint64) (*types.CSR, bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixCSR)
 	key := UInt64ToBytes(nftId)
@@ -25,7 +25,8 @@ func (k Keeper) GetCSR(ctx sdk.Context, nftId uint64) (*types.CSR, bool) {
 	return csr, true
 }
 
-// Returns the NFT id a given smart contract corresponds to if it exists in the store
+// Returns the NFT ID associated with a smart contract address. If the smart contract address
+// entered does belong to some NFT, then it will return (id, true), otherwise (0, false).
 func (k Keeper) GetNFTByContract(ctx sdk.Context, address string) (uint64, bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixContract)
 	bz := store.Get([]byte(address))
@@ -36,20 +37,21 @@ func (k Keeper) GetNFTByContract(ctx sdk.Context, address string) (uint64, bool)
 	return nftId, true
 }
 
-// Set CSR will place a new or update CSR type into the store with the
-// key being the NFT id and the value being the marshalled CSR object
-// We also map the smart contract to the correct NFT for easy reads/writes
+// Set CSR will place a new or updated CSR into the store with the
+// key being the NFT ID and the value being the marshalled CSR object (bytes).
+// Additionally, every single smart contract address entered will get mapped to its
+// NFT ID for easy reads and writes later.
 func (k Keeper) SetCSR(ctx sdk.Context, csr types.CSR) {
 	// Marshal the CSR object into a byte string
 	bz, _ := csr.Marshal()
-	// Convert the NFT id to bytes so we can store properly
+	// Convert the NFT ID to bytes
 	nftId := UInt64ToBytes(csr.Id)
 
 	// Sets the id of the NFT to the CSR object itself
 	storeCSR := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixCSR)
 	storeCSR.Set(nftId, bz)
 
-	// Add a new key, value pair in the store mapping the contract to NFT id
+	// Add a new key, value pair in the store mapping the contract to NFT ID
 	contracts := csr.Contracts
 	storeContracts := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixContract)
 	for _, contract := range contracts {
@@ -57,7 +59,7 @@ func (k Keeper) SetCSR(ctx sdk.Context, csr types.CSR) {
 	}
 }
 
-// retrieves the deployed Turnstile Address from state if found
+// Retrieves the deployed Turnstile Address from state if found.
 func (k Keeper) GetTurnstile(ctx sdk.Context) (common.Address, bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixAddrs)
 	// retrieve state object at TurnstileKey
@@ -65,11 +67,10 @@ func (k Keeper) GetTurnstile(ctx sdk.Context) (common.Address, bool) {
 	if len(bz) == 0 {
 		return common.Address{}, false
 	}
-	// if something was found, convert byte to address and return true
 	return common.BytesToAddress(bz), true
 }
 
-// sets the deployed Turnstile Address to state
+// Sets the deployed Turnstile Address to state.
 func (k Keeper) SetTurnstile(ctx sdk.Context, turnstile common.Address) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixAddrs)
 	store.Set(types.TurnstileKey, turnstile.Bytes())

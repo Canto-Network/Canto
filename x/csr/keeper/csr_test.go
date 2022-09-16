@@ -5,7 +5,8 @@ import (
 	"github.com/evmos/ethermint/tests"
 )
 
-// Sets a bunch of CSRs in the store and then
+// Sets a bunch of CSRs in the store and then get and ensure that each of them
+// match up with what is stored on stack vs keeper
 func (suite *KeeperTestSuite) TestCSRSetGet() {
 	numberCSRs := 10
 	csrs := GenerateCSRs(numberCSRs)
@@ -25,23 +26,25 @@ func (suite *KeeperTestSuite) TestCSRSetGet() {
 	}
 }
 
-// Creates a bunch of CSRs and checks if every single contract belongs to the correct pool
+// Creates a bunch of CSRs and checks if every single contract belongs the correct NFT
 func (suite *KeeperTestSuite) TestGetNFTByContract() {
 	csrs := GenerateCSRs(5)
 	for _, csr := range csrs {
 		suite.app.CSRKeeper.SetCSR(suite.ctx, csr)
 	}
 
+	// Iterate every smart contract in every csr and ensure it belongs to the correct NFT
 	for _, csr := range csrs {
 		contracts := csr.Contracts
 		for _, contract := range contracts {
 			result, found := suite.app.CSRKeeper.GetNFTByContract(suite.ctx, contract)
 
+			// Validation
 			suite.Require().True(found)
 			suite.Require().Equal(csr.Id, result)
 		}
 
-		// Check if a newly generated address belongs to any pool
+		// Check if a newly generated address belongs to any NFT
 		contract := tests.GenerateAddress().String()
 		_, found := suite.app.CSRKeeper.GetNFTByContract(suite.ctx, contract)
 
@@ -49,18 +52,21 @@ func (suite *KeeperTestSuite) TestGetNFTByContract() {
 	}
 }
 
+// Test the setter/getter for the Turnstile address
 func (suite *KeeperTestSuite) TestSetGetTurnstile() {
 	// Set Turnstile address and retrieve it
 	addr := tests.GenerateAddress()
 	suite.app.CSRKeeper.SetTurnstile(suite.ctx, addr)
 	suite.Commit()
+
 	// retrieve addr
 	expectAddr, found := suite.app.CSRKeeper.GetTurnstile(suite.ctx)
 	suite.Require().True(found)
 	suite.Require().Equal(addr, expectAddr)
 }
 
-// Generates an array of CSRs for testing purposes
+// Generates an array of CSRs with 4 randomly generated smart contracts per CSR for testing purposes.
+// Will create `number` of CSRs where each NFT ID starts from 0 and increments to number - 1.
 func GenerateCSRs(number int) []types.CSR {
 	csrs := make([]types.CSR, 0)
 

@@ -10,6 +10,6 @@ func (suite *KeeperTestSuite) TestParams() {
 	params := suite.app.CSRKeeper.GetDefaultParams()
 	// CSR is disabled by default
 	suite.Require().False(params.EnableCsr)
-	// Default CSRShares are 50%
-	suite.Require().Equal(params.CsrShares, sdk.NewDecWithPrec(50, 2))
+	// Default CSRShares are 20%
+	suite.Require().Equal(params.CsrShares, sdk.NewDecWithPrec(20, 2))
 }

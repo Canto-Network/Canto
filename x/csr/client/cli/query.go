@@ -14,7 +14,7 @@ import (
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
 )
 
-// GetQueryCmd returns the cli query commands for this module
+// GetQueryCmd returns the cli query commands for the CSR module
 func GetQueryCmd(queryRoute string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                        types.ModuleName,
@@ -48,6 +48,7 @@ func CmdQueryParams() *cobra.Command {
 
 			request := &types.QueryParamsRequest{}
 
+			// Query store
 			response, err := queryClient.Params(context.Background(), request)
 			if err != nil {
 				return err
@@ -62,7 +63,7 @@ func CmdQueryParams() *cobra.Command {
 	return cmd
 }
 
-// CmdQueryCSRs implements a command that will return the CSRs from the CSR module
+// CmdQueryCSRs implements a command that will return the CSRs from the CSR store
 func CmdQueryCSRs() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "csrs",
@@ -82,6 +83,7 @@ func CmdQueryCSRs() *cobra.Command {
 				Pagination: pageRequest,
 			}
 
+			// Query store
 			response, err := queryClient.CSRs(context.Background(), request)
 			if err != nil {
 				return err
@@ -112,6 +114,7 @@ func CmdQueryCSRByNFT() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
+			// arg must be converted to a uint
 			nftID, err := strconv.ParseUint(args[0], 10, 64)
 			if err != nil {
 				return err

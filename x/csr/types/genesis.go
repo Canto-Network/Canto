@@ -10,8 +10,8 @@ func DefaultGenesis() *GenesisState {
 	}
 }
 
-// Validate checks if there are any entered CSRs. By default, there should be no CSRs on genesis because
-// the CSR turnstile and NFT smart contracts have not been deployed yet. Checks if params are valid.
+// By default, there should be no CSRs on genesis because the CSR turnstile and NFT smart contracts
+// have not been deployed yet. Checks if params are valid.
 func (gs GenesisState) Validate() error {
 	return gs.Params.Validate()
 }

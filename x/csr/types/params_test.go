@@ -43,7 +43,7 @@ func TestParamsValidate(t *testing.T) {
 			true,
 		},
 		{
-			"Testing all nothing goes to csrShares - pass",
+			"Testing nothing goes to csrShares - pass",
 			Params{true, sdk.NewDecFromInt(sdk.NewInt(0))},
 			true,
 		},

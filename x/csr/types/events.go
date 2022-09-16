@@ -8,15 +8,17 @@ import (
 
 const (
 	TurnstileEventRegister = "Register"
-	TurnstileEventUpdate   = "Attach"
+	TurnstileEventUpdate   = "Assign"
 )
 
+// Register Event that is emitted from the Turnstile Smart Contract
 type RegisterCSREvent struct {
 	SmartContractAddress common.Address
 	Receiver             common.Address
 	Id                   *big.Int
 }
 
+// Update event that is emitted from the Turnstile Smart Contract
 type UpdateCSREvent struct {
 	SmartContractAddress common.Address
 	Id                   *big.Int

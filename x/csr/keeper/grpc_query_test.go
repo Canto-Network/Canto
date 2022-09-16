@@ -177,7 +177,7 @@ func (suite *KeeperTestSuite) TestCSRByNFT() {
 			false,
 		},
 		{
-			"invalid request with non-existing NFT",
+			"invalid request with non-existing NFT -> no csrs exist",
 			func() {
 				request = &types.QueryCSRByNFTRequest{}
 				expectedResponse = nil
@@ -298,6 +298,7 @@ func (suite *KeeperTestSuite) TestCSRByContract() {
 	}
 }
 
+// Special edge case for when the request made is null, cannot be routed to the query client
 func (suite *KeeperTestSuite) TestQueryParams() {
 	ctx := sdk.WrapSDKContext(suite.ctx)
 	expectedParams := types.DefaultParams()
