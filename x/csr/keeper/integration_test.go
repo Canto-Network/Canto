@@ -185,7 +185,6 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 			data, err := factoryContract.ABI.Pack("register", deployerEVMAddress)
 			s.Require().NoError(err)
 
-			gasPrice = big.NewInt(1240000000)
 			evmTX(userKey, &factoryContractAddress, amount, gasLimit, gasPrice, gasFeeCap, gasTipCap, data, accesses)
 			s.Commit()
 
