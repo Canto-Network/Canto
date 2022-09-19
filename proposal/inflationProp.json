@@ -3,9 +3,9 @@
     "description": "If successful this parameter-change governance proposal will change the voting period from x to y",
     "changes": [
      {
-      "subspace": "inflation",
-      "key": "ParamStoreKeyEnableInflation",
-      "value": true
+      "subspace": "slashing",
+      "key": "SlashFractionDowntime",
+      "value": "0"
      }
     ],
     "deposit": "201000000000acanto"

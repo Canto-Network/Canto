@@ -137,6 +137,7 @@ import (
 	govshuttletypes "github.com/Canto-Network/Canto/v2/x/govshuttle/types"
 
 	v2 "github.com/Canto-Network/Canto/v2/app/upgrades/v2"
+	v3 "github.com/Canto-Network/Canto/v2/app/upgrades/v3"
 )
 
 func init() {
@@ -1035,6 +1036,12 @@ func (app *Canto) setupUpgradeHandlers() {
 		v2.CreateUpgradeHandler(app.mm, app.configurator),
 	)
 
+	// v3 upgrade handler
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v3.UpgradeName,
+		v3.CreateUpgradeHandler(app.mm, app.configurator),
+	)
+
 	// When a planned update height is reached, the old binary will panic
 	// writing on disk the height and name of the update that triggered it
 	// This will read that value, and execute the preparations for the upgrade.
@@ -1052,7 +1059,10 @@ func (app *Canto) setupUpgradeHandlers() {
 	switch upgradeInfo.Name {
 	case v2.UpgradeName:
 		// no store upgrades in v2
-	}
+	case v3.UpgradeName: 
+		// no store upgrade in v3
+	}	
+
 
 	if storeUpgrades != nil {
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades

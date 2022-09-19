@@ -44,7 +44,7 @@ func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {}
 
 // ConsensusVersion returns the consensus state-breaking version for the module.
 func (AppModuleBasic) ConsensusVersion() uint64 {
-	return 2 // set verison to 2
+	return 3 // set verison to 3 to trigger migration v2 -> v3
 }
 
 // RegisterInterfaces registers interfaces and implementations of the incentives
@@ -149,6 +149,10 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 
 	if err := cfg.RegisterMigration(types.ModuleName, 1, migrator.Migrate1to2); err != nil {
 		panic(fmt.Errorf("FAILURE IN MIGRATION from v1 to v2 %s: %w", types.ModuleName, err))
+	}
+	// register 2 -> 3 migration
+	if err := cfg.RegisterMigration(types.ModuleName, 2,migrator.Migrate2to3); err != nil {
+		panic(fmt.Errorf("FAILURE IN MIGRATION from v2 to v3: %s, %w", types.ModuleName, err))
 	}
 }
 

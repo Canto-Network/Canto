@@ -1,0 +1,7 @@
+{
+    "Account"       : ["0x5E23dC409Fc2F832f83CEc191E245A191a4bCc5C"],
+    "PropId"        : 1,
+    "values"        : [0],
+    "calldatas"     : ["0000000000000000000000005b7713d116fe7905952e8957f67b624329a5f437"],
+    "signatures"    : ["_setPriceOracle(address)"]
+}
