@@ -70,11 +70,11 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 	type nftCheck struct {
 		nftID   uint64
 		gasUsed uint64
+		txs     uint64
 	}
 
 	type result struct {
 		shouldReceiveFunds bool
-		expectErr          bool
 		cumulativeGasUsed  uint64 // cumulative revenue tracking for the turnstile address (expected revenue across all NFTs)
 		nft                nftCheck
 	}
@@ -97,7 +97,6 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			},
 			result{
 				false,
-				false,
 				0,
 				nftCheck{},
 			},
@@ -113,7 +112,6 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 				}
 			},
 			result{
-				false,
 				false,
 				0,
 				nftCheck{},
@@ -132,9 +130,8 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			},
 			result{
 				true,
-				false,
 				10,
-				nftCheck{nftID: 0, gasUsed: 10},
+				nftCheck{nftID: 0, gasUsed: 10, txs: 1},
 			},
 		},
 		{
@@ -151,9 +148,8 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			},
 			result{
 				true,
-				false,
 				23,
-				nftCheck{nftID: 0, gasUsed: 23},
+				nftCheck{nftID: 0, gasUsed: 23, txs: 2},
 			},
 		},
 		{
@@ -177,7 +173,6 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			},
 			result{
 				false,
-				true,
 				23,
 				nftCheck{},
 			},
@@ -204,7 +199,6 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			},
 			result{
 				false,
-				true,
 				23,
 				nftCheck{},
 			},
@@ -231,7 +225,6 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			},
 			result{
 				false,
-				false,
 				23,
 				nftCheck{},
 			},
@@ -248,9 +241,8 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			},
 			result{
 				true,
-				false,
 				33,
-				nftCheck{nftID: 1, gasUsed: 10},
+				nftCheck{nftID: 1, gasUsed: 10, txs: 1},
 			},
 		},
 		{
@@ -275,7 +267,6 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			},
 			result{
 				false,
-				true,
 				33,
 				nftCheck{},
 			},
@@ -301,9 +292,8 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			},
 			result{
 				true,
-				false,
 				46,
-				nftCheck{nftID: 1, gasUsed: 23},
+				nftCheck{nftID: 1, gasUsed: 23, txs: 2},
 			},
 		},
 		{
@@ -318,9 +308,8 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			},
 			result{
 				true,
-				false,
 				56,
-				nftCheck{nftID: 2, gasUsed: 10},
+				nftCheck{nftID: 2, gasUsed: 10, txs: 1},
 			},
 		},
 		{
@@ -338,14 +327,13 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 				}
 				receipt = &ethtypes.Receipt{
 					Logs:    []*ethtypes.Log{&log},
-					GasUsed: 0,
+					GasUsed: 20,
 				}
 			},
 			result{
 				true,
-				true,
-				56,
-				nftCheck{},
+				76,
+				nftCheck{nftID: 2, gasUsed: 30, txs: 2},
 			},
 		},
 		{
@@ -362,14 +350,13 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 				}
 				receipt = &ethtypes.Receipt{
 					Logs:    []*ethtypes.Log{&log},
-					GasUsed: 0,
+					GasUsed: 33,
 				}
 			},
 			result{
 				true,
-				true,
-				56,
-				nftCheck{},
+				109,
+				nftCheck{nftID: 2, gasUsed: 63, txs: 3},
 			},
 		},
 		{
@@ -391,9 +378,8 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			},
 			result{
 				true,
-				false,
-				61,
-				nftCheck{nftID: 2, gasUsed: 15},
+				114,
+				nftCheck{nftID: 2, gasUsed: 68, txs: 4},
 			},
 		},
 		{
@@ -416,7 +402,6 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			},
 			result{
 				false,
-				true,
 				61,
 				nftCheck{},
 			},
@@ -441,7 +426,6 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			},
 			result{
 				false,
-				true,
 				61,
 				nftCheck{},
 			},
@@ -466,7 +450,6 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			},
 			result{
 				false,
-				false,
 				61,
 				nftCheck{},
 			},
@@ -483,9 +466,8 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			},
 			result{
 				true,
-				false,
-				68,
-				nftCheck{nftID: 1, gasUsed: 30},
+				121,
+				nftCheck{nftID: 1, gasUsed: 30, txs: 3},
 			},
 		},
 		{
@@ -500,9 +482,8 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			},
 			result{
 				true,
-				false,
-				75,
-				nftCheck{nftID: 1, gasUsed: 37},
+				128,
+				nftCheck{nftID: 1, gasUsed: 37, txs: 4},
 			},
 		},
 	}
@@ -527,12 +508,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 			)
 
 			err := suite.app.CSRKeeper.Hooks().PostTxProcessing(suite.ctx, msg, receipt)
-			if !tc.test.expectErr {
-				suite.Require().NoError(err)
-			} else {
-				suite.Require().Error(err)
-				return
-			}
+			suite.Require().NoError(err)
 
 			if tc.test.shouldReceiveFunds {
 				// Get the percentage of fees that should be going to the CSR nfts
@@ -549,7 +525,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 				suite.Require().Equal(testNFT, nft)
 
 				// The CSR object should be found
-				_, found = suite.app.CSRKeeper.GetCSR(suite.ctx, nft)
+				csr, found := suite.app.CSRKeeper.GetCSR(suite.ctx, nft)
 				suite.Require().True(found)
 
 				// Checking the turnstile balance
@@ -567,6 +543,13 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 				// Check that the expected NFT balance matches the actual balance
 				nftFee := calculateExpectedFee(gasUsedByNFT, gasPrice, csrShare)
 				suite.Require().Equal(nftFee.BigInt(), nftRevenue)
+
+				// Check that the internal cumulative NFT balance matches the smart contract
+				bigInt := big.NewInt(0)
+				suite.Require().Equal(bigInt.SetBytes(csr.Revenue).Uint64(), nftRevenue.Uint64())
+
+				// Require that the number of transactions match up with what is expected
+				suite.Require().Equal(csr.Txs, tc.test.nft.txs)
 			} else {
 				contract := msg.To()
 				_, found := suite.app.CSRKeeper.GetNFTByContract(suite.ctx, contract.String())
@@ -575,30 +558,4 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 		})
 	}
 
-}
-
-// Helper function that will calculate how much revenue a NFT or the Turnstile should accumulate
-// Calculation is done by the following: int(gasUsed * gasPrice * csrShares)
-func calculateExpectedFee(gasUsed uint64, gasPrice *big.Int, csrShare sdk.Dec) sdk.Int {
-	fee := sdk.NewIntFromUint64(gasUsed).Mul(sdk.NewIntFromBigInt(gasPrice))
-	expectedTurnstileBalance := sdk.NewDecFromInt(fee).Mul(csrShare).TruncateInt()
-	return expectedTurnstileBalance
-}
-
-// Helper function that will get the transaction revenue for a given NFT
-func getNFTRevenue(suite *KeeperTestSuite, address *common.Address, nft uint64) (*big.Int, error) {
-	// Call to retrieve the amount of canto for a given NFT
-	resp, err := suite.app.CSRKeeper.CallMethod(suite.ctx, "revenue", contracts.TurnstileContract, types.ModuleAddress, address, big.NewInt(0), new(big.Int).SetUint64(nft))
-	if err != nil {
-		return nil, err
-	}
-
-	// Unpack the results into a big int
-	unpackedData, err := turnstileContract.Methods["revenue"].Outputs.Unpack(resp.Ret)
-	if err != nil {
-		return nil, err
-	}
-	nftRevenue := unpackedData[0].(*big.Int)
-
-	return nftRevenue, nil
 }

@@ -9,7 +9,7 @@ contract Turnstile {
 
     // Attach is emitted when a user wants to add new smart contracts
     // to the same CSR NFT.
-    event Attach(address smartContractAddress, uint256 id);
+    event Assign(address smartContractAddress, uint256 id);
     // RegisterEvent is emitted when a user wants to create a new CSR nft
     event Register(address smartContractAddress, address receiver, uint256 id);
 
@@ -19,8 +19,7 @@ contract Turnstile {
 
     // register the smart contract to an existing CSR nft
     function assign(uint256 id) public {
-        tokenID++;
-        emit Attach(msg.sender, id);
+        emit Assign(msg.sender, id);
     }
 
     // register and mint a new CSR nft that will be transferred to the to address entered

@@ -19,7 +19,6 @@ contract Turnstile {
 
     // register the smart contract to an existing CSR nft
     function assign(uint256 id) public {
-        tokenID++;
         emit Assign(msg.sender, id);
     }
 

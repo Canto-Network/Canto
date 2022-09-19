@@ -14,6 +14,8 @@ type CSRTestSuite struct {
 	contracts []string
 	id        uint64
 	account   string
+	txs       uint64
+	revenue   []byte
 }
 
 func TestCSRSuite(t *testing.T) {
