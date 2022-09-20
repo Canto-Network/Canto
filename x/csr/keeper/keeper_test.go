@@ -12,6 +12,7 @@ import (
 	"github.com/Canto-Network/Canto/v2/app"
 	"github.com/Canto-Network/Canto/v2/contracts"
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
+	csrTypes "github.com/Canto-Network/Canto/v2/x/csr/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
@@ -20,6 +21,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/evmos/ethermint/crypto/ethsecp256k1"
+	"github.com/evmos/ethermint/encoding"
+	"github.com/evmos/ethermint/tests"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
@@ -204,4 +207,125 @@ func GenerateEventData(name string, contract evmtypes.CompiledContract, args ...
 	}
 
 	return data, nil
+}
+
+// Helper function that will calculate how much revenue a NFT or the Turnstile should accumulate
+// Calculation is done by the following: int(gasUsed * gasPrice * csrShares)
+func calculateExpectedFee(gasUsed uint64, gasPrice *big.Int, csrShare sdk.Dec) sdk.Int {
+	fee := sdk.NewIntFromUint64(gasUsed).Mul(sdk.NewIntFromBigInt(gasPrice))
+	expectedTurnstileBalance := sdk.NewDecFromInt(fee).Mul(csrShare).TruncateInt()
+	return expectedTurnstileBalance
+}
+
+// Helper function that will get the transaction revenue for a given NFT
+func getNFTRevenue(suite *KeeperTestSuite, address *common.Address, nft uint64) (*big.Int, error) {
+	// Call to retrieve the amount of canto for a given NFT
+	resp, err := suite.app.CSRKeeper.CallMethod(suite.ctx, "revenue", contracts.TurnstileContract, types.ModuleAddress, address, big.NewInt(0), new(big.Int).SetUint64(nft))
+	if err != nil {
+		return nil, err
+	}
+
+	// Unpack the results into a big int
+	unpackedData, err := contracts.TurnstileContract.ABI.Methods["revenue"].Outputs.Unpack(resp.Ret)
+	if err != nil {
+		return nil, err
+	}
+	nftRevenue := unpackedData[0].(*big.Int)
+
+	return nftRevenue, nil
+}
+
+// Helper function that checks the state of the CSR objects
+func checkCSRValues(csr csrTypes.CSR, expectedID uint64, expectedContracts []string, expectedTxs uint64, expectedRevenue *big.Int) {
+	s.Require().Equal(expectedID, csr.Id)
+	s.Require().Equal(expectedContracts, csr.Contracts)
+	s.Require().Equal(expectedTxs, csr.Txs)
+	if expectedTxs > 0 {
+		revenue := big.NewInt(0)
+		revenue.SetBytes(csr.Revenue)
+		s.Require().NotZero(revenue)
+
+		s.Require().Equal(expectedRevenue, revenue)
+	}
+}
+
+// Generates a new private private key and corresponding SDK Account Address
+func generateKey() (*ethsecp256k1.PrivKey, sdk.AccAddress) {
+	address, priv := tests.NewAddrKey()
+	return priv.(*ethsecp256k1.PrivKey), sdk.AccAddress(address.Bytes())
+}
+
+// Helper function to create and make a ethereum transaction
+func evmTX(
+	priv *ethsecp256k1.PrivKey,
+	to *common.Address,
+	amount *big.Int,
+	gasLimit uint64,
+	gasPrice *big.Int,
+	gasFeeCap *big.Int,
+	gasTipCap *big.Int,
+	data []byte,
+	accesses *ethtypes.AccessList,
+) abci.ResponseDeliverTx {
+	msgEthereumTx := buildEthTx(priv, to, amount, gasLimit, gasPrice, gasFeeCap, gasTipCap, data, accesses)
+	res := deliverEthTx(priv, msgEthereumTx)
+	return res
+}
+
+// Helper function that creates an ethereum transaction
+func buildEthTx(
+	priv *ethsecp256k1.PrivKey,
+	to *common.Address,
+	amount *big.Int,
+	gasLimit uint64,
+	gasPrice *big.Int,
+	gasFeeCap *big.Int,
+	gasTipCap *big.Int,
+	data []byte,
+	accesses *ethtypes.AccessList,
+) *evmtypes.MsgEthereumTx {
+	chainID := s.app.EvmKeeper.ChainID()
+	from := common.BytesToAddress(priv.PubKey().Address().Bytes())
+	nonce, err := s.app.AccountKeeper.GetSequence(s.ctx, sdk.AccAddress(from.Bytes()))
+	s.Require().NoError(err)
+	msgEthereumTx := evmtypes.NewTx(
+		chainID,
+		nonce,
+		to,
+		amount,
+		gasLimit,
+		gasPrice,
+		gasFeeCap,
+		gasTipCap,
+		data,
+		accesses,
+	)
+	msgEthereumTx.From = from.String()
+	return msgEthereumTx
+}
+
+func deliverEthTx(priv *ethsecp256k1.PrivKey, msgEthereumTx *evmtypes.MsgEthereumTx) abci.ResponseDeliverTx {
+	bz := prepareEthTx(priv, msgEthereumTx)
+	req := abci.RequestDeliverTx{Tx: bz}
+	res := s.app.BaseApp.DeliverTx(req)
+	return res
+}
+
+func prepareEthTx(priv *ethsecp256k1.PrivKey, msgEthereumTx *evmtypes.MsgEthereumTx) []byte {
+	// Sign transaction
+	err := msgEthereumTx.Sign(s.ethSigner, tests.NewSigner(priv))
+	s.Require().NoError(err)
+
+	// Assemble transaction from fields
+	encodingConfig := encoding.MakeConfig(app.ModuleBasics)
+	txBuilder := encodingConfig.TxConfig.NewTxBuilder()
+	tx, err := msgEthereumTx.BuildTx(txBuilder, s.app.EvmKeeper.GetParams(s.ctx).EvmDenom)
+	s.Require().NoError(err)
+
+	// Encode transaction by default Tx encoder and broadcasted over the network
+	txEncoder := encodingConfig.TxConfig.TxEncoder()
+	bz, err := txEncoder(tx)
+	s.Require().NoError(err)
+
+	return bz
 }

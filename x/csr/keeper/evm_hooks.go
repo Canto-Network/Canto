@@ -54,13 +54,18 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 	// If a tx has turnstile events, then no fees will get distributed
 	err := h.processEvents(ctx, receipt)
 	if err != nil {
-		return err
+		h.k.Logger(ctx).Error("failed to process turnstile events in the receipt: ", err.Error())
 	}
 
 	// Grab the nft the smart contract corresponds to, if it has no nft -> return
 	nftID, foundNFT := h.k.GetNFTByContract(ctx, contract.String())
 	if !foundNFT {
 		return nil
+	}
+
+	csr, found := h.k.GetCSR(ctx, nftID)
+	if !found {
+		return sdkerrors.Wrapf(ErrNonexistentCSR, "EVMHook::PostTxProcessing the NFT ID was found but the CSR was not.")
 	}
 
 	// Calculate fees to be distributed = intFloor(GasUsed * GasPrice * csrShares)
@@ -87,6 +92,16 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 	if err != nil {
 		return sdkerrors.Wrapf(ErrFeeDistribution, "EVMHook::PostTxProcessing failed to distribute fees from module account to turnstile, %d", err)
 	}
+
+	// Update TX count for this NFT
+	csr.Txs += 1
+	// Update the cumulative revenue accumulated by this NFT
+	revenue := new(big.Int).SetBytes(csr.Revenue)
+	revenue.Add(revenue, amount)
+	csr.Revenue = revenue.Bytes()
+
+	// Store updated CSR
+	h.k.SetCSR(ctx, *csr)
 
 	return nil
 }

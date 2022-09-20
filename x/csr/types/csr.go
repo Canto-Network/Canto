@@ -10,6 +10,8 @@ func NewCSR(contracts []string, id uint64) CSR {
 	return CSR{
 		Contracts: contracts,
 		Id:        id,
+		Txs:       0,
+		Revenue:   nil,
 	}
 }
 
