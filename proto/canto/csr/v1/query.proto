@@ -30,6 +30,16 @@ service Query {
     // query by deployer address 
     option (google.api.http).get = "/canto/v1/csr/contract/{address}";
   }
+  // query the turnstile address
+  rpc Turnstile(QueryTurnstileRequest) returns (QueryTurnstileResponse) {
+    option (google.api.http).get = "/canto/v1/csr/turnstile";
+  }
+}
+
+// This is a wrapper around the CSR proto that returns the CSR and revenue in the form of a string.
+message WrappedCSR {
+  CSR csr = 1 [(gogoproto.nullable) = false];
+  string revenue_string = 2;
 }
 
 // QueryParamsRequest is the request type for the Query/Params RPC method.
@@ -38,7 +48,7 @@ message QueryParamsRequest {}
 // QueryParamsResponse is the response type for the Query/Params RPC method.
 message QueryParamsResponse {
   // params holds all the parameters of this module.
-  Params params = 1 [ (gogoproto.nullable) = false];
+  Params params = 1 [(gogoproto.nullable) = false];
 }
 
 // QueryCSRsRequest is the request type for the Query/CSRs RPC method.
@@ -49,7 +59,7 @@ message QueryCSRsRequest {
 
 // QueryCSRsResponse is the response type for the Query/CSRs RPC method.
 message QueryCSRsResponse {
-  repeated CSR csrs = 1 [ (gogoproto.nullable) = false ];
+  repeated WrappedCSR csrs = 1 [ (gogoproto.nullable) = false ];
   // pagination for response
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
@@ -62,7 +72,7 @@ message QueryCSRByNFTRequest {
 // QueryCSRByNFTResponse is the response type for the Query/CSRByNFT RPC method.
 message QueryCSRByNFTResponse { 
   // csr object queried by nft id
-  CSR csr = 1 [ (gogoproto.nullable) = false];
+  WrappedCSR csr = 1 [ (gogoproto.nullable) = false];
 }
 
 // QueryCSRByContractRequest is the request type for the Query/CSRByContract RPC method.
@@ -73,5 +83,14 @@ message QueryCSRByContractRequest {
 // QueryCSRByContractResponse is the response type for the Query/CSRByContract RPC method.
 message QueryCSRByContractResponse { 
   // csr object queried by smart contract address
-  CSR csr = 1 [ (gogoproto.nullable) = false];
+  WrappedCSR csr = 1 [ (gogoproto.nullable) = false];
+}
+
+// QueryTurnstileRequest is the request type for the Query/Turnstile RPC method.
+message QueryTurnstileRequest {
+}
+
+// QueryTurnstileResponse is the response type for the Query/Turnstile RPC method.
+message QueryTurnstileResponse {
+  string address = 1;
 }

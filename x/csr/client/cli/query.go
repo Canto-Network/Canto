@@ -29,6 +29,7 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 		CmdQueryCSRs(),
 		CmdQueryCSRByNFT(),
 		CmdQueryCSRByContract(),
+		CmdQueryTurnstile(),
 	)
 
 	return cmd
@@ -155,6 +156,32 @@ func CmdQueryCSRByContract() *cobra.Command {
 
 			// Query store
 			response, err := queryClient.CSRByContract(context.Background(), request)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(response)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
+}
+
+// CmdQueryTurnstile implements a cobra command that will return the Turnstile address that was deployed by the module account
+func CmdQueryTurnstile() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "turnstile",
+		Short: "Query the address of the turnstile smart contract deployed by the module account",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			request := &types.QueryTurnstileRequest{}
+
+			// Query store
+			response, err := queryClient.Turnstile(context.Background(), request)
 			if err != nil {
 				return err
 			}

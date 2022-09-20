@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"math/big"
 	"strings"
 
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
@@ -31,14 +32,19 @@ func (k Keeper) CSRs(c context.Context, request *types.QueryCSRsRequest) (*types
 	ctx := sdk.UnwrapSDKContext(c)
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixCSR)
 
-	csrs := make([]types.CSR, 0)
+	wrappedCSRs := make([]types.WrappedCSR, 0)
 	pageRes, err := query.Paginate(
 		store,
 		request.Pagination,
 		func(key, value []byte) error {
 			nft := BytesToUInt64(key)
 			csr, _ := k.GetCSR(ctx, nft)
-			csrs = append(csrs, *csr)
+			revenue := big.NewInt(0).SetBytes(csr.Revenue)
+			wrappedCSR := types.WrappedCSR{
+				Csr:           *csr,
+				RevenueString: revenue.String(),
+			}
+			wrappedCSRs = append(wrappedCSRs, wrappedCSR)
 			return nil
 		},
 	)
@@ -48,7 +54,7 @@ func (k Keeper) CSRs(c context.Context, request *types.QueryCSRsRequest) (*types
 	}
 
 	return &types.QueryCSRsResponse{
-		Csrs:       csrs,
+		Csrs:       wrappedCSRs,
 		Pagination: pageRes,
 	}, nil
 }
@@ -66,7 +72,14 @@ func (k Keeper) CSRByNFT(c context.Context, request *types.QueryCSRByNFTRequest)
 	if !found {
 		return nil, status.Errorf(codes.NotFound, "no csr is associated with NFT ID %d", request.NftId)
 	}
-	return &types.QueryCSRByNFTResponse{Csr: *csr}, nil
+
+	revenue := big.NewInt(0).SetBytes(csr.Revenue)
+	wrappedCSR := types.WrappedCSR{
+		Csr:           *csr,
+		RevenueString: revenue.String(),
+	}
+
+	return &types.QueryCSRByNFTResponse{Csr: wrappedCSR}, nil
 }
 
 // CSRByContract returns the CSR associated with a given smart contracted address passed into the request. This will return nil if the smart contract
@@ -97,5 +110,22 @@ func (k Keeper) CSRByContract(c context.Context, request *types.QueryCSRByContra
 		return nil, status.Errorf(codes.NotFound, "no csr contains an smart contract with address %s", request.Address)
 	}
 	csr, _ := k.GetCSR(ctx, nft)
-	return &types.QueryCSRByContractResponse{Csr: *csr}, nil
+
+	revenue := big.NewInt(0).SetBytes(csr.Revenue)
+	wrappedCSR := types.WrappedCSR{
+		Csr:           *csr,
+		RevenueString: revenue.String(),
+	}
+
+	return &types.QueryCSRByContractResponse{Csr: wrappedCSR}, nil
+}
+
+// Turnstile returns the turnstile address that was deployed by the module account. This function does not take in any request params.
+func (k Keeper) Turnstile(c context.Context, _ *types.QueryTurnstileRequest) (*types.QueryTurnstileResponse, error) {
+	ctx := sdk.UnwrapSDKContext(c)
+	address, found := k.GetTurnstile(ctx)
+	if !found {
+		return nil, status.Errorf(codes.NotFound, "the turnstile address has not been found.")
+	}
+	return &types.QueryTurnstileResponse{Address: address.String()}, nil
 }

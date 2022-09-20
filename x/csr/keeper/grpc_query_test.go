@@ -1,6 +1,8 @@
 package keeper_test
 
 import (
+	"math/big"
+
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
@@ -49,7 +51,7 @@ func (suite *KeeperTestSuite) TestCSRs() {
 				}
 				expectedResponse = &types.QueryCSRsResponse{
 					Pagination: &query.PageResponse{Total: 10},
-					Csrs:       csrs[:1],
+					Csrs:       wrapCSRs(csrs[:1]),
 				}
 			},
 			true,
@@ -67,7 +69,7 @@ func (suite *KeeperTestSuite) TestCSRs() {
 				}
 				expectedResponse = &types.QueryCSRsResponse{
 					Pagination: &query.PageResponse{Total: 10},
-					Csrs:       csrs[:5],
+					Csrs:       wrapCSRs(csrs[:5]),
 				}
 			},
 			true,
@@ -85,7 +87,7 @@ func (suite *KeeperTestSuite) TestCSRs() {
 				}
 				expectedResponse = &types.QueryCSRsResponse{
 					Pagination: &query.PageResponse{Total: 10},
-					Csrs:       csrs,
+					Csrs:       wrapCSRs(csrs),
 				}
 			},
 			true,
@@ -103,7 +105,7 @@ func (suite *KeeperTestSuite) TestCSRs() {
 				}
 				expectedResponse = &types.QueryCSRsResponse{
 					Pagination: &query.PageResponse{Total: 10},
-					Csrs:       csrs,
+					Csrs:       wrapCSRs(csrs),
 				}
 			},
 			true,
@@ -159,7 +161,7 @@ func (suite *KeeperTestSuite) TestCSRByNFT() {
 				}
 
 				request = &types.QueryCSRByNFTRequest{NftId: csrs[0].Id}
-				expectedResponse = &types.QueryCSRByNFTResponse{Csr: csrs[0]}
+				expectedResponse = &types.QueryCSRByNFTResponse{Csr: createWrappedCSR(csrs[0])}
 			},
 			true,
 		},
@@ -234,7 +236,7 @@ func (suite *KeeperTestSuite) TestCSRByContract() {
 				}
 
 				request = &types.QueryCSRByContractRequest{Address: csrs[0].Contracts[0]}
-				expectedResponse = &types.QueryCSRByContractResponse{Csr: csrs[0]}
+				expectedResponse = &types.QueryCSRByContractResponse{Csr: createWrappedCSR(csrs[0])}
 			},
 			true,
 		},
@@ -298,7 +300,7 @@ func (suite *KeeperTestSuite) TestCSRByContract() {
 	}
 }
 
-// Special edge case for when the request made is null, cannot be routed to the query client
+// Test the query service for params
 func (suite *KeeperTestSuite) TestQueryParams() {
 	ctx := sdk.WrapSDKContext(suite.ctx)
 	expectedParams := types.DefaultParams()
@@ -307,4 +309,33 @@ func (suite *KeeperTestSuite) TestQueryParams() {
 	res, err := suite.queryClient.Params(ctx, &types.QueryParamsRequest{})
 	suite.Require().NoError(err)
 	suite.Require().Equal(expectedParams, res.Params)
+}
+
+// Test the query service that retrieves the turnstile address
+func (suite *KeeperTestSuite) TestQueryTurnstile() {
+	suite.Commit()
+	ctx := sdk.WrapSDKContext(suite.ctx)
+
+	address, _ := suite.app.CSRKeeper.GetTurnstile(suite.ctx)
+	res, err := suite.queryClient.Turnstile(ctx, &types.QueryTurnstileRequest{})
+	suite.Require().NoError(err)
+	suite.Require().Equal(address.String(), res.Address)
+}
+
+// Helper function that inputs the CSR and wraps it in the return type expected from the query services
+func createWrappedCSR(csr types.CSR) types.WrappedCSR {
+	revenue := big.NewInt(0).SetBytes(csr.Revenue)
+	return types.WrappedCSR{
+		Csr:           csr,
+		RevenueString: revenue.String(),
+	}
+}
+
+// Helper function that inputs an array of CSRs and wraps them
+func wrapCSRs(csrs []types.CSR) []types.WrappedCSR {
+	wrappedCSRs := make([]types.WrappedCSR, 0)
+	for _, csr := range csrs {
+		wrappedCSRs = append(wrappedCSRs, createWrappedCSR(csr))
+	}
+	return wrappedCSRs
 }

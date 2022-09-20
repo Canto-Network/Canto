@@ -30,6 +30,59 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// This is a wrapper around the CSR proto that returns the CSR and revenue in the form of a string.
+type WrappedCSR struct {
+	Csr           CSR    `protobuf:"bytes,1,opt,name=csr,proto3" json:"csr"`
+	RevenueString string `protobuf:"bytes,2,opt,name=revenue_string,json=revenueString,proto3" json:"revenue_string,omitempty"`
+}
+
+func (m *WrappedCSR) Reset()         { *m = WrappedCSR{} }
+func (m *WrappedCSR) String() string { return proto.CompactTextString(m) }
+func (*WrappedCSR) ProtoMessage()    {}
+func (*WrappedCSR) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a845ddc1dc245388, []int{0}
+}
+func (m *WrappedCSR) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *WrappedCSR) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_WrappedCSR.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *WrappedCSR) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_WrappedCSR.Merge(m, src)
+}
+func (m *WrappedCSR) XXX_Size() int {
+	return m.Size()
+}
+func (m *WrappedCSR) XXX_DiscardUnknown() {
+	xxx_messageInfo_WrappedCSR.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_WrappedCSR proto.InternalMessageInfo
+
+func (m *WrappedCSR) GetCsr() CSR {
+	if m != nil {
+		return m.Csr
+	}
+	return CSR{}
+}
+
+func (m *WrappedCSR) GetRevenueString() string {
+	if m != nil {
+		return m.RevenueString
+	}
+	return ""
+}
+
 // QueryParamsRequest is the request type for the Query/Params RPC method.
 type QueryParamsRequest struct {
 }
@@ -38,7 +91,7 @@ func (m *QueryParamsRequest) Reset()         { *m = QueryParamsRequest{} }
 func (m *QueryParamsRequest) String() string { return proto.CompactTextString(m) }
 func (*QueryParamsRequest) ProtoMessage()    {}
 func (*QueryParamsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a845ddc1dc245388, []int{0}
+	return fileDescriptor_a845ddc1dc245388, []int{1}
 }
 func (m *QueryParamsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -77,7 +130,7 @@ func (m *QueryParamsResponse) Reset()         { *m = QueryParamsResponse{} }
 func (m *QueryParamsResponse) String() string { return proto.CompactTextString(m) }
 func (*QueryParamsResponse) ProtoMessage()    {}
 func (*QueryParamsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a845ddc1dc245388, []int{1}
+	return fileDescriptor_a845ddc1dc245388, []int{2}
 }
 func (m *QueryParamsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -123,7 +176,7 @@ func (m *QueryCSRsRequest) Reset()         { *m = QueryCSRsRequest{} }
 func (m *QueryCSRsRequest) String() string { return proto.CompactTextString(m) }
 func (*QueryCSRsRequest) ProtoMessage()    {}
 func (*QueryCSRsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a845ddc1dc245388, []int{2}
+	return fileDescriptor_a845ddc1dc245388, []int{3}
 }
 func (m *QueryCSRsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -161,7 +214,7 @@ func (m *QueryCSRsRequest) GetPagination() *query.PageRequest {
 
 // QueryCSRsResponse is the response type for the Query/CSRs RPC method.
 type QueryCSRsResponse struct {
-	Csrs []CSR `protobuf:"bytes,1,rep,name=csrs,proto3" json:"csrs"`
+	Csrs []WrappedCSR `protobuf:"bytes,1,rep,name=csrs,proto3" json:"csrs"`
 	// pagination for response
 	Pagination *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
@@ -170,7 +223,7 @@ func (m *QueryCSRsResponse) Reset()         { *m = QueryCSRsResponse{} }
 func (m *QueryCSRsResponse) String() string { return proto.CompactTextString(m) }
 func (*QueryCSRsResponse) ProtoMessage()    {}
 func (*QueryCSRsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a845ddc1dc245388, []int{3}
+	return fileDescriptor_a845ddc1dc245388, []int{4}
 }
 func (m *QueryCSRsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -199,7 +252,7 @@ func (m *QueryCSRsResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryCSRsResponse proto.InternalMessageInfo
 
-func (m *QueryCSRsResponse) GetCsrs() []CSR {
+func (m *QueryCSRsResponse) GetCsrs() []WrappedCSR {
 	if m != nil {
 		return m.Csrs
 	}
@@ -222,7 +275,7 @@ func (m *QueryCSRByNFTRequest) Reset()         { *m = QueryCSRByNFTRequest{} }
 func (m *QueryCSRByNFTRequest) String() string { return proto.CompactTextString(m) }
 func (*QueryCSRByNFTRequest) ProtoMessage()    {}
 func (*QueryCSRByNFTRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a845ddc1dc245388, []int{4}
+	return fileDescriptor_a845ddc1dc245388, []int{5}
 }
 func (m *QueryCSRByNFTRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -261,14 +314,14 @@ func (m *QueryCSRByNFTRequest) GetNftId() uint64 {
 // QueryCSRByNFTResponse is the response type for the Query/CSRByNFT RPC method.
 type QueryCSRByNFTResponse struct {
 	// csr object queried by nft id
-	Csr CSR `protobuf:"bytes,1,opt,name=csr,proto3" json:"csr"`
+	Csr WrappedCSR `protobuf:"bytes,1,opt,name=csr,proto3" json:"csr"`
 }
 
 func (m *QueryCSRByNFTResponse) Reset()         { *m = QueryCSRByNFTResponse{} }
 func (m *QueryCSRByNFTResponse) String() string { return proto.CompactTextString(m) }
 func (*QueryCSRByNFTResponse) ProtoMessage()    {}
 func (*QueryCSRByNFTResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a845ddc1dc245388, []int{5}
+	return fileDescriptor_a845ddc1dc245388, []int{6}
 }
 func (m *QueryCSRByNFTResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -297,11 +350,11 @@ func (m *QueryCSRByNFTResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryCSRByNFTResponse proto.InternalMessageInfo
 
-func (m *QueryCSRByNFTResponse) GetCsr() CSR {
+func (m *QueryCSRByNFTResponse) GetCsr() WrappedCSR {
 	if m != nil {
 		return m.Csr
 	}
-	return CSR{}
+	return WrappedCSR{}
 }
 
 // QueryCSRByContractRequest is the request type for the Query/CSRByContract RPC method.
@@ -313,7 +366,7 @@ func (m *QueryCSRByContractRequest) Reset()         { *m = QueryCSRByContractReq
 func (m *QueryCSRByContractRequest) String() string { return proto.CompactTextString(m) }
 func (*QueryCSRByContractRequest) ProtoMessage()    {}
 func (*QueryCSRByContractRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a845ddc1dc245388, []int{6}
+	return fileDescriptor_a845ddc1dc245388, []int{7}
 }
 func (m *QueryCSRByContractRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -352,14 +405,14 @@ func (m *QueryCSRByContractRequest) GetAddress() string {
 // QueryCSRByContractResponse is the response type for the Query/CSRByContract RPC method.
 type QueryCSRByContractResponse struct {
 	// csr object queried by smart contract address
-	Csr CSR `protobuf:"bytes,1,opt,name=csr,proto3" json:"csr"`
+	Csr WrappedCSR `protobuf:"bytes,1,opt,name=csr,proto3" json:"csr"`
 }
 
 func (m *QueryCSRByContractResponse) Reset()         { *m = QueryCSRByContractResponse{} }
 func (m *QueryCSRByContractResponse) String() string { return proto.CompactTextString(m) }
 func (*QueryCSRByContractResponse) ProtoMessage()    {}
 func (*QueryCSRByContractResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a845ddc1dc245388, []int{7}
+	return fileDescriptor_a845ddc1dc245388, []int{8}
 }
 func (m *QueryCSRByContractResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -388,14 +441,97 @@ func (m *QueryCSRByContractResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryCSRByContractResponse proto.InternalMessageInfo
 
-func (m *QueryCSRByContractResponse) GetCsr() CSR {
+func (m *QueryCSRByContractResponse) GetCsr() WrappedCSR {
 	if m != nil {
 		return m.Csr
 	}
-	return CSR{}
+	return WrappedCSR{}
+}
+
+// QueryTurnstileRequest is the request type for the Query/Turnstile RPC method.
+type QueryTurnstileRequest struct {
+}
+
+func (m *QueryTurnstileRequest) Reset()         { *m = QueryTurnstileRequest{} }
+func (m *QueryTurnstileRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryTurnstileRequest) ProtoMessage()    {}
+func (*QueryTurnstileRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a845ddc1dc245388, []int{9}
+}
+func (m *QueryTurnstileRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryTurnstileRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryTurnstileRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryTurnstileRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryTurnstileRequest.Merge(m, src)
+}
+func (m *QueryTurnstileRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryTurnstileRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryTurnstileRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryTurnstileRequest proto.InternalMessageInfo
+
+// QueryTurnstileResponse is the response type for the Query/Turnstile RPC method.
+type QueryTurnstileResponse struct {
+	Address string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
+}
+
+func (m *QueryTurnstileResponse) Reset()         { *m = QueryTurnstileResponse{} }
+func (m *QueryTurnstileResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryTurnstileResponse) ProtoMessage()    {}
+func (*QueryTurnstileResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a845ddc1dc245388, []int{10}
+}
+func (m *QueryTurnstileResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryTurnstileResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryTurnstileResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryTurnstileResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryTurnstileResponse.Merge(m, src)
+}
+func (m *QueryTurnstileResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryTurnstileResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryTurnstileResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryTurnstileResponse proto.InternalMessageInfo
+
+func (m *QueryTurnstileResponse) GetAddress() string {
+	if m != nil {
+		return m.Address
+	}
+	return ""
 }
 
 func init() {
+	proto.RegisterType((*WrappedCSR)(nil), "canto.csr.v1.WrappedCSR")
 	proto.RegisterType((*QueryParamsRequest)(nil), "canto.csr.v1.QueryParamsRequest")
 	proto.RegisterType((*QueryParamsResponse)(nil), "canto.csr.v1.QueryParamsResponse")
 	proto.RegisterType((*QueryCSRsRequest)(nil), "canto.csr.v1.QueryCSRsRequest")
@@ -404,48 +540,56 @@ func init() {
 	proto.RegisterType((*QueryCSRByNFTResponse)(nil), "canto.csr.v1.QueryCSRByNFTResponse")
 	proto.RegisterType((*QueryCSRByContractRequest)(nil), "canto.csr.v1.QueryCSRByContractRequest")
 	proto.RegisterType((*QueryCSRByContractResponse)(nil), "canto.csr.v1.QueryCSRByContractResponse")
+	proto.RegisterType((*QueryTurnstileRequest)(nil), "canto.csr.v1.QueryTurnstileRequest")
+	proto.RegisterType((*QueryTurnstileResponse)(nil), "canto.csr.v1.QueryTurnstileResponse")
 }
 
 func init() { proto.RegisterFile("canto/csr/v1/query.proto", fileDescriptor_a845ddc1dc245388) }
 
 var fileDescriptor_a845ddc1dc245388 = []byte{
-	// 576 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x94, 0xcf, 0x6e, 0xd3, 0x4c,
-	0x14, 0xc5, 0xe3, 0x26, 0xcd, 0xf7, 0x71, 0x0b, 0x12, 0x1d, 0x4c, 0x95, 0x98, 0xca, 0x4d, 0x8d,
-	0x44, 0xc3, 0x9f, 0x7a, 0x94, 0x20, 0x5e, 0x20, 0x91, 0x1a, 0x75, 0x53, 0x15, 0x97, 0x55, 0x77,
-	0x13, 0x67, 0x6a, 0xa2, 0x12, 0x8f, 0xeb, 0x99, 0x04, 0xa2, 0xaa, 0x1b, 0x76, 0x48, 0x2c, 0x90,
-	0x78, 0xa9, 0x2e, 0x2b, 0xb1, 0x61, 0x85, 0xaa, 0x84, 0x07, 0x41, 0x9e, 0x19, 0xab, 0x99, 0x90,
-	0xb4, 0x62, 0x97, 0xf1, 0x3d, 0x73, 0xce, 0xef, 0xce, 0xbd, 0x0a, 0x54, 0x42, 0x12, 0x0b, 0x86,
-	0x43, 0x9e, 0xe2, 0x51, 0x03, 0x9f, 0x0d, 0x69, 0x3a, 0xf6, 0x93, 0x94, 0x09, 0x86, 0xee, 0xcb,
-	0x8a, 0x1f, 0xf2, 0xd4, 0x1f, 0x35, 0x1c, 0x3b, 0x62, 0x11, 0x93, 0x05, 0x9c, 0xfd, 0x52, 0x1a,
-	0x67, 0x33, 0x62, 0x2c, 0xfa, 0x40, 0x31, 0x49, 0xfa, 0x98, 0xc4, 0x31, 0x13, 0x44, 0xf4, 0x59,
-	0xcc, 0x75, 0xf5, 0x45, 0xc8, 0xf8, 0x80, 0x71, 0xdc, 0x25, 0x9c, 0x2a, 0x6b, 0x3c, 0x6a, 0x74,
-	0xa9, 0x20, 0x0d, 0x9c, 0x90, 0xa8, 0x1f, 0x4b, 0xb1, 0xd6, 0x56, 0x0d, 0x8e, 0x84, 0xa4, 0x64,
-	0x90, 0xdb, 0x6c, 0x18, 0xa5, 0x8c, 0x47, 0x7e, 0xf7, 0x6c, 0x40, 0x6f, 0x33, 0xd3, 0x43, 0x29,
-	0x0e, 0xe8, 0xd9, 0x90, 0x72, 0xe1, 0xed, 0xc3, 0x23, 0xe3, 0x2b, 0x4f, 0x58, 0xcc, 0x29, 0x6a,
-	0x42, 0x59, 0x99, 0x56, 0xac, 0x9a, 0x55, 0x5f, 0x6b, 0xda, 0xfe, 0x6c, 0x7b, 0xbe, 0x52, 0xb7,
-	0x4a, 0x97, 0xbf, 0xb6, 0x0a, 0x81, 0x56, 0x7a, 0xc7, 0xf0, 0x50, 0x5a, 0xb5, 0x8f, 0x82, 0xdc,
-	0x1e, 0xed, 0x01, 0xdc, 0xb0, 0x6b, 0xaf, 0x67, 0xbe, 0x6a, 0xd4, 0xcf, 0x1a, 0xf5, 0xd5, 0x1b,
-	0xea, 0x46, 0xfd, 0x43, 0x12, 0x51, 0x7d, 0x37, 0x98, 0xb9, 0xe9, 0x7d, 0xb1, 0x60, 0x7d, 0xc6,
-	0x5c, 0x53, 0xbe, 0x84, 0x52, 0xc8, 0xd3, 0x8c, 0xb1, 0x58, 0x5f, 0x6b, 0xae, 0x9b, 0x8c, 0xed,
-	0xa3, 0x40, 0x03, 0x4a, 0x11, 0xea, 0x18, 0x28, 0x2b, 0x12, 0x65, 0xe7, 0x4e, 0x14, 0x95, 0x64,
-	0xb0, 0xbc, 0x02, 0x3b, 0x47, 0x69, 0x8d, 0x0f, 0xf6, 0xde, 0xe5, 0xbd, 0xda, 0xb0, 0x1a, 0x9f,
-	0x88, 0xfd, 0x9e, 0x6c, 0xb3, 0x14, 0xa8, 0x83, 0xd7, 0x82, 0xc7, 0x73, 0x6a, 0x0d, 0xff, 0x1c,
-	0x8a, 0x21, 0x4f, 0xf5, 0x9b, 0x2c, 0x65, 0xcf, 0x34, 0xde, 0x1b, 0xa8, 0xde, 0x78, 0xb4, 0x59,
-	0x2c, 0x52, 0x12, 0x8a, 0x3c, 0xb6, 0x02, 0xff, 0x91, 0x5e, 0x2f, 0xa5, 0x5c, 0xcd, 0xea, 0x5e,
-	0x90, 0x1f, 0xbd, 0x0e, 0x38, 0x8b, 0xae, 0xfd, 0x73, 0x7e, 0xf3, 0xba, 0x08, 0xab, 0xd2, 0x09,
-	0x9d, 0x42, 0x59, 0xcd, 0x1e, 0xd5, 0xcc, 0x1b, 0x7f, 0xaf, 0x96, 0xb3, 0x7d, 0x8b, 0x42, 0x31,
-	0x78, 0x9b, 0x9f, 0x7f, 0xfc, 0xfe, 0xbe, 0xb2, 0x81, 0x6c, 0xac, 0x96, 0x56, 0x2d, 0xac, 0xde,
-	0x67, 0x14, 0x42, 0x29, 0x1b, 0x37, 0x72, 0x17, 0x18, 0xcd, 0x2c, 0x99, 0xb3, 0xb5, 0xb4, 0xae,
-	0x63, 0x1c, 0x19, 0x63, 0x23, 0x64, 0xc6, 0xc8, 0xb5, 0x18, 0xc1, 0xff, 0xf9, 0x68, 0x90, 0xb7,
-	0xd8, 0x68, 0x76, 0xca, 0xce, 0xd3, 0x5b, 0x35, 0x3a, 0x70, 0x5b, 0x06, 0x3e, 0x41, 0x55, 0x33,
-	0x30, 0x3e, 0x11, 0xf8, 0x5c, 0xae, 0xc5, 0x05, 0xfa, 0x6a, 0xc1, 0x03, 0x63, 0x30, 0x68, 0x67,
-	0x99, 0xf3, 0xdc, 0xc4, 0x9d, 0xfa, 0xdd, 0x42, 0xcd, 0x51, 0x97, 0x1c, 0x1e, 0xaa, 0xcd, 0x35,
-	0xae, 0x75, 0xf8, 0x5c, 0xaf, 0xca, 0x45, 0xab, 0x73, 0x39, 0x71, 0xad, 0xab, 0x89, 0x6b, 0x5d,
-	0x4f, 0x5c, 0xeb, 0xdb, 0xd4, 0x2d, 0x5c, 0x4d, 0xdd, 0xc2, 0xcf, 0xa9, 0x5b, 0x38, 0xde, 0x8d,
-	0xfa, 0xe2, 0xfd, 0xb0, 0xeb, 0x87, 0x6c, 0x80, 0xdb, 0x99, 0xcb, 0xee, 0x01, 0x15, 0x1f, 0x59,
-	0x7a, 0xaa, 0x4e, 0x78, 0xd4, 0xc4, 0x9f, 0xa4, 0xab, 0x18, 0x27, 0x94, 0x77, 0xcb, 0xf2, 0xdf,
-	0xe6, 0xf5, 0x9f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x93, 0x69, 0xb4, 0xf5, 0x2a, 0x05, 0x00, 0x00,
+	// 671 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x94, 0x4d, 0x4f, 0x13, 0x41,
+	0x18, 0xc7, 0xbb, 0x50, 0x50, 0x1e, 0xc4, 0xc8, 0xb8, 0x42, 0xbb, 0x92, 0xa5, 0xac, 0x2f, 0x54,
+	0x23, 0x3b, 0xb6, 0xc6, 0x2f, 0x40, 0x13, 0x08, 0x17, 0x82, 0x5b, 0x12, 0x13, 0x0e, 0x9a, 0xe9,
+	0x76, 0x58, 0x1b, 0x60, 0x67, 0x99, 0x99, 0x16, 0x09, 0xe1, 0xe2, 0xd9, 0x03, 0x89, 0x5f, 0x8a,
+	0x23, 0x89, 0x17, 0xbd, 0x18, 0x03, 0x7e, 0x10, 0xb3, 0x33, 0xb3, 0xd0, 0xad, 0x05, 0x12, 0x6f,
+	0xdd, 0x79, 0xfe, 0xf3, 0x7f, 0x7e, 0xcf, 0xcb, 0x14, 0x4a, 0x21, 0x89, 0x25, 0xc3, 0xa1, 0xe0,
+	0xb8, 0x57, 0xc3, 0xfb, 0x5d, 0xca, 0x0f, 0xfd, 0x84, 0x33, 0xc9, 0xd0, 0x3d, 0x15, 0xf1, 0x43,
+	0xc1, 0xfd, 0x5e, 0xcd, 0xb1, 0x23, 0x16, 0x31, 0x15, 0xc0, 0xe9, 0x2f, 0xad, 0x71, 0xe6, 0x22,
+	0xc6, 0xa2, 0x5d, 0x8a, 0x49, 0xd2, 0xc1, 0x24, 0x8e, 0x99, 0x24, 0xb2, 0xc3, 0x62, 0x61, 0xa2,
+	0x2f, 0x43, 0x26, 0xf6, 0x98, 0xc0, 0x2d, 0x22, 0xa8, 0xb6, 0xc6, 0xbd, 0x5a, 0x8b, 0x4a, 0x52,
+	0xc3, 0x09, 0x89, 0x3a, 0xb1, 0x12, 0x1b, 0x6d, 0x39, 0xc7, 0x91, 0x10, 0x4e, 0xf6, 0x32, 0x9b,
+	0x99, 0x5c, 0x28, 0xe5, 0x51, 0xe7, 0xde, 0x07, 0x80, 0xf7, 0x9c, 0x24, 0x09, 0x6d, 0x37, 0x9a,
+	0x01, 0x7a, 0x01, 0xa3, 0xa1, 0xe0, 0x25, 0xab, 0x62, 0x55, 0x27, 0xeb, 0xd3, 0x7e, 0x3f, 0xbc,
+	0xdf, 0x68, 0x06, 0xcb, 0xc5, 0xd3, 0x5f, 0xf3, 0x85, 0x20, 0xd5, 0xa0, 0x67, 0x70, 0x9f, 0xd3,
+	0x1e, 0x8d, 0xbb, 0xf4, 0xa3, 0x90, 0xbc, 0x13, 0x47, 0xa5, 0x91, 0x8a, 0x55, 0x9d, 0x08, 0xa6,
+	0xcc, 0x69, 0x53, 0x1d, 0x7a, 0x36, 0xa0, 0x77, 0x29, 0xf4, 0x86, 0x82, 0x09, 0xe8, 0x7e, 0x97,
+	0x0a, 0xe9, 0xad, 0xc1, 0xc3, 0xdc, 0xa9, 0x48, 0x58, 0x2c, 0x28, 0xaa, 0xc3, 0xb8, 0x86, 0x36,
+	0x04, 0x76, 0x9e, 0x40, 0xab, 0x0d, 0x84, 0x51, 0x7a, 0x5b, 0xf0, 0x40, 0x59, 0x35, 0x9a, 0x41,
+	0x66, 0x8f, 0x56, 0x00, 0xae, 0x7a, 0x63, 0xbc, 0x9e, 0xfb, 0xba, 0x91, 0x7e, 0xda, 0x48, 0x5f,
+	0xcf, 0xc8, 0x34, 0xd2, 0xdf, 0x20, 0x11, 0x35, 0x77, 0x83, 0xbe, 0x9b, 0xde, 0x89, 0x05, 0xd3,
+	0x7d, 0xe6, 0x97, 0x94, 0xc5, 0x50, 0xf0, 0x94, 0x71, 0xb4, 0x3a, 0x59, 0x2f, 0xe5, 0x19, 0xaf,
+	0x9a, 0x69, 0x38, 0x95, 0x16, 0xad, 0xe6, 0x88, 0x46, 0x14, 0xd1, 0xe2, 0xad, 0x44, 0x3a, 0x61,
+	0x0e, 0xe9, 0x15, 0xd8, 0x19, 0xd1, 0xf2, 0xe1, 0xfa, 0xca, 0x66, 0x56, 0xb2, 0x0d, 0x63, 0xf1,
+	0xb6, 0x5c, 0x6b, 0xab, 0x6a, 0x8b, 0x81, 0xfe, 0xf0, 0xd6, 0xe0, 0xd1, 0x80, 0xda, 0xd4, 0xf0,
+	0xba, 0x7f, 0xd0, 0xb7, 0x95, 0x90, 0x4a, 0xbd, 0xb7, 0x50, 0xbe, 0xb2, 0x6a, 0xb0, 0x58, 0x72,
+	0x12, 0xca, 0x2c, 0x7b, 0x09, 0xee, 0x90, 0x76, 0x9b, 0x53, 0xa1, 0x27, 0x37, 0x11, 0x64, 0x9f,
+	0xde, 0x3a, 0x38, 0xc3, 0xae, 0xfd, 0x37, 0xc6, 0xac, 0xa9, 0x68, 0xb3, 0xcb, 0x63, 0x21, 0x3b,
+	0xbb, 0xd9, 0xdc, 0xbc, 0x3a, 0xcc, 0x0c, 0x06, 0x4c, 0x92, 0x6b, 0xe1, 0xea, 0x3f, 0x8b, 0x30,
+	0xa6, 0x2e, 0xa1, 0x1d, 0x18, 0xd7, 0xdb, 0x85, 0x2a, 0x79, 0x8a, 0x7f, 0x97, 0xd7, 0x59, 0xb8,
+	0x41, 0xa1, 0x53, 0x7a, 0x73, 0x5f, 0xbe, 0xff, 0xf9, 0x36, 0x32, 0x83, 0x6c, 0xac, 0x9f, 0x9d,
+	0x7e, 0x72, 0xe6, 0x45, 0xa2, 0x10, 0x8a, 0xe9, 0x42, 0x21, 0x77, 0x88, 0x51, 0xdf, 0x1a, 0x3b,
+	0xf3, 0xd7, 0xc6, 0x4d, 0x1a, 0x47, 0xa5, 0xb1, 0x11, 0xca, 0xa7, 0x51, 0x1b, 0xd7, 0x83, 0xbb,
+	0xd9, 0xd4, 0x91, 0x37, 0xdc, 0xa8, 0x7f, 0x81, 0x9c, 0x27, 0x37, 0x6a, 0x4c, 0xc2, 0x05, 0x95,
+	0xf0, 0x31, 0x2a, 0xe7, 0x13, 0xc6, 0xdb, 0x12, 0x1f, 0xa9, 0x8d, 0x3b, 0x46, 0x5f, 0x2d, 0x98,
+	0xca, 0x0d, 0x1b, 0x2d, 0x5e, 0xe7, 0x3c, 0xb0, 0x45, 0x4e, 0xf5, 0x76, 0xa1, 0xe1, 0xa8, 0x2a,
+	0x0e, 0x0f, 0x55, 0x06, 0x0a, 0x37, 0x3a, 0x7c, 0x64, 0x26, 0x7c, 0x8c, 0x0e, 0x60, 0xe2, 0x72,
+	0x23, 0xd0, 0xb0, 0x1a, 0x07, 0x17, 0xc9, 0x79, 0x7a, 0xb3, 0xc8, 0x10, 0xcc, 0x2b, 0x82, 0x32,
+	0x9a, 0xcd, 0x13, 0xc8, 0x4c, 0xb8, 0xbc, 0x7a, 0x7a, 0xee, 0x5a, 0x67, 0xe7, 0xae, 0xf5, 0xfb,
+	0xdc, 0xb5, 0x4e, 0x2e, 0xdc, 0xc2, 0xd9, 0x85, 0x5b, 0xf8, 0x71, 0xe1, 0x16, 0xb6, 0x96, 0xa2,
+	0x8e, 0xfc, 0xd4, 0x6d, 0xf9, 0x21, 0xdb, 0xc3, 0x8d, 0xf4, 0xf2, 0xd2, 0x3a, 0x95, 0x07, 0x8c,
+	0xef, 0xe8, 0x2f, 0xdc, 0xab, 0xe3, 0xcf, 0xda, 0xec, 0x30, 0xa1, 0xa2, 0x35, 0xae, 0xfe, 0xa8,
+	0xdf, 0xfc, 0x0d, 0x00, 0x00, 0xff, 0xff, 0x44, 0xed, 0x0a, 0x6d, 0x65, 0x06, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -468,6 +612,8 @@ type QueryClient interface {
 	CSRByNFT(ctx context.Context, in *QueryCSRByNFTRequest, opts ...grpc.CallOption) (*QueryCSRByNFTResponse, error)
 	// query a CSR by smart contract address
 	CSRByContract(ctx context.Context, in *QueryCSRByContractRequest, opts ...grpc.CallOption) (*QueryCSRByContractResponse, error)
+	// query the turnstile address
+	Turnstile(ctx context.Context, in *QueryTurnstileRequest, opts ...grpc.CallOption) (*QueryTurnstileResponse, error)
 }
 
 type queryClient struct {
@@ -514,6 +660,15 @@ func (c *queryClient) CSRByContract(ctx context.Context, in *QueryCSRByContractR
 	return out, nil
 }
 
+func (c *queryClient) Turnstile(ctx context.Context, in *QueryTurnstileRequest, opts ...grpc.CallOption) (*QueryTurnstileResponse, error) {
+	out := new(QueryTurnstileResponse)
+	err := c.cc.Invoke(ctx, "/canto.csr.v1.Query/Turnstile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 type QueryServer interface {
 	// Parameters queries the parameters of the module.
@@ -524,6 +679,8 @@ type QueryServer interface {
 	CSRByNFT(context.Context, *QueryCSRByNFTRequest) (*QueryCSRByNFTResponse, error)
 	// query a CSR by smart contract address
 	CSRByContract(context.Context, *QueryCSRByContractRequest) (*QueryCSRByContractResponse, error)
+	// query the turnstile address
+	Turnstile(context.Context, *QueryTurnstileRequest) (*QueryTurnstileResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
@@ -541,6 +698,9 @@ func (*UnimplementedQueryServer) CSRByNFT(ctx context.Context, req *QueryCSRByNF
 }
 func (*UnimplementedQueryServer) CSRByContract(ctx context.Context, req *QueryCSRByContractRequest) (*QueryCSRByContractResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CSRByContract not implemented")
+}
+func (*UnimplementedQueryServer) Turnstile(ctx context.Context, req *QueryTurnstileRequest) (*QueryTurnstileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Turnstile not implemented")
 }
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
@@ -619,6 +779,24 @@ func _Query_CSRByContract_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_Turnstile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryTurnstileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).Turnstile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/canto.csr.v1.Query/Turnstile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).Turnstile(ctx, req.(*QueryTurnstileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Query_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "canto.csr.v1.Query",
 	HandlerType: (*QueryServer)(nil),
@@ -639,9 +817,53 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 			MethodName: "CSRByContract",
 			Handler:    _Query_CSRByContract_Handler,
 		},
+		{
+			MethodName: "Turnstile",
+			Handler:    _Query_Turnstile_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "canto/csr/v1/query.proto",
+}
+
+func (m *WrappedCSR) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *WrappedCSR) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *WrappedCSR) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.RevenueString) > 0 {
+		i -= len(m.RevenueString)
+		copy(dAtA[i:], m.RevenueString)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.RevenueString)))
+		i--
+		dAtA[i] = 0x12
+	}
+	{
+		size, err := m.Csr.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintQuery(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
 }
 
 func (m *QueryParamsRequest) Marshal() (dAtA []byte, err error) {
@@ -908,6 +1130,59 @@ func (m *QueryCSRByContractResponse) MarshalToSizedBuffer(dAtA []byte) (int, err
 	return len(dAtA) - i, nil
 }
 
+func (m *QueryTurnstileRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryTurnstileRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryTurnstileRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryTurnstileResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryTurnstileResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryTurnstileResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Address) > 0 {
+		i -= len(m.Address)
+		copy(dAtA[i:], m.Address)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.Address)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	offset -= sovQuery(v)
 	base := offset
@@ -919,6 +1194,21 @@ func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
+func (m *WrappedCSR) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.Csr.Size()
+	n += 1 + l + sovQuery(uint64(l))
+	l = len(m.RevenueString)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
 func (m *QueryParamsRequest) Size() (n int) {
 	if m == nil {
 		return 0
@@ -1018,11 +1308,148 @@ func (m *QueryCSRByContractResponse) Size() (n int) {
 	return n
 }
 
+func (m *QueryTurnstileRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *QueryTurnstileResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Address)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
 func sovQuery(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozQuery(x uint64) (n int) {
 	return sovQuery(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+}
+func (m *WrappedCSR) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: WrappedCSR: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: WrappedCSR: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Csr", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Csr.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RevenueString", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RevenueString = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
 }
 func (m *QueryParamsRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
@@ -1301,7 +1728,7 @@ func (m *QueryCSRsResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Csrs = append(m.Csrs, CSR{})
+			m.Csrs = append(m.Csrs, WrappedCSR{})
 			if err := m.Csrs[len(m.Csrs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1658,6 +2085,138 @@ func (m *QueryCSRByContractResponse) Unmarshal(dAtA []byte) error {
 			if err := m.Csr.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryTurnstileRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryTurnstileRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryTurnstileRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryTurnstileResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryTurnstileResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryTurnstileResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Address = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

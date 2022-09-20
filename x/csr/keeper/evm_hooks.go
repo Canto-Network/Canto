@@ -39,16 +39,14 @@ func (k Keeper) Hooks() Hooks {
 // the store. If so, the fees will be split and distributed to the Turnstile Address.
 func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *ethtypes.Receipt) error {
 	// Check if the csr module has been enabled
+	h.k.Logger(ctx).Info("The PostTxProcessing hook of CSR has been reached")
+
 	params := h.k.GetParams(ctx)
 	if !params.EnableCsr {
 		return nil
 	}
 
-	// Ensure that transactions have a valid to address
-	contract := msg.To()
-	if contract == nil {
-		return nil
-	}
+	h.k.Logger(ctx).Info("Past the Params function so good")
 
 	// Check and process turnstile events if applicable
 	// If a tx has turnstile events, then no fees will get distributed
@@ -57,9 +55,14 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 		h.k.Logger(ctx).Error("failed to process turnstile events in the receipt: ", err.Error())
 	}
 
+	h.k.Logger(ctx).Info("done with process events")
+
 	// Grab the nft the smart contract corresponds to, if it has no nft -> return
+	contract := msg.To()
+	h.k.Logger(ctx).Info("Finding the Contract: ", contract.String())
 	nftID, foundNFT := h.k.GetNFTByContract(ctx, contract.String())
 	if !foundNFT {
+		h.k.Logger(ctx).Info("Contract not found: ", contract.String())
 		return nil
 	}
 
@@ -67,6 +70,8 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 	if !found {
 		return sdkerrors.Wrapf(ErrNonexistentCSR, "EVMHook::PostTxProcessing the NFT ID was found but the CSR was not.")
 	}
+
+	h.k.Logger(ctx).Info("CSR found: ", csr)
 
 	// Calculate fees to be distributed = intFloor(GasUsed * GasPrice * csrShares)
 	fee := sdk.NewIntFromUint64(receipt.GasUsed).Mul(sdk.NewIntFromBigInt(msg.GasPrice()))
@@ -108,6 +113,8 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 
 // returns an error if there was an issue processing any of the events (register, assign) from the turnstile address
 func (h Hooks) processEvents(ctx sdk.Context, receipt *ethtypes.Receipt) error {
+	h.k.Logger(ctx).Info("In Process events")
+
 	// Get the turnstile which is used to check events
 	turnstileAddress, found := h.k.GetTurnstile(ctx)
 	if !found {
@@ -130,8 +137,12 @@ func (h Hooks) processEvents(ctx sdk.Context, receipt *ethtypes.Receipt) error {
 			// switch and process based on the turnstile event type
 			switch event.Name {
 			case types.TurnstileEventRegister:
+				h.k.Logger(ctx).Info("In Register Event")
+
 				err = h.k.RegisterEvent(ctx, log.Data)
 			case types.TurnstileEventUpdate:
+				h.k.Logger(ctx).Info("In Update Event")
+
 				err = h.k.UpdateEvent(ctx, log.Data)
 			}
 			if err != nil {
