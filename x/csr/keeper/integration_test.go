@@ -33,7 +33,6 @@ var turnstileContract = contracts.TurnstileContract
 var _ = Describe("CSR Distribution : ", Ordered, func() {
 	var (
 		// Variables pertaining to account that deploys smart contract
-		_                  *ethsecp256k1.PrivKey
 		deployerAddress    sdk.AccAddress
 		deployerEVMAddress common.Address
 

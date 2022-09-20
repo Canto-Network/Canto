@@ -54,7 +54,7 @@ func (k Keeper) RegisterEvent(ctx sdk.Context, data []byte) error {
 	return nil
 }
 
-// Update events occue in the Turnstile contract when a user is attempting to assign their newly
+// Update events occur in the Turnstile contract when a user is attempting to assign their newly
 // deployed smart contract to an existing NFT. This event handler will unpack the data, validate
 // that the smart contract to be assigned is valid, check that NFT id exists, and append the smart contract
 // to the NFT id entered. Update is permissionless in the sense that you do not have to be the owner
