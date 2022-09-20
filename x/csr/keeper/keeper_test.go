@@ -12,7 +12,6 @@ import (
 	"github.com/Canto-Network/Canto/v2/app"
 	"github.com/Canto-Network/Canto/v2/contracts"
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
-	csrTypes "github.com/Canto-Network/Canto/v2/x/csr/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
@@ -236,7 +235,7 @@ func getNFTRevenue(suite *KeeperTestSuite, address *common.Address, nft uint64) 
 }
 
 // Helper function that checks the state of the CSR objects
-func checkCSRValues(csr csrTypes.CSR, expectedID uint64, expectedContracts []string, expectedTxs uint64, expectedRevenue *big.Int) {
+func checkCSRValues(csr types.CSR, expectedID uint64, expectedContracts []string, expectedTxs uint64, expectedRevenue *big.Int) {
 	s.Require().Equal(expectedID, csr.Id)
 	s.Require().Equal(expectedContracts, csr.Contracts)
 	s.Require().Equal(expectedTxs, csr.Txs)

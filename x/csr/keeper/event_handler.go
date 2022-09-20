@@ -21,22 +21,16 @@ func (k Keeper) RegisterEvent(ctx sdk.Context, data []byte) error {
 		return err
 	}
 
-	k.Logger(ctx).Info("In Register Event this is the event ", event)
-
 	// Validate that the contract entered can be registered
 	err = k.ValidateContract(ctx, event.SmartContractAddress)
 	if err != nil {
 		return err
 	}
 
-	k.Logger(ctx).Info("Contract has been validated ", event)
-
 	// Check that the receiver account  exists in the evm store
 	if acct := k.evmKeeper.GetAccount(ctx, event.Receiver); acct == nil {
 		return sdkerrors.Wrapf(ErrNonexistentAcct, "EventHandler::RegisterEvent: account does not exist: %s", event.Receiver)
 	}
-
-	k.Logger(ctx).Info("Account has been validated ", event)
 
 	// Set the NFTID in the store if it has not been registered yet
 	nftID := event.Id.Uint64()
@@ -54,12 +48,8 @@ func (k Keeper) RegisterEvent(ctx sdk.Context, data []byte) error {
 		return err
 	}
 
-	k.Logger(ctx).Info("CSR has been validated ", csr)
-
 	// Set the CSR in the store
 	k.SetCSR(ctx, csr)
-
-	k.Logger(ctx).Info("CSR has been set in state ", csr)
 
 	return nil
 }
