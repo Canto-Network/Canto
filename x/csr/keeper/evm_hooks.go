@@ -48,7 +48,7 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 	// If a tx has turnstile events, then no fees will get distributed
 	err := h.processEvents(ctx, receipt)
 	if err != nil {
-		h.k.Logger(ctx).Error("failed to process turnstile events in the receipt: ", err.Error())
+		h.k.Logger(ctx).Error(err.Error())
 	}
 
 	// Grab the nft the smart contract corresponds to, if it has no nft -> return nil
