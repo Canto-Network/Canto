@@ -66,6 +66,7 @@ func (k Keeper) CSRByNFT(c context.Context, request *types.QueryCSRByNFTRequest)
 	if !found {
 		return nil, status.Errorf(codes.NotFound, "no csr is associated with NFT ID %d", request.NftId)
 	}
+
 	return &types.QueryCSRByNFTResponse{Csr: *csr}, nil
 }
 
@@ -97,5 +98,16 @@ func (k Keeper) CSRByContract(c context.Context, request *types.QueryCSRByContra
 		return nil, status.Errorf(codes.NotFound, "no csr contains an smart contract with address %s", request.Address)
 	}
 	csr, _ := k.GetCSR(ctx, nft)
+
 	return &types.QueryCSRByContractResponse{Csr: *csr}, nil
+}
+
+// Turnstile returns the turnstile address that was deployed by the module account. This function does not take in any request params.
+func (k Keeper) Turnstile(c context.Context, _ *types.QueryTurnstileRequest) (*types.QueryTurnstileResponse, error) {
+	ctx := sdk.UnwrapSDKContext(c)
+	address, found := k.GetTurnstile(ctx)
+	if !found {
+		return nil, status.Errorf(codes.NotFound, "the turnstile address has not been found.")
+	}
+	return &types.QueryTurnstileResponse{Address: address.String()}, nil
 }

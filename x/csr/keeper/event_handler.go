@@ -22,18 +22,18 @@ func (k Keeper) RegisterEvent(ctx sdk.Context, data []byte) error {
 	}
 
 	// Validate that the contract entered can be registered
-	err = k.ValidateContract(ctx, event.SmartContractAddress)
+	err = k.ValidateContract(ctx, event.SmartContract)
 	if err != nil {
 		return err
 	}
 
 	// Check that the receiver account  exists in the evm store
-	if acct := k.evmKeeper.GetAccount(ctx, event.Receiver); acct == nil {
-		return sdkerrors.Wrapf(ErrNonexistentAcct, "EventHandler::RegisterEvent: account does not exist: %s", event.Receiver)
+	if acct := k.evmKeeper.GetAccount(ctx, event.Recipient); acct == nil {
+		return sdkerrors.Wrapf(ErrNonexistentAcct, "EventHandler::RegisterEvent: account does not exist: %s", event.Recipient)
 	}
 
 	// Set the NFTID in the store if it has not been registered yet
-	nftID := event.Id.Uint64()
+	nftID := event.TokenId.Uint64()
 	_, found := k.GetCSR(ctx, nftID)
 	if found {
 		return sdkerrors.Wrapf(ErrDuplicateNFTID, "EventHandler::RegisterEvent: this NFT id has already been registered")
@@ -41,7 +41,7 @@ func (k Keeper) RegisterEvent(ctx sdk.Context, data []byte) error {
 
 	// Create CSR object and perform stateless validation
 	csr := types.NewCSR(
-		[]string{event.SmartContractAddress.String()},
+		[]string{event.SmartContract.String()},
 		nftID,
 	)
 	if err := csr.Validate(); err != nil {
@@ -67,19 +67,19 @@ func (k Keeper) UpdateEvent(ctx sdk.Context, data []byte) error {
 		return err
 	}
 	// Validate that the contract entered can be registered
-	err = k.ValidateContract(ctx, event.SmartContractAddress)
+	err = k.ValidateContract(ctx, event.SmartContract)
 	if err != nil {
 		return err
 	}
 
 	// Check if the NFT that is being updated exists in the CSR store
-	nftID := event.Id.Uint64()
+	nftID := event.TokenId.Uint64()
 	csr, found := k.GetCSR(ctx, nftID)
 	if !found {
 		return sdkerrors.Wrapf(ErrNFTNotFound, "EventHandler::UpdateCSREvent the nft entered does not currently exist")
 	}
 	// Add the new smart contract to the CSR NFT and validate
-	csr.Contracts = append(csr.Contracts, event.SmartContractAddress.String())
+	csr.Contracts = append(csr.Contracts, event.SmartContract.String())
 	err = csr.Validate()
 	if err != nil {
 		return err

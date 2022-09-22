@@ -12,7 +12,6 @@ import (
 	"github.com/Canto-Network/Canto/v2/app"
 	"github.com/Canto-Network/Canto/v2/contracts"
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
-	csrTypes "github.com/Canto-Network/Canto/v2/x/csr/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
@@ -217,36 +216,12 @@ func calculateExpectedFee(gasUsed uint64, gasPrice *big.Int, csrShare sdk.Dec) s
 	return expectedTurnstileBalance
 }
 
-// Helper function that will get the transaction revenue for a given NFT
-func getNFTRevenue(suite *KeeperTestSuite, address *common.Address, nft uint64) (*big.Int, error) {
-	// Call to retrieve the amount of canto for a given NFT
-	resp, err := suite.app.CSRKeeper.CallMethod(suite.ctx, "revenue", contracts.TurnstileContract, types.ModuleAddress, address, big.NewInt(0), new(big.Int).SetUint64(nft))
-	if err != nil {
-		return nil, err
-	}
-
-	// Unpack the results into a big int
-	unpackedData, err := contracts.TurnstileContract.ABI.Methods["revenue"].Outputs.Unpack(resp.Ret)
-	if err != nil {
-		return nil, err
-	}
-	nftRevenue := unpackedData[0].(*big.Int)
-
-	return nftRevenue, nil
-}
-
 // Helper function that checks the state of the CSR objects
-func checkCSRValues(csr csrTypes.CSR, expectedID uint64, expectedContracts []string, expectedTxs uint64, expectedRevenue *big.Int) {
+func checkCSRValues(csr types.CSR, expectedID uint64, expectedContracts []string, expectedTxs uint64, expectedRevenue *big.Int) {
 	s.Require().Equal(expectedID, csr.Id)
 	s.Require().Equal(expectedContracts, csr.Contracts)
 	s.Require().Equal(expectedTxs, csr.Txs)
-	if expectedTxs > 0 {
-		revenue := big.NewInt(0)
-		revenue.SetBytes(csr.Revenue)
-		s.Require().NotZero(revenue)
-
-		s.Require().Equal(expectedRevenue, revenue)
-	}
+	s.Require().Equal(expectedRevenue, csr.Revenue.BigInt())
 }
 
 // Generates a new private private key and corresponding SDK Account Address

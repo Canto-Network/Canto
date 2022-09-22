@@ -298,7 +298,7 @@ func (suite *KeeperTestSuite) TestCSRByContract() {
 	}
 }
 
-// Special edge case for when the request made is null, cannot be routed to the query client
+// Test the query service for params
 func (suite *KeeperTestSuite) TestQueryParams() {
 	ctx := sdk.WrapSDKContext(suite.ctx)
 	expectedParams := types.DefaultParams()
@@ -307,4 +307,15 @@ func (suite *KeeperTestSuite) TestQueryParams() {
 	res, err := suite.queryClient.Params(ctx, &types.QueryParamsRequest{})
 	suite.Require().NoError(err)
 	suite.Require().Equal(expectedParams, res.Params)
+}
+
+// Test the query service that retrieves the turnstile address
+func (suite *KeeperTestSuite) TestQueryTurnstile() {
+	suite.Commit()
+	ctx := sdk.WrapSDKContext(suite.ctx)
+
+	address, _ := suite.app.CSRKeeper.GetTurnstile(suite.ctx)
+	res, err := suite.queryClient.Turnstile(ctx, &types.QueryTurnstileRequest{})
+	suite.Require().NoError(err)
+	suite.Require().Equal(address.String(), res.Address)
 }

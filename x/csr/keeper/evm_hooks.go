@@ -29,14 +29,15 @@ func (k Keeper) Hooks() Hooks {
 	return Hooks{k}
 }
 
-// PostTxProcessing implements EvmHooks.PostTxProcessing. The EVM hook allows users to utilize the Turnstile
-// Smart Contract to register and assign smart contracts that are deployed to a Contract Secured Revenue NFT and
-// distribute transaction fees for contracts that are already registered to some NFT. After each successful EVM
-// transaction, the PostTxProcessing hook will process all of the events from the log receipt of the EVM tx.
-// If any of the events originate from the Turnstile address, there will be an event handler that processes the two
-// Turnstile events – register and assign – accordingly. At the very end of the hook, the To address from the EVM
-// tx to will be read in. From there, the hook will check if that contract address belongs to any NFT currently in
-// the store. If so, the fees will be split and distributed to the Turnstile Address.
+// The PostTxProcessing hook implements EvmHooks.PostTxProcessing. The EVM hook allows
+// users to utilize the Turnstile smart contract to register and assign smart contracts
+// to a CSR NFT + distribute transaction fees for contracts that are already registered
+// to some NFT. After each successful EVM transaction, the PostTxProcessing hook will
+// check if any of the events emitted in the tx originate from the Turnstile address.
+// If some event does exist, the event handler will process and update state accordingly.
+// At the very end of the hook, the hook will check if the To address in the tx belongs
+// to any NFT currently in state. If so, the fees will be split and distributed to the
+// Turnstile Address / NFT.
 func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *ethtypes.Receipt) error {
 	// Check if the csr module has been enabled
 	params := h.k.GetParams(ctx)
@@ -44,20 +45,14 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 		return nil
 	}
 
-	// Ensure that transactions have a valid to address
+	// Check and process turnstile events if applicable
+	h.processEvents(ctx, receipt)
+
 	contract := msg.To()
 	if contract == nil {
 		return nil
 	}
 
-	// Check and process turnstile events if applicable
-	// If a tx has turnstile events, then no fees will get distributed
-	err := h.processEvents(ctx, receipt)
-	if err != nil {
-		h.k.Logger(ctx).Error("failed to process turnstile events in the receipt: ", err.Error())
-	}
-
-	// Grab the nft the smart contract corresponds to, if it has no nft -> return
 	nftID, foundNFT := h.k.GetNFTByContract(ctx, contract.String())
 	if !foundNFT {
 		return nil
@@ -75,7 +70,7 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 	csrFees := sdk.Coins{{Denom: evmDenom, Amount: csrFee}}
 
 	// Send fees from fee collector to module account before distribution
-	err = h.k.bankKeeper.SendCoinsFromModuleToModule(ctx, h.k.FeeCollectorName, types.ModuleName, csrFees)
+	err := h.k.bankKeeper.SendCoinsFromModuleToModule(ctx, h.k.FeeCollectorName, types.ModuleName, csrFees)
 	if err != nil {
 		return sdkerrors.Wrapf(ErrFeeDistribution, "EVMHook::PostTxProcessing failed to distribute fees from fee collector to module, %d", err)
 	}
@@ -93,12 +88,9 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 		return sdkerrors.Wrapf(ErrFeeDistribution, "EVMHook::PostTxProcessing failed to distribute fees from module account to turnstile, %d", err)
 	}
 
-	// Update TX count for this NFT
+	// Update metrics on the CSR obj
 	csr.Txs += 1
-	// Update the cumulative revenue accumulated by this NFT
-	revenue := new(big.Int).SetBytes(csr.Revenue)
-	revenue.Add(revenue, amount)
-	csr.Revenue = revenue.Bytes()
+	csr.Revenue = csr.Revenue.Add(csrFee)
 
 	// Store updated CSR
 	h.k.SetCSR(ctx, *csr)
@@ -106,12 +98,11 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 	return nil
 }
 
-// returns an error if there was an issue processing any of the events (register, assign) from the turnstile address
-func (h Hooks) processEvents(ctx sdk.Context, receipt *ethtypes.Receipt) error {
-	// Get the turnstile which is used to check events
+func (h Hooks) processEvents(ctx sdk.Context, receipt *ethtypes.Receipt) {
+	// Get the turnstile address from which state transition events are emitted
 	turnstileAddress, found := h.k.GetTurnstile(ctx)
 	if !found {
-		return sdkerrors.Wrapf(ErrContractDeployments, "Keeper::ProcessEvents the turnstile contract has not been found.")
+		panic(sdkerrors.Wrapf(ErrContractDeployments, "Keeper::ProcessEvents the turnstile contract has not been found."))
 	}
 
 	for _, log := range receipt.Logs {
@@ -119,12 +110,13 @@ func (h Hooks) processEvents(ctx sdk.Context, receipt *ethtypes.Receipt) error {
 			continue
 		}
 
-		// Check if the address matches the turnstile contracts
+		// Only process events that originate from the Turnstile contract
 		eventID := log.Topics[0]
 		if log.Address == turnstileAddress {
 			event, err := TurnstileContract.EventByID(eventID)
 			if err != nil {
-				return err
+				h.k.Logger(ctx).Error(err.Error())
+				return
 			}
 
 			// switch and process based on the turnstile event type
@@ -135,9 +127,9 @@ func (h Hooks) processEvents(ctx sdk.Context, receipt *ethtypes.Receipt) error {
 				err = h.k.UpdateEvent(ctx, log.Data)
 			}
 			if err != nil {
-				return err
+				h.k.Logger(ctx).Error(err.Error())
+				return
 			}
 		}
 	}
-	return nil
 }
