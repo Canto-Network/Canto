@@ -36,12 +36,6 @@ service Query {
   }
 }
 
-// This is a wrapper around the CSR proto that returns the CSR and revenue in the form of a string.
-message WrappedCSR {
-  CSR csr = 1 [(gogoproto.nullable) = false];
-  string revenue_string = 2;
-}
-
 // QueryParamsRequest is the request type for the Query/Params RPC method.
 message QueryParamsRequest {}
 
@@ -59,7 +53,7 @@ message QueryCSRsRequest {
 
 // QueryCSRsResponse is the response type for the Query/CSRs RPC method.
 message QueryCSRsResponse {
-  repeated WrappedCSR csrs = 1 [ (gogoproto.nullable) = false ];
+  repeated CSR csrs = 1 [ (gogoproto.nullable) = false ];
   // pagination for response
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
@@ -72,7 +66,7 @@ message QueryCSRByNFTRequest {
 // QueryCSRByNFTResponse is the response type for the Query/CSRByNFT RPC method.
 message QueryCSRByNFTResponse { 
   // csr object queried by nft id
-  WrappedCSR csr = 1 [ (gogoproto.nullable) = false];
+  CSR csr = 1 [ (gogoproto.nullable) = false];
 }
 
 // QueryCSRByContractRequest is the request type for the Query/CSRByContract RPC method.
@@ -83,7 +77,7 @@ message QueryCSRByContractRequest {
 // QueryCSRByContractResponse is the response type for the Query/CSRByContract RPC method.
 message QueryCSRByContractResponse { 
   // csr object queried by smart contract address
-  WrappedCSR csr = 1 [ (gogoproto.nullable) = false];
+  CSR csr = 1 [ (gogoproto.nullable) = false];
 }
 
 // QueryTurnstileRequest is the request type for the Query/Turnstile RPC method.

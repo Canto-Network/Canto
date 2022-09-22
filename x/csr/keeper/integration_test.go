@@ -108,7 +108,7 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 			s.Commit()
 
 			// CSR object should have been created and set in store
-			_, found := s.app.CSRKeeper.GetCSR(s.ctx, 1)
+			_, found := s.app.CSRKeeper.GetCSR(s.ctx, 0)
 			s.Require().False(found)
 		})
 		It("it should register a smart contract (non-factory deployed)", func() {
@@ -126,23 +126,18 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 			s.Commit()
 
 			// Track contracts added to NFT
-			csrContracts[2] = append(csrContracts[2], contractAddress.String())
+			csrContracts[0] = append(csrContracts[0], contractAddress.String())
 
 			// CSR object should have been created and set in store
-			csr, found := s.app.CSRKeeper.GetCSR(s.ctx, 2)
+			csr, found := s.app.CSRKeeper.GetCSR(s.ctx, 0)
 			s.Require().True(found)
 
 			// Calculate the expected revenue for the transaction
 			expectedFee := calculateExpectedFee(uint64(response.GasUsed), gasPrice, csrShares).BigInt()
-			revenueByNFT[2] = expectedFee
+			revenueByNFT[0] = expectedFee
 
 			// Check CSR obj values
-			checkCSRValues(*csr, 2, csrContracts[2], 1, revenueByNFT[2])
-
-			// Get the balance of the revenue accumulated at the given NFT
-			nftRevenue, err := getNFTRevenue(s, &turnstileAddress, 2)
-			s.Require().NoError(err)
-			s.Require().Equal(nftRevenue, revenueByNFT[2])
+			checkCSRValues(*csr, 0, csrContracts[0], 1, revenueByNFT[0])
 		})
 		It("it should not re-register a smart contract", func() {
 			// This call will make the turnstile address register the test contract to itself
@@ -150,25 +145,16 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 			s.Require().NoError(err)
 
 			// Register the smart contract
-			contractAddress := common.HexToAddress(csrContracts[2][0])
-			response := evmTX(userKey, &contractAddress, amount, gasLimit, gasPrice, gasFeeCap, gasTipCap, data, accesses)
+			contractAddress := common.HexToAddress(csrContracts[0][0])
+			evmTX(userKey, &contractAddress, amount, gasLimit, gasPrice, gasFeeCap, gasTipCap, data, accesses)
 			s.Commit()
 
 			// CSR object should have been created and set in store
-			csr, found := s.app.CSRKeeper.GetCSR(s.ctx, 2)
+			csr, found := s.app.CSRKeeper.GetCSR(s.ctx, 0)
 			s.Require().True(found)
 
-			// Calculate the expected revenue for the transaction
-			expectedFee := calculateExpectedFee(uint64(response.GasUsed), gasPrice, csrShares).BigInt()
-			revenueByNFT[2].Add(revenueByNFT[2], expectedFee)
-
 			// Check CSR obj values
-			checkCSRValues(*csr, 2, csrContracts[2], 2, revenueByNFT[2])
-
-			// Get the balance of the revenue accumulated at the given NFT
-			nftRevenue, err := getNFTRevenue(s, &turnstileAddress, 2)
-			s.Require().NoError(err)
-			s.Require().Equal(nftRevenue, revenueByNFT[2])
+			checkCSRValues(*csr, 0, csrContracts[0], 1, revenueByNFT[0])
 		})
 		It("it should register a contract deployed by a smart contract factory", func() {
 			// Deploys the factory contract directly to the EVM state (does not hit the postTxProcessing hooks)
@@ -177,10 +163,10 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 			s.Commit()
 
 			// Check that the NFT is not registered beforehand
-			_, found := s.app.CSRKeeper.GetCSR(s.ctx, 3)
+			_, found := s.app.CSRKeeper.GetCSR(s.ctx, 1)
 			s.Require().False(found)
 
-			// Register will create a new NFT (3) and deploy a smart contract
+			// Register will create a new NFT (1) and deploy a smart contract
 			data, err := factoryContract.ABI.Pack("register", deployerEVMAddress)
 			s.Require().NoError(err)
 
@@ -188,11 +174,12 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 			s.Commit()
 
 			// CSR object should have been created and set in store
-			csr, found := s.app.CSRKeeper.GetCSR(s.ctx, 3)
+			csr, found := s.app.CSRKeeper.GetCSR(s.ctx, 1)
 			s.Require().True(found)
 
 			s.Require().Equal(csr.Txs, uint64(0))
-			s.Require().Equal(big.NewInt(0).SetBytes(csr.Revenue), big.NewInt(0))
+			s.Require().Equal(len(csr.Contracts), 1)
+			s.Require().Equal(csr.Revenue.BigInt(), big.NewInt(0))
 		})
 	})
 })

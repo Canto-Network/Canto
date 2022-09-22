@@ -536,17 +536,9 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 				expectedTurnstileBalance := calculateExpectedFee(tc.test.cumulativeGasUsed, gasPrice, csrShare)
 				suite.Require().Equal(expectedTurnstileBalance, turnstileBalance.AmountOf(evmDenom))
 
-				// Get the balance of the revenue accumulated at the given NFT
-				nftRevenue, err := getNFTRevenue(suite, &turnstileAddress, testNFT)
-				suite.Require().NoError(err)
-
 				// Check that the expected NFT balance matches the actual balance
 				nftFee := calculateExpectedFee(gasUsedByNFT, gasPrice, csrShare)
-				suite.Require().Equal(nftFee.BigInt(), nftRevenue)
-
-				// Check that the internal cumulative NFT balance matches the smart contract
-				bigInt := big.NewInt(0)
-				suite.Require().Equal(bigInt.SetBytes(csr.Revenue).Uint64(), nftRevenue.Uint64())
+				suite.Require().Equal(nftFee, csr.Revenue)
 
 				// Require that the number of transactions match up with what is expected
 				suite.Require().Equal(csr.Txs, tc.test.nft.txs)

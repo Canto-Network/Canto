@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"math/big"
 	"strings"
 
 	"github.com/Canto-Network/Canto/v2/x/csr/types"
@@ -32,19 +31,14 @@ func (k Keeper) CSRs(c context.Context, request *types.QueryCSRsRequest) (*types
 	ctx := sdk.UnwrapSDKContext(c)
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixCSR)
 
-	wrappedCSRs := make([]types.WrappedCSR, 0)
+	csrs := make([]types.CSR, 0)
 	pageRes, err := query.Paginate(
 		store,
 		request.Pagination,
 		func(key, value []byte) error {
 			nft := BytesToUInt64(key)
 			csr, _ := k.GetCSR(ctx, nft)
-			revenue := big.NewInt(0).SetBytes(csr.Revenue)
-			wrappedCSR := types.WrappedCSR{
-				Csr:           *csr,
-				RevenueString: revenue.String(),
-			}
-			wrappedCSRs = append(wrappedCSRs, wrappedCSR)
+			csrs = append(csrs, *csr)
 			return nil
 		},
 	)
@@ -54,7 +48,7 @@ func (k Keeper) CSRs(c context.Context, request *types.QueryCSRsRequest) (*types
 	}
 
 	return &types.QueryCSRsResponse{
-		Csrs:       wrappedCSRs,
+		Csrs:       csrs,
 		Pagination: pageRes,
 	}, nil
 }
@@ -73,13 +67,7 @@ func (k Keeper) CSRByNFT(c context.Context, request *types.QueryCSRByNFTRequest)
 		return nil, status.Errorf(codes.NotFound, "no csr is associated with NFT ID %d", request.NftId)
 	}
 
-	revenue := big.NewInt(0).SetBytes(csr.Revenue)
-	wrappedCSR := types.WrappedCSR{
-		Csr:           *csr,
-		RevenueString: revenue.String(),
-	}
-
-	return &types.QueryCSRByNFTResponse{Csr: wrappedCSR}, nil
+	return &types.QueryCSRByNFTResponse{Csr: *csr}, nil
 }
 
 // CSRByContract returns the CSR associated with a given smart contracted address passed into the request. This will return nil if the smart contract
@@ -111,13 +99,7 @@ func (k Keeper) CSRByContract(c context.Context, request *types.QueryCSRByContra
 	}
 	csr, _ := k.GetCSR(ctx, nft)
 
-	revenue := big.NewInt(0).SetBytes(csr.Revenue)
-	wrappedCSR := types.WrappedCSR{
-		Csr:           *csr,
-		RevenueString: revenue.String(),
-	}
-
-	return &types.QueryCSRByContractResponse{Csr: wrappedCSR}, nil
+	return &types.QueryCSRByContractResponse{Csr: *csr}, nil
 }
 
 // Turnstile returns the turnstile address that was deployed by the module account. This function does not take in any request params.

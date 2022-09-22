@@ -1,6 +1,7 @@
 package types
 
 import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	ethermint "github.com/evmos/ethermint/types"
 )
@@ -11,7 +12,7 @@ func NewCSR(contracts []string, id uint64) CSR {
 		Contracts: contracts,
 		Id:        id,
 		Txs:       0,
-		Revenue:   nil,
+		Revenue:   sdk.Int(sdk.ZeroUint()),
 	}
 }
 

@@ -15,7 +15,7 @@ import (
 )
 
 // Default gas limit for eth txs on the turnstile
-var DefaultGasLimit uint64 = 25000000
+var DefaultGasLimit uint64 = 30000000
 
 // DeployTurnstile will deploy the Turnstile smart contract from the csr module account. This will allow the
 // CSR module to interact with the CSR NFTs in a permissionless way.
