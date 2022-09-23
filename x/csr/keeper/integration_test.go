@@ -112,7 +112,7 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 			s.Require().False(found)
 		})
 		It("it should register a smart contract (non-factory deployed)", func() {
-			// Create a new smart contract and register it to userAddress
+			// Deploys the contract directly to the EVM state (does not hit the postTxProcessing hooks)
 			contractAddress, err := s.app.CSRKeeper.DeployContract(s.ctx, csrSmartContract, &turnstileAddress)
 			s.Require().NoError(err)
 			s.Commit()
@@ -126,35 +126,34 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 			s.Commit()
 
 			// Track contracts added to NFT
-			csrContracts[0] = append(csrContracts[0], contractAddress.String())
+			csrContracts[1] = append(csrContracts[1], contractAddress.String())
 
 			// CSR object should have been created and set in store
-			csr, found := s.app.CSRKeeper.GetCSR(s.ctx, 0)
+			csr, found := s.app.CSRKeeper.GetCSR(s.ctx, 1)
 			s.Require().True(found)
 
 			// Calculate the expected revenue for the transaction
 			expectedFee := calculateExpectedFee(uint64(response.GasUsed), gasPrice, csrShares).BigInt()
-			revenueByNFT[0] = expectedFee
+			revenueByNFT[1] = expectedFee
 
 			// Check CSR obj values
-			checkCSRValues(*csr, 0, csrContracts[0], 1, revenueByNFT[0])
+			checkCSRValues(*csr, 1, csrContracts[1], 1, revenueByNFT[1])
 		})
 		It("it should not re-register a smart contract", func() {
-			// This call will make the turnstile address register the test contract to itself
-			data, err := csrSmartContract.ABI.Pack("assign", big.NewInt(2))
+			data, err := csrSmartContract.ABI.Pack("assign", big.NewInt(1))
 			s.Require().NoError(err)
 
-			// Register the smart contract
-			contractAddress := common.HexToAddress(csrContracts[0][0])
+			// Assign the smart contract
+			contractAddress := common.HexToAddress(csrContracts[1][0])
 			evmTX(userKey, &contractAddress, amount, gasLimit, gasPrice, gasFeeCap, gasTipCap, data, accesses)
 			s.Commit()
 
 			// CSR object should have been created and set in store
-			csr, found := s.app.CSRKeeper.GetCSR(s.ctx, 0)
+			csr, found := s.app.CSRKeeper.GetCSR(s.ctx, 1)
 			s.Require().True(found)
 
 			// Check CSR obj values
-			checkCSRValues(*csr, 0, csrContracts[0], 1, revenueByNFT[0])
+			checkCSRValues(*csr, 1, csrContracts[1], 1, revenueByNFT[1])
 		})
 		It("it should register a contract deployed by a smart contract factory", func() {
 			// Deploys the factory contract directly to the EVM state (does not hit the postTxProcessing hooks)
@@ -163,10 +162,10 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 			s.Commit()
 
 			// Check that the NFT is not registered beforehand
-			_, found := s.app.CSRKeeper.GetCSR(s.ctx, 1)
+			_, found := s.app.CSRKeeper.GetCSR(s.ctx, 2)
 			s.Require().False(found)
 
-			// Register will create a new NFT (1) and deploy a smart contract
+			// Register will create a new NFT (2) and deploy a smart contract
 			data, err := factoryContract.ABI.Pack("register", deployerEVMAddress)
 			s.Require().NoError(err)
 
@@ -174,7 +173,7 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 			s.Commit()
 
 			// CSR object should have been created and set in store
-			csr, found := s.app.CSRKeeper.GetCSR(s.ctx, 1)
+			csr, found := s.app.CSRKeeper.GetCSR(s.ctx, 2)
 			s.Require().True(found)
 
 			s.Require().Equal(csr.Txs, uint64(0))

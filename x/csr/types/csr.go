@@ -23,11 +23,11 @@ func (csr CSR) Validate() error {
 	seenSmartContracts := make(map[string]bool)
 	for _, smartContract := range csr.Contracts {
 		if err := ethermint.ValidateNonZeroAddress(smartContract); err != nil {
-			return sdkerrors.Wrapf(ErrInvalidSmartContractAddress, "CSR::Validate one or more of the entered smart contract address are invalid.")
+			return sdkerrors.Wrapf(ErrInvalidSmartContractAddress, "CSR::Validate one or more of the entered smart contract address are invalid: %s", smartContract)
 		}
 
 		if seenSmartContracts[smartContract] {
-			return sdkerrors.Wrapf(ErrDuplicateSmartContracts, "CSR::Validate there are duplicate smart contracts in this CSR.")
+			return sdkerrors.Wrapf(ErrDuplicateSmartContracts, "CSR::Validate there are duplicate smart contracts in this CSR: %s", smartContract)
 		}
 		seenSmartContracts[smartContract] = true
 	}

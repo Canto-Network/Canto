@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	DefaultEnableCSR = true
+	DefaultEnableCSR = false
 	DefaultCSRShares = sdk.NewDecWithPrec(20, 2)
 
 	ParamStoreKeyEnableCSR = []byte("EnableCSR")
@@ -44,7 +44,7 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 func ValidateEnableCSR(i interface{}) error {
 	_, ok := i.(bool)
 	if !ok {
-		return sdkerrors.Wrapf(ErrInvalidParams, "Params::Validate::ValidateEnableCSR enableCSR must be a bool.")
+		return sdkerrors.Wrapf(ErrInvalidParams, "Params::Validate::ValidateEnableCSR enableCSR must be a bool")
 	}
 
 	return nil

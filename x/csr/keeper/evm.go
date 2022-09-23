@@ -25,7 +25,7 @@ func (k Keeper) DeployTurnstile(
 	addr, err := k.DeployContract(ctx, contracts.TurnstileContract)
 	if err != nil {
 		return common.Address{}, sdkerrors.Wrapf(ErrContractDeployments,
-			"CSR::Keeper: DeployTurnstile: error deploying Turnstile: %s", err.Error())
+			"EVM::DeployTurnstile error deploying Turnstile: %s", err.Error())
 	}
 	return addr, nil
 }
@@ -43,7 +43,7 @@ func (k Keeper) DeployContract(
 	ctorArgs, err := contract.ABI.Pack("", args...)
 	if err != nil {
 		return common.Address{}, sdkerrors.Wrapf(ErrContractDeployments,
-			"CSR::Keeper::DeployContract: error packing data: %s", err.Error())
+			"EVM::DeployContract error packing data: %s", err.Error())
 	}
 
 	// pack method data into byte string, enough for bin and constructor arguments
@@ -60,15 +60,15 @@ func (k Keeper) DeployContract(
 	if err != nil {
 		return common.Address{},
 			sdkerrors.Wrapf(ErrContractDeployments,
-				"CSR:Keeper::DeployContract: error retrieving nonce: %s", err.Error())
+				"EVM::DeployContract error retrieving nonce: %s", err.Error())
 	}
 
 	amount := big.NewInt(0)
 	_, err = k.CallEVM(ctx, types.ModuleAddress, nil, amount, data, true)
 	if err != nil {
 		return common.Address{},
-			sdkerrors.Wrapf(ErrAddressDerivation,
-				"CSR:Keeper::DeployContract: error deploying contract: %s", err.Error())
+			sdkerrors.Wrapf(ErrContractDeployments,
+				"EVM::DeployContract error deploying contract: %s", err.Error())
 	}
 
 	// Derive the newly created module smart contract using the module address and nonce
@@ -91,13 +91,13 @@ func (k Keeper) CallMethod(
 	// pack method args
 	data, err := contract.ABI.Pack(method, args...)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(ErrContractDeployments, "CSR:Keeper::DeployContract: method call incorrect: %s", err.Error())
+		return nil, sdkerrors.Wrapf(ErrMethodCall, "EVM::CallMethod there was an issue packing the arguments into the method signature: %s", err.Error())
 	}
 
 	// call method
 	resp, err := k.CallEVM(ctx, from, contractAddr, amount, data, true)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(ErrContractDeployments, "CSR:Keeper: :CallMethod: error applying message: %s", err.Error())
+		return nil, sdkerrors.Wrapf(ErrMethodCall, "EVM::CallMethod error applying message: %s", err.Error())
 	}
 
 	return resp, nil
