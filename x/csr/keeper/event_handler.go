@@ -29,14 +29,14 @@ func (k Keeper) RegisterEvent(ctx sdk.Context, data []byte) error {
 
 	// Check that the receiver account  exists in the evm store
 	if acct := k.evmKeeper.GetAccount(ctx, event.Recipient); acct == nil {
-		return sdkerrors.Wrapf(ErrNonexistentAcct, "EventHandler::RegisterEvent: account does not exist: %s", event.Recipient)
+		return sdkerrors.Wrapf(ErrNonexistentAcct, "EventHandler::RegisterEvent account does not exist: %s", event.Recipient)
 	}
 
 	// Set the NFTID in the store if it has not been registered yet
 	nftID := event.TokenId.Uint64()
 	_, found := k.GetCSR(ctx, nftID)
 	if found {
-		return sdkerrors.Wrapf(ErrDuplicateNFTID, "EventHandler::RegisterEvent: this NFT id has already been registered")
+		return sdkerrors.Wrapf(ErrDuplicateNFTID, "EventHandler::RegisterEvent this NFT id has already been registered: %d", nftID)
 	}
 
 	// Create CSR object and perform stateless validation
@@ -76,7 +76,7 @@ func (k Keeper) UpdateEvent(ctx sdk.Context, data []byte) error {
 	nftID := event.TokenId.Uint64()
 	csr, found := k.GetCSR(ctx, nftID)
 	if !found {
-		return sdkerrors.Wrapf(ErrNFTNotFound, "EventHandler::UpdateCSREvent the nft entered does not currently exist")
+		return sdkerrors.Wrapf(ErrNFTNotFound, "EventHandler::UpdateEvent the nft entered does not currently exist: %d", nftID)
 	}
 	// Add the new smart contract to the CSR NFT and validate
 	csr.Contracts = append(csr.Contracts, event.SmartContract.String())
@@ -103,8 +103,8 @@ func (k Keeper) ValidateContract(ctx sdk.Context, contract common.Address) error
 	// Check if the user is attempting to register a non-smart contract address (i.e. an EOA or non-existent address)
 	account := k.evmKeeper.GetAccount(ctx, contract)
 	if account == nil || !account.IsContract() {
-		return sdkerrors.Wrapf(ErrRegisterEOA,
-			"EventHandler::ValidateContract user is attempting to register a nil or non-smart contract address")
+		return sdkerrors.Wrapf(ErrRegisterInvalidContract,
+			"EventHandler::ValidateContract user is attempting to register/assign a nil or non-smart contract address")
 	}
 	return nil
 }

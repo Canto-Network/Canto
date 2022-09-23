@@ -6,11 +6,8 @@ import (
 
 // CSR module sentinel errors
 var (
-	ErrSmartContractSupply         = sdkerrors.Register(ModuleName, 1000, "csr::CSR")
-	ErrDuplicateSmartContracts     = sdkerrors.Register(ModuleName, 1001, "csr::CSR")
-	ErrInvalidSmartContractAddress = sdkerrors.Register(ModuleName, 1002, "csr::CSR")
-
-	ErrPrevRegisteredSmartContract = sdkerrors.Register(ModuleName, 1006, "csr::CSR")
-
-	ErrInvalidParams = sdkerrors.Register(ModuleName, 1003, "csr::Params")
+	ErrSmartContractSupply         = sdkerrors.Register(ModuleName, 1000, "The supply of smart contracts must be greater than 0")
+	ErrDuplicateSmartContracts     = sdkerrors.Register(ModuleName, 1001, "There cannot be duplicate smart contracts")
+	ErrInvalidSmartContractAddress = sdkerrors.Register(ModuleName, 1002, "There cannot be invalid smart contract addresses")
+	ErrInvalidParams               = sdkerrors.Register(ModuleName, 1003, "The parameters for CSR are invalid")
 )

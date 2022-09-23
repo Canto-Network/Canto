@@ -60,7 +60,7 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 
 	csr, found := h.k.GetCSR(ctx, nftID)
 	if !found {
-		return sdkerrors.Wrapf(ErrNonexistentCSR, "EVMHook::PostTxProcessing the NFT ID was found but the CSR was not.")
+		return sdkerrors.Wrapf(ErrNonexistentCSR, "EVMHook::PostTxProcessing the NFT ID was found but the CSR was not: %d", nftID)
 	}
 
 	// Calculate fees to be distributed = intFloor(GasUsed * GasPrice * csrShares)
@@ -72,13 +72,13 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 	// Send fees from fee collector to module account before distribution
 	err := h.k.bankKeeper.SendCoinsFromModuleToModule(ctx, h.k.FeeCollectorName, types.ModuleName, csrFees)
 	if err != nil {
-		return sdkerrors.Wrapf(ErrFeeDistribution, "EVMHook::PostTxProcessing failed to distribute fees from fee collector to module, %d", err)
+		return sdkerrors.Wrapf(ErrFeeDistribution, "EVMHook::PostTxProcessing failed to distribute fees from fee collector to module acount, %d", err)
 	}
 
 	// Get the turnstile which will receive funds for tx fees
 	turnstileAddress, found := h.k.GetTurnstile(ctx)
 	if !found {
-		return sdkerrors.Wrapf(ErrContractDeployments, "Keeper::ProcessEvents the turnstile contract has not been found.")
+		return sdkerrors.Wrapf(ErrContractDeployments, "EVMHook::PostTxProcessing the turnstile contract has not been found.")
 	}
 
 	// Distribute fees to turnstile contract by NFT ID distributeFees(amount, nftID)
@@ -102,7 +102,7 @@ func (h Hooks) processEvents(ctx sdk.Context, receipt *ethtypes.Receipt) {
 	// Get the turnstile address from which state transition events are emitted
 	turnstileAddress, found := h.k.GetTurnstile(ctx)
 	if !found {
-		panic(sdkerrors.Wrapf(ErrContractDeployments, "Keeper::ProcessEvents the turnstile contract has not been found."))
+		panic(sdkerrors.Wrapf(ErrContractDeployments, "EVMHook::PostTxProcessing the turnstile contract has not been found."))
 	}
 
 	for _, log := range receipt.Logs {
