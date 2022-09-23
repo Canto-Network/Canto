@@ -1,6 +1,8 @@
 package types
 
 import (
+	context "context"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/core/vm"
@@ -26,4 +28,5 @@ type EVMKeeper interface {
 	ApplyMessage(ctx sdk.Context, msg core.Message, tracer vm.EVMLogger, commit bool) (*evmtypes.MsgEthereumTxResponse, error)
 	GetParams(ctx sdk.Context) evmtypes.Params
 	GetAccount(ctx sdk.Context, addr common.Address) *statedb.Account
+	EstimateGas(c context.Context, req *evmtypes.EthCallRequest) (*evmtypes.EstimateGasResponse, error)
 }

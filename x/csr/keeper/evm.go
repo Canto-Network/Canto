@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"encoding/json"
 	"math/big"
 
 	"github.com/Canto-Network/Canto/v2/contracts"
@@ -8,9 +9,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 
+	"github.com/evmos/ethermint/server/config"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 )
 
@@ -120,6 +123,25 @@ func (k Keeper) CallEVM(
 
 	// Default the gas limit to const
 	gasLimit := DefaultGasLimit
+	if commit {
+		args, err := json.Marshal(evmtypes.TransactionArgs{
+			From: &from,
+			To:   to,
+			Data: (*hexutil.Bytes)(&data),
+		})
+		if err != nil {
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal tx args: %s", err.Error())
+		}
+
+		gasRes, err := k.evmKeeper.EstimateGas(sdk.WrapSDKContext(ctx), &evmtypes.EthCallRequest{
+			Args:   args,
+			GasCap: config.DefaultGasCap,
+		})
+		if err != nil {
+			return nil, err
+		}
+		gasLimit = gasRes.Gas
+	}
 
 	// Create the EVM msg
 	msg := ethtypes.NewMessage(
