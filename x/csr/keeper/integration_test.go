@@ -69,14 +69,14 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 		initBalance := sdk.NewCoins(sdk.NewCoin(s.denom, initAmount))
 
 		// Set up account that will be used to deploy smart contracts
-		_, deployerAddress = generateKey()
+		_, deployerAddress = GenerateKey()
 		testutil.FundAccount(s.app.BankKeeper, s.ctx, deployerAddress, initBalance)
 		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, deployerAddress)
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
 		deployerEVMAddress = common.BytesToAddress(deployerAddress.Bytes())
 
 		// Set up account that will be used to interact with smart contract
-		userKey, userAddress = generateKey()
+		userKey, userAddress = GenerateKey()
 		testutil.FundAccount(s.app.BankKeeper, s.ctx, userAddress, initBalance)
 		acc = s.app.AccountKeeper.NewAccountWithAddress(s.ctx, userAddress)
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
@@ -104,7 +104,7 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 			data, _ := turnstileContract.ABI.Pack("register", common.BytesToAddress(userAddress.Bytes()))
 
 			// This call will make the turnstile address register the test contract to itself
-			evmTX(userKey, &turnstileAddress, amount, gasLimit, gasPrice, gasFeeCap, gasTipCap, data, accesses)
+			EVMTX(userKey, &turnstileAddress, amount, gasLimit, gasPrice, gasFeeCap, gasTipCap, data, accesses)
 			s.Commit()
 
 			// CSR object should have been created and set in store
@@ -122,7 +122,7 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 			s.Require().NoError(err)
 
 			// Register the smart contract
-			response := evmTX(userKey, &contractAddress, amount, gasLimit, gasPrice, gasFeeCap, gasTipCap, data, accesses)
+			response := EVMTX(userKey, &contractAddress, amount, gasLimit, gasPrice, gasFeeCap, gasTipCap, data, accesses)
 			s.Commit()
 
 			// Track contracts added to NFT
@@ -133,11 +133,11 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 			s.Require().True(found)
 
 			// Calculate the expected revenue for the transaction
-			expectedFee := calculateExpectedFee(uint64(response.GasUsed), gasPrice, csrShares).BigInt()
+			expectedFee := CalculateExpectedFee(uint64(response.GasUsed), gasPrice, csrShares).BigInt()
 			revenueByNFT[1] = expectedFee
 
 			// Check CSR obj values
-			checkCSRValues(*csr, 1, csrContracts[1], 1, revenueByNFT[1])
+			CheckCSRValues(*csr, 1, csrContracts[1], 1, revenueByNFT[1])
 		})
 		It("it should not re-register a smart contract", func() {
 			data, err := csrSmartContract.ABI.Pack("assign", big.NewInt(1))
@@ -145,7 +145,7 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 
 			// Assign the smart contract
 			contractAddress := common.HexToAddress(csrContracts[1][0])
-			evmTX(userKey, &contractAddress, amount, gasLimit, gasPrice, gasFeeCap, gasTipCap, data, accesses)
+			EVMTX(userKey, &contractAddress, amount, gasLimit, gasPrice, gasFeeCap, gasTipCap, data, accesses)
 			s.Commit()
 
 			// CSR object should have been created and set in store
@@ -153,7 +153,7 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 			s.Require().True(found)
 
 			// Check CSR obj values
-			checkCSRValues(*csr, 1, csrContracts[1], 1, revenueByNFT[1])
+			CheckCSRValues(*csr, 1, csrContracts[1], 1, revenueByNFT[1])
 		})
 		It("it should register a contract deployed by a smart contract factory", func() {
 			// Deploys the factory contract directly to the EVM state (does not hit the postTxProcessing hooks)
@@ -169,7 +169,7 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 			data, err := factoryContract.ABI.Pack("register", deployerEVMAddress)
 			s.Require().NoError(err)
 
-			evmTX(userKey, &factoryContractAddress, amount, gasLimit, gasPrice, gasFeeCap, gasTipCap, data, accesses)
+			EVMTX(userKey, &factoryContractAddress, amount, gasLimit, gasPrice, gasFeeCap, gasTipCap, data, accesses)
 			s.Commit()
 
 			// CSR object should have been created and set in store

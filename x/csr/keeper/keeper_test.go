@@ -38,13 +38,14 @@ import (
 type KeeperTestSuite struct {
 	suite.Suite
 	// use keeper for tests
-	ctx         sdk.Context
-	app         *app.Canto
-	queryClient types.QueryClient
-	consAddress sdk.ConsAddress
-	ethSigner   ethtypes.Signer
-	address     common.Address
-	validator   stakingtypes.Validator
+	ctx            sdk.Context
+	app            *app.Canto
+	queryClient    types.QueryClient
+	queryClientEvm evmtypes.QueryClient
+	consAddress    sdk.ConsAddress
+	ethSigner      ethtypes.Signer
+	address        common.Address
+	validator      stakingtypes.Validator
 
 	denom string
 }
@@ -62,8 +63,12 @@ func TestKeeperTestSuite(t *testing.T) {
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
+	feemarketGenesis := feemarkettypes.DefaultGenesisState()
+	feemarketGenesis.Params.EnableHeight = 0
+	feemarketGenesis.Params.NoBaseFee = false
+
 	// instantiate app
-	suite.app = app.Setup(false, feemarkettypes.DefaultGenesisState())
+	suite.app = app.Setup(false, feemarketGenesis)
 	// initialize ctx for tests
 	suite.SetupApp()
 }
@@ -105,6 +110,10 @@ func (suite *KeeperTestSuite) SetupApp() {
 		ConsensusHash:      tmhash.Sum([]byte("consensus")),
 		LastResultsHash:    tmhash.Sum([]byte("last_result")),
 	})
+
+	queryHelperEvm := baseapp.NewQueryServerTestHelper(suite.ctx, suite.app.InterfaceRegistry())
+	evmtypes.RegisterQueryServer(queryHelperEvm, suite.app.EvmKeeper)
+	suite.queryClientEvm = evmtypes.NewQueryClient(queryHelperEvm)
 
 	queryHelper := baseapp.NewQueryServerTestHelper(suite.ctx, suite.app.InterfaceRegistry())
 	types.RegisterQueryServer(queryHelper, suite.app.CSRKeeper)
@@ -149,9 +158,8 @@ func (suite *KeeperTestSuite) Commit() {
 
 // Commit commits a block at a given time.
 func (suite *KeeperTestSuite) CommitAfter(t time.Duration) {
-	header := suite.ctx.BlockHeader()
-	suite.app.EndBlock(abci.RequestEndBlock{Height: header.Height})
 	_ = suite.app.Commit()
+	header := suite.ctx.BlockHeader()
 
 	header.Height += 1
 	header.Time = header.Time.Add(t)
@@ -163,6 +171,10 @@ func (suite *KeeperTestSuite) CommitAfter(t time.Duration) {
 	suite.ctx = suite.app.BaseApp.NewContext(false, header)
 
 	queryHelper := baseapp.NewQueryServerTestHelper(suite.ctx, suite.app.InterfaceRegistry())
+	evmtypes.RegisterQueryServer(queryHelper, suite.app.EvmKeeper)
+	suite.queryClientEvm = evmtypes.NewQueryClient(queryHelper)
+
+	queryHelper = baseapp.NewQueryServerTestHelper(suite.ctx, suite.app.InterfaceRegistry())
 	types.RegisterQueryServer(queryHelper, suite.app.CSRKeeper)
 	suite.queryClient = types.NewQueryClient(queryHelper)
 }
@@ -210,14 +222,14 @@ func GenerateEventData(name string, contract evmtypes.CompiledContract, args ...
 
 // Helper function that will calculate how much revenue a NFT or the Turnstile should accumulate
 // Calculation is done by the following: int(gasUsed * gasPrice * csrShares)
-func calculateExpectedFee(gasUsed uint64, gasPrice *big.Int, csrShare sdk.Dec) sdk.Int {
+func CalculateExpectedFee(gasUsed uint64, gasPrice *big.Int, csrShare sdk.Dec) sdk.Int {
 	fee := sdk.NewIntFromUint64(gasUsed).Mul(sdk.NewIntFromBigInt(gasPrice))
 	expectedTurnstileBalance := sdk.NewDecFromInt(fee).Mul(csrShare).TruncateInt()
 	return expectedTurnstileBalance
 }
 
 // Helper function that checks the state of the CSR objects
-func checkCSRValues(csr types.CSR, expectedID uint64, expectedContracts []string, expectedTxs uint64, expectedRevenue *big.Int) {
+func CheckCSRValues(csr types.CSR, expectedID uint64, expectedContracts []string, expectedTxs uint64, expectedRevenue *big.Int) {
 	s.Require().Equal(expectedID, csr.Id)
 	s.Require().Equal(expectedContracts, csr.Contracts)
 	s.Require().Equal(expectedTxs, csr.Txs)
@@ -225,13 +237,13 @@ func checkCSRValues(csr types.CSR, expectedID uint64, expectedContracts []string
 }
 
 // Generates a new private private key and corresponding SDK Account Address
-func generateKey() (*ethsecp256k1.PrivKey, sdk.AccAddress) {
+func GenerateKey() (*ethsecp256k1.PrivKey, sdk.AccAddress) {
 	address, priv := tests.NewAddrKey()
 	return priv.(*ethsecp256k1.PrivKey), sdk.AccAddress(address.Bytes())
 }
 
 // Helper function to create and make a ethereum transaction
-func evmTX(
+func EVMTX(
 	priv *ethsecp256k1.PrivKey,
 	to *common.Address,
 	amount *big.Int,
@@ -242,13 +254,13 @@ func evmTX(
 	data []byte,
 	accesses *ethtypes.AccessList,
 ) abci.ResponseDeliverTx {
-	msgEthereumTx := buildEthTx(priv, to, amount, gasLimit, gasPrice, gasFeeCap, gasTipCap, data, accesses)
-	res := deliverEthTx(priv, msgEthereumTx)
+	msgEthereumTx := BuildEthTx(priv, to, amount, gasLimit, gasPrice, gasFeeCap, gasTipCap, data, accesses)
+	res := DeliverEthTx(priv, msgEthereumTx)
 	return res
 }
 
 // Helper function that creates an ethereum transaction
-func buildEthTx(
+func BuildEthTx(
 	priv *ethsecp256k1.PrivKey,
 	to *common.Address,
 	amount *big.Int,
@@ -279,14 +291,14 @@ func buildEthTx(
 	return msgEthereumTx
 }
 
-func deliverEthTx(priv *ethsecp256k1.PrivKey, msgEthereumTx *evmtypes.MsgEthereumTx) abci.ResponseDeliverTx {
-	bz := prepareEthTx(priv, msgEthereumTx)
+func DeliverEthTx(priv *ethsecp256k1.PrivKey, msgEthereumTx *evmtypes.MsgEthereumTx) abci.ResponseDeliverTx {
+	bz := PrepareEthTx(priv, msgEthereumTx)
 	req := abci.RequestDeliverTx{Tx: bz}
 	res := s.app.BaseApp.DeliverTx(req)
 	return res
 }
 
-func prepareEthTx(priv *ethsecp256k1.PrivKey, msgEthereumTx *evmtypes.MsgEthereumTx) []byte {
+func PrepareEthTx(priv *ethsecp256k1.PrivKey, msgEthereumTx *evmtypes.MsgEthereumTx) []byte {
 	// Sign transaction
 	err := msgEthereumTx.Sign(s.ethSigner, tests.NewSigner(priv))
 	s.Require().NoError(err)

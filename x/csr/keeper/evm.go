@@ -137,10 +137,10 @@ func (k Keeper) CallEVM(
 			Args:   args,
 			GasCap: config.DefaultGasCap,
 		})
-		if err != nil {
-			return nil, err
+		// If no error then we set the gas res
+		if err == nil {
+			gasLimit = gasRes.Gas
 		}
-		gasLimit = gasRes.Gas
 	}
 
 	// Create the EVM msg
@@ -155,7 +155,7 @@ func (k Keeper) CallEVM(
 		big.NewInt(0), // gasTipCap
 		data,
 		ethtypes.AccessList{}, // AccessList
-		!commit,               // isFake
+		!commit,
 	)
 
 	// Apply the msg to the EVM keeper
