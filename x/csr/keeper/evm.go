@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"encoding/json"
+	"fmt"
 	"math/big"
 
 	"github.com/Canto-Network/Canto/v2/contracts"
@@ -18,7 +19,7 @@ import (
 )
 
 // Default gas limit for eth txs on the turnstile
-var DefaultGasLimit uint64 = 30000000
+var DefaultGasLimit uint64 = 100000
 
 // DeployTurnstile will deploy the Turnstile smart contract from the csr module account. This will allow the
 // CSR module to interact with the CSR NFTs in a permissionless way.
@@ -138,10 +139,13 @@ func (k Keeper) CallEVM(
 			GasCap: config.DefaultGasCap,
 		})
 		// If no error then we set the gas res
-		if err == nil {
-			gasLimit = gasRes.Gas
+		if err != nil {
+			return nil, err
 		}
+		gasLimit = gasRes.Gas
 	}
+	info := "The number of units of gas consumed is " + fmt.Sprint(gasLimit)
+	k.Logger(ctx).Info(info)
 
 	// Create the EVM msg
 	msg := ethtypes.NewMessage(
