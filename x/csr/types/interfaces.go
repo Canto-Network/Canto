@@ -26,7 +26,7 @@ type BankKeeper interface {
 // EVMKeeper defines the expected EVM keeper interface used to make EVM deployments and txs from the module account.
 type EVMKeeper interface {
 	ApplyMessage(ctx sdk.Context, msg core.Message, tracer vm.EVMLogger, commit bool) (*evmtypes.MsgEthereumTxResponse, error)
-	GetParams(ctx sdk.Context) evmtypes.Params
-	GetAccount(ctx sdk.Context, addr common.Address) *statedb.Account
 	EstimateGas(c context.Context, req *evmtypes.EthCallRequest) (*evmtypes.EstimateGasResponse, error)
+	GetAccount(ctx sdk.Context, addr common.Address) *statedb.Account
+	GetParams(ctx sdk.Context) evmtypes.Params
 }

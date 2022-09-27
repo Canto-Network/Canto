@@ -1,8 +1,6 @@
 package keeper
 
 import (
-	"encoding/json"
-	"fmt"
 	"math/big"
 
 	"github.com/Canto-Network/Canto/v2/contracts"
@@ -10,16 +8,14 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 
-	"github.com/evmos/ethermint/server/config"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 )
 
-// Default gas limit for eth txs on the turnstile
-var DefaultGasLimit uint64 = 100000
+// Default gas limit for eth txs from the module account
+var DefaultGasLimit uint64 = 30000000
 
 // DeployTurnstile will deploy the Turnstile smart contract from the csr module account. This will allow the
 // CSR module to interact with the CSR NFTs in a permissionless way.
@@ -122,30 +118,12 @@ func (k Keeper) CallEVM(
 		return nil, err
 	}
 
-	// Default the gas limit to const
+	// As evmKeeper.ApplyMessage does not directly increment the gas meter, any transaction
+	// completed through the CSR module account will technically be 'free'. As such, we can
+	// set the gas limit to some arbitrarily high enough number such that every transaction
+	// from the module account will always go through.
+	// see: https://github.com/evmos/ethermint/blob/35850e620d2825327a175f46ec3e8c60af84208d/x/evm/keeper/state_transition.go#L466
 	gasLimit := DefaultGasLimit
-	if commit {
-		args, err := json.Marshal(evmtypes.TransactionArgs{
-			From: &from,
-			To:   to,
-			Data: (*hexutil.Bytes)(&data),
-		})
-		if err != nil {
-			return nil, sdkerrors.Wrapf(sdkerrors.ErrJSONMarshal, "failed to marshal tx args: %s", err.Error())
-		}
-
-		gasRes, err := k.evmKeeper.EstimateGas(sdk.WrapSDKContext(ctx), &evmtypes.EthCallRequest{
-			Args:   args,
-			GasCap: config.DefaultGasCap,
-		})
-		// If no error then we set the gas res
-		if err != nil {
-			return nil, err
-		}
-		gasLimit = gasRes.Gas
-	}
-	info := "The number of units of gas consumed is " + fmt.Sprint(gasLimit)
-	k.Logger(ctx).Info(info)
 
 	// Create the EVM msg
 	msg := ethtypes.NewMessage(
