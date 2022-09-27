@@ -14,7 +14,7 @@ import (
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 )
 
-// Default gas limit for eth txs on the turnstile
+// Default gas limit for eth txs from the module account
 var DefaultGasLimit uint64 = 30000000
 
 // DeployTurnstile will deploy the Turnstile smart contract from the csr module account. This will allow the
@@ -118,7 +118,11 @@ func (k Keeper) CallEVM(
 		return nil, err
 	}
 
-	// Default the gas limit to const
+	// As evmKeeper.ApplyMessage does not directly increment the gas meter, any transaction
+	// completed through the CSR module account will technically be 'free'. As such, we can
+	// set the gas limit to some arbitrarily high enough number such that every transaction
+	// from the module account will always go through.
+	// see: https://github.com/evmos/ethermint/blob/35850e620d2825327a175f46ec3e8c60af84208d/x/evm/keeper/state_transition.go#L466
 	gasLimit := DefaultGasLimit
 
 	// Create the EVM msg
@@ -133,7 +137,7 @@ func (k Keeper) CallEVM(
 		big.NewInt(0), // gasTipCap
 		data,
 		ethtypes.AccessList{}, // AccessList
-		!commit,               // isFake
+		!commit,
 	)
 
 	// Apply the msg to the EVM keeper

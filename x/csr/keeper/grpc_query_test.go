@@ -314,7 +314,9 @@ func (suite *KeeperTestSuite) TestQueryTurnstile() {
 	suite.Commit()
 	ctx := sdk.WrapSDKContext(suite.ctx)
 
-	address, _ := suite.app.CSRKeeper.GetTurnstile(suite.ctx)
+	address, found := suite.app.CSRKeeper.GetTurnstile(suite.ctx)
+	suite.Require().True(found)
+
 	res, err := suite.queryClient.Turnstile(ctx, &types.QueryTurnstileRequest{})
 	suite.Require().NoError(err)
 	suite.Require().Equal(address.String(), res.Address)

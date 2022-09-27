@@ -533,11 +533,11 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 				turnstileBalance := suite.app.BankKeeper.GetAllBalances(suite.ctx, turnstile)
 
 				// Ensuring the turnstile and expected turnstile balances match
-				expectedTurnstileBalance := calculateExpectedFee(tc.test.cumulativeGasUsed, gasPrice, csrShare)
+				expectedTurnstileBalance := CalculateExpectedFee(tc.test.cumulativeGasUsed, gasPrice, csrShare)
 				suite.Require().Equal(expectedTurnstileBalance, turnstileBalance.AmountOf(evmDenom))
 
 				// Check that the expected NFT balance matches the actual balance
-				nftFee := calculateExpectedFee(gasUsedByNFT, gasPrice, csrShare)
+				nftFee := CalculateExpectedFee(gasUsedByNFT, gasPrice, csrShare)
 				suite.Require().Equal(nftFee, csr.Revenue)
 
 				// Require that the number of transactions match up with what is expected
