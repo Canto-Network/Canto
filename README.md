@@ -2,7 +2,7 @@
 
 **How to validate on the Canto Mainnet**
 
-*(canto_7744-1)*
+*(canto_7700-1)*
 
 > Genesis file [Published](https://github.com/Canto-Network/Canto/raw/main/Mainnet/genesis.json)
 > Peers list [Published](https://github.com/Canto-Network/Canto/blob/main/Mainnet/peers.txt)
@@ -88,7 +88,7 @@ Install cantod binary from `Canto` directory:
 
 Initialize the node. Replace `<moniker>` with whatever you'd like to name your validator.
 
-`cantod init <moniker> --chain-id canto_7744-1`
+`cantod init <moniker> --chain-id canto_7700-1`
 
 If this runs successfully, it should dump a blob of JSON to the terminal.
 
@@ -168,7 +168,7 @@ Modify the following items below, removing the `<>`
 
 cantod tx staking create-validator \
 --from <KEY_NAME> \
---chain-id canto_7744-1 \
+--chain-id canto_7700-1 \
 --moniker="<VALIDATOR_NAME>" \
 --commission-max-change-rate=0.01 \
 --commission-max-rate=1.0 \
