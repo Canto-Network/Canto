@@ -141,6 +141,7 @@ import (
 	csrtypes "github.com/Canto-Network/Canto/v2/x/csr/types"
 
 	v2 "github.com/Canto-Network/Canto/v2/app/upgrades/v2"
+	v4 "github.com/Canto-Network/Canto/v2/app/upgrades/v4"
 )
 
 func init() {
@@ -1056,6 +1057,12 @@ func (app *Canto) setupUpgradeHandlers() {
 		v2.CreateUpgradeHandler(app.mm, app.configurator),
 	)
 
+	// v4 upgrade handler
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v4.UpgradeName,
+		v4.CreateUpgradeHandler(app.mm, app.configurator),
+	)
+
 	// When a planned update height is reached, the old binary will panic
 	// writing on disk the height and name of the update that triggered it
 	// This will read that value, and execute the preparations for the upgrade.
@@ -1073,6 +1080,10 @@ func (app *Canto) setupUpgradeHandlers() {
 	switch upgradeInfo.Name {
 	case v2.UpgradeName:
 		// no store upgrades in v2
+	case v4.UpgradeName:
+		storeUpgrades = &storetypes.StoreUpgrades{
+			Added: []string{csrtypes.StoreKey},
+		}
 	}
 
 	if storeUpgrades != nil {
