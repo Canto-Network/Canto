@@ -138,6 +138,7 @@ import (
 
 	v2 "github.com/Canto-Network/Canto/v2/app/upgrades/v2"
 	v3 "github.com/Canto-Network/Canto/v2/app/upgrades/v3"
+	v4 "github.com/Canto-Network/Canto/v2/app/upgrades/v4"
 )
 
 func init() {
@@ -1039,6 +1040,11 @@ func (app *Canto) setupUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(
 		v3.UpgradeName,
 		v3.CreateUpgradeHandler(app.mm, app.configurator),
+	)
+	// v4 upgrade handler
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v4.UpgradeName,
+		v4.CreateUpgradeHandler(app.mm, app.configurator, app.GovshuttleKeeper),
 	)
 
 	// When a planned update height is reached, the old binary will panic

@@ -34,6 +34,8 @@ func (k *Keeper) AppendLendingMarketProposal(ctx sdk.Context, lm *types.LendingM
 		if err != nil {
 			return &types.LendingMarketProposal{}, err
 		}
+		// set the port address in state
+		k.SetPort(ctx, addr)
 	}
 
 	_, err = k.erc20Keeper.CallEVM(ctx, contracts.ProposalStoreContract.ABI, types.ModuleAddress, addr, true,
