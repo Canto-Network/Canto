@@ -22,7 +22,10 @@ const (
 	MemStoreKey = "mem_govshuttle"
 )
 
-var ModuleAddress common.Address
+var (
+	ModuleAddress common.Address
+	PortKey = []byte("Port")
+)
 
 func init() {
 	ModuleAddress = common.BytesToAddress(authtypes.NewModuleAddress(ModuleName).Bytes())
