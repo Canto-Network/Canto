@@ -335,6 +335,7 @@ func NewCanto(
 		inflationtypes.StoreKey, erc20types.StoreKey,
 		epochstypes.StoreKey, vestingtypes.StoreKey, recoverytypes.StoreKey, //recoverytypes.StoreKe
 		feestypes.StoreKey,
+		govshuttletypes.StoreKey,
 	)
 
 	// Add the EVM transient store key
@@ -1067,9 +1068,7 @@ func (app *Canto) setupUpgradeHandlers() {
 	case v3.UpgradeName:
 		// no store upgrades in v3
 	case v4.UpgradeName:
-		storeUpgrades = &storetypes.StoreUpgrades{
-			Added: []string{govshuttletypes.StoreKey},
-		}
+		// no store upgrades in v4
 	}
 
 	if storeUpgrades != nil {
