@@ -28,7 +28,7 @@ var (
 )
 
 func init() {
-	ModuleAddress = common.BytesToAddress(authtypes.NewModuleAddress(ModuleName).Bytes())
+	ModuleAddress = common.BytesToAddress(authtypes.NewModuleAddress("govshuttle").Bytes())
 }
 
 func KeyPrefix(p string) []byte {
