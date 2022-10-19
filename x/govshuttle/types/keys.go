@@ -7,7 +7,7 @@ import (
 
 const (
 	// ModuleName defines the module name
-	ModuleName = "govshuttle"
+	ModuleName = "shuttle"
 
 	// StoreKey defines the primary module store key
 	StoreKey = ModuleName
