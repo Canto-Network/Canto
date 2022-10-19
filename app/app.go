@@ -1066,6 +1066,10 @@ func (app *Canto) setupUpgradeHandlers() {
 		// no store upgrades in v2
 	case v3.UpgradeName:
 		// no store upgrades in v3
+	case v4.UpgradeName:
+		storeUpgrades = &storetypes.StoreUpgrades{
+			Added: []string{govshuttletypes.StoreKey},
+		}
 	}
 
 	if storeUpgrades != nil {
