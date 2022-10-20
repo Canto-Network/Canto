@@ -7,10 +7,10 @@ import (
 
 const (
 	// ModuleName defines the module name
-	ModuleName = "shuttle"
+	ModuleName = "govshuttle"
 
 	// StoreKey defines the primary module store key
-	StoreKey = ModuleName
+	StoreKey = "shuttle"
 
 	// RouterKey is the message route for slashing
 	RouterKey = ModuleName
@@ -24,11 +24,11 @@ const (
 
 var (
 	ModuleAddress common.Address
-	PortKey = []byte("Port")
+	PortKey       = []byte("Port")
 )
 
 func init() {
-	ModuleAddress = common.BytesToAddress(authtypes.NewModuleAddress("govshuttle").Bytes())
+	ModuleAddress = common.BytesToAddress(authtypes.NewModuleAddress(ModuleName).Bytes())
 }
 
 func KeyPrefix(p string) []byte {
