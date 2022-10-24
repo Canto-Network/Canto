@@ -25,20 +25,20 @@ func (k *Keeper) AppendLendingMarketProposal(ctx sdk.Context, lm *types.LendingM
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Error obtaining Proposal ID")
 	}
-	nonce, err := k.accKeeper.GetSequence(ctx, types.ModuleAddress.Bytes())
-	if err != nil {
-		return nil, sdkerrors.Wrap(err, "Error obtaining account nonce")
-	}
+	
 	//if this is the first govshuttle proposal, deploy the map contract as well
-	if nonce == 0 {
-		*k.mapContractAddr, err = k.DeployMapContract(ctx, lm)
+	addr, found := k.GetPort(ctx)
+	// port has not been deployed yet, deploy and store
+	if !found {
+		addr, err = k.DeployMapContract(ctx, lm)
 		if err != nil {
-			return nil, err
+			return &types.LendingMarketProposal{}, err
 		}
-		return lm, nil
+		// set the port address in state
+		k.SetPort(ctx, addr)
 	}
 
-	_, err = k.erc20Keeper.CallEVM(ctx, contracts.ProposalStoreContract.ABI, types.ModuleAddress, *k.mapContractAddr, true,
+	_, err = k.erc20Keeper.CallEVM(ctx, contracts.ProposalStoreContract.ABI, types.ModuleAddress, addr, true,
 		"AddProposal", sdk.NewIntFromUint64(m.GetPropId()).BigInt(), lm.GetTitle(), lm.GetDescription(), ToAddress(m.GetAccount()),
 		ToBigInt(m.GetValues()), m.GetSignatures(), ToBytes(m.GetCalldatas()))
 

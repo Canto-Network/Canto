@@ -10,7 +10,7 @@ const (
 	ModuleName = "govshuttle"
 
 	// StoreKey defines the primary module store key
-	StoreKey = ModuleName
+	StoreKey = "shuttle"
 
 	// RouterKey is the message route for slashing
 	RouterKey = ModuleName
@@ -22,7 +22,10 @@ const (
 	MemStoreKey = "mem_govshuttle"
 )
 
-var ModuleAddress common.Address
+var (
+	ModuleAddress common.Address
+	PortKey       = []byte("Port")
+)
 
 func init() {
 	ModuleAddress = common.BytesToAddress(authtypes.NewModuleAddress(ModuleName).Bytes())

@@ -141,6 +141,8 @@ import (
 	csrtypes "github.com/Canto-Network/Canto/v2/x/csr/types"
 
 	v2 "github.com/Canto-Network/Canto/v2/app/upgrades/v2"
+	v3 "github.com/Canto-Network/Canto/v2/app/upgrades/v3"
+	v4 "github.com/Canto-Network/Canto/v2/app/upgrades/v4"
 	v5 "github.com/Canto-Network/Canto/v2/app/upgrades/v5"
 )
 
@@ -342,6 +344,7 @@ func NewCanto(
 		epochstypes.StoreKey, vestingtypes.StoreKey, recoverytypes.StoreKey, //recoverytypes.StoreKe
 		feestypes.StoreKey,
 		csrtypes.StoreKey,
+		govshuttletypes.StoreKey,
 	)
 
 	// Add the EVM transient store key
@@ -1056,6 +1059,16 @@ func (app *Canto) setupUpgradeHandlers() {
 		v2.UpgradeName,
 		v2.CreateUpgradeHandler(app.mm, app.configurator),
 	)
+	// v3 upgrade handler
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v3.UpgradeName,
+		v3.CreateUpgradeHandler(app.mm, app.configurator),
+	)
+	// v4 upgrade handler
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v4.UpgradeName,
+		v4.CreateUpgradeHandler(app.mm, app.configurator, app.GovshuttleKeeper),
+	)
 
 	// v4 upgrade handler
 	app.UpgradeKeeper.SetUpgradeHandler(
@@ -1078,6 +1091,15 @@ func (app *Canto) setupUpgradeHandlers() {
 	var storeUpgrades *storetypes.StoreUpgrades
 
 	switch upgradeInfo.Name {
+	case v2.UpgradeName:
+		// no store upgrades in v2
+	case v3.UpgradeName:
+		// no store upgrades in v3
+	case v4.UpgradeName:
+		// no store upgrades in v4
+		storeUpgrades = &storetypes.StoreUpgrades{
+			Added: []string{govshuttletypes.StoreKey},
+		}
 	case v5.UpgradeName:
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Added: []string{csrtypes.StoreKey},
