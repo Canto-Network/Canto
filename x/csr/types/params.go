@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	DefaultEnableCSR = true
+	DefaultEnableCSR = false
 	DefaultCSRShares = sdk.NewDecWithPrec(20, 2)
 
 	ParamStoreKeyEnableCSR = []byte("EnableCSR")

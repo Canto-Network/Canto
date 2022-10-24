@@ -1,6 +1,6 @@
 KEY="mykey"
 KEY2="mykey2"
-CHAINID="canto_6969-1"
+CHAINID="canto_7701-1"
 MONIKER="plex-validator"
 KEYRING="test"
 KEYALGO="eth_secp256k1"

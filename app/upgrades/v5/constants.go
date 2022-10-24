@@ -1,6 +1,6 @@
-package v4
+package v5
 
 const (
 	//UpgradeName is the name of the upgrade to be associated with the chain upgrade
-	UpgradeName = "v4.0.0"
+	UpgradeName = "v5.0.0"
 )
