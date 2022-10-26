@@ -51,10 +51,10 @@ Or install individually:
 
 ```bash
 git clone https://github.com/Canto-Network/Canto.git
-cd Canto/cmd/cantod
-go install -tags ledger ./...
+cd Canto/
+git checkout v4.0.0
+make install
 sudo mv $HOME/go/bin/cantod /usr/bin/
-
 ```
 
 ### Generate and store keys
