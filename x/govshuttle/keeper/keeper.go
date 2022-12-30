@@ -5,6 +5,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/tendermint/tendermint/libs/log"
+	"github.com/cosmos/cosmos-sdk/store/prefix"
 
 	"github.com/Canto-Network/Canto/v2/x/govshuttle/types"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -18,7 +19,6 @@ type (
 		cdc        codec.BinaryCodec
 		paramstore paramtypes.Subspace
 
-		mapContractAddr *common.Address
 		accKeeper       types.AccountKeeper
 		erc20Keeper     types.ERC20Keeper
 		govKeeper       types.GovKeeper
@@ -40,12 +40,10 @@ func NewKeeper(
 		ps = ps.WithKeyTable(types.ParamKeyTable())
 	}
 
-	mca := new(common.Address)
 	return Keeper{
 
 		cdc:             cdc,
 		storeKey:        storeKey,
-		mapContractAddr: mca,
 		paramstore:      ps,
 		accKeeper:       ak,
 		erc20Keeper:     ek,
@@ -55,4 +53,21 @@ func NewKeeper(
 
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
+}
+
+// retrieve the port address from state
+func (k Keeper) GetPort(ctx sdk.Context) (common.Address, bool) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.PortKey)
+	bz := store.Get(types.PortKey)
+	// if not found return false
+	if len(bz) == 0 {
+		return common.Address{}, false
+	}
+	return common.BytesToAddress(bz), true
+}
+
+// commit the address of the current govShuttle mapcontract to state (Port.sol)
+func (k Keeper) SetPort(ctx sdk.Context, portAddr common.Address) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.PortKey)
+	store.Set(types.PortKey, portAddr.Bytes())
 }
