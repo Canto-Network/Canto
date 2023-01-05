@@ -27,11 +27,6 @@ func (k Keeper) RegisterEvent(ctx sdk.Context, data []byte) error {
 		return err
 	}
 
-	// Check that the receiver account  exists in the evm store
-	if acct := k.evmKeeper.GetAccount(ctx, event.Recipient); acct == nil {
-		return sdkerrors.Wrapf(ErrNonexistentAcct, "EventHandler::RegisterEvent account does not exist: %s", event.Recipient)
-	}
-
 	// Set the NFTID in the store if it has not been registered yet
 	nftID := event.TokenId.Uint64()
 	_, found := k.GetCSR(ctx, nftID)
