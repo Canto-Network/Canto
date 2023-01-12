@@ -29,6 +29,7 @@ import (
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
+
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
@@ -92,52 +93,52 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
 	ibctesting "github.com/cosmos/ibc-go/v3/testing"
 
-	ethermintapp "github.com/Canto-Network/ethermint-v2/app"
-	"github.com/Canto-Network/ethermint-v2/encoding"
-	srvflags "github.com/Canto-Network/ethermint-v2/server/flags"
-	ethermint "github.com/Canto-Network/ethermint-v2/types"
-	"github.com/Canto-Network/ethermint-v2/x/evm"
-	evmrest "github.com/Canto-Network/ethermint-v2/x/evm/client/rest"
-	evmkeeper "github.com/Canto-Network/ethermint-v2/x/evm/keeper"
-	evmtypes "github.com/Canto-Network/ethermint-v2/x/evm/types"
-	"github.com/Canto-Network/ethermint-v2/x/feemarket"
-	feemarketkeeper "github.com/Canto-Network/ethermint-v2/x/feemarket/keeper"
-	feemarkettypes "github.com/Canto-Network/ethermint-v2/x/feemarket/types"
+	ethermintapp "github.com/evmos/ethermint/app"
+	"github.com/evmos/ethermint/encoding"
+	srvflags "github.com/evmos/ethermint/server/flags"
+	ethermint "github.com/evmos/ethermint/types"
+	"github.com/evmos/ethermint/x/evm"
+	evmrest "github.com/evmos/ethermint/x/evm/client/rest"
+	evmkeeper "github.com/evmos/ethermint/x/evm/keeper"
+	evmtypes "github.com/evmos/ethermint/x/evm/types"
+	"github.com/evmos/ethermint/x/feemarket"
+	feemarketkeeper "github.com/evmos/ethermint/x/feemarket/keeper"
+	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
 	// unnamed import of statik for swagger UI support
-	_ "github.com/Canto-Network/Canto-Testnet-v2/v1/client/docs/statik"
+	_ "github.com/Canto-Network/Canto/v2/client/docs/statik"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/app/ante"
-	v2 "github.com/Canto-Network/Canto-Testnet-v2/v1/app/upgrades/v2"
-	v4 "github.com/Canto-Network/Canto-Testnet-v2/v1/app/upgrades/v4"
-	v5 "github.com/Canto-Network/Canto-Testnet-v2/v1/app/upgrades/v5"
-	v6 "github.com/Canto-Network/Canto-Testnet-v2/v1/app/upgrades/v6"
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/epochs"
-	epochskeeper "github.com/Canto-Network/Canto-Testnet-v2/v1/x/epochs/keeper"
-	epochstypes "github.com/Canto-Network/Canto-Testnet-v2/v1/x/epochs/types"
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/erc20"
-	erc20client "github.com/Canto-Network/Canto-Testnet-v2/v1/x/erc20/client"
-	erc20keeper "github.com/Canto-Network/Canto-Testnet-v2/v1/x/erc20/keeper"
-	erc20types "github.com/Canto-Network/Canto-Testnet-v2/v1/x/erc20/types"
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/fees"
-	feeskeeper "github.com/Canto-Network/Canto-Testnet-v2/v1/x/fees/keeper"
-	feestypes "github.com/Canto-Network/Canto-Testnet-v2/v1/x/fees/types"
+	"github.com/Canto-Network/Canto/v2/app/ante"
+	"github.com/Canto-Network/Canto/v2/x/epochs"
+	epochskeeper "github.com/Canto-Network/Canto/v2/x/epochs/keeper"
+	epochstypes "github.com/Canto-Network/Canto/v2/x/epochs/types"
+	"github.com/Canto-Network/Canto/v2/x/erc20"
+	erc20client "github.com/Canto-Network/Canto/v2/x/erc20/client"
+	erc20keeper "github.com/Canto-Network/Canto/v2/x/erc20/keeper"
+	erc20types "github.com/Canto-Network/Canto/v2/x/erc20/types"
+	"github.com/Canto-Network/Canto/v2/x/fees"
+	feeskeeper "github.com/Canto-Network/Canto/v2/x/fees/keeper"
+	feestypes "github.com/Canto-Network/Canto/v2/x/fees/types"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/inflation"
-	inflationkeeper "github.com/Canto-Network/Canto-Testnet-v2/v1/x/inflation/keeper"
-	inflationtypes "github.com/Canto-Network/Canto-Testnet-v2/v1/x/inflation/types"
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/recovery"
-	recoverykeeper "github.com/Canto-Network/Canto-Testnet-v2/v1/x/recovery/keeper"
-	recoverytypes "github.com/Canto-Network/Canto-Testnet-v2/v1/x/recovery/types"
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/vesting"
-	vestingkeeper "github.com/Canto-Network/Canto-Testnet-v2/v1/x/vesting/keeper"
-	vestingtypes "github.com/Canto-Network/Canto-Testnet-v2/v1/x/vesting/types"
+	"github.com/Canto-Network/Canto/v2/x/inflation"
+	inflationkeeper "github.com/Canto-Network/Canto/v2/x/inflation/keeper"
+	inflationtypes "github.com/Canto-Network/Canto/v2/x/inflation/types"
+	"github.com/Canto-Network/Canto/v2/x/recovery"
+	recoverykeeper "github.com/Canto-Network/Canto/v2/x/recovery/keeper"
+	recoverytypes "github.com/Canto-Network/Canto/v2/x/recovery/types"
+	"github.com/Canto-Network/Canto/v2/x/vesting"
+	vestingkeeper "github.com/Canto-Network/Canto/v2/x/vesting/keeper"
+	vestingtypes "github.com/Canto-Network/Canto/v2/x/vesting/types"
 
-	//unigov imports
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/unigov"
-	unigovclient "github.com/Canto-Network/Canto-Testnet-v2/v1/x/unigov/client"
-	unigovkeeper "github.com/Canto-Network/Canto-Testnet-v2/v1/x/unigov/keeper"
-	unigovtypes "github.com/Canto-Network/Canto-Testnet-v2/v1/x/unigov/types"
+	//govshuttle imports
+	"github.com/Canto-Network/Canto/v2/x/govshuttle"
+	govshuttleclient "github.com/Canto-Network/Canto/v2/x/govshuttle/client"
+	govshuttlekeeper "github.com/Canto-Network/Canto/v2/x/govshuttle/keeper"
+	govshuttletypes "github.com/Canto-Network/Canto/v2/x/govshuttle/types"
+
+	v2 "github.com/Canto-Network/Canto/v2/app/upgrades/v2"
+	v3 "github.com/Canto-Network/Canto/v2/app/upgrades/v3"
+	v4 "github.com/Canto-Network/Canto/v2/app/upgrades/v4"
 )
 
 func init() {
@@ -151,8 +152,8 @@ func init() {
 	// manually update the power reduction by replacing micro (u) -> atto (a) Canto
 	sdk.DefaultPowerReduction = ethermint.PowerReduction
 	// modify fee market parameter defaults through global
-	feemarkettypes.DefaultMinGasPrice = v5.MainnetMinGasPrices
-	feemarkettypes.DefaultMinGasMultiplier = v5.MainnetMinGasMultiplier
+	feemarkettypes.DefaultMinGasPrice = sdk.NewDec(20_000_000_000)
+	feemarkettypes.DefaultMinGasMultiplier = sdk.NewDecWithPrec(5, 1)
 }
 
 // Name defines the application binary name
@@ -177,8 +178,8 @@ var (
 			ibcclientclient.UpdateClientProposalHandler, ibcclientclient.UpgradeProposalHandler,
 			// Canto proposal types
 			erc20client.RegisterCoinProposalHandler, erc20client.RegisterERC20ProposalHandler, erc20client.ToggleTokenConversionProposalHandler,
-			unigovclient.LendingMarketProposalHandler,
-			unigovclient.TreasuryProposalHandler,
+			govshuttleclient.LendingMarketProposalHandler,
+			govshuttleclient.TreasuryProposalHandler,
 		),
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
@@ -194,7 +195,7 @@ var (
 		feemarket.AppModuleBasic{},
 		inflation.AppModuleBasic{},
 		erc20.AppModuleBasic{},
-		unigov.AppModuleBasic{},
+		govshuttle.AppModuleBasic{},
 		epochs.AppModuleBasic{},
 		recovery.AppModuleBasic{},
 		fees.AppModuleBasic{},
@@ -211,7 +212,7 @@ var (
 		evmtypes.ModuleName:            {authtypes.Minter, authtypes.Burner}, // used for secure addition and subtraction of balance using module account
 		inflationtypes.ModuleName:      {authtypes.Minter},
 		erc20types.ModuleName:          {authtypes.Minter, authtypes.Burner},
-		unigovtypes.ModuleName:         {authtypes.Minter, authtypes.Burner},
+		govshuttletypes.ModuleName:     {authtypes.Minter, authtypes.Burner},
 	}
 
 	// module accounts that are allowed to receive tokens
@@ -270,13 +271,13 @@ type Canto struct {
 	FeeMarketKeeper feemarketkeeper.Keeper
 
 	// Canto keepers
-	InflationKeeper inflationkeeper.Keeper
-	Erc20Keeper     erc20keeper.Keeper
-	EpochsKeeper    epochskeeper.Keeper
-	VestingKeeper   vestingkeeper.Keeper
-	RecoveryKeeper  *recoverykeeper.Keeper
-	FeesKeeper      feeskeeper.Keeper
-	UnigovKeeper    unigovkeeper.Keeper
+	InflationKeeper  inflationkeeper.Keeper
+	Erc20Keeper      erc20keeper.Keeper
+	EpochsKeeper     epochskeeper.Keeper
+	VestingKeeper    vestingkeeper.Keeper
+	RecoveryKeeper   *recoverykeeper.Keeper
+	FeesKeeper       feeskeeper.Keeper
+	GovshuttleKeeper govshuttlekeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -334,6 +335,7 @@ func NewCanto(
 		inflationtypes.StoreKey, erc20types.StoreKey,
 		epochstypes.StoreKey, vestingtypes.StoreKey, recoverytypes.StoreKey, //recoverytypes.StoreKe
 		feestypes.StoreKey,
+		govshuttletypes.StoreKey,
 	)
 
 	// Add the EVM transient store key
@@ -417,7 +419,7 @@ func NewCanto(
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
 		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper)).
 		AddRoute(erc20types.RouterKey, erc20.NewErc20ProposalHandler(&app.Erc20Keeper)).
-		AddRoute(unigovtypes.RouterKey, unigov.NewUniGovProposalHandler(&app.UnigovKeeper))
+		AddRoute(govshuttletypes.RouterKey, govshuttle.NewgovshuttleProposalHandler(&app.GovshuttleKeeper))
 
 	govKeeper := govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName),
@@ -451,8 +453,8 @@ func NewCanto(
 		app.AccountKeeper, app.BankKeeper, app.EvmKeeper,
 	)
 
-	app.UnigovKeeper = unigovkeeper.NewKeeper(
-		keys[unigovtypes.StoreKey], appCodec, app.GetSubspace(unigovtypes.ModuleName),
+	app.GovshuttleKeeper = govshuttlekeeper.NewKeeper(
+		keys[govshuttletypes.StoreKey], appCodec, app.GetSubspace(govshuttletypes.ModuleName),
 		app.AccountKeeper, app.Erc20Keeper, govKeeper,
 	)
 
@@ -600,7 +602,7 @@ func NewCanto(
 		vesting.NewAppModule(app.VestingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		recovery.NewAppModule(*app.RecoveryKeeper),
 		fees.NewAppModule(app.FeesKeeper, app.AccountKeeper),
-		unigov.NewAppModule(app.UnigovKeeper, app.AccountKeeper),
+		govshuttle.NewAppModule(app.GovshuttleKeeper, app.AccountKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -636,7 +638,7 @@ func NewCanto(
 		erc20types.ModuleName,
 		recoverytypes.ModuleName,
 		feestypes.ModuleName,
-		unigovtypes.ModuleName,
+		govshuttletypes.ModuleName,
 	)
 
 	// NOTE: fee market module must go last in order to retrieve the block gas used.
@@ -667,7 +669,7 @@ func NewCanto(
 		vestingtypes.ModuleName,
 		inflationtypes.ModuleName,
 		erc20types.ModuleName,
-		unigovtypes.ModuleName,
+		govshuttletypes.ModuleName,
 		// recoverytypes.ModuleName,
 		feestypes.ModuleName,
 	)
@@ -708,7 +710,7 @@ func NewCanto(
 		epochstypes.ModuleName,
 		recoverytypes.ModuleName,
 		feestypes.ModuleName,
-		unigovtypes.ModuleName,
+		govshuttletypes.ModuleName,
 		// NOTE: crisis module must go at the end to check for invariants on each module
 		crisistypes.ModuleName,
 	)
@@ -806,8 +808,6 @@ func (app *Canto) Name() string { return app.BaseApp.Name() }
 // of the new block for every registered module. If there is a registered fork at the current height,
 // BeginBlocker will schedule the upgrade plan and perform the state migration (if any).
 func (app *Canto) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
-	// Perform any scheduled forks before executing the modules logic
-	app.ScheduleForkUpgrade(ctx)
 	return app.mm.BeginBlock(ctx, req)
 }
 
@@ -1027,7 +1027,7 @@ func initParamsKeeper(
 	paramsKeeper.Subspace(erc20types.ModuleName)
 	paramsKeeper.Subspace(recoverytypes.ModuleName)
 	paramsKeeper.Subspace(feestypes.ModuleName)
-	paramsKeeper.Subspace(unigovtypes.ModuleName)
+	paramsKeeper.Subspace(govshuttletypes.ModuleName)
 	return paramsKeeper
 }
 
@@ -1037,42 +1037,15 @@ func (app *Canto) setupUpgradeHandlers() {
 		v2.UpgradeName,
 		v2.CreateUpgradeHandler(app.mm, app.configurator),
 	)
-
-	// NOTE: no v3 upgrade handler as it required an unscheduled manual upgrade.
-
+	// v3 upgrade handler
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v3.UpgradeName,
+		v3.CreateUpgradeHandler(app.mm, app.configurator),
+	)
 	// v4 upgrade handler
 	app.UpgradeKeeper.SetUpgradeHandler(
 		v4.UpgradeName,
-		v4.CreateUpgradeHandler(
-			app.mm, app.configurator,
-			app.IBCKeeper.ClientKeeper,
-		),
-	)
-
-	// v5 upgrade handler
-	app.UpgradeKeeper.SetUpgradeHandler(
-		v5.UpgradeName,
-		v5.CreateUpgradeHandler(
-			app.mm, app.configurator,
-			app.BankKeeper,
-			app.StakingKeeper,
-			app.ParamsKeeper,
-			app.TransferKeeper,
-			app.SlashingKeeper,
-		),
-	)
-
-	// v6 upgrade handler
-	app.UpgradeKeeper.SetUpgradeHandler(
-		v6.UpgradeName,
-		v6.CreateUpgradeHandler(
-			app.mm, app.configurator,
-			app.BankKeeper,
-			app.StakingKeeper,
-			app.ParamsKeeper,
-			app.TransferKeeper,
-			app.SlashingKeeper,
-		),
+		v4.CreateUpgradeHandler(app.mm, app.configurator, app.GovshuttleKeeper),
 	)
 
 	// When a planned update height is reached, the old binary will panic
@@ -1092,12 +1065,13 @@ func (app *Canto) setupUpgradeHandlers() {
 	switch upgradeInfo.Name {
 	case v2.UpgradeName:
 		// no store upgrades in v2
+	case v3.UpgradeName:
+		// no store upgrades in v3
 	case v4.UpgradeName:
 		// no store upgrades in v4
-	case v5.UpgradeName:
-		// no store upgrades in v5
-	case v6.UpgradeName:
-		// no store upgrades in v6
+		storeUpgrades = &storetypes.StoreUpgrades{
+            Added: []string{govshuttletypes.StoreKey},
+        }	
 	}
 
 	if storeUpgrades != nil {

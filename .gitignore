@@ -1,1 +1,4 @@
-.DS_Store
+.vscode
+.testnets
+.bencher
+DS_Store

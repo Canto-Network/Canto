@@ -3,7 +3,7 @@ package types
 import (
 	fmt "fmt"
 
-	epochstypes "github.com/Canto-Network/Canto-Testnet-v2/v1/x/epochs/types"
+	epochstypes "github.com/Canto-Network/Canto/v2/x/epochs/types"
 )
 
 // NewGenesisState creates a new GenesisState object
@@ -29,7 +29,7 @@ func DefaultGenesisState() *GenesisState {
 		Params:          DefaultParams(),
 		Period:          uint64(0),
 		EpochIdentifier: epochstypes.DayEpochID,
-		EpochsPerPeriod: 365,
+		EpochsPerPeriod: 30,
 		SkippedEpochs:   0,
 	}
 }

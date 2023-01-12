@@ -10,11 +10,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
-	"github.com/Canto-Network/ethermint-v2/encoding"
+	"github.com/evmos/ethermint/encoding"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/app"
-	v2 "github.com/Canto-Network/Canto-Testnet-v2/v1/x/erc20/migrations/v2"
-	erc20types "github.com/Canto-Network/Canto-Testnet-v2/v1/x/erc20/types"
+	"github.com/Canto-Network/Canto/v2/app"
+	v2 "github.com/Canto-Network/Canto/v2/x/erc20/migrations/v2"
+	erc20types "github.com/Canto-Network/Canto/v2/x/erc20/types"
 )
 
 func TestUpdateParams(t *testing.T) {

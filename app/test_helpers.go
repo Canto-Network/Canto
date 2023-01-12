@@ -13,11 +13,11 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/Canto-Network/ethermint-v2/encoding"
-	feemarkettypes "github.com/Canto-Network/ethermint-v2/x/feemarket/types"
+	"github.com/evmos/ethermint/encoding"
+	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/cmd/config"
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/types"
+	"github.com/Canto-Network/Canto/v2/cmd/config"
+	"github.com/Canto-Network/Canto/v2/types"
 )
 
 func init() {

@@ -5,8 +5,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/inflation/types"
-	ethermint "github.com/Canto-Network/ethermint-v2/types"
+	"github.com/Canto-Network/Canto/v2/x/inflation/types"
+	ethermint "github.com/evmos/ethermint/types"
 )
 
 func (suite *KeeperTestSuite) TestPeriod() {
@@ -73,8 +73,13 @@ func (suite *KeeperTestSuite) TestEpochMintProvision() {
 		{
 			"default epochMintProvision",
 			func() {
-				defaultEpochMintProvision, err := suite.app.InflationKeeper.CalculateEpochMintProvision(suite.ctx)
-				suite.Require().NoError(err)
+				params := types.DefaultParams()
+				defaultEpochMintProvision := types.CalculateEpochMintProvision(
+					params,
+					uint64(0),
+					30,
+					sdk.OneDec(),
+				)
 				req = &types.QueryEpochMintProvisionRequest{}
 				expRes = &types.QueryEpochMintProvisionResponse{
 					EpochMintProvision: sdk.NewDecCoinFromDec(types.DefaultInflationDenom, defaultEpochMintProvision),
@@ -190,7 +195,7 @@ func (suite *KeeperTestSuite) TestQueryInflationRate() {
 	err := suite.app.InflationKeeper.MintCoins(suite.ctx, mintCoin)
 	suite.Require().NoError(err)
 
-	expInflationRate := sdk.MustNewDecFromStr("0.007640821917808219")
+	expInflationRate := sdk.MustNewDecFromStr("4.076087000000000000")
 	res, err := suite.queryClient.InflationRate(ctx, &types.QueryInflationRateRequest{})
 	suite.Require().NoError(err)
 	suite.Require().Equal(expInflationRate, res.InflationRate)

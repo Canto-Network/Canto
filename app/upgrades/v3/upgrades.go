@@ -1,41 +1,24 @@
 package v3
 
 import (
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/x/genutil/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/module"
+	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
-	feemarketv010 "github.com/Canto-Network/ethermint-v2/x/feemarket/migrations/v010"
-	feemarketv09types "github.com/Canto-Network/ethermint-v2/x/feemarket/migrations/v09/types"
-	feemarkettypes "github.com/Canto-Network/ethermint-v2/x/feemarket/types"
+
 )
 
-// MigrateGenesis migrates exported state from v2 to v3 genesis state.
-// It performs a no-op if the migration errors.
-func MigrateGenesis(appState types.AppMap, clientCtx client.Context) types.AppMap {
-	// Migrate x/feemarket.
-	if appState[feemarkettypes.ModuleName] == nil {
-		return appState
+// CreateUpgradeHandler creates an SDK upgrade handler for v2
+func CreateUpgradeHandler(
+	mm *module.Manager,
+	configurator module.Configurator,
+) upgradetypes.UpgradeHandler {
+	return func(ctx sdk.Context, _ upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
+		logger := ctx.Logger().With("upgrading to v3.0.0", UpgradeName)
+
+
+		// Leave modules are as-is to avoid running InitGenesis.
+		logger.Debug("running module migrations ...")
+		return mm.RunMigrations(ctx, configurator, vm)
 	}
-
-	// unmarshal relative source genesis application state
-	var oldFeeMarketState feemarketv09types.GenesisState
-	if err := clientCtx.Codec.UnmarshalJSON(appState[feemarkettypes.ModuleName], &oldFeeMarketState); err != nil {
-		return appState
-	}
-
-	// delete deprecated x/feemarket genesis state
-	delete(appState, feemarkettypes.ModuleName)
-
-	// Migrate relative source genesis application state and marshal it into
-	// the respective key.
-	newFeeMarketState := feemarketv010.MigrateJSON(oldFeeMarketState)
-
-	feeMarketBz, err := clientCtx.Codec.MarshalJSON(&newFeeMarketState)
-	if err != nil {
-		return appState
-	}
-
-	appState[feemarkettypes.ModuleName] = feeMarketBz
-
-	return appState
 }

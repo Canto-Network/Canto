@@ -3,11 +3,11 @@ package keeper_test
 import (
 	"fmt"
 
-	"github.com/Canto-Network/ethermint-v2/tests"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
+	"github.com/evmos/ethermint/tests"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/erc20/types"
+	"github.com/Canto-Network/Canto/v2/x/erc20/types"
 )
 
 func (suite *KeeperTestSuite) TestTokenPairs() {

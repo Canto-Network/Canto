@@ -13,11 +13,11 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/types"
-	"github.com/Canto-Network/ethermint-v2/encoding"
+	"github.com/Canto-Network/Canto/v2/types"
+	"github.com/evmos/ethermint/encoding"
 )
 
-func TestcantoExport(t *testing.T) {
+func TestCantoExport(t *testing.T) {
 	db := dbm.NewMemDB()
 	app := NewCanto(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, DefaultNodeHome, 0, encoding.MakeConfig(ModuleBasics), simapp.EmptyAppOptions{})
 

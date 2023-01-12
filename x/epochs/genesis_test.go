@@ -4,13 +4,13 @@ import (
 	"testing"
 	"time"
 
-	feemarkettypes "github.com/Canto-Network/ethermint-v2/x/feemarket/types"
+	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 	"github.com/stretchr/testify/require"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
-	simapp "github.com/Canto-Network/Canto-Testnet-v2/v1/app"
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/epochs"
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/epochs/types"
+	simapp "github.com/Canto-Network/Canto/v2/app"
+	"github.com/Canto-Network/Canto/v2/x/epochs"
+	"github.com/Canto-Network/Canto/v2/x/epochs/types"
 )
 
 func TestEpochsExportGenesis(t *testing.T) {

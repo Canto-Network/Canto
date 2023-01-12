@@ -1,0 +1,3 @@
+PEER IDs:
+
+plex-validator: 4826b71e7d34840cc12bd9c075226555eb27ea8a@137.184.0.69:26656

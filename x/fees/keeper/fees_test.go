@@ -3,10 +3,10 @@ package keeper_test
 import (
 	"fmt"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/fees/types"
-	"github.com/Canto-Network/ethermint-v2/tests"
+	"github.com/Canto-Network/Canto/v2/x/fees/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/evmos/ethermint/tests"
 )
 
 func (suite *KeeperTestSuite) TestGetFees() {

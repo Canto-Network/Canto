@@ -3,7 +3,7 @@ package keeper_test
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/recovery/types"
+	"github.com/Canto-Network/Canto/v2/x/recovery/types"
 )
 
 func (suite *KeeperTestSuite) TestQueryParams() {

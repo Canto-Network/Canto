@@ -10,11 +10,11 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/Canto-Network/ethermint-v2/server/config"
-	"github.com/Canto-Network/ethermint-v2/testutil/network"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/evmos/ethermint/server/config"
+	"github.com/evmos/ethermint/testutil/network"
 
-	cantonetwork "github.com/Canto-Network/Canto-Testnet-v2/v1/testutil/network"
+	cantonetwork "github.com/Canto-Network/Canto/v2/testutil/network"
 )
 
 type IntegrationTestSuite struct {

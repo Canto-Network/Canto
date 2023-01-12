@@ -7,7 +7,7 @@ import (
 
 	"github.com/tendermint/tendermint/libs/log"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/inflation/types"
+	"github.com/Canto-Network/Canto/v2/x/inflation/types"
 )
 
 // Keeper of the inflation store
@@ -59,4 +59,8 @@ func NewKeeper(
 // Logger returns a module-specific logger.
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", "x/"+types.ModuleName)
+}
+
+func (k Keeper) GetComPool(ctx sdk.Context) sdk.DecCoins {
+	return k.distrKeeper.GetFeePoolCommunityCoins(ctx)
 }

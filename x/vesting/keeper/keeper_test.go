@@ -27,18 +27,18 @@ import (
 	tmversion "github.com/tendermint/tendermint/proto/tendermint/version"
 	"github.com/tendermint/tendermint/version"
 
-	"github.com/Canto-Network/ethermint-v2/crypto/ethsecp256k1"
-	"github.com/Canto-Network/ethermint-v2/encoding"
-	"github.com/Canto-Network/ethermint-v2/server/config"
-	"github.com/Canto-Network/ethermint-v2/tests"
-	ethermint "github.com/Canto-Network/ethermint-v2/types"
-	evm "github.com/Canto-Network/ethermint-v2/x/evm/types"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
+	"github.com/evmos/ethermint/crypto/ethsecp256k1"
+	"github.com/evmos/ethermint/encoding"
+	"github.com/evmos/ethermint/server/config"
+	"github.com/evmos/ethermint/tests"
+	ethermint "github.com/evmos/ethermint/types"
+	evm "github.com/evmos/ethermint/x/evm/types"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/app"
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/contracts"
-	epochstypes "github.com/Canto-Network/Canto-Testnet-v2/v1/x/epochs/types"
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/vesting/types"
+	"github.com/Canto-Network/Canto/v2/app"
+	"github.com/Canto-Network/Canto/v2/contracts"
+	epochstypes "github.com/Canto-Network/Canto/v2/x/epochs/types"
+	"github.com/Canto-Network/Canto/v2/x/vesting/types"
 )
 
 var (

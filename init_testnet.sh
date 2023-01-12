@@ -1,6 +1,6 @@
 KEY="mykey"
 KEY2="mykey2"
-CHAINID="canto_7744-1"
+CHAINID="canto_7701-1"
 MONIKER="plex-validator"
 KEYRING="test"
 KEYALGO="eth_secp256k1"
@@ -35,7 +35,7 @@ cat $HOME/.cantod/config/genesis.json | jq '.app_state["evm"]["params"]["evm_den
 cat $HOME/.cantod/config/genesis.json | jq '.app_state["inflation"]["params"]["mint_denom"]="acanto"' > $HOME/.cantod/config/tmp_genesis.json && mv $HOME/.cantod/config/tmp_genesis.json $HOME/.cantod/config/genesis.json
 
 # Change voting params so that submitted proposals pass immediately for testing
-cat $HOME/.cantod/config/genesis.json| jq '.app_state.gov.voting_params.voting_period="600s"' > $HOME/.cantod/config/tmp_genesis.json && mv $HOME/.cantod/config/tmp_genesis.json $HOME/.cantod/config/genesis.json
+cat $HOME/.cantod/config/genesis.json| jq '.app_state.gov.voting_params.voting_period="30s"' > $HOME/.cantod/config/tmp_genesis.json && mv $HOME/.cantod/config/tmp_genesis.json $HOME/.cantod/config/genesis.json
 
 
 # disable produce empty block

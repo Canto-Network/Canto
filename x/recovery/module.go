@@ -19,9 +19,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/recovery/client/cli"
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/recovery/keeper"
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/recovery/types"
+	"github.com/Canto-Network/Canto/v2/x/recovery/client/cli"
+	"github.com/Canto-Network/Canto/v2/x/recovery/keeper"
+	"github.com/Canto-Network/Canto/v2/x/recovery/types"
 )
 
 // type check to ensure the interface is properly implemented

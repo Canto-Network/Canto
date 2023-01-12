@@ -1,14 +1,17 @@
 package keeper_test
 
 import (
-	"time"
 	"fmt"
+	"time"
 
+	epochstypes "github.com/Canto-Network/Canto/v2/x/epochs/types"
+	"github.com/Canto-Network/Canto/v2/x/inflation/types"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	bankKeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-
-	epochstypes "github.com/Canto-Network/Canto-Testnet-v2/v1/x/epochs/types"
 )
 
 var (
@@ -21,10 +24,6 @@ var (
 var _ = Describe("Inflation", Ordered, func() {
 	BeforeEach(func() {
 		s.SetupTest()
-	
-		params := s.app.InflationKeeper.GetParams(s.ctx)
-		coin := sdk.NewInt64Coin(params.MintDenom, int64(1_000_000))
-		s.app.InflationKeeper.MintCoins(s.ctx, coin) //update circulatingSupply
 	})
 
 	Describe("Commiting a block", func() {
@@ -34,9 +33,6 @@ var _ = Describe("Inflation", Ordered, func() {
 				params := s.app.InflationKeeper.GetParams(s.ctx)
 				params.EnableInflation = true
 				s.app.InflationKeeper.SetParams(s.ctx, params)
-
-				coin := sdk.NewInt64Coin(params.MintDenom, int64(1_000_000))
-				s.app.InflationKeeper.MintCoins(s.ctx, coin) //update circulatingSupply
 			})
 
 			Context("before an epoch ends", func() {
@@ -44,9 +40,9 @@ var _ = Describe("Inflation", Ordered, func() {
 					s.CommitAfter(time.Minute)    // Start Epoch
 					s.CommitAfter(time.Hour * 23) // End Epoch
 				})
-
 				It("should not allocate funds to the community pool", func() {
 					balance := s.app.DistrKeeper.GetFeePoolCommunityCoins(s.ctx)
+					fmt.Println("Community Pool balance before epoch end: ", balance.AmountOf(denomMint))
 					Expect(balance.IsZero()).To(BeTrue())
 				})
 			})
@@ -56,17 +52,20 @@ var _ = Describe("Inflation", Ordered, func() {
 					s.CommitAfter(time.Minute)    // Start Epoch
 					s.CommitAfter(time.Hour * 25) // End Epoch
 				})
-
-				It("should allocate funds to the community pool", func() {
+				It("should allocate staking provision funds to the community pool", func() {
 					balanceCommunityPool := s.app.DistrKeeper.GetFeePoolCommunityCoins(s.ctx)
 
 					provision, _ := s.app.InflationKeeper.GetEpochMintProvision(s.ctx)
 					params := s.app.InflationKeeper.GetParams(s.ctx)
-					distribution := params.InflationDistribution.CommunityPool
-					expected := provision.Mul(distribution)
 
-					Expect(balanceCommunityPool.IsZero()).ToNot(BeTrue())
-					Expect(balanceCommunityPool.AmountOf(denomMint).GT(expected)).To(BeTrue())
+					distributionStaking := params.InflationDistribution.StakingRewards
+					expectedStaking := provision.Mul(distributionStaking)
+
+					staking := s.app.AccountKeeper.GetModuleAddress("fee_collector")
+					stakingBal := s.app.BankKeeper.GetAllBalances(s.ctx, staking)
+					// fees distributed
+					Expect(balanceCommunityPool.AmountOf(denomMint).Equal(expectedStaking)).To(BeTrue())
+					Expect(stakingBal.AmountOf(denomMint).Equal(sdk.NewInt(0))).To(BeTrue())
 				})
 			})
 		})
@@ -151,6 +150,7 @@ var _ = Describe("Inflation", Ordered, func() {
 
 							provision, found = s.app.InflationKeeper.GetEpochMintProvision(s.ctx)
 							s.Require().True(found)
+							fmt.Println(provision)
 
 							s.CommitAfter(time.Hour * 23) // commit before next full epoch
 							provisionAfter, _ := s.app.InflationKeeper.GetEpochMintProvision(s.ctx)
@@ -161,9 +161,10 @@ var _ = Describe("Inflation", Ordered, func() {
 
 						It("should recalculate the EpochMintProvision", func() {
 							provisionAfter, _ := s.app.InflationKeeper.GetEpochMintProvision(s.ctx)
-							fmt.Println(provisionAfter)
+							// fmt.Println("provisionAfter: ", provisionAfter)
 							Expect(provisionAfter).ToNot(Equal(provision))
-							// Expect(provisionAfter.BigInt().Uint64()).To.Be(Greater(provision.BigInt().Uint64()))
+							fmt.Println("provision after: ", provisionAfter)
+							Expect(provisionAfter).To(Equal(sdk.MustNewDecFromStr("10597826200000000000000000.000000000000000000")))
 						})
 					})
 				})
@@ -171,3 +172,91 @@ var _ = Describe("Inflation", Ordered, func() {
 		})
 	})
 })
+var v stakingtypes.Validator
+var _ = Describe("Inflation", Ordered, func() {
+	BeforeEach(func() {
+		s.clearValidatorsAndInitPool(1000)
+		valAddrs := MakeValAccts(1)
+		pk := GenKeys(1)
+		// instantiate validator
+		v, err := stakingtypes.NewValidator(valAddrs[0], pk[0].PubKey(), stakingtypes.Description{})
+		s.Require().NoError(err)
+		s.Require().Equal(stakingtypes.Unbonded, v.Status)
+		// Increment Validator balance + power Index
+		tokens := s.app.StakingKeeper.TokensFromConsensusPower(s.ctx, 1000)
+		v, _ = v.AddTokensFromDel(tokens)
+		// set validator in state
+		s.app.StakingKeeper.SetValidator(s.ctx, v)
+		s.app.StakingKeeper.SetValidatorByPowerIndex(s.ctx, v)
+		//update validator set
+		_, err = s.app.StakingKeeper.ApplyAndReturnValidatorSetUpdates(s.ctx) // failing bc validator tokens are not enough
+		v, found := s.app.StakingKeeper.GetValidator(s.ctx, valAddrs[0])
+		s.Require().True(found)
+		s.Require().NoError(err)
+		s.Require().Equal(stakingtypes.Bonded, v.Status)
+		// set consAddress
+		s.consAddress = sdk.GetConsAddress(pk[0].PubKey())
+		s.SetupTest()
+	})
+	Context("Expect the validator consAddress to be the block proposer address", func() {
+		BeforeEach(func() {
+			params := s.app.InflationKeeper.GetParams(s.ctx)
+			params.EnableInflation = true
+			s.app.InflationKeeper.SetParams(s.ctx, params)
+		})
+		It("Commit a block and check that proposer address is the address of the suite consAddress", func() {
+			// commit
+			s.CommitAfter(time.Minute)
+			header := s.ctx.BlockHeader()
+			s.Require().Equal(sdk.AccAddress(s.consAddress), sdk.AccAddress(header.ProposerAddress))
+		})
+		It("Commit Block Before Epoch and check rewards", func() {
+			s.CommitAfter(time.Minute)
+			valBal := s.app.BankKeeper.GetAllBalances(s.ctx, sdk.AccAddress(sdk.AccAddress(s.consAddress)))
+			Expect(valBal.AmountOf(denomMint).Equal(sdk.NewInt(0))).To(BeTrue())
+		})
+		It("Commit block after Epoch and balance will be Epoch Mint Provision", func() {
+			provision, _ := s.app.InflationKeeper.GetEpochMintProvision(s.ctx)
+			s.CommitAfter(time.Minute)
+			s.CommitAfter(time.Hour * 25)                     // epoch will have ended
+			s.app.DistrKeeper.GetFeePoolCommunityCoins(s.ctx) //Get Fee Pool befor
+			//
+			valAddr, _ := sdk.ValAddressFromBech32(v.OperatorAddress)
+			valBal := s.app.DistrKeeper.GetValidatorCurrentRewards(s.ctx, valAddr)
+			Expect(valBal.Rewards.AmountOf(denomMint).Equal(provision)).To(BeFalse())
+		})
+	})
+})
+
+func (s *KeeperTestSuite) clearValidatorsAndInitPool(power int64) {
+	amt := s.app.StakingKeeper.TokensFromConsensusPower(s.ctx, power)
+	notBondedPool := s.app.StakingKeeper.GetNotBondedPool(s.ctx)
+	totalSupply := sdk.NewCoins(sdk.NewCoin(s.app.StakingKeeper.BondDenom(s.ctx), amt))
+	s.app.AccountKeeper.SetModuleAccount(s.ctx, notBondedPool)
+	err := FundModuleAccount(s.app.BankKeeper, s.ctx, notBondedPool.GetName(), totalSupply)
+	s.Require().NoError(err)
+}
+
+func FundModuleAccount(bk bankKeeper.Keeper, ctx sdk.Context, recipient string, amount sdk.Coins) error {
+	if err := bk.MintCoins(ctx, types.ModuleName, amount); err != nil {
+		panic(err)
+	}
+	return bk.SendCoinsFromModuleToModule(ctx, types.ModuleName, recipient, amount)
+}
+
+func MakeValAccts(numAccts int) []sdk.ValAddress {
+	addrs := make([]sdk.ValAddress, numAccts)
+	for i := 0; i < numAccts; i++ {
+		pk := ed25519.GenPrivKey().PubKey()
+		addrs[i] = sdk.ValAddress(sdk.AccAddress(pk.Address()))
+	}
+	return addrs
+}
+
+func GenKeys(numKeys int) []*ed25519.PrivKey {
+	pks := make([]*ed25519.PrivKey, numKeys)
+	for i := 0; i < numKeys; i++ {
+		pks[i] = ed25519.GenPrivKey()
+	}
+	return pks
+}

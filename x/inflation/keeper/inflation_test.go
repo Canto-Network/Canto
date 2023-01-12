@@ -3,10 +3,10 @@ package keeper_test
 import (
 	"fmt"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/inflation/types"
-	ethermint "github.com/Canto-Network/ethermint-v2/types"
+	"github.com/Canto-Network/Canto/v2/x/inflation/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	ethermint "github.com/evmos/ethermint/types"
 )
 
 func (suite *KeeperTestSuite) TestMintAndAllocateInflation() {
@@ -22,8 +22,8 @@ func (suite *KeeperTestSuite) TestMintAndAllocateInflation() {
 			"pass",
 			sdk.NewCoin(denomMint, sdk.NewInt(1_000_000)),
 			func() {},
-			sdk.NewCoin(denomMint, sdk.NewInt(800_000)),
-			sdk.NewDecCoins(sdk.NewDecCoin(denomMint, sdk.NewInt(200_000))),
+			sdk.NewCoin(denomMint, sdk.NewInt(1_000_000)),
+			sdk.DecCoins(nil),
 			true,
 		},
 		{
@@ -56,7 +56,6 @@ func (suite *KeeperTestSuite) TestMintAndAllocateInflation() {
 				feeCollector,
 				denomMint,
 			)
-
 			balanceCommunityPool := suite.app.DistrKeeper.GetFeePoolCommunityCoins(suite.ctx)
 
 			if tc.expPass {
@@ -71,22 +70,20 @@ func (suite *KeeperTestSuite) TestMintAndAllocateInflation() {
 	}
 }
 
-func (suite *KeeperTestSuite) TestGetCirculatingSupplyAndProvision() {
+func (suite *KeeperTestSuite) TestGetCirculatingSupplyAndInflationRate() {
 	testCases := []struct {
 		name             string
 		bankSupply       int64
 		malleate         func()
 		expInflationRate sdk.Dec
-		expProvision     sdk.Dec
 	}{
 		{
-			"Low Circulating Supply",
+			"no mint provision",
 			400_000_000,
 			func() {
 				suite.app.InflationKeeper.SetEpochMintProvision(suite.ctx, sdk.ZeroDec())
 			},
-			sdk.MustNewDecFromStr("0.007640821917808219"),
-			sdk.MustNewDecFromStr("1115560000000000000000000000.000000000000000000"),
+			sdk.ZeroDec(),
 		},
 		{
 			"no epochs per period",
@@ -95,14 +92,18 @@ func (suite *KeeperTestSuite) TestGetCirculatingSupplyAndProvision() {
 				suite.app.InflationKeeper.SetEpochsPerPeriod(suite.ctx, 0)
 			},
 			sdk.ZeroDec(),
-			sdk.ZeroDec(),
 		},
 		{
 			"high supply",
 			800_000_000,
 			func() {},
-			sdk.MustNewDecFromStr("0.007640821917808219"),
-			sdk.MustNewDecFromStr("2231120000000000000000000000.000000000000000000"),
+			sdk.MustNewDecFromStr("2.038043500000000000"),
+		},
+		{
+			"low supply",
+			400_000_000,
+			func() {},
+			sdk.MustNewDecFromStr("4.076087000000000000"),
 		},
 	}
 	for _, tc := range testCases {
@@ -110,9 +111,7 @@ func (suite *KeeperTestSuite) TestGetCirculatingSupplyAndProvision() {
 			suite.SetupTest() // reset
 
 			// Team allocation is only set on mainnet
-			suite.ctx = suite.ctx.WithChainID("canto_9001-1")
 			tc.malleate()
-
 			// Mint coins to increase supply
 			coin := sdk.NewCoin(types.DefaultInflationDenom, sdk.TokensFromConsensusPower(tc.bankSupply, ethermint.PowerReduction))
 			decCoin := sdk.NewDecCoinFromCoin(coin)
@@ -120,30 +119,10 @@ func (suite *KeeperTestSuite) TestGetCirculatingSupplyAndProvision() {
 			suite.Require().NoError(err)
 
 			circulatingSupply := s.app.InflationKeeper.GetCirculatingSupply(suite.ctx)
-
 			suite.Require().Equal(decCoin.Amount, circulatingSupply)
 
-			inflationRate, err := s.app.InflationKeeper.GetInflationRate(suite.ctx)
-			suite.Require().NoError(err)
+			inflationRate := s.app.InflationKeeper.GetInflationRate(suite.ctx)
 			suite.Require().Equal(tc.expInflationRate, inflationRate)
-			periodProvision, err := s.app.InflationKeeper.CalculateEpochMintProvision(suite.ctx)
-			suite.Require().NoError(err)
-			suite.Require().Equal(tc.expProvision, periodProvision)
-
-			prevBondingRatio := suite.app.InflationKeeper.BondedRatio(suite.ctx)
-
-			err = suite.app.InflationKeeper.MintCoins(suite.ctx, coin)
-			suite.Require().NoError(err)
-			//send to communityPool
-			moduleAddr := suite.app.AccountKeeper.GetModuleAddress(types.ModuleName)
-			suite.app.DistrKeeper.FundCommunityPool(
-				suite.ctx,
-				sdk.NewCoins(coin),
-				moduleAddr,
-			)
-			newBondingRatio := suite.app.InflationKeeper.BondedRatio(suite.ctx)
-			suite.Require().Equal(prevBondingRatio, newBondingRatio)
-
 		})
 	}
 }

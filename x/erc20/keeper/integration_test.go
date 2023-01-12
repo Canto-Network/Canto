@@ -10,13 +10,13 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/Canto-Network/ethermint-v2/crypto/ethsecp256k1"
-	"github.com/Canto-Network/ethermint-v2/encoding"
-	ethermint "github.com/Canto-Network/ethermint-v2/types"
+	"github.com/evmos/ethermint/crypto/ethsecp256k1"
+	"github.com/evmos/ethermint/encoding"
+	ethermint "github.com/evmos/ethermint/types"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/app"
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/testutil"
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/erc20/types"
+	"github.com/Canto-Network/Canto/v2/app"
+	"github.com/Canto-Network/Canto/v2/testutil"
+	"github.com/Canto-Network/Canto/v2/x/erc20/types"
 
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	abci "github.com/tendermint/tendermint/abci/types"

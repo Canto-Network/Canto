@@ -17,12 +17,6 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
 
-	ethermintclient "github.com/Canto-Network/ethermint-v2/client"
-	"github.com/Canto-Network/ethermint-v2/client/debug"
-	"github.com/Canto-Network/ethermint-v2/encoding"
-	ethermintserver "github.com/Canto-Network/ethermint-v2/server"
-	servercfg "github.com/Canto-Network/ethermint-v2/server/config"
-	srvflags "github.com/Canto-Network/ethermint-v2/server/flags"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/config"
@@ -37,10 +31,16 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
+	ethermintclient "github.com/evmos/ethermint/client"
+	"github.com/evmos/ethermint/client/debug"
+	"github.com/evmos/ethermint/encoding"
+	ethermintserver "github.com/evmos/ethermint/server"
+	servercfg "github.com/evmos/ethermint/server/config"
+	srvflags "github.com/evmos/ethermint/server/flags"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/app"
-	cmdcfg "github.com/Canto-Network/Canto-Testnet-v2/v1/cmd/config"
-	cantokr "github.com/Canto-Network/Canto-Testnet-v2/v1/crypto/keyring"
+	"github.com/Canto-Network/Canto/v2/app"
+	cmdcfg "github.com/Canto-Network/Canto/v2/cmd/config"
+	cantokr "github.com/Canto-Network/Canto/v2/crypto/keyring"
 )
 
 const (
@@ -106,7 +106,6 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 			InitCmd(app.ModuleBasics, app.DefaultNodeHome),
 		),
 		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
-		MigrateGenesisCmd(),
 		genutilcli.GenTxCmd(app.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
 		genutilcli.ValidateGenesisCmd(app.ModuleBasics),
 		AddGenesisAccountCmd(app.DefaultNodeHome),

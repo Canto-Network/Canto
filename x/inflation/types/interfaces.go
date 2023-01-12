@@ -3,7 +3,6 @@ package types // noalias
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
-	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 )
 
 // AccountKeeper defines the contract required for account APIs.
@@ -30,7 +29,7 @@ type BankKeeper interface {
 // DistrKeeper defines the contract needed to be fulfilled for distribution keeper
 type DistrKeeper interface {
 	FundCommunityPool(ctx sdk.Context, amount sdk.Coins, sender sdk.AccAddress) error
-	GetFeePool(ctx sdk.Context) distrtypes.FeePool
+	GetFeePoolCommunityCoins(ctx sdk.Context) sdk.DecCoins
 }
 
 // StakingKeeper expected staking keeper

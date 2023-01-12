@@ -17,14 +17,14 @@ import (
 	tmversion "github.com/tendermint/tendermint/proto/tendermint/version"
 	"github.com/tendermint/tendermint/version"
 
-	evm "github.com/Canto-Network/ethermint-v2/x/evm/types"
+	evm "github.com/evmos/ethermint/x/evm/types"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/app"
-	epochstypes "github.com/Canto-Network/Canto-Testnet-v2/v1/x/epochs/types"
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/inflation/types"
+	"github.com/Canto-Network/Canto/v2/app"
+	epochstypes "github.com/Canto-Network/Canto/v2/x/epochs/types"
+	"github.com/Canto-Network/Canto/v2/x/inflation/types"
 )
 
-var denomMint = types.DefaultInflationDenom
+var denomMint = "acanto"
 
 type KeeperTestSuite struct {
 	suite.Suite

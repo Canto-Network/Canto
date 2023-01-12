@@ -3,8 +3,8 @@ package types
 import (
 	"testing"
 
-	"github.com/Canto-Network/ethermint-v2/tests"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/evmos/ethermint/tests"
 	"github.com/stretchr/testify/suite"
 )
 

@@ -3,7 +3,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/Canto-Network/Canto-Testnet-v2/v1/x/inflation/types"
+	"github.com/Canto-Network/Canto/v2/x/inflation/types"
 )
 
 // MintAndAllocateInflation performs inflation minting and allocation
@@ -52,7 +52,6 @@ func (k Keeper) AllocateExponentialInflation(
 	proportions := params.InflationDistribution
 	// Allocate staking rewards into fee collector account
 	staking = sdk.NewCoins(k.GetProportions(ctx, mintedCoin, proportions.StakingRewards))
-
 	err = k.bankKeeper.SendCoinsFromModuleToModule(
 		ctx,
 		types.ModuleName,
@@ -62,7 +61,6 @@ func (k Keeper) AllocateExponentialInflation(
 	if err != nil {
 		return nil, nil, err
 	}
-	//remove minting coins to the incentives module
 
 	// Allocate community pool amount (remaining module balance) to community
 	// pool address
@@ -96,21 +94,18 @@ func (k Keeper) GetProportions(
 }
 
 // BondedRatio the fraction of the staking tokens which are currently bonded
+// It doesn't consider team allocation for inflation
 func (k Keeper) BondedRatio(ctx sdk.Context) sdk.Dec {
-	stakeSupply := sdk.Dec(k.stakingKeeper.StakingTokenSupply(ctx))
-
-	denomMint := k.GetParams(ctx).MintDenom
-	feePool := k.distrKeeper.GetFeePool(ctx)
-	inflSupply := stakeSupply.Sub(feePool.CommunityPool.AmountOf(denomMint))
+	stakeSupply := k.stakingKeeper.StakingTokenSupply(ctx)
 
 	if !stakeSupply.IsPositive() {
 		return sdk.ZeroDec()
 	}
 
-	return k.stakingKeeper.TotalBondedTokens(ctx).ToDec().Quo(inflSupply)
+	return k.stakingKeeper.TotalBondedTokens(ctx).ToDec().QuoInt(stakeSupply)
 }
 
-// GetCirculatingSupply returns the bank supply of the total inflation
+// GetCirculatingSupply returns the bank supply of the mintDenom
 func (k Keeper) GetCirculatingSupply(ctx sdk.Context) sdk.Dec {
 	mintDenom := k.GetParams(ctx).MintDenom
 
@@ -119,91 +114,25 @@ func (k Keeper) GetCirculatingSupply(ctx sdk.Context) sdk.Dec {
 	return circulatingSupply
 }
 
-//Set the curInflation as an Amino Marshalled object
-func (k Keeper) SetCurInflation(ctx sdk.Context, curInflation sdk.Dec) error {
-	store := ctx.KVStore(k.storeKey)
-	marshalledCurInflation, err := curInflation.MarshalAmino()
-	if err != nil {
-		return err
+// GetInflationRate returns the inflation rate for the current period.
+func (k Keeper) GetInflationRate(ctx sdk.Context) sdk.Dec {
+	epochMintProvision, _ := k.GetEpochMintProvision(ctx)
+	if epochMintProvision.IsZero() {
+		return sdk.ZeroDec()
 	}
 
-	store.Set(types.KeyPrefixCurInflation, marshalledCurInflation)
-	return nil
-}
-
-func (k Keeper) GetCurInflation(ctx sdk.Context) (sdk.Dec, error) {
-	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(types.KeyPrefixCurInflation)
-	if len(bz) == 0 {
-		return sdk.Dec{}, nil
-	}
-
-	var dec sdk.Dec
-	if err := dec.UnmarshalAmino(bz); err != nil {
-		return sdk.Dec{}, err
-	}
-
-	return dec, nil
-}
-
-//newInflation = min(maxInflation, Max(minInflation, curInflation * ((1 + (target - actual)) * adjustSpeed)
-func (k Keeper) GetInflationRate(ctx sdk.Context) (sdk.Dec, error) {
 	epp := k.GetEpochsPerPeriod(ctx)
 	if epp == 0 {
-		return sdk.ZeroDec(), nil
+		return sdk.ZeroDec()
 	}
 
-	params := k.GetParams(ctx)
-	//parameters for inflation calculation
-	minInflation := params.ExponentialCalculation.MinInflation
-	maxInflation := params.ExponentialCalculation.MaxInflation
-	bondedTarget := params.ExponentialCalculation.BondingTarget
-	adjustSpeed := params.ExponentialCalculation.AdjustSpeed
-	curInflation, err := k.GetCurInflation(ctx)
+	epochsPerPeriod := sdk.NewDec(epp)
 
-	if err != nil {
-		return sdk.Dec{}, err
+	circulatingSupply := k.GetCirculatingSupply(ctx)
+	if circulatingSupply.IsZero() {
+		return sdk.ZeroDec()
 	}
 
-	//bondDifference
-	curBonded := k.BondedRatio(ctx)
-	bondDiff := bondedTarget.Sub(curBonded)
-
-	//inflation annualized
-	inflation := curInflation.Mul(adjustSpeed).Mul(bondDiff.Add(sdk.OneDec()))
-
-	if inflation.LT(minInflation) {
-		inflation = minInflation
-	}
-	if inflation.GT(maxInflation) {
-		inflation = maxInflation
-	}
-
-	if err := k.SetCurInflation(ctx, inflation); err != nil {
-		return sdk.Dec{}, err
-	}
-	//periodized inflation
-	return inflation.Quo(sdk.NewDec(epp)), nil
-}
-
-//requires that inflation has already been calculated
-func (k Keeper) CalculateEpochMintProvision(ctx sdk.Context) (sdk.Dec, error) {
-	if epp := k.GetEpochsPerPeriod(ctx); epp == 0 {
-		return sdk.ZeroDec(), nil
-	}
-
-	denomMint := k.GetParams(ctx).MintDenom
-	//get the current circulatingSupply
-	totalCirculatingSupply := k.GetCirculatingSupply(ctx)
-	//distrKeeper supply of acanto is not counted
-	feePool := k.distrKeeper.GetFeePool(ctx)
-	circulatingSupply := totalCirculatingSupply.Sub(feePool.CommunityPool.AmountOf(denomMint))
-
-	curInfl, err := k.GetCurInflation(ctx)
-	if err != nil {
-		return sdk.Dec{}, err
-	}
-
-	periodProvision := curInfl.Mul(circulatingSupply)
-	return periodProvision, nil
+	// EpochMintProvision * 365 / circulatingSupply * 100
+	return epochMintProvision.Mul(epochsPerPeriod).Quo(circulatingSupply).Mul(sdk.NewDec(100))
 }
