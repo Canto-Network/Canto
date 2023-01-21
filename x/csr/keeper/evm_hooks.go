@@ -66,11 +66,15 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 	// Calculate fees to be distributed = intFloor(GasUsed * GasPrice * csrShares)
 	fee := sdk.NewIntFromUint64(receipt.GasUsed).Mul(sdk.NewIntFromBigInt(msg.GasPrice()))
 	csrFee := sdk.NewDecFromInt(fee).Mul(params.CsrShares).TruncateInt()
+	remainingFee := fee.Sub(csrFee) // remining fee is calculated by fee - csrFee = remainingFee
 	evmDenom := h.k.evmKeeper.GetParams(ctx).EvmDenom
-	csrFees := sdk.Coins{{Denom: evmDenom, Amount: csrFee}}
+
+	// coin objects
+	fees := sdk.Coins{{Denom: evmDenom, Amount: fee}}
+	burnFees := sdk.Coins{{Denom: evmDenom, Amount: remainingFee}} // amount to burn
 
 	// Send fees from fee collector to module account before distribution
-	err := h.k.bankKeeper.SendCoinsFromModuleToModule(ctx, h.k.FeeCollectorName, types.ModuleName, csrFees)
+	err := h.k.bankKeeper.SendCoinsFromModuleToModule(ctx, h.k.FeeCollectorName, types.ModuleName, fees)
 	if err != nil {
 		return sdkerrors.Wrapf(ErrFeeDistribution, "EVMHook::PostTxProcessing failed to distribute fees from fee collector to module acount, %d", err)
 	}
@@ -86,6 +90,12 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 	_, err = h.k.CallMethod(ctx, "distributeFees", contracts.TurnstileContract, types.ModuleAddress, &turnstileAddress, amount, new(big.Int).SetUint64(nftID))
 	if err != nil {
 		return sdkerrors.Wrapf(ErrFeeDistribution, "EVMHook::PostTxProcessing failed to distribute fees from module account to turnstile, %d", err)
+	}
+
+	// Burn remaining base fee
+	errBurn := h.k.bankKeeper.BurnCoins(ctx, types.ModuleName, burnFees)
+	if errBurn != nil {
+		return sdkerrors.Wrapf(ErrFeeDistribution, "EVMHook::PostTxProcessing failed to burn base fee, %d", errBurn)
 	}
 
 	// Update metrics on the CSR obj
