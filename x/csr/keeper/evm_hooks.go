@@ -48,13 +48,39 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 	// Check and process turnstile events if applicable
 	h.processEvents(ctx, receipt)
 
+	// Return if gas used is 0; if gas is 0, no fees to distribute
+	if receipt.GasUsed == 0 {
+		return nil
+	}
+
+	// Get the gas fee for the TX
+	fee := sdk.NewIntFromUint64(receipt.GasUsed).Mul(sdk.NewIntFromBigInt(msg.GasPrice()))
+	evmDenom := h.k.evmKeeper.GetParams(ctx).EvmDenom
+	fees := sdk.Coins{{Denom: evmDenom, Amount: fee}}
+
+	// Send fees from fee collector to CSR module account before distribution
+	err := h.k.bankKeeper.SendCoinsFromModuleToModule(ctx, h.k.FeeCollectorName, types.ModuleName, fees)
+	if err != nil {
+		return sdkerrors.Wrapf(ErrFeeDistribution, "EVMHook::PostTxProcessing failed to distribute fees from fee collector to module acount, %d", err)
+	}
+
 	contract := msg.To()
 	if contract == nil {
+		// Burn the whole fee if TX isn't smart contract interaction
+		errBurn := h.k.bankKeeper.BurnCoins(ctx, types.ModuleName, fees)
+		if errBurn != nil {
+			return sdkerrors.Wrapf(ErrFeeDistribution, "EVMHook::PostTxProcessing failed to burn base fee after contract was nill, %d", errBurn)
+		}
 		return nil
 	}
 
 	nftID, foundNFT := h.k.GetNFTByContract(ctx, contract.String())
 	if !foundNFT {
+		// Burn the whole fee if contract isn't registered to CSR
+		errBurn := h.k.bankKeeper.BurnCoins(ctx, types.ModuleName, fees)
+		if errBurn != nil {
+			return sdkerrors.Wrapf(ErrFeeDistribution, "EVMHook::PostTxProcessing failed to burn base fee after NFT wasn't found, %d", errBurn)
+		}
 		return nil
 	}
 
@@ -64,16 +90,11 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 	}
 
 	// Calculate fees to be distributed = intFloor(GasUsed * GasPrice * csrShares)
-	fee := sdk.NewIntFromUint64(receipt.GasUsed).Mul(sdk.NewIntFromBigInt(msg.GasPrice()))
 	csrFee := sdk.NewDecFromInt(fee).Mul(params.CsrShares).TruncateInt()
-	evmDenom := h.k.evmKeeper.GetParams(ctx).EvmDenom
-	csrFees := sdk.Coins{{Denom: evmDenom, Amount: csrFee}}
 
-	// Send fees from fee collector to module account before distribution
-	err := h.k.bankKeeper.SendCoinsFromModuleToModule(ctx, h.k.FeeCollectorName, types.ModuleName, csrFees)
-	if err != nil {
-		return sdkerrors.Wrapf(ErrFeeDistribution, "EVMHook::PostTxProcessing failed to distribute fees from fee collector to module acount, %d", err)
-	}
+	// Remaining fee is calculated by fee - csrFee = remainingFee
+	remainingFee := fee.Sub(csrFee)
+	burnRemainingFees := sdk.Coins{{Denom: evmDenom, Amount: remainingFee}} // remaining amount to burn
 
 	// Get the turnstile which will receive funds for tx fees
 	turnstileAddress, found := h.k.GetTurnstile(ctx)
@@ -81,11 +102,17 @@ func (h Hooks) PostTxProcessing(ctx sdk.Context, msg core.Message, receipt *etht
 		return sdkerrors.Wrapf(ErrContractDeployments, "EVMHook::PostTxProcessing the turnstile contract has not been found.")
 	}
 
-	// Distribute fees to turnstile contract by NFT ID distributeFees(amount, nftID)
+	// Distribute CSR fee to turnstile contract by NFT ID distributeFees(amount, nftID)
 	amount := csrFee.BigInt()
 	_, err = h.k.CallMethod(ctx, "distributeFees", contracts.TurnstileContract, types.ModuleAddress, &turnstileAddress, amount, new(big.Int).SetUint64(nftID))
 	if err != nil {
 		return sdkerrors.Wrapf(ErrFeeDistribution, "EVMHook::PostTxProcessing failed to distribute fees from module account to turnstile, %d", err)
+	}
+
+	// Burn remaining base fee
+	errBurn := h.k.bankKeeper.BurnCoins(ctx, types.ModuleName, burnRemainingFees)
+	if errBurn != nil {
+		return sdkerrors.Wrapf(ErrFeeDistribution, "EVMHook::PostTxProcessing failed to burn remaining base fee, %d", errBurn)
 	}
 
 	// Update metrics on the CSR obj
