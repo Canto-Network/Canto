@@ -5,9 +5,7 @@ import (
 )
 
 func TestGetParams(t *testing.T) {
-
 	// params := types.DefaultParams()
 
 	// k.SetParams(ctx, params)
-
 }
