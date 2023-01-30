@@ -130,7 +130,6 @@ import (
 	vestingkeeper "github.com/Canto-Network/Canto/v2/x/vesting/keeper"
 	vestingtypes "github.com/Canto-Network/Canto/v2/x/vesting/types"
 
-
 	"github.com/Canto-Network/Canto/v2/x/govshuttle"
 	govshuttleclient "github.com/Canto-Network/Canto/v2/x/govshuttle/client"
 	govshuttlekeeper "github.com/Canto-Network/Canto/v2/x/govshuttle/keeper"
@@ -473,9 +472,7 @@ func NewCanto(
 	)
 
 	app.GovKeeper = *govKeeper.SetHooks(
-		govtypes.NewMultiGovHooks(
-
-		),
+		govtypes.NewMultiGovHooks(),
 	)
 
 	app.EvmKeeper = app.EvmKeeper.SetHooks(

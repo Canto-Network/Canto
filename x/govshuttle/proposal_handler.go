@@ -8,7 +8,6 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 )
 
-
 func NewgovshuttleProposalHandler(k *keeper.Keeper) govtypes.Handler {
 	return func(ctx sdk.Context, content govtypes.Content) error {
 		switch c := content.(type) {
@@ -35,7 +34,6 @@ func handleLendingMarketProposal(ctx sdk.Context, k *keeper.Keeper, p *types.Len
 
 	return nil
 }
-
 
 func handleTreasuryProposal(ctx sdk.Context, k *keeper.Keeper, tp *types.TreasuryProposal) error {
 	err := tp.ValidateBasic()
