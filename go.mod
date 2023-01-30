@@ -1,12 +1,14 @@
 module github.com/Canto-Network/Canto/v2
 
-go 1.18
+go 1.19
 
 require (
 	github.com/armon/go-metrics v0.4.0
 	github.com/cosmos/cosmos-sdk v0.45.11
 	github.com/cosmos/go-bip39 v1.0.0
+	github.com/cosmos/ibc-go/v3 v3.2.1
 	github.com/ethereum/go-ethereum v1.10.19
+	github.com/evmos/ethermint v0.19.3
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/mux v1.8.0
@@ -26,11 +28,6 @@ require (
 	google.golang.org/grpc v1.50.1
 	google.golang.org/protobuf v1.28.2-0.20220831092852-f930b1dc76e8
 	gopkg.in/yaml.v2 v2.4.0
-)
-
-require (
-	github.com/cosmos/ibc-go/v3 v3.2.1
-	github.com/evmos/ethermint v0.19.3
 )
 
 require (

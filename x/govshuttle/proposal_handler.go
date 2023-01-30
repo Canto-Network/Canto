@@ -22,7 +22,7 @@ func NewgovshuttleProposalHandler(k *keeper.Keeper) govtypes.Handler {
 	}
 }
 
-func handleLendingMarketProposal(ctx sdk.Context, k *keeper.Keeper, p *types.LendingMarketProposal) error {
+func handleLendingMarketProposal(ctx sdk.Context, k *keeper.Keeper, p *types.LendingMarketProposal) error { //nolint:unparam
 	err := p.ValidateBasic()
 	if err != nil {
 		return err

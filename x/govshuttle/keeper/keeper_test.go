@@ -18,15 +18,12 @@ import (
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 	"github.com/stretchr/testify/require"
 
-
 	"github.com/Canto-Network/Canto/v2/contracts"
 	"github.com/Canto-Network/Canto/v2/x/erc20/types"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 )
 
 type KeeperTestSuite struct {
-
-
 	ctx     sdk.Context
 	app     *app.Canto
 	address common.Address
@@ -43,7 +40,6 @@ func TestKeeperTestSuite(t *testing.T) {
 	suite.Run(t, s)
 }
 
-
 func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 	checkTx := false
 
@@ -51,12 +47,11 @@ func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 	feemarketGenesis.Params.EnableHeight = 1
 	feemarketGenesis.Params.NoBaseFee = false
 
-
 	suite.app = app.Setup(checkTx, feemarketGenesis)
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
-	suite.DoSetupTest(suite.T())
+	suite.DoSetupTest()
 }
 
 func (suite *KeeperTestSuite) DeployCaller() (common.Address, error) {
