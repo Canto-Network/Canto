@@ -2,15 +2,15 @@
 
 ### Install & Initialize
 
--   Install cantod binary
+- Install cantod binary
 
--   Initialize canto node directory
+- Initialize canto node directory
 
 ```bash
 cantod init <node_name> --chain-id canto_7700-1
 ```
 
--   Download the [genesis file](https://github.com/Canto-Network/Canto/raw/genesis/Networks/Mainnet/genesis.json)
+- Download the [genesis file](https://github.com/Canto-Network/Canto/raw/genesis/Networks/Mainnet/genesis.json)
 
 ```bash
 wget https://github.com/Canto-Network/Canto/raw/genesis/Networks/Mainnet/genesis.json -b $HOME/.cantod/config
@@ -24,11 +24,11 @@ A GENTX is a genesis transaction that adds a validator node to the genesis file.
 cantod gentx <key_name> <token-amount>acanto --chain-id=canto_7700-1 --moniker=<your_moniker> --commission-max-change-rate=0.01 --commission-max-rate=0.10 --commission-rate=0.05 --details="<details here>" --security-contact="<email>" --website="<website>"
 ```
 
--   Fork [Canto](https://github.com/Canto-Network/Canto)
+- Fork [Canto](https://github.com/Canto-Network/Canto)
 
--   Copy the contents of `${HOME}/.cantod/config/gentx/gentx-XXXXXXXX.json` to `$HOME/Canto/Mainnet/Gentx/<yourvalidatorname>.json`
+- Copy the contents of `${HOME}/.cantod/config/gentx/gentx-XXXXXXXX.json` to `$HOME/Canto/Mainnet/Gentx/<yourvalidatorname>.json`
 
--   Create a pull request to the genesis branch of the [repository](https://github.com/Canto-Network/Canto/Mainnet/gentx)
+- Create a pull request to the genesis branch of the [repository](https://github.com/Canto-Network/Canto/Mainnet/gentx)
 
 ### Restarting Your Node
 
@@ -36,31 +36,31 @@ You do not need to reinitialize your Canto Node. Basically a hard fork on Cosmos
 
 1. Backup your data directory.
 
--   `mkdir $HOME/canto-backup`
+- `mkdir $HOME/canto-backup`
 
--   `cp $HOME/.cantod/data $HOME/canto-backup/`
+- `cp $HOME/.cantod/data $HOME/canto-backup/`
 
 2. Remove old genesis
 
--   `rm $HOME/.cantod/genesis.json`
+- `rm $HOME/.cantod/genesis.json`
 
 3. Download new genesis
 
--   `wget`
+- `wget`
 
 4. Remove old data
 
--   `rm -rf $HOME/.cantod/data`
+- `rm -rf $HOME/.cantod/data`
 
 6. Create a new data directory
 
--   `mkdir $HOME/.cantod/data`
+- `mkdir $HOME/.cantod/data`
 
-7. copy the contents of the `priv_validator_state.json` file 
+7. copy the contents of the `priv_validator_state.json` file
 
--   `nano $HOME/.cantod/data/priv_validator_state.json`
+- `nano $HOME/.cantod/data/priv_validator_state.json`
 
--   Copy the json string and paste into the file
+- Copy the json string and paste into the file
  {
 "height": "0",
  "round": 0,
@@ -80,18 +80,18 @@ mv $HOME/go/bin/cantod /usr/bin/
 
 9. Restart your node
 
--   `systemctl restart cantod`
+- `systemctl restart cantod`
 
 ## Emergency Reversion
 
 1. Move your backup data directory into your .cantod directory
 
--   `mv HOME/canto-backup/data $HOME/.canto/`
+- `mv HOME/canto-backup/data $HOME/.canto/`
 
 2. Download the old genesis file
 
--   `wget https://github.com/Canto-Network/Canto/raw/main/Mainnet/genesis.json -b $HOME/.cantod/config/`
+- `wget https://github.com/Canto-Network/Canto/raw/main/Mainnet/genesis.json -b $HOME/.cantod/config/`
 
 3. Restart your node
 
--   `systemctl restart cantod`
+- `systemctl restart cantod`

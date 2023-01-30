@@ -9,21 +9,24 @@
 
 ## Hardware Requirements
 
-### Minimum:
+### Minimum
+
 * 16 GB RAM
 * 100 GB NVME SSD
 * 3.2 GHz x4 CPU
 
-### Recommended:
+### Recommended
+
 * 32 GB RAM
 * 500 GB NVME SSD
 * 4.2 GHz x6 CPU
 
-### Operating System:
+### Operating System
+
 * Linux (x86_64) or Linux (amd64)
 * Recommended Ubuntu or Arch Linux
 
-## Install dependencies 
+## Install dependencies
 
 **If using Ubuntu:**
 
@@ -61,9 +64,9 @@ sudo mv $HOME/go/bin/cantod /usr/bin/
 
 Replace `<keyname>` below with whatever you'd like to name your key.
 
-*  `cantod keys add <key_name>`
-*  `cantod keys add <key_name> --recover` to regenerate keys with your mnemonic
-*  `cantod keys add <key_name> --ledger` to generate keys with ledger device
+* `cantod keys add <key_name>`
+* `cantod keys add <key_name> --recover` to regenerate keys with your mnemonic
+* `cantod keys add <key_name> --ledger` to generate keys with ledger device
 
 Store a backup of your keys and mnemonic securely offline.
 
@@ -82,7 +85,7 @@ You'll use this file later when creating your validator txn.
 
 ## Set up validator
 
-Install cantod binary from `Canto` directory: 
+Install cantod binary from `Canto` directory:
 
 `sudo make install`
 
@@ -92,12 +95,12 @@ Initialize the node. Replace `<moniker>` with whatever you'd like to name your v
 
 If this runs successfully, it should dump a blob of JSON to the terminal.
 
-Download the Genesis file: 
+Download the Genesis file:
 
-`wget https://github.com/Canto-Network/Canto/raw/main/Mainnet/genesis.json -P $HOME/.cantod/config/` 
+`wget https://github.com/Canto-Network/Canto/raw/main/Mainnet/genesis.json -P $HOME/.cantod/config/`
 
 > _**Note:** If you later get `Error: couldn't read GenesisDoc file: open /root/.cantod/config/genesis.json: no such file or directory` put the genesis.json file wherever it wants instead, such as:
-> 
+>
 > `sudo wget https://github.com/Canto-Network/Canto/raw/main/Mainnet/genesis.json -P/root/.cantod/config/`
 
 Edit the minimum-gas-prices in `${HOME}/.cantod/config/app.toml`:
@@ -109,7 +112,7 @@ Add persistent peers to `$HOME/.cantod/config/config.toml`:
 
 ### Set `cantod` to run automatically
 
-* Start `cantod` by creating a systemd service to run the node in the background: 
+* Start `cantod` by creating a systemd service to run the node in the background:
 * Edit the file: `sudo nano /etc/systemd/system/cantod.service`
 * Then copy and paste the following text into your service file. Be sure to edit as you see fit.
 
@@ -137,15 +140,15 @@ WantedBy=multi-user.target
 
 ## Start the node
 
-Reload the service files: 
+Reload the service files:
 
 `sudo systemctl daemon-reload`
 
-Create the symlinlk: 
+Create the symlinlk:
 
 `sudo systemctl enable cantod.service`
 
-Start the node: 
+Start the node:
 
 `sudo systemctl start cantod && journalctl -u cantod -f`
 
@@ -157,12 +160,12 @@ This is an indicator things thus far are working and now you need to create your
 
 Modify the following items below, removing the `<>`
 
-- `<KEY_NAME>` should be the same as `<key_name>` when you followed the steps above in creating or restoring your key.
-- `<VALIDATOR_NAME>` is whatever you'd like to name your node
-- `<DESCRIPTION>` is whatever you'd like in the description field for your node
-- `<SECURITY_CONTACT_EMAIL>` is the email you want to use in the event of a security incident
-- `<YOUR_WEBSITE>` the website you want associated with your node
-- `<TOKEN_DELEGATION>` is the amount of tokens staked by your node (`1acanto` should work here, but you'll also need to make sure your address contains tokens.)
+* `<KEY_NAME>` should be the same as `<key_name>` when you followed the steps above in creating or restoring your key.
+* `<VALIDATOR_NAME>` is whatever you'd like to name your node
+* `<DESCRIPTION>` is whatever you'd like in the description field for your node
+* `<SECURITY_CONTACT_EMAIL>` is the email you want to use in the event of a security incident
+* `<YOUR_WEBSITE>` the website you want associated with your node
+* `<TOKEN_DELEGATION>` is the amount of tokens staked by your node (`1acanto` should work here, but you'll also need to make sure your address contains tokens.)
 
 ```bash
 

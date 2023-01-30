@@ -41,15 +41,15 @@ parameters and the list of active incentives and their corresponding gas meters
 
 ```go
 type GenesisState struct {
-	// params defines all the paramaters of the module.
-	Params Params `protobuf:"bytes,1,opt,name=params,proto3" json:"params"`
-	// amount of past periods, based on the epochs per period param
-	Period uint64 `protobuf:"varint,2,opt,name=period,proto3" json:"period,omitempty"`
-	// inflation epoch identifier
-	EpochIdentifier string `protobuf:"bytes,3,opt,name=epoch_identifier,json=epochIdentifier,proto3" json:"epoch_identifier,omitempty"`
-	// number of epochs after which inflation is recalculated
-	EpochsPerPeriod int64 `protobuf:"varint,4,opt,name=epochs_per_period,json=epochsPerPeriod,proto3" json:"epochs_per_period,omitempty"`
-	// number of epochs that have passed while inflation is disabled
-	SkippedEpochs uint64 `protobuf:"varint,5,opt,name=skipped_epochs,json=skippedEpochs,proto3" json:"skipped_epochs,omitempty"`
+ // params defines all the paramaters of the module.
+ Params Params `protobuf:"bytes,1,opt,name=params,proto3" json:"params"`
+ // amount of past periods, based on the epochs per period param
+ Period uint64 `protobuf:"varint,2,opt,name=period,proto3" json:"period,omitempty"`
+ // inflation epoch identifier
+ EpochIdentifier string `protobuf:"bytes,3,opt,name=epoch_identifier,json=epochIdentifier,proto3" json:"epoch_identifier,omitempty"`
+ // number of epochs after which inflation is recalculated
+ EpochsPerPeriod int64 `protobuf:"varint,4,opt,name=epochs_per_period,json=epochsPerPeriod,proto3" json:"epochs_per_period,omitempty"`
+ // number of epochs that have passed while inflation is disabled
+ SkippedEpochs uint64 `protobuf:"varint,5,opt,name=skipped_epochs,json=skippedEpochs,proto3" json:"skipped_epochs,omitempty"`
 }
 ```
