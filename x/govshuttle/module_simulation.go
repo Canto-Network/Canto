@@ -3,7 +3,7 @@ package govshuttle
 import (
 	"math/rand"
 
-	//"github.com/Canto-Network/Canto/v2/testutil/sample"
+	// "github.com/Canto-Network/Canto/v2/testutil/sample"
 	govshuttlesimulation "github.com/Canto-Network/Canto/v2/x/govshuttle/simulation"
 	"github.com/Canto-Network/Canto/v2/x/govshuttle/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -16,7 +16,7 @@ import (
 
 // avoid unused import issue
 var (
-	//_ = sample.AccAddress
+	// _ = sample.AccAddress
 	_ = govshuttlesimulation.FindAccount
 	_ = simappparams.StakePerAccount
 	_ = simulation.MsgEntryKind
@@ -47,7 +47,6 @@ func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedP
 
 // RandomizedParams creates randomized  param changes for the simulator
 func (am AppModule) RandomizedParams(_ *rand.Rand) []simtypes.ParamChange {
-
 	return []simtypes.ParamChange{}
 }
 

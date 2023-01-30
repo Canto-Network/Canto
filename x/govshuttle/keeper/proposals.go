@@ -14,7 +14,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
-//method for appending govshuttle proposal types to the govshuttle Map contract
+
 func (k *Keeper) AppendLendingMarketProposal(ctx sdk.Context, lm *types.LendingMarketProposal) (*types.LendingMarketProposal, error) {
 	m := lm.GetMetadata()
 	var err error
@@ -25,8 +25,8 @@ func (k *Keeper) AppendLendingMarketProposal(ctx sdk.Context, lm *types.LendingM
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Error obtaining Proposal ID")
 	}
-	
-	//if this is the first govshuttle proposal, deploy the map contract as well
+
+	// if this is the first govshuttle proposal, deploy the map contract as well
 	addr, found := k.GetPort(ctx)
 	// port has not been deployed yet, deploy and store
 	if !found {
@@ -50,11 +50,10 @@ func (k *Keeper) AppendLendingMarketProposal(ctx sdk.Context, lm *types.LendingM
 }
 
 func (k Keeper) DeployMapContract(ctx sdk.Context, lm *types.LendingMarketProposal) (common.Address, error) {
-
 	m := lm.GetMetadata()
 
 	ctorArgs, err := contracts.ProposalStoreContract.ABI.Pack("", sdk.NewIntFromUint64(m.GetPropId()).BigInt(), lm.GetTitle(), lm.GetDescription(), ToAddress(m.GetAccount()),
-		ToBigInt(m.GetValues()), m.GetSignatures(), ToBytes(m.GetCalldatas())) //Call empty constructor of Proposal-Store
+
 
 	if err != nil {
 		return common.Address{}, sdkerrors.Wrapf(erc20types.ErrABIPack, "Contract deployment failure: %s", err.Error())
@@ -65,7 +64,6 @@ func (k Keeper) DeployMapContract(ctx sdk.Context, lm *types.LendingMarketPropos
 	copy(data[len(contracts.ProposalStoreContract.Bin):], ctorArgs)
 
 	nonce, err := k.accKeeper.GetSequence(ctx, types.ModuleAddress.Bytes())
-
 	if err != nil {
 		return common.Address{}, sdkerrors.Wrap(err, "Error obtaining account nonce")
 	}

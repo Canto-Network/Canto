@@ -27,7 +27,6 @@ func UpdateParams(ctx sdk.Context, ik InflationKeeper) error {
 	params.ExponentialCalculation = newExp
 	ik.SetParams(ctx, params)
 
-	//update EpochsPerPeriod
 	ik.SetEpochsPerPeriod(ctx, int64(30))
 
 	epochMintProvision := types.CalculateEpochMintProvision(params, 0, 30, sdk.NewDec(1))

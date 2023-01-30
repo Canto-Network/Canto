@@ -89,7 +89,7 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 			"continue - destination channel is EVM",
 			func() {
 				// EVMChannels := suite.app.ClaimsKeeper.GetParams(suite.ctx).EVMChannels
-				//set EVM IBC channel to default one
+
 				EVMChannels := []string{"channel-2"}
 				transfer := transfertypes.NewFungibleTokenPacketData(denom, "100", ethsecpAddrcanto, ethsecpAddrCosmos)
 				bz := transfertypes.ModuleCdc.MustMarshalJSON(&transfer)
@@ -308,7 +308,7 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 			suite.app.IBCKeeper.ChannelKeeper.SetNextSequenceSend(suite.ctx, transfertypes.PortID, cantoChannel, 1)
 
 			// Mock the Transferkeeper to always return nil on SendTransfer(), as this
-			// method requires a successfull handshake with the counterparty chain.
+			// method requires a successful handshake with the counterparty chain.
 			// This, however, exceeds the requirements of the unit tests.
 			mockTransferKeeper := &MockTransferKeeper{
 				Keeper: suite.app.BankKeeper,

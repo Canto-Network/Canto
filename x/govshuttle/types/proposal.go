@@ -19,7 +19,6 @@ var (
 	_ govtypes.Content = &TreasuryProposal{}
 )
 
-//Register Compound Proposal type as a valid proposal type in goveranance module
 func init() {
 	govtypes.RegisterProposalType(ProposalTypeLendingMarket)
 	govtypes.RegisterProposalType(ProposalTypeTreasury)

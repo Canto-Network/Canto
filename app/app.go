@@ -130,7 +130,7 @@ import (
 	vestingkeeper "github.com/Canto-Network/Canto/v2/x/vesting/keeper"
 	vestingtypes "github.com/Canto-Network/Canto/v2/x/vesting/types"
 
-	//govshuttle imports
+
 	"github.com/Canto-Network/Canto/v2/x/govshuttle"
 	govshuttleclient "github.com/Canto-Network/Canto/v2/x/govshuttle/client"
 	govshuttlekeeper "github.com/Canto-Network/Canto/v2/x/govshuttle/keeper"
@@ -333,7 +333,7 @@ func NewCanto(
 		evmtypes.StoreKey, feemarkettypes.StoreKey,
 		// Canto keys
 		inflationtypes.StoreKey, erc20types.StoreKey,
-		epochstypes.StoreKey, vestingtypes.StoreKey, recoverytypes.StoreKey, //recoverytypes.StoreKe
+
 		feestypes.StoreKey,
 		govshuttletypes.StoreKey,
 	)
@@ -474,7 +474,7 @@ func NewCanto(
 
 	app.GovKeeper = *govKeeper.SetHooks(
 		govtypes.NewMultiGovHooks(
-		//insert Gov hooks here
+
 		),
 	)
 
@@ -512,7 +512,7 @@ func NewCanto(
 
 	app.TransferKeeper = ibctransferkeeper.NewKeeper(
 		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName), app.RecoveryKeeper,
-		//nil, // ICS4 Wrapper: claims IBC middleware
+
 		app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
 		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
 	)
@@ -1070,8 +1070,8 @@ func (app *Canto) setupUpgradeHandlers() {
 	case v4.UpgradeName:
 		// no store upgrades in v4
 		storeUpgrades = &storetypes.StoreUpgrades{
-            Added: []string{govshuttletypes.StoreKey},
-        }	
+			Added: []string{govshuttletypes.StoreKey},
+		}
 	}
 
 	if storeUpgrades != nil {

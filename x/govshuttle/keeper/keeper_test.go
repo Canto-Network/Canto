@@ -18,14 +18,14 @@ import (
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 	"github.com/stretchr/testify/require"
 
-	//used for deploying contracts
+
 	"github.com/Canto-Network/Canto/v2/contracts"
 	"github.com/Canto-Network/Canto/v2/x/erc20/types"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 )
 
 type KeeperTestSuite struct {
-	suite.Suite //top level testing suite
+
 
 	ctx     sdk.Context
 	app     *app.Canto
@@ -43,7 +43,7 @@ func TestKeeperTestSuite(t *testing.T) {
 	suite.Run(t, s)
 }
 
-//Test Helpers
+
 func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 	checkTx := false
 
@@ -51,7 +51,7 @@ func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 	feemarketGenesis.Params.EnableHeight = 1
 	feemarketGenesis.Params.NoBaseFee = false
 
-	//init app
+
 	suite.app = app.Setup(checkTx, feemarketGenesis)
 }
 
@@ -64,7 +64,6 @@ func (suite *KeeperTestSuite) DeployCaller() (common.Address, error) {
 	chainID := suite.app.EvmKeeper.ChainID()
 
 	ctorArgs, err := contracts.CallerContract.ABI.Pack("")
-
 	if err != nil {
 		return common.Address{}, err
 	}
@@ -74,7 +73,6 @@ func (suite *KeeperTestSuite) DeployCaller() (common.Address, error) {
 		From: &suite.address,
 		Data: (*hexutil.Bytes)(&data),
 	})
-
 	if err != nil {
 		return common.Address{}, err
 	}
@@ -117,5 +115,4 @@ func (suite *KeeperTestSuite) DeployCaller() (common.Address, error) {
 }
 
 func (suite *KeeperTestSuite) DeployCallee() {
-
 }

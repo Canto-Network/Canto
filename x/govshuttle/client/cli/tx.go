@@ -18,9 +18,7 @@ import (
 	"github.com/Canto-Network/Canto/v2/x/govshuttle/types"
 )
 
-var (
-	DefaultRelativePacketTimeoutTimestamp = uint64((time.Duration(10) * time.Minute).Nanoseconds())
-)
+var DefaultRelativePacketTimeoutTimestamp = uint64((time.Duration(10) * time.Minute).Nanoseconds())
 
 const (
 	flagPacketTimeoutTimestamp = "packet-timeout-timestamp"
@@ -125,7 +123,6 @@ Where metadata.json contains (example):
 	return cmd
 }
 
-//Register TreasuryProposal submit cmd
 func NewTreasuryProposalCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "treasury-proposal [metadata]",
