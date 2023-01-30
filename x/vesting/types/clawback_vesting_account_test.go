@@ -451,17 +451,16 @@ func (suite *VestingAccountTestSuite) TestTrackDelegationUndelegation() {
 				suite.Require().Panics(func() {
 					tc.undelegate(va)
 				})
-			} else {
-				// Track Delegation
-				tc.delegate(va)
-				suite.Require().Equal(tc.expDelegatedUnvested, va.DelegatedVesting)
-				suite.Require().Equal(tc.expDelegatedFree, va.DelegatedFree)
-
-				// Track Undelegation
-				tc.undelegate(va)
-				suite.Require().Equal(tc.expUndelegatedUnvested, va.DelegatedVesting)
-				suite.Require().Equal(tc.expUndelegatedFree, va.DelegatedFree)
 			}
+			// Track Delegation
+			tc.delegate(va)
+			suite.Require().Equal(tc.expDelegatedUnvested, va.DelegatedVesting)
+			suite.Require().Equal(tc.expDelegatedFree, va.DelegatedFree)
+
+			// Track Undelegation
+			tc.undelegate(va)
+			suite.Require().Equal(tc.expUndelegatedUnvested, va.DelegatedVesting)
+			suite.Require().Equal(tc.expUndelegatedFree, va.DelegatedFree)
 		})
 	}
 }

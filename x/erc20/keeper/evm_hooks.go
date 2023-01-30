@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"bytes"
-	
 	"math/big"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"

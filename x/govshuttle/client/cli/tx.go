@@ -20,11 +20,6 @@ import (
 
 var DefaultRelativePacketTimeoutTimestamp = uint64((time.Duration(10) * time.Minute).Nanoseconds())
 
-const (
-	flagPacketTimeoutTimestamp = "packet-timeout-timestamp"
-	listSeparator              = ","
-)
-
 // NewTxCmd returns a root CLI command handler for certain modules/erc20 transaction commands.
 func NewTxCmd() *cobra.Command {
 	txCmd := &cobra.Command{

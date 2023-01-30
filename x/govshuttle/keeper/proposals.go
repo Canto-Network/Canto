@@ -53,8 +53,6 @@ func (k Keeper) DeployMapContract(ctx sdk.Context, lm *types.LendingMarketPropos
 	m := lm.GetMetadata()
 
 	ctorArgs, err := contracts.ProposalStoreContract.ABI.Pack("", sdk.NewIntFromUint64(m.GetPropId()).BigInt(), lm.GetTitle(), lm.GetDescription(), ToAddress(m.GetAccount()),
-
-
 	if err != nil {
 		return common.Address{}, sdkerrors.Wrapf(erc20types.ErrABIPack, "Contract deployment failure: %s", err.Error())
 	}

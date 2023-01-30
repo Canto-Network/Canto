@@ -2,7 +2,7 @@ package cli
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/Canto-Network/Canto/v2/x/govshuttle/types"
@@ -15,7 +15,7 @@ import (
 func ParseLendingMarketMetadata(cdc codec.JSONCodec, metadataFile string) (types.LendingMarketMetadata, error) {
 	propMetaData := types.LendingMarketMetadata{}
 
-	contents, err := ioutil.ReadFile(filepath.Clean(metadataFile))
+	contents, err := os.ReadFile(filepath.Clean(metadataFile))
 	if err != nil {
 		return propMetaData, err
 	}
@@ -36,7 +36,7 @@ func ParseLendingMarketMetadata(cdc codec.JSONCodec, metadataFile string) (types
 func ParseTreasuryMetadata(cdc codec.JSONCodec, metadataFile string) (types.TreasuryProposalMetadata, error) {
 	propMetaData := types.TreasuryProposalMetadata{}
 
-	contents, err := ioutil.ReadFile(filepath.Clean(metadataFile))
+	contents, err := os.ReadFile(filepath.Clean(metadataFile))
 	if err != nil {
 		return propMetaData, err
 	}

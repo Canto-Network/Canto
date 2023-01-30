@@ -6,13 +6,10 @@ import (
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 )
 
-var (
-	//go:embed compiled_contracts/caller.json
-	callerJSON []byte
+//go:embed compiled_contracts/caller.json
 
-	// ERC20BurnableContract is the compiled ERC20Burnable contract
-	CallerContract evmtypes.CompiledContract
-)
+// ERC20BurnableContract is the compiled ERC20Burnable contract
+var CallerContract evmtypes.CompiledContract
 
 func init() {
 	// err := json.Unmarshal(callerJSON, &CallerContract)

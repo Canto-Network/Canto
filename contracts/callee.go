@@ -6,13 +6,10 @@ import (
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 )
 
-var (
-	//go:embed compiled_contracts/callee.json
-	calleeJSON []byte
+//go:embed compiled_contracts/callee.json
 
-	// ERC20BurnableContract is the compiled ERC20Burnable contract
-	CalleeContract evmtypes.CompiledContract
-)
+// ERC20BurnableContract is the compiled ERC20Burnable contract
+var CalleeContract evmtypes.CompiledContract
 
 func init() {
 	// err := json.Unmarshal(calleeJSON, &CalleeContract)

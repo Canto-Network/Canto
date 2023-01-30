@@ -3,6 +3,7 @@ package types
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+
 	// this line is used by starport scaffolding # 1
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
@@ -25,4 +26,5 @@ func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 }
 
 // Amino = codec.NewLegacyAmino()
+
 var ModuleCdc = codec.NewProtoCodec(codectypes.NewInterfaceRegistry())
