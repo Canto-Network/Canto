@@ -97,7 +97,7 @@ If this runs successfully, it should dump a blob of JSON to the terminal.
 
 Download the Genesis file:
 
-`wget https://github.com/Canto-Network/Canto/raw/main/Mainnet/genesis.json -P $HOME/.cantod/config/`
+`wget https://raw.githubusercontent.com/Canto-Network/Canto/genesis/Networks/Mainnet/genesis.json -P $HOME/.cantod/config/`
 
 > _**Note:** If you later get `Error: couldn't read GenesisDoc file: open /root/.cantod/config/genesis.json: no such file or directory` put the genesis.json file wherever it wants instead, such as:
 >
