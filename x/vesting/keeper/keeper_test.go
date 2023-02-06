@@ -47,19 +47,6 @@ var (
 )
 
 var (
-	participant     = tests.GenerateAddress()
-	participant2    = tests.GenerateAddress()
-	denomMint       = evm.DefaultEVMDenom
-	denomCoin       = "acoin"
-	allocationRate  = int64(5)
-	mintAllocations = sdk.DecCoins{
-		sdk.NewDecCoinFromDec(denomMint, sdk.NewDecWithPrec(allocationRate, 2)),
-	}
-	allocations = sdk.DecCoins{
-		sdk.NewDecCoinFromDec(denomMint, sdk.NewDecWithPrec(allocationRate, 2)),
-		sdk.NewDecCoinFromDec(denomCoin, sdk.NewDecWithPrec(allocationRate, 2)),
-	}
-	epochs        = uint32(10)
 	erc20Name     = "Coin Token"
 	erc20Symbol   = "CTKN"
 	erc20Name2    = "Coin Token 2"
@@ -70,17 +57,16 @@ var (
 type KeeperTestSuite struct {
 	suite.Suite
 
-	ctx              sdk.Context
-	app              *app.Canto
-	queryClientEvm   evm.QueryClient
-	queryClient      types.QueryClient
-	address          common.Address
-	consAddress      sdk.ConsAddress
-	validator        stakingtypes.Validator
-	clientCtx        client.Context
-	ethSigner        ethtypes.Signer
-	signer           keyring.Signer
-	mintFeeCollector bool
+	ctx            sdk.Context
+	app            *app.Canto
+	queryClientEvm evm.QueryClient
+	queryClient    types.QueryClient
+	address        common.Address
+	consAddress    sdk.ConsAddress
+	validator      stakingtypes.Validator
+	clientCtx      client.Context
+	ethSigner      ethtypes.Signer
+	signer         keyring.Signer
 }
 
 var s *KeeperTestSuite
@@ -200,7 +186,7 @@ func (suite *KeeperTestSuite) Commit() {
 func (suite *KeeperTestSuite) CommitAfter(t time.Duration) {
 	_ = suite.app.Commit()
 	header := suite.ctx.BlockHeader()
-	header.Height += 1
+	header.Height++
 	header.Time = header.Time.Add(t)
 	suite.app.BeginBlock(abci.RequestBeginBlock{
 		Header: header,
@@ -247,7 +233,7 @@ func (suite *KeeperTestSuite) DeployContract(
 
 	res, err := suite.queryClientEvm.EstimateGas(ctx, &evm.EthCallRequest{
 		Args:   args,
-		GasCap: uint64(config.DefaultGasCap),
+		GasCap: config.DefaultGasCap,
 	})
 	if err != nil {
 		return common.Address{}, err

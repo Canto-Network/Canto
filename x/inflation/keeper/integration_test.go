@@ -213,7 +213,7 @@ var (
 			})
 			It("Commit Block Before Epoch and check rewards", func() {
 				s.CommitAfter(time.Minute)
-				valBal := s.app.BankKeeper.GetAllBalances(s.ctx, sdk.AccAddress(sdk.AccAddress(s.consAddress)))
+				valBal := s.app.BankKeeper.GetAllBalances(s.ctx, sdk.AccAddress(s.consAddress))
 				Expect(valBal.AmountOf(denomMint).Equal(sdk.NewInt(0))).To(BeTrue())
 			})
 			It("Commit block after Epoch and balance will be Epoch Mint Provision", func() {
