@@ -475,7 +475,9 @@ func performEthTx(clawbackAccount *types.ClawbackVestingAccount) error {
 
 	encodingConfig := encoding.MakeConfig(app.ModuleBasics)
 	txBuilder := encodingConfig.TxConfig.NewTxBuilder()
-	txBuilder.SetMsgs(msgEthereumTx)
+	err = txBuilder.SetMsgs(msgEthereumTx)
+	s.Require().NoError(err)
+
 	tx := txBuilder.GetTx()
 
 	// Call Ante decorator

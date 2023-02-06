@@ -222,7 +222,7 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 
 				invalidDenom := "ibc/1"
 				coins := sdk.NewCoins(sdk.NewCoin(invalidDenom, sdk.NewInt(1000)))
-				testutil.FundAccount(suite.app.BankKeeper, suite.ctx, secpAddr, coins)
+				testutil.FundAccount(suite.app.BankKeeper, suite.ctx, secpAddr, coins) //nolint:errcheck
 			},
 			false,
 			false,

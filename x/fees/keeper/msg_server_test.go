@@ -152,7 +152,7 @@ func (suite *KeeperTestSuite) TestRegisterFee() {
 					[]uint64{1},
 				)
 				ctx := sdk.WrapSDKContext(suite.ctx)
-				suite.app.FeesKeeper.RegisterFee(ctx, msg)
+				suite.app.FeesKeeper.RegisterFee(ctx, msg) //nolint:errcheck
 			},
 			false,
 			"contract is already registered",

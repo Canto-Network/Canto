@@ -255,8 +255,8 @@ func MakeValAccts(numAccts int) []sdk.ValAddress {
 	return addrs
 }
 
-func GenKeys(numKeys int) []*ed25519.PrivKey {
-	pks := make([]*ed25519.PrivKey, numKeys)
+func GenKeys(numKeys int) []*ed25519.PrivKey { //nolint:staticcheck // SA1019: ed25519 is deprecated: Use golang.org/x/crypto/ed25519
+	pks := make([]*ed25519.PrivKey, numKeys) //nolint:staticcheck // SA1019: ed25519 is deprecated: Use golang.org/x/crypto/ed25519
 	for i := 0; i < numKeys; i++ {
 		pks[i] = ed25519.GenPrivKey()
 	}
