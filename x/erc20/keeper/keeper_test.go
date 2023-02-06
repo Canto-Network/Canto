@@ -41,7 +41,6 @@ import (
 	ethermint "github.com/evmos/ethermint/types"
 	"github.com/evmos/ethermint/x/evm/statedb"
 	evm "github.com/evmos/ethermint/x/evm/types"
-	evmtypes "github.com/evmos/ethermint/x/evm/types"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 
@@ -460,9 +459,9 @@ type MockEVMKeeper struct {
 	mock.Mock
 }
 
-func (m *MockEVMKeeper) GetParams(ctx sdk.Context) evmtypes.Params {
+func (m *MockEVMKeeper) GetParams(ctx sdk.Context) evm.Params {
 	args := m.Called(mock.Anything)
-	return args.Get(0).(evmtypes.Params)
+	return args.Get(0).(evm.Params)
 }
 
 func (m *MockEVMKeeper) GetAccountWithoutBalance(ctx sdk.Context, addr common.Address) *statedb.Account {
@@ -473,21 +472,21 @@ func (m *MockEVMKeeper) GetAccountWithoutBalance(ctx sdk.Context, addr common.Ad
 	return args.Get(0).(*statedb.Account)
 }
 
-func (m *MockEVMKeeper) EstimateGas(c context.Context, req *evmtypes.EthCallRequest) (*evmtypes.EstimateGasResponse, error) {
+func (m *MockEVMKeeper) EstimateGas(c context.Context, req *evm.EthCallRequest) (*evm.EstimateGasResponse, error) {
 	args := m.Called(mock.Anything, mock.Anything)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*evmtypes.EstimateGasResponse), args.Error(1)
+	return args.Get(0).(*evm.EstimateGasResponse), args.Error(1)
 }
 
-func (m *MockEVMKeeper) ApplyMessage(ctx sdk.Context, msg core.Message, tracer vm.EVMLogger, commit bool) (*evmtypes.MsgEthereumTxResponse, error) {
+func (m *MockEVMKeeper) ApplyMessage(ctx sdk.Context, msg core.Message, tracer vm.EVMLogger, commit bool) (*evm.MsgEthereumTxResponse, error) {
 	args := m.Called(mock.Anything, mock.Anything, mock.Anything, mock.Anything)
 
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*evmtypes.MsgEthereumTxResponse), args.Error(1)
+	return args.Get(0).(*evm.MsgEthereumTxResponse), args.Error(1)
 }
 
 var _ types.BankKeeper = &MockBankKeeper{}

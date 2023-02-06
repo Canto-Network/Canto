@@ -262,7 +262,8 @@ var _ = Describe("Clawback Vesting Accounts - claw back tokens", Ordered, func()
 
 		// Create and fund periodic vesting account
 		vestingStart := s.ctx.BlockTime()
-		testutil.FundAccount(s.app.BankKeeper, s.ctx, funder, vestingAmtTotal)
+		err := testutil.FundAccount(s.app.BankKeeper, s.ctx, funder, vestingAmtTotal)
+		s.Require().NoError(err)
 
 		balanceFunder := s.app.BankKeeper.GetBalance(s.ctx, funder, stakeDenom)
 		balanceGrantee := s.app.BankKeeper.GetBalance(s.ctx, grantee, stakeDenom)
@@ -273,7 +274,7 @@ var _ = Describe("Clawback Vesting Accounts - claw back tokens", Ordered, func()
 
 		msg := types.NewMsgCreateClawbackVestingAccount(funder, grantee, vestingStart, lockupPeriods, vestingPeriods, true)
 
-		_, err := s.app.VestingKeeper.CreateClawbackVestingAccount(ctx, msg)
+		_, err = s.app.VestingKeeper.CreateClawbackVestingAccount(ctx, msg)
 		s.Require().NoError(err)
 
 		acc := s.app.AccountKeeper.GetAccount(s.ctx, grantee)
@@ -452,7 +453,9 @@ func delegate(clawbackAccount *types.ClawbackVestingAccount, amount int64) error
 	val, err := sdk.ValAddressFromBech32("cantovaloper1z3t55m0l9h0eupuz3dp5t5cypyv674jjvj4sdt")
 	s.Require().NoError(err)
 	delegateMsg := stakingtypes.NewMsgDelegate(addr, val, sdk.NewCoin(stakingtypes.DefaultParams().BondDenom, sdk.NewInt(amount)))
-	txBuilder.SetMsgs(delegateMsg)
+	err = txBuilder.SetMsgs(delegateMsg)
+	s.Require().NoError(err)
+
 	tx := txBuilder.GetTx()
 
 	dec := ante.NewVestingDelegationDecorator(s.app.AccountKeeper, s.app.StakingKeeper, types.ModuleCdc)
