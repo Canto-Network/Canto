@@ -8,7 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 
-	"github.com/Canto-Network/Canto/v5/x/fees/types"
+	"github.com/Canto-Network/Canto/v6/x/fees/types"
 )
 
 var _ types.MsgServer = &Keeper{}

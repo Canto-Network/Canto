@@ -8,7 +8,7 @@ import (
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/tendermint/tendermint/libs/log"
 
-	"github.com/Canto-Network/Canto/v5/x/erc20/types"
+	"github.com/Canto-Network/Canto/v6/x/erc20/types"
 )
 
 // Keeper of this module maintains collections of erc20.

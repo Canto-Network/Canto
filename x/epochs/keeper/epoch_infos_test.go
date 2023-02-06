@@ -3,7 +3,7 @@ package keeper_test
 import (
 	"time"
 
-	"github.com/Canto-Network/Canto/v5/x/epochs/types"
+	"github.com/Canto-Network/Canto/v6/x/epochs/types"
 )
 
 func (suite *KeeperTestSuite) TestEpochLifeCycle() {

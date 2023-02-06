@@ -19,9 +19,9 @@ import (
 
 	evm "github.com/evmos/ethermint/x/evm/types"
 
-	"github.com/Canto-Network/Canto/v5/app"
-	epochstypes "github.com/Canto-Network/Canto/v5/x/epochs/types"
-	"github.com/Canto-Network/Canto/v5/x/inflation/types"
+	"github.com/Canto-Network/Canto/v6/app"
+	epochstypes "github.com/Canto-Network/Canto/v6/x/epochs/types"
+	"github.com/Canto-Network/Canto/v6/x/inflation/types"
 )
 
 var denomMint = "acanto"

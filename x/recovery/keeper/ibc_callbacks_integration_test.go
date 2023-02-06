@@ -3,8 +3,8 @@ package keeper_test
 import (
 	"time"
 
-	"github.com/Canto-Network/Canto/v5/app"
-	"github.com/Canto-Network/Canto/v5/x/recovery/types"
+	"github.com/Canto-Network/Canto/v6/app"
+	"github.com/Canto-Network/Canto/v6/x/recovery/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	transfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
 	channeltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"

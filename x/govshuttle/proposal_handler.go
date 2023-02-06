@@ -1,8 +1,8 @@
 package govshuttle
 
 import (
-	"github.com/Canto-Network/Canto/v5/x/govshuttle/keeper"
-	"github.com/Canto-Network/Canto/v5/x/govshuttle/types"
+	"github.com/Canto-Network/Canto/v6/x/govshuttle/keeper"
+	"github.com/Canto-Network/Canto/v6/x/govshuttle/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"

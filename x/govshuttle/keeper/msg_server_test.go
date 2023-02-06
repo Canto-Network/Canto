@@ -1,7 +1,7 @@
 package keeper_test
 
-// "github.com/Canto-Network/Canto/v5/x/govshuttle/keeper"
-// keepertest "github.com/Canto-Network/Canto/v5/testutil/keeper"
+// "github.com/Canto-Network/Canto/v6/x/govshuttle/keeper"
+// keepertest "github.com/Canto-Network/Canto/v6/testutil/keeper"
 
 /*
 func setupMsgServer(t testing.TB) (types.MsgServer, context.Context) {

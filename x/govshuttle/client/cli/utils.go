@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/Canto-Network/Canto/v5/x/govshuttle/types"
+	"github.com/Canto-Network/Canto/v6/x/govshuttle/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 )
 

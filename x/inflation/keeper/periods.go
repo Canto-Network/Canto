@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/Canto-Network/Canto/v5/x/inflation/types"
+	"github.com/Canto-Network/Canto/v6/x/inflation/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

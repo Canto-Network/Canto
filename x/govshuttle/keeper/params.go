@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/Canto-Network/Canto/v5/x/govshuttle/types"
+	"github.com/Canto-Network/Canto/v6/x/govshuttle/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

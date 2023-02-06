@@ -12,9 +12,9 @@ import (
 
 	"github.com/evmos/ethermint/encoding"
 
-	"github.com/Canto-Network/Canto/v5/app"
-	v2 "github.com/Canto-Network/Canto/v5/x/erc20/migrations/v2"
-	erc20types "github.com/Canto-Network/Canto/v5/x/erc20/types"
+	"github.com/Canto-Network/Canto/v6/app"
+	v2 "github.com/Canto-Network/Canto/v6/x/erc20/migrations/v2"
+	erc20types "github.com/Canto-Network/Canto/v6/x/erc20/types"
 )
 
 func TestUpdateParams(t *testing.T) {

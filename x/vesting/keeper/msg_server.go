@@ -13,7 +13,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	sdkvesting "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 
-	"github.com/Canto-Network/Canto/v5/x/vesting/types"
+	"github.com/Canto-Network/Canto/v6/x/vesting/types"
 )
 
 var _ types.MsgServer = &Keeper{}

@@ -35,10 +35,10 @@ import (
 	ethermint "github.com/evmos/ethermint/types"
 	evm "github.com/evmos/ethermint/x/evm/types"
 
-	"github.com/Canto-Network/Canto/v5/app"
-	"github.com/Canto-Network/Canto/v5/contracts"
-	epochstypes "github.com/Canto-Network/Canto/v5/x/epochs/types"
-	"github.com/Canto-Network/Canto/v5/x/vesting/types"
+	"github.com/Canto-Network/Canto/v6/app"
+	"github.com/Canto-Network/Canto/v6/contracts"
+	epochstypes "github.com/Canto-Network/Canto/v6/x/epochs/types"
+	"github.com/Canto-Network/Canto/v6/x/vesting/types"
 )
 
 var (
