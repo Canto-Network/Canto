@@ -14,9 +14,9 @@ import (
 	"github.com/evmos/ethermint/encoding"
 	ethermint "github.com/evmos/ethermint/types"
 
-	"github.com/Canto-Network/Canto/v5/app"
-	"github.com/Canto-Network/Canto/v5/testutil"
-	"github.com/Canto-Network/Canto/v5/x/erc20/types"
+	"github.com/Canto-Network/Canto/v6/app"
+	"github.com/Canto-Network/Canto/v6/testutil"
+	"github.com/Canto-Network/Canto/v6/x/erc20/types"
 
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	abci "github.com/tendermint/tendermint/abci/types"
