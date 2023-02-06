@@ -66,11 +66,11 @@ var _ = Describe("Fee distribution:", Ordered, func() {
 
 		// setup deployer account
 		deployerKey, deployerAddress = generateKey()
-		testutil.FundAccount(s.app.BankKeeper, s.ctx, deployerAddress, initBalance)
+		testutil.FundAccount(s.app.BankKeeper, s.ctx, deployerAddress, initBalance) //nolint:errcheck
 
 		// setup account interacting with registered contracts
 		userKey, userAddress = generateKey()
-		testutil.FundAccount(s.app.BankKeeper, s.ctx, userAddress, initBalance)
+		testutil.FundAccount(s.app.BankKeeper, s.ctx, userAddress, initBalance) //nolint:errcheck
 		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, userAddress)
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
 		s.Commit()
@@ -624,8 +624,8 @@ var _ = Describe("Fee distribution:", Ordered, func() {
 				deployerKey2, deployerAddress2 := generateKey()
 
 				BeforeEach(func() {
-					testutil.FundAccount(s.app.BankKeeper, s.ctx, deployerAddress1, initBalance)
-					testutil.FundAccount(s.app.BankKeeper, s.ctx, deployerAddress2, initBalance)
+					testutil.FundAccount(s.app.BankKeeper, s.ctx, deployerAddress1, initBalance) //nolint:errcheck
+					testutil.FundAccount(s.app.BankKeeper, s.ctx, deployerAddress2, initBalance) //nolint:errcheck
 
 					// Create contract: deployerKey1 -> factory1 -> factory2 -> contract
 					// Create factory1

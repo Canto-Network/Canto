@@ -322,7 +322,7 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 			suite.app.RecoveryKeeper = keeper.NewKeeper(sp, suite.app.AccountKeeper, suite.app.BankKeeper, suite.app.IBCKeeper.ChannelKeeper, mockTransferKeeper)
 
 			// Fund receiver account with canto, ERC20 coins and IBC vouchers
-			testutil.FundAccount(suite.app.BankKeeper, suite.ctx, secpAddr, coins)
+			testutil.FundAccount(suite.app.BankKeeper, suite.ctx, secpAddr, coins) //nolint:errcheck
 
 			// Perform IBC callback
 			ack := suite.app.RecoveryKeeper.OnRecvPacket(suite.ctx, packet, expAck)
@@ -583,7 +583,7 @@ func (suite *KeeperTestSuite) TestOnRecvPacketFailTransfer() {
 				sdk.NewCoin("acanto", sdk.NewInt(1000)),
 				sdk.NewCoin(ibcAtomDenom, sdk.NewInt(1000)),
 			)
-			testutil.FundAccount(suite.app.BankKeeper, suite.ctx, secpAddr, coins)
+			testutil.FundAccount(suite.app.BankKeeper, suite.ctx, secpAddr, coins) //nolint:errcheck
 
 			// Perform IBC callback
 			ack := suite.app.RecoveryKeeper.OnRecvPacket(suite.ctx, packet, expAck)
