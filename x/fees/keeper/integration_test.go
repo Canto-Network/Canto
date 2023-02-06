@@ -697,7 +697,7 @@ func calculateFees(
 	params types.Params,
 	res abci.ResponseDeliverTx,
 	gasPrice *big.Int,
-	logIndex int64,
+	logIndex int64, //nolint:unparam
 ) (sdk.Coin, sdk.Coin) {
 	feeDistribution := sdk.NewInt(res.GasUsed).Mul(sdk.NewIntFromBigInt(gasPrice))
 	developerFee := sdk.NewDecFromInt(feeDistribution).Mul(params.DeveloperShares)
@@ -895,13 +895,6 @@ func deliverEthTx(priv *ethsecp256k1.PrivKey, msgEthereumTx *evmtypes.MsgEthereu
 	return res
 }
 
-func checkEthTx(priv *ethsecp256k1.PrivKey, msgEthereumTx *evmtypes.MsgEthereumTx) abci.ResponseCheckTx {
-	bz := prepareEthTx(priv, msgEthereumTx)
-	req := abci.RequestCheckTx{Tx: bz}
-	res := s.app.BaseApp.CheckTx(req)
-	return res
-}
-
 func prepareCosmosTx(priv *ethsecp256k1.PrivKey, gasPrice *sdk.Int, msgs ...sdk.Msg) []byte {
 	encodingConfig := encoding.MakeConfig(app.ModuleBasics)
 	accountAddress := sdk.AccAddress(priv.PubKey().Address().Bytes())
@@ -963,16 +956,9 @@ func prepareCosmosTx(priv *ethsecp256k1.PrivKey, gasPrice *sdk.Int, msgs ...sdk.
 	return bz
 }
 
-func deliverTx(priv *ethsecp256k1.PrivKey, gasPrice *sdk.Int, msgs ...sdk.Msg) abci.ResponseDeliverTx {
+func deliverTx(priv *ethsecp256k1.PrivKey, gasPrice *sdk.Int, msgs ...sdk.Msg) abci.ResponseDeliverTx { //nolint:unparam
 	bz := prepareCosmosTx(priv, gasPrice, msgs...)
 	req := abci.RequestDeliverTx{Tx: bz}
 	res := s.app.BaseApp.DeliverTx(req)
-	return res
-}
-
-func checkTx(priv *ethsecp256k1.PrivKey, gasPrice *sdk.Int, msgs ...sdk.Msg) abci.ResponseCheckTx {
-	bz := prepareCosmosTx(priv, gasPrice, msgs...)
-	req := abci.RequestCheckTx{Tx: bz}
-	res := s.app.BaseApp.CheckTx(req)
 	return res
 }

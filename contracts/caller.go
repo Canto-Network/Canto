@@ -8,7 +8,7 @@ import (
 
 var (
 	//go:embed compiled_contracts/caller.json
-	callerJSON []byte
+	callerJSON []byte //nolint:unused
 
 	// ERC20BurnableContract is the compiled ERC20Burnable contract
 	CallerContract evmtypes.CompiledContract

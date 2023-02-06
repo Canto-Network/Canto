@@ -210,7 +210,7 @@ func (suite *KeeperTestSuite) TestCallEVMWithData() {
 				params.EnableCreate = false
 				suite.app.EvmKeeper.SetParams(suite.ctx, params)
 				ctorArgs, _ := contracts.ERC20MinterBurnerDecimalsContract.ABI.Pack("", "test", "test", uint8(18))
-				data := append(contracts.ERC20MinterBurnerDecimalsContract.Bin, ctorArgs...)
+				data := append(contracts.ERC20MinterBurnerDecimalsContract.Bin, ctorArgs...) //nolint:gocritic
 				return data, nil
 			},
 			false,

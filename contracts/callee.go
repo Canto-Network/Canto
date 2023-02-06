@@ -8,7 +8,7 @@ import (
 
 var (
 	//go:embed compiled_contracts/callee.json
-	calleeJSON []byte
+	calleeJSON []byte //nolint:unused
 
 	// ERC20BurnableContract is the compiled ERC20Burnable contract
 	CalleeContract evmtypes.CompiledContract
