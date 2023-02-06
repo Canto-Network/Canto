@@ -16,8 +16,8 @@ import (
 	"github.com/evmos/ethermint/encoding"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
-	"github.com/Canto-Network/Canto/v2/cmd/config"
-	"github.com/Canto-Network/Canto/v2/types"
+	"github.com/Canto-Network/Canto/v5/cmd/config"
+	"github.com/Canto-Network/Canto/v5/types"
 )
 
 func init() {

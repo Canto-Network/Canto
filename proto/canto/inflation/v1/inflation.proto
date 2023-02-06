@@ -3,7 +3,7 @@ package canto.inflation.v1;
 
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/Canto-Network/Canto/v2/x/inflation/types";
+option go_package = "github.com/Canto-Network/Canto/v5/x/inflation/types";
 
 // InflationDistribution defines the distribution in which inflation is
 // allocated through minting on each epoch (staking, incentives, community). It
@@ -19,7 +19,8 @@ message InflationDistribution {
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];
-  // // usage_incentives defines the proportion of the minted minted_denom that is
+  // // usage_incentives defines the proportion of the minted minted_denom that
+  // is
   // // to be allocated to the incentives module address
   // string usage_incentives = 2 [
   //   (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
@@ -65,4 +66,3 @@ message ExponentialCalculation {
     (gogoproto.nullable) = false
   ];
 }
-

@@ -2,10 +2,10 @@ package govshuttle_test
 
 import (
 	"testing"
-	// keepertest "github.com/Canto-Network/Canto/v2/testutil/keeper"
-	// "github.com/Canto-Network/Canto/v2/testutil/nullify"
-	// "github.com/Canto-Network/Canto/v2/x/govshuttle"
-	// "github.com/Canto-Network/Canto/v2/x/govshuttle/types"
+	// keepertest "github.com/Canto-Network/Canto/v5/testutil/keeper"
+	// "github.com/Canto-Network/Canto/v5/testutil/nullify"
+	// "github.com/Canto-Network/Canto/v5/x/govshuttle"
+	// "github.com/Canto-Network/Canto/v5/x/govshuttle/types"
 	// "github.com/stretchr/testify/require"
 )
 

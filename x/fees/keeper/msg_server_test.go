@@ -11,7 +11,7 @@ import (
 	"github.com/evmos/ethermint/tests"
 	"github.com/evmos/ethermint/x/evm/statedb"
 
-	"github.com/Canto-Network/Canto/v2/x/fees/types"
+	"github.com/Canto-Network/Canto/v5/x/fees/types"
 )
 
 func (suite *KeeperTestSuite) TestRegisterFee() {

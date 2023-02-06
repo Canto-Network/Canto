@@ -3,7 +3,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/Canto-Network/Canto/v2/x/recovery/types"
+	"github.com/Canto-Network/Canto/v5/x/recovery/types"
 )
 
 // GetParams returns the total set of recovery parameters.

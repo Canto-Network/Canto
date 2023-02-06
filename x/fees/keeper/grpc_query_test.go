@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 
-	"github.com/Canto-Network/Canto/v2/x/fees/types"
+	"github.com/Canto-Network/Canto/v5/x/fees/types"
 	"github.com/evmos/ethermint/tests"
 )
 

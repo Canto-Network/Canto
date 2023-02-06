@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	epochstypes "github.com/Canto-Network/Canto/v2/x/epochs/types"
-	"github.com/Canto-Network/Canto/v2/x/inflation/types"
+	epochstypes "github.com/Canto-Network/Canto/v5/x/epochs/types"
+	"github.com/Canto-Network/Canto/v5/x/inflation/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bankKeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"

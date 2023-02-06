@@ -3,7 +3,7 @@ package types_test
 import (
 	"testing"
 
-	"github.com/Canto-Network/Canto/v2/x/govshuttle/types"
+	"github.com/Canto-Network/Canto/v5/x/govshuttle/types"
 	"github.com/stretchr/testify/require"
 )
 

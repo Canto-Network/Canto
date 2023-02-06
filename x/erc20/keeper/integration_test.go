@@ -14,9 +14,9 @@ import (
 	"github.com/evmos/ethermint/encoding"
 	ethermint "github.com/evmos/ethermint/types"
 
-	"github.com/Canto-Network/Canto/v2/app"
-	"github.com/Canto-Network/Canto/v2/testutil"
-	"github.com/Canto-Network/Canto/v2/x/erc20/types"
+	"github.com/Canto-Network/Canto/v5/app"
+	"github.com/Canto-Network/Canto/v5/testutil"
+	"github.com/Canto-Network/Canto/v5/x/erc20/types"
 
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -161,10 +161,10 @@ var _ = Describe("ERC20: Converting", Ordered, func() {
 			*pair, _ = s.app.Erc20Keeper.GetTokenPair(s.ctx, id)
 			coin = sdk.NewCoin(pair.Denom, amt)
 
-			//denom := s.app.ClaimsKeeper.GetParams(s.ctx).ClaimsDenom
+			// denom := s.app.ClaimsKeeper.GetParams(s.ctx).ClaimsDenom
 
-			//err := testutil.FundAccount(s.app.BankKeeper, s.ctx, accAddr, sdk.NewCoins(sdk.NewCoin(denom, sdk.NewInt(1000))))
-			//s.Require().NoError(err)
+			// err := testutil.FundAccount(s.app.BankKeeper, s.ctx, accAddr, sdk.NewCoins(sdk.NewCoin(denom, sdk.NewInt(1000))))
+			// s.Require().NoError(err)
 
 			_ = s.MintERC20Token(contract, s.address, addr, big.NewInt(amt.Int64()))
 			s.Commit()
