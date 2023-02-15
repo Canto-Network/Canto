@@ -19,7 +19,7 @@ require (
 	github.com/spf13/cast v1.5.0
 	github.com/spf13/cobra v1.5.0
 	github.com/stretchr/testify v1.8.0
-	github.com/tendermint/tendermint v0.34.21
+	github.com/tendermint/tendermint v0.34.25
 	github.com/tendermint/tm-db v0.6.7
 	go.opencensus.io v0.23.0
 	google.golang.org/genproto v0.0.0-20220810155839-1856144b1d9c
