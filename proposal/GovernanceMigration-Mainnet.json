@@ -1,7 +1,0 @@
-{
-    "Account"       : ["", "", "", "", "", "", "", "", "", ""],
-    "PropId"        : 1,
-    "values"        : [0,0,0,0,0,0,0,0,0,0],
-    "calldatas"     : ["", "", "", "","","","","","",""],
-    "signatures"    : ["_acceptAdmin()", "_acceptAdmin()", "_acceptAdmin()", "_acceptAdmin()", "_acceptAdmin()", "_acceptAdmin()", "_acceptAdmin()", "_acceptAdmin()", "_acceptAdmin()", "_acceptAdmin()"]
-}
