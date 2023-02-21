@@ -136,9 +136,14 @@ import (
 	govshuttlekeeper "github.com/Canto-Network/Canto/v2/x/govshuttle/keeper"
 	govshuttletypes "github.com/Canto-Network/Canto/v2/x/govshuttle/types"
 
+	"github.com/Canto-Network/Canto/v2/x/csr"
+	csrkeeper "github.com/Canto-Network/Canto/v2/x/csr/keeper"
+	csrtypes "github.com/Canto-Network/Canto/v2/x/csr/types"
+
 	v2 "github.com/Canto-Network/Canto/v2/app/upgrades/v2"
 	v3 "github.com/Canto-Network/Canto/v2/app/upgrades/v3"
 	v4 "github.com/Canto-Network/Canto/v2/app/upgrades/v4"
+	v5 "github.com/Canto-Network/Canto/v2/app/upgrades/v5"
 )
 
 func init() {
@@ -196,6 +201,7 @@ var (
 		inflation.AppModuleBasic{},
 		erc20.AppModuleBasic{},
 		govshuttle.AppModuleBasic{},
+		csr.AppModuleBasic{},
 		epochs.AppModuleBasic{},
 		recovery.AppModuleBasic{},
 		fees.AppModuleBasic{},
@@ -212,6 +218,7 @@ var (
 		evmtypes.ModuleName:            {authtypes.Minter, authtypes.Burner}, // used for secure addition and subtraction of balance using module account
 		inflationtypes.ModuleName:      {authtypes.Minter},
 		erc20types.ModuleName:          {authtypes.Minter, authtypes.Burner},
+		csrtypes.ModuleName:            {authtypes.Minter, authtypes.Burner},
 		govshuttletypes.ModuleName:     {authtypes.Minter, authtypes.Burner},
 	}
 
@@ -278,6 +285,7 @@ type Canto struct {
 	RecoveryKeeper   *recoverykeeper.Keeper
 	FeesKeeper       feeskeeper.Keeper
 	GovshuttleKeeper govshuttlekeeper.Keeper
+	CSRKeeper        csrkeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -335,6 +343,7 @@ func NewCanto(
 		inflationtypes.StoreKey, erc20types.StoreKey,
 		epochstypes.StoreKey, vestingtypes.StoreKey, recoverytypes.StoreKey, //recoverytypes.StoreKe
 		feestypes.StoreKey,
+		csrtypes.StoreKey,
 		govshuttletypes.StoreKey,
 	)
 
@@ -464,6 +473,13 @@ func NewCanto(
 		authtypes.FeeCollectorName,
 	)
 
+	app.CSRKeeper = csrkeeper.NewKeeper(
+		appCodec, keys[csrtypes.StoreKey],
+		app.GetSubspace(csrtypes.ModuleName),
+		app.AccountKeeper, app.EvmKeeper, app.BankKeeper,
+		authtypes.FeeCollectorName,
+	)
+
 	epochsKeeper := epochskeeper.NewKeeper(appCodec, keys[epochstypes.StoreKey])
 	app.EpochsKeeper = *epochsKeeper.SetHooks(
 		epochskeeper.NewMultiEpochHooks(
@@ -482,6 +498,7 @@ func NewCanto(
 		evmkeeper.NewMultiEvmHooks(
 			app.Erc20Keeper.Hooks(),
 			app.FeesKeeper.Hooks(),
+			app.CSRKeeper.Hooks(),
 		),
 	)
 
@@ -603,6 +620,7 @@ func NewCanto(
 		recovery.NewAppModule(*app.RecoveryKeeper),
 		fees.NewAppModule(app.FeesKeeper, app.AccountKeeper),
 		govshuttle.NewAppModule(app.GovshuttleKeeper, app.AccountKeeper),
+		csr.NewAppModule(app.CSRKeeper, app.AccountKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -639,6 +657,7 @@ func NewCanto(
 		recoverytypes.ModuleName,
 		feestypes.ModuleName,
 		govshuttletypes.ModuleName,
+		csrtypes.ModuleName,
 	)
 
 	// NOTE: fee market module must go last in order to retrieve the block gas used.
@@ -670,6 +689,7 @@ func NewCanto(
 		inflationtypes.ModuleName,
 		erc20types.ModuleName,
 		govshuttletypes.ModuleName,
+		csrtypes.ModuleName,
 		// recoverytypes.ModuleName,
 		feestypes.ModuleName,
 	)
@@ -711,6 +731,7 @@ func NewCanto(
 		recoverytypes.ModuleName,
 		feestypes.ModuleName,
 		govshuttletypes.ModuleName,
+		csrtypes.ModuleName,
 		// NOTE: crisis module must go at the end to check for invariants on each module
 		crisistypes.ModuleName,
 	)
@@ -1028,6 +1049,7 @@ func initParamsKeeper(
 	paramsKeeper.Subspace(recoverytypes.ModuleName)
 	paramsKeeper.Subspace(feestypes.ModuleName)
 	paramsKeeper.Subspace(govshuttletypes.ModuleName)
+	paramsKeeper.Subspace(csrtypes.ModuleName)
 	return paramsKeeper
 }
 
@@ -1046,6 +1068,12 @@ func (app *Canto) setupUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(
 		v4.UpgradeName,
 		v4.CreateUpgradeHandler(app.mm, app.configurator, app.GovshuttleKeeper),
+	)
+
+	// v4 upgrade handler
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v5.UpgradeName,
+		v5.CreateUpgradeHandler(app.mm, app.configurator),
 	)
 
 	// When a planned update height is reached, the old binary will panic
@@ -1070,8 +1098,12 @@ func (app *Canto) setupUpgradeHandlers() {
 	case v4.UpgradeName:
 		// no store upgrades in v4
 		storeUpgrades = &storetypes.StoreUpgrades{
-            Added: []string{govshuttletypes.StoreKey},
-        }	
+			Added: []string{govshuttletypes.StoreKey},
+		}
+	case v5.UpgradeName:
+		storeUpgrades = &storetypes.StoreUpgrades{
+			Added: []string{csrtypes.StoreKey},
+		}
 	}
 
 	if storeUpgrades != nil {

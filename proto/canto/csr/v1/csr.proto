@@ -1,0 +1,21 @@
+syntax = "proto3";
+package canto.csr.v1;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/Canto-Network/Canto/v2/x/csr/types";
+
+// The CSR struct is a wrapper to all of the metadata associated with a given CST NFT
+message CSR {
+    // Contracts is the list of all EVM address that are registered to this NFT
+    repeated string contracts = 1;
+    // The NFT id which this CSR corresponds to
+    uint64 id = 2;
+    // The total number of transactions for this CSR NFT
+    uint64 txs = 3;
+    // The cumulative revenue for this CSR NFT -> represented as a sdk.Int
+    string revenue = 4 [
+        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+        (gogoproto.nullable) = false
+    ];
+}

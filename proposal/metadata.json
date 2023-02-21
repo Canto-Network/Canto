@@ -1,7 +1,0 @@
-{
-    "Account"       : ["0x42a2Ae543a39e935ffa62803703C2288E8DCe7c6"],
-    "PropId"        : 1,
-    "values"        : [0],
-    "calldatas"     : [""],
-    "signatures"    : ["inte()"]
-}
