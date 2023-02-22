@@ -4,7 +4,7 @@ import "canto/fees/v1/fees.proto";
 
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/Canto-Network/Canto/v2/x/fees/types";
+option go_package = "github.com/Canto-Network/Canto/v6/x/fees/types";
 
 // GenesisState defines the module's genesis state.
 message GenesisState {
