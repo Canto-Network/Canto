@@ -3,13 +3,13 @@ package keeper
 import (
 	"math/big"
 
-	"github.com/Canto-Network/Canto/v2/contracts"
+	"github.com/Canto-Network/Canto/v6/contracts"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/Canto-Network/Canto/v2/x/govshuttle/types"
+	"github.com/Canto-Network/Canto/v6/x/govshuttle/types"
 
-	erc20types "github.com/Canto-Network/Canto/v2/x/erc20/types"
+	erc20types "github.com/Canto-Network/Canto/v6/x/erc20/types"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 )
@@ -25,7 +25,7 @@ func (k *Keeper) AppendLendingMarketProposal(ctx sdk.Context, lm *types.LendingM
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Error obtaining Proposal ID")
 	}
-	
+
 	//if this is the first govshuttle proposal, deploy the map contract as well
 	addr, found := k.GetPort(ctx)
 	// port has not been deployed yet, deploy and store

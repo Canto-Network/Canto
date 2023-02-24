@@ -3,11 +3,11 @@ package keeper
 import (
 	"fmt"
 
+	"github.com/cosmos/cosmos-sdk/store/prefix"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/tendermint/tendermint/libs/log"
-	"github.com/cosmos/cosmos-sdk/store/prefix"
 
-	"github.com/Canto-Network/Canto/v2/x/govshuttle/types"
+	"github.com/Canto-Network/Canto/v6/x/govshuttle/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
@@ -19,9 +19,9 @@ type (
 		cdc        codec.BinaryCodec
 		paramstore paramtypes.Subspace
 
-		accKeeper       types.AccountKeeper
-		erc20Keeper     types.ERC20Keeper
-		govKeeper       types.GovKeeper
+		accKeeper   types.AccountKeeper
+		erc20Keeper types.ERC20Keeper
+		govKeeper   types.GovKeeper
 	}
 )
 
@@ -42,12 +42,12 @@ func NewKeeper(
 
 	return Keeper{
 
-		cdc:             cdc,
-		storeKey:        storeKey,
-		paramstore:      ps,
-		accKeeper:       ak,
-		erc20Keeper:     ek,
-		govKeeper:       gk,
+		cdc:         cdc,
+		storeKey:    storeKey,
+		paramstore:  ps,
+		accKeeper:   ak,
+		erc20Keeper: ek,
+		govKeeper:   gk,
 	}
 }
 

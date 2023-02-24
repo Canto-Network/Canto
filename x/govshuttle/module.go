@@ -12,9 +12,9 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/Canto-Network/Canto/v2/x/govshuttle/client/cli"
-	"github.com/Canto-Network/Canto/v2/x/govshuttle/keeper"
-	"github.com/Canto-Network/Canto/v2/x/govshuttle/types"
+	"github.com/Canto-Network/Canto/v6/x/govshuttle/client/cli"
+	"github.com/Canto-Network/Canto/v6/x/govshuttle/keeper"
+	"github.com/Canto-Network/Canto/v6/x/govshuttle/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -148,7 +148,7 @@ func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, gs json.Ra
 	var genState types.GenesisState
 	// Initialize global index to index in genesis state
 	cdc.MustUnmarshalJSON(gs, &genState)
-	
+
 	InitGenesis(ctx, am.keeper, am.accountkeeper, genState)
 
 	return []abci.ValidatorUpdate{}

@@ -3,8 +3,8 @@ package keeper
 import (
 	"math/big"
 
-	"github.com/Canto-Network/Canto/v2/contracts"
-	"github.com/Canto-Network/Canto/v2/x/csr/types"
+	"github.com/Canto-Network/Canto/v6/contracts"
+	"github.com/Canto-Network/Canto/v6/x/csr/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ethereum/go-ethereum/common"

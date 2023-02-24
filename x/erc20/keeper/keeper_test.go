@@ -45,9 +45,9 @@ import (
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 
-	"github.com/Canto-Network/Canto/v2/app"
-	"github.com/Canto-Network/Canto/v2/contracts"
-	"github.com/Canto-Network/Canto/v2/x/erc20/types"
+	"github.com/Canto-Network/Canto/v6/app"
+	"github.com/Canto-Network/Canto/v6/contracts"
+	"github.com/Canto-Network/Canto/v6/x/erc20/types"
 )
 
 type KeeperTestSuite struct {
