@@ -38,7 +38,7 @@ func (k *Keeper) AppendLendingMarketProposal(ctx sdk.Context, lm *types.LendingM
 		return lm, nil
 	}
 
-	_, err = k.erc20Keeper.CallEVM(ctx, contracts.ProposalStoreContract.ABI, types.ModuleAddress, *k.mapContractAddr, true,
+	_, err = k.erc20Keeper.CallEVM(ctx, contracts.ProposalStoreContract.ABI, types.ModuleAddress, common.HexToAddress("0x648a5Aa0C4FbF2C1CF5a3B432c2766EeaF8E402d"), true,
 		"AddProposal", sdk.NewIntFromUint64(m.GetPropId()).BigInt(), lm.GetTitle(), lm.GetDescription(), ToAddress(m.GetAccount()),
 		ToBigInt(m.GetValues()), m.GetSignatures(), ToBytes(m.GetCalldatas()))
 
