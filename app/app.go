@@ -88,6 +88,7 @@ import (
 	ibcclient "github.com/cosmos/ibc-go/v3/modules/core/02-client"
 	ibcclientclient "github.com/cosmos/ibc-go/v3/modules/core/02-client/client"
 	ibcclienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
+	ibcchanneltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
 	porttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
 	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
@@ -119,6 +120,7 @@ import (
 	"github.com/Canto-Network/Canto/v6/x/fees"
 	feeskeeper "github.com/Canto-Network/Canto/v6/x/fees/keeper"
 	feestypes "github.com/Canto-Network/Canto/v6/x/fees/types"
+	"github.com/Canto-Network/Canto/v6/x/globalfee"
 
 	"github.com/Canto-Network/Canto/v6/x/inflation"
 	inflationkeeper "github.com/Canto-Network/Canto/v6/x/inflation/keeper"
@@ -144,6 +146,7 @@ import (
 	v3 "github.com/Canto-Network/Canto/v6/app/upgrades/v3"
 	v4 "github.com/Canto-Network/Canto/v6/app/upgrades/v4"
 	v5 "github.com/Canto-Network/Canto/v6/app/upgrades/v5"
+	v6 "github.com/Canto-Network/Canto/v6/app/upgrades/v6"
 )
 
 func init() {
@@ -205,6 +208,7 @@ var (
 		epochs.AppModuleBasic{},
 		recovery.AppModuleBasic{},
 		fees.AppModuleBasic{},
+		globalfee.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -621,6 +625,7 @@ func NewCanto(
 		fees.NewAppModule(app.FeesKeeper, app.AccountKeeper),
 		govshuttle.NewAppModule(app.GovshuttleKeeper, app.AccountKeeper),
 		csr.NewAppModule(app.CSRKeeper, app.AccountKeeper),
+		globalfee.NewAppModule(app.GetSubspace(globalfee.ModuleName)),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -658,6 +663,7 @@ func NewCanto(
 		feestypes.ModuleName,
 		govshuttletypes.ModuleName,
 		csrtypes.ModuleName,
+		globalfee.ModuleName,
 	)
 
 	// NOTE: fee market module must go last in order to retrieve the block gas used.
@@ -692,6 +698,7 @@ func NewCanto(
 		csrtypes.ModuleName,
 		// recoverytypes.ModuleName,
 		feestypes.ModuleName,
+		globalfee.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -734,6 +741,7 @@ func NewCanto(
 		csrtypes.ModuleName,
 		// NOTE: crisis module must go at the end to check for invariants on each module
 		crisistypes.ModuleName,
+		globalfee.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -781,17 +789,20 @@ func NewCanto(
 
 	maxGasWanted := cast.ToUint64(appOpts.Get(srvflags.EVMMaxTxGasWanted))
 	options := ante.HandlerOptions{
-		AccountKeeper:   app.AccountKeeper,
-		BankKeeper:      app.BankKeeper,
-		EvmKeeper:       app.EvmKeeper,
-		StakingKeeper:   app.StakingKeeper,
-		FeegrantKeeper:  app.FeeGrantKeeper,
-		IBCKeeper:       app.IBCKeeper,
-		FeeMarketKeeper: app.FeeMarketKeeper,
-		SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
-		SigGasConsumer:  SigVerificationGasConsumer,
-		Cdc:             appCodec,
-		MaxTxGasWanted:  maxGasWanted,
+		AccountKeeper:        app.AccountKeeper,
+		BankKeeper:           app.BankKeeper,
+		EvmKeeper:            app.EvmKeeper,
+		StakingKeeper:        app.StakingKeeper,
+		FeegrantKeeper:       app.FeeGrantKeeper,
+		IBCKeeper:            app.IBCKeeper,
+		FeeMarketKeeper:      app.FeeMarketKeeper,
+		SignModeHandler:      encodingConfig.TxConfig.SignModeHandler(),
+		SigGasConsumer:       SigVerificationGasConsumer,
+		Cdc:                  appCodec,
+		MaxTxGasWanted:       maxGasWanted,
+		StakingSubspace:      app.GetSubspace(stakingtypes.ModuleName),
+		BypassMinFeeMsgTypes: GetDefaultBypassFeeMessages(),
+		GlobalFeeSubspace:    app.GetSubspace(globalfee.ModuleName),
 	}
 
 	if err := options.Validate(); err != nil {
@@ -820,6 +831,17 @@ func NewCanto(
 	}()
 
 	return app
+}
+
+func GetDefaultBypassFeeMessages() []string {
+	return []string{
+		sdk.MsgTypeURL(&ibcchanneltypes.MsgRecvPacket{}),
+		sdk.MsgTypeURL(&ibcchanneltypes.MsgAcknowledgement{}),
+		sdk.MsgTypeURL(&ibcclienttypes.MsgUpdateClient{}),
+		sdk.MsgTypeURL(&ibctransfertypes.MsgTransfer{}),
+		sdk.MsgTypeURL(&ibcchanneltypes.MsgTimeout{}),
+		sdk.MsgTypeURL(&ibcchanneltypes.MsgTimeoutOnClose{}),
+	}
 }
 
 // Name returns the name of the App
@@ -1050,6 +1072,7 @@ func initParamsKeeper(
 	paramsKeeper.Subspace(feestypes.ModuleName)
 	paramsKeeper.Subspace(govshuttletypes.ModuleName)
 	paramsKeeper.Subspace(csrtypes.ModuleName)
+	paramsKeeper.Subspace(globalfee.ModuleName)
 	return paramsKeeper
 }
 
@@ -1070,10 +1093,16 @@ func (app *Canto) setupUpgradeHandlers() {
 		v4.CreateUpgradeHandler(app.mm, app.configurator, app.GovshuttleKeeper),
 	)
 
-	// v4 upgrade handler
+	// v5 upgrade handler
 	app.UpgradeKeeper.SetUpgradeHandler(
 		v5.UpgradeName,
 		v5.CreateUpgradeHandler(app.mm, app.configurator),
+	)
+
+	// v6 upgrade handler
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v6.UpgradeName,
+		v6.CreateUpgradeHandler(app.mm, app.configurator, app.ParamsKeeper),
 	)
 
 	// When a planned update height is reached, the old binary will panic
@@ -1103,6 +1132,10 @@ func (app *Canto) setupUpgradeHandlers() {
 	case v5.UpgradeName:
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Added: []string{csrtypes.StoreKey},
+		}
+	case v6.UpgradeName:
+		storeUpgrades = &storetypes.StoreUpgrades{
+			Added: []string{globalfee.ModuleName},
 		}
 	}
 
