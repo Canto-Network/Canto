@@ -2,8 +2,6 @@
 
 ### Install & Initialize
 
--   Install cantod binary
-
 -   Initialize canto node directory
 
 ```bash
@@ -26,9 +24,9 @@ cantod gentx <key_name> <token-amount>acanto --chain-id=canto_7700-1 --moniker=<
 
 -   Fork [Canto](https://github.com/Canto-Network/Canto)
 
--   Copy the contents of `${HOME}/.cantod/config/gentx/gentx-XXXXXXXX.json` to `$HOME/Canto/Mainnet/Gentx/<yourvalidatorname>.json`
+-   Copy the contents of `${HOME}/.cantod/config/gentx/gentx-XXXXXXXX.json` to `$HOME/Canto/Mainnet/Networks/Gentx/<yourvalidatorname>.json`
 
--   Create a pull request to the genesis branch of the [repository](https://github.com/Canto-Network/Canto/Mainnet/gentx)
+-   Create a pull request to the genesis branch of the [repository](https://github.com/Canto-Network/Canto/Networks/Mainnet/gentx)
 
 ### Restarting Your Node
 
@@ -73,7 +71,7 @@ If you do not reinitialize then your peer id and ip address will remain the same
 
 ```
 cd $HOME/Canto
-git checkout <branch>
+git checkout genesis
 make install
 mv $HOME/go/bin/cantod /usr/bin/
 ```
