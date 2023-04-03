@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"math/big"
 	"testing"
 	"time"
 
@@ -17,6 +18,12 @@ import (
 	tmversion "github.com/tendermint/tendermint/proto/tendermint/version"
 	"github.com/tendermint/tendermint/version"
 
+	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
+	"github.com/ethereum/go-ethereum/common"
+	ethtypes "github.com/ethereum/go-ethereum/core/types"
+	"github.com/evmos/ethermint/crypto/ethsecp256k1"
 	evm "github.com/evmos/ethermint/x/evm/types"
 
 	"github.com/Canto-Network/Canto/v6/app"
@@ -33,6 +40,12 @@ type KeeperTestSuite struct {
 	queryClientEvm evm.QueryClient
 	queryClient    types.QueryClient
 	consAddress    sdk.ConsAddress
+
+	address   common.Address
+	validator stakingtypes.Validator
+	ethSigner ethtypes.Signer
+
+	denom string
 }
 
 var s *KeeperTestSuite
@@ -56,6 +69,17 @@ func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 
 	// init app
 	suite.app = app.Setup(checkTx, nil)
+
+	priv, err := ethsecp256k1.GenerateKey()
+	require.NoError(t, err)
+
+	suite.address = common.BytesToAddress(priv.PubKey().Address().Bytes())
+	suite.denom = "acanto"
+
+	// consensus key
+	privCons, err := ethsecp256k1.GenerateKey()
+	require.NoError(t, err)
+	suite.consAddress = sdk.ConsAddress(privCons.PubKey().Address())
 
 	// setup context
 	suite.ctx = suite.app.BaseApp.NewContext(checkTx, tmproto.Header{
@@ -87,6 +111,33 @@ func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 	queryHelper := baseapp.NewQueryServerTestHelper(suite.ctx, suite.app.InterfaceRegistry())
 	types.RegisterQueryServer(queryHelper, suite.app.EpochsKeeper)
 	suite.queryClient = types.NewQueryClient(queryHelper)
+
+	bigInt := &big.Int{}
+	bigInt.SetUint64(100)
+	s.app.FeeMarketKeeper.SetBaseFee(suite.ctx, bigInt)
+
+	evmParams := suite.app.EvmKeeper.GetParams(suite.ctx)
+	evmParams.EvmDenom = suite.denom
+	suite.app.EvmKeeper.SetParams(suite.ctx, evmParams)
+
+	stakingParams := suite.app.StakingKeeper.GetParams(suite.ctx)
+	stakingParams.BondDenom = suite.denom
+	suite.app.StakingKeeper.SetParams(suite.ctx, stakingParams)
+
+	// Set Validator
+	valAddr := sdk.ValAddress(suite.address.Bytes())
+	validator, err := stakingtypes.NewValidator(valAddr, privCons.PubKey(), stakingtypes.Description{})
+	require.NoError(t, err)
+
+	validator = stakingkeeper.TestingUpdateValidator(suite.app.StakingKeeper, suite.ctx, validator, true)
+	suite.app.StakingKeeper.AfterValidatorCreated(suite.ctx, validator.GetOperator())
+	err = suite.app.StakingKeeper.SetValidatorByConsAddr(suite.ctx, validator)
+	require.NoError(t, err)
+
+	validators := s.app.StakingKeeper.GetValidators(s.ctx, 1)
+	suite.validator = validators[0]
+
+	suite.ethSigner = ethtypes.LatestSignerForChainID(s.app.EvmKeeper.ChainID())
 
 	// Set epoch start time and height for all epoch identifiers
 	identifiers := []string{types.WeekEpochID, types.DayEpochID}
