@@ -1,10 +1,10 @@
 package types
 
 import (
-	evmtypes "github.com/Canto-Network/ethermint-v2/x/evm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
+	evmtypes "github.com/evmos/ethermint/x/evm/types"
 )
 
 //Required for deploying Map-Contract/Caling setter methods of Map-Contract

@@ -8,7 +8,7 @@ import (
 
 	"github.com/Canto-Network/Canto/v1/testutil"
 	"github.com/Canto-Network/Canto/v1/x/vesting/types"
-	"github.com/Canto-Network/ethermint-v2/tests"
+	"github.com/evmos/ethermint/tests"
 )
 
 func (suite *KeeperTestSuite) TestBalances() {

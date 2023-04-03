@@ -15,7 +15,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 
-	ethermint "github.com/Canto-Network/ethermint-v2/types"
+	ethermint "github.com/evmos/ethermint/types"
 
 	"github.com/Canto-Network/Canto/v1/x/erc20/types"
 )

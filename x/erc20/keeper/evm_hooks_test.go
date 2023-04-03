@@ -10,7 +10,7 @@ import (
 
 	"github.com/Canto-Network/Canto/v1/contracts"
 	"github.com/Canto-Network/Canto/v1/x/erc20/types"
-	"github.com/Canto-Network/ethermint-v2/tests"
+	"github.com/evmos/ethermint/tests"
 )
 
 // ensureHooksSet tries to set the hooks on EVMKeeper, this will fail if the erc20 hook is already set
