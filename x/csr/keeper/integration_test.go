@@ -112,6 +112,7 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 			s.Require().False(found)
 		})
 		It("it should register a smart contract (non-factory deployed)", func() {
+
 			// Deploys the contract directly to the EVM state (does not hit the postTxProcessing hooks)
 			contractAddress, err := s.app.CSRKeeper.DeployContract(s.ctx, csrSmartContract, &turnstileAddress)
 			s.Require().NoError(err)
