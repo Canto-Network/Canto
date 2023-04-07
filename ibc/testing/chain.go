@@ -18,9 +18,9 @@ import (
 	ibcgotesting "github.com/cosmos/ibc-go/v3/testing"
 	"github.com/cosmos/ibc-go/v3/testing/mock"
 
-	"github.com/Canto-Network/ethermint-v2/crypto/ethsecp256k1"
-	ethermint "github.com/Canto-Network/ethermint-v2/types"
-	evmtypes "github.com/Canto-Network/ethermint-v2/x/evm/types"
+	"github.com/evmos/ethermint/crypto/ethsecp256k1"
+	ethermint "github.com/evmos/ethermint/types"
+	evmtypes "github.com/evmos/ethermint/x/evm/types"
 )
 
 // ChainIDPrefix defines the default chain ID prefix for canto test chains

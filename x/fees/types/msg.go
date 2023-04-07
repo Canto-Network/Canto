@@ -1,10 +1,10 @@
 package types
 
 import (
-	ethermint "github.com/Canto-Network/ethermint-v2/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ethereum/go-ethereum/common"
+	ethermint "github.com/evmos/ethermint/types"
 )
 
 var (

@@ -20,8 +20,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 
-	ethermint "github.com/Canto-Network/ethermint-v2/types"
-	evmtypes "github.com/Canto-Network/ethermint-v2/x/evm/types"
+	ethermint "github.com/evmos/ethermint/types"
+	evmtypes "github.com/evmos/ethermint/x/evm/types"
 
 	cantokr "github.com/Canto-Network/Canto/v1/crypto/keyring"
 

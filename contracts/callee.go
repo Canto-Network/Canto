@@ -3,7 +3,7 @@ package contracts
 import (
 	_ "embed" // embed compiled smart contract
 
-	evmtypes "github.com/Canto-Network/ethermint-v2/x/evm/types"
+	evmtypes "github.com/evmos/ethermint/x/evm/types"
 )
 
 var (

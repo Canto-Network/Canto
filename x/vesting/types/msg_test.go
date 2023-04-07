@@ -8,7 +8,7 @@ import (
 	sdkvesting "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/Canto-Network/ethermint-v2/tests"
+	"github.com/evmos/ethermint/tests"
 )
 
 type MsgsTestSuite struct {

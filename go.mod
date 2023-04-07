@@ -29,8 +29,8 @@ require (
 )
 
 require (
-	github.com/Canto-Network/ethermint-v2 v0.2.0
 	github.com/cosmos/ibc-go/v3 v3.1.0
+	github.com/evmos/ethermint v0.17.2
 )
 
 require (
