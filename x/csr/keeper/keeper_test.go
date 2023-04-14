@@ -54,7 +54,6 @@ var s *KeeperTestSuite
 
 func TestKeeperTestSuite(t *testing.T) {
 	s = new(KeeperTestSuite)
-
 	suite.Run(t, s)
 
 	// Run Ginkgo integration tests

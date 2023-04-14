@@ -169,14 +169,16 @@ func (AppModule) ConsensusVersion() uint64 { return 2 }
 func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 	// check in begin block whether the Turnstile has been deployed, if not, deploy it and set it to state
 	if _, found := am.keeper.GetTurnstile(ctx); !found {
-		// deploy turnstile
-		turnstile, err := am.keeper.DeployTurnstile(ctx)
-		// panic on errors, (Turnstile existence is invariant)
-		if err != nil {
-			panic(err)
+		if am.keeper.GetParams(ctx).EnableCsr { // only deploy if csr is enabled
+			// deploy turnstile
+			turnstile, err := am.keeper.DeployTurnstile(ctx)
+			// panic on errors, (Turnstile existence is invariant)
+			if err != nil {
+				panic(err)
+			}
+			// set the Turnstile address to state
+			am.keeper.SetTurnstile(ctx, turnstile)
 		}
-		// set the Turnstile address to state
-		am.keeper.SetTurnstile(ctx, turnstile)
 	}
 }
 
