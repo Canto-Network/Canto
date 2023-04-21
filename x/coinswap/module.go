@@ -19,12 +19,12 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/b-harvest/coinswap/modules/coinswap/client/cli"
-	"github.com/b-harvest/coinswap/modules/coinswap/client/rest"
+	"github.com/Canto-Network/Canto/v7/x/coinswap/client/cli"
+	"github.com/Canto-Network/Canto/v7/x/coinswap/client/rest"
 
-	"github.com/b-harvest/coinswap/modules/coinswap/keeper"
-	"github.com/b-harvest/coinswap/modules/coinswap/simulation"
-	"github.com/b-harvest/coinswap/modules/coinswap/types"
+	"github.com/Canto-Network/Canto/v7/x/coinswap/keeper"
+	"github.com/Canto-Network/Canto/v7/x/coinswap/simulation"
+	"github.com/Canto-Network/Canto/v7/x/coinswap/types"
 )
 
 var (
@@ -117,15 +117,6 @@ func (AppModule) Name() string { return types.ModuleName }
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
-
-	m := keeper.NewMigrator(am.keeper)
-	if err := cfg.RegisterMigration(types.ModuleName, 1, m.Migrate1to2); err != nil {
-		panic(err)
-	}
-
-	if err := cfg.RegisterMigration(types.ModuleName, 2, m.Migrate2to3); err != nil {
-		panic(err)
-	}
 }
 
 // RegisterInvariants registers the coinswap module invariants.

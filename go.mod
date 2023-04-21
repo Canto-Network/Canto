@@ -4,7 +4,6 @@ go 1.18
 
 require (
 	github.com/armon/go-metrics v0.4.0
-	github.com/b-harvest/coinswap v1.6.1-0.20230414065910-2002aca6852f
 	github.com/cosmos/cosmos-sdk v0.45.9
 	github.com/cosmos/go-bip39 v1.0.0
 	github.com/ethereum/go-ethereum v1.10.19

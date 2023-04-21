@@ -3,8 +3,8 @@ package onboarding_test
 import (
 	"github.com/Canto-Network/Canto/v7/app"
 	"github.com/Canto-Network/Canto/v7/contracts"
+	coinswaptypes "github.com/Canto-Network/Canto/v7/x/coinswap/types"
 	inflationtypes "github.com/Canto-Network/Canto/v7/x/inflation/types"
-	coinswaptypes "github.com/b-harvest/coinswap/modules/coinswap/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
 	"github.com/ethereum/go-ethereum/common"

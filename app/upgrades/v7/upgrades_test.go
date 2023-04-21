@@ -1,9 +1,9 @@
 package v7_test
 
 import (
-	v6 "github.com/Canto-Network/Canto/v7/app/upgrades/v7"
+	v7 "github.com/Canto-Network/Canto/v7/app/upgrades/v7"
+	coinswaptypes "github.com/Canto-Network/Canto/v7/x/coinswap/types"
 	onboardingtypes "github.com/Canto-Network/Canto/v7/x/onboarding/types"
-	coinswaptypes "github.com/b-harvest/coinswap/modules/coinswap/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/evmos/ethermint/crypto/ethsecp256k1"
@@ -51,10 +51,7 @@ func (s *UpgradeTestSuite) SetupTest() {
 	s.app.StakingKeeper.AfterValidatorCreated(s.ctx, validator.GetOperator())
 	err = s.app.StakingKeeper.SetValidatorByConsAddr(s.ctx, validator)
 	s.NoError(err)
-	//validators := s.app.StakingKeeper.GetValidators(s.ctx, 1)
-	//s.validator = validators[0]
-	//
-	//s.ethSigner = ethtypes.LatestSignerForChainID(s.app.EvmKeeper.ChainID())
+
 }
 
 func TestKeeperTestSuite(t *testing.T) {
@@ -79,9 +76,9 @@ func (s *UpgradeTestSuite) TestUpgradeV6() {
 					coinswapParams.PoolCreationFee, sdk.NewCoin("acanto", sdk.ZeroInt()))
 				s.Require().EqualValues(
 					coinswapParams.MaxSwapAmount, sdk.NewCoins(
-						sdk.NewCoin(v6.UsdcIBCDenom, sdk.NewIntWithDecimal(10, 6)),
-						sdk.NewCoin(v6.UsdtIBCDenom, sdk.NewIntWithDecimal(10, 6)),
-						sdk.NewCoin(v6.EthIBCDenom, sdk.NewIntWithDecimal(1, 17)),
+						sdk.NewCoin(v7.UsdcIBCDenom, sdk.NewIntWithDecimal(10, 6)),
+						sdk.NewCoin(v7.UsdtIBCDenom, sdk.NewIntWithDecimal(10, 6)),
+						sdk.NewCoin(v7.EthIBCDenom, sdk.NewIntWithDecimal(1, 17)),
 					))
 				s.Require().EqualValues(
 					coinswapParams.MaxStandardCoinPerPool, coinswaptypes.DefaultMaxStandardCoinPerPool)
@@ -107,7 +104,7 @@ func (s *UpgradeTestSuite) TestUpgradeV6() {
 			tc.before()
 
 			s.ctx = s.ctx.WithBlockHeight(testUpgradeHeight - 1)
-			plan := upgradetypes.Plan{Name: v6.UpgradeName, Height: testUpgradeHeight}
+			plan := upgradetypes.Plan{Name: v7.UpgradeName, Height: testUpgradeHeight}
 			err := s.app.UpgradeKeeper.ScheduleUpgrade(s.ctx, plan)
 			s.Require().NoError(err)
 			_, exists := s.app.UpgradeKeeper.GetUpgradePlan(s.ctx)

@@ -3,9 +3,9 @@ package keeper_test
 import (
 	"fmt"
 	"github.com/Canto-Network/Canto/v7/contracts"
+	coinswaptypes "github.com/Canto-Network/Canto/v7/x/coinswap/types"
 	inflationtypes "github.com/Canto-Network/Canto/v7/x/inflation/types"
 	vestingtypes "github.com/Canto-Network/Canto/v7/x/vesting/types"
-	coinswaptypes "github.com/b-harvest/coinswap/modules/coinswap/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"

@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	coinswaptypes "github.com/b-harvest/coinswap/modules/coinswap/types"
+	coinswaptypes "github.com/Canto-Network/Canto/v7/x/coinswap/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

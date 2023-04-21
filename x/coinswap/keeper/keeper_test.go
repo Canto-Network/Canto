@@ -14,9 +14,9 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
-	"github.com/b-harvest/coinswap/modules/coinswap/keeper"
-	"github.com/b-harvest/coinswap/modules/coinswap/types"
-	"github.com/b-harvest/coinswap/simapp"
+	"github.com/Canto-Network/Canto/v7/app"
+	"github.com/Canto-Network/Canto/v7/x/coinswap/keeper"
+	"github.com/Canto-Network/Canto/v7/x/coinswap/types"
 )
 
 const (
@@ -35,7 +35,7 @@ type TestSuite struct {
 	suite.Suite
 
 	ctx         sdk.Context
-	app         *simapp.SimApp
+	app         *app.Canto
 	keeper      keeper.Keeper
 	queryClient types.QueryClient
 	msgServer   types.MsgServer
@@ -90,7 +90,7 @@ func (suite *TestSuite) TestParams() {
 	}
 }
 
-func setupWithGenesisAccounts() *simapp.SimApp {
+func setupWithGenesisAccounts() *app.Canto {
 	amountInitStandard, _ := sdk.NewIntFromString("30000000000000000000")
 	amountInitBTC, _ := sdk.NewIntFromString("3000000000")
 
@@ -120,7 +120,7 @@ func setupWithGenesisAccounts() *simapp.SimApp {
 	}
 
 	genAccs := []authtypes.GenesisAccount{acc1, acc2}
-	app := simapp.SetupWithGenesisAccounts(genAccs, acc1Balances, acc2Balances)
+	app := app.SetupWithGenesisAccounts(genAccs, acc1Balances, acc2Balances)
 	return app
 }
 

@@ -10,8 +10,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/b-harvest/coinswap/modules/coinswap/keeper"
-	"github.com/b-harvest/coinswap/modules/coinswap/types"
+	"github.com/Canto-Network/Canto/v7/x/coinswap/keeper"
+	"github.com/Canto-Network/Canto/v7/x/coinswap/types"
 )
 
 func TestSwapSuite(t *testing.T) {
