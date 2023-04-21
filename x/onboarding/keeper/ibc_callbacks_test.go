@@ -344,6 +344,27 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 			sdk.NewCoin(uusdcIbcdenom, sdk.ZeroInt()),
 			transferAmount,
 		},
+		{
+			"convert fail",
+			func() {
+				cantoChannel = "channel-0"
+				transferAmount = sdk.NewIntWithDecimal(25, 6)
+				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, secpAddrcanto)
+				bz := transfertypes.ModuleCdc.MustMarshalJSON(&transfer)
+				packet = channeltypes.NewPacket(bz, 100, transfertypes.PortID, sourceChannel, transfertypes.PortID, cantoChannel, timeoutHeight, 0)
+
+				pairID := suite.app.Erc20Keeper.GetTokenPairID(suite.ctx, metadataIbcUSDC.Base)
+				pair, _ := suite.app.Erc20Keeper.GetTokenPair(suite.ctx, pairID)
+				pair.ContractOwner = erc20types.OWNER_UNSPECIFIED
+				suite.app.Erc20Keeper.SetTokenPair(suite.ctx, pair)
+
+			},
+			true,
+			sdk.NewCoins(sdk.NewCoin("acanto", sdk.ZeroInt())),
+			sdk.NewCoin("acanto", sdk.NewIntWithDecimal(4, 18)),
+			sdk.NewCoin(uusdcIbcdenom, sdk.NewInt(20998399)),
+			sdk.NewInt(0),
+		},
 	}
 	for _, tc := range testCases {
 		suite.Run(fmt.Sprintf("Case %s", tc.name), func() {
@@ -372,6 +393,19 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 			params.EnableOnboarding = true
 			params.WhitelistedChannels = []string{"channel-0"}
 			suite.app.OnboardingKeeper.SetParams(suite.ctx, params)
+
+			// Deploy ERC20 Contract
+			err := suite.app.BankKeeper.MintCoins(suite.ctx, inflationtypes.ModuleName, sdk.Coins{sdk.NewInt64Coin(metadataIbcUSDC.Base, 1)})
+			suite.Require().NoError(err)
+			usdcPair := suite.setupRegisterCoin(metadataIbcUSDC)
+			suite.Require().NotNil(usdcPair)
+			suite.app.Erc20Keeper.SetTokenPair(suite.ctx, *usdcPair)
+
+			err = suite.app.BankKeeper.MintCoins(suite.ctx, inflationtypes.ModuleName, sdk.Coins{sdk.NewInt64Coin(metadataIbcUSDT.Base, 1)})
+			suite.Require().NoError(err)
+			usdtPair := suite.setupRegisterCoin(metadataIbcUSDT)
+			suite.Require().NotNil(usdtPair)
+			suite.app.Erc20Keeper.SetTokenPair(suite.ctx, *usdtPair)
 
 			tc.malleate()
 
@@ -412,19 +446,6 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 			testutil.FundAccount(suite.app.BankKeeper, suite.ctx, secpAddr, tc.receiverBalance)
 			// Fund receiver account with the transferred amount
 			testutil.FundAccount(suite.app.BankKeeper, suite.ctx, secpAddr, sdk.NewCoins(sdk.NewCoin(ibcDenom, transferAmount)))
-
-			// Deploy ERC20 Contract
-			err := suite.app.BankKeeper.MintCoins(suite.ctx, inflationtypes.ModuleName, sdk.Coins{sdk.NewInt64Coin(metadataIbcUSDC.Base, 1)})
-			suite.Require().NoError(err)
-			usdcPair := suite.setupRegisterCoin(metadataIbcUSDC)
-			suite.Require().NotNil(usdcPair)
-			suite.app.Erc20Keeper.SetTokenPair(suite.ctx, *usdcPair)
-
-			err = suite.app.BankKeeper.MintCoins(suite.ctx, inflationtypes.ModuleName, sdk.Coins{sdk.NewInt64Coin(metadataIbcUSDT.Base, 1)})
-			suite.Require().NoError(err)
-			usdtPair := suite.setupRegisterCoin(metadataIbcUSDT)
-			suite.Require().NotNil(usdtPair)
-			suite.app.Erc20Keeper.SetTokenPair(suite.ctx, *usdtPair)
 
 			// Perform IBC callback
 			ack := suite.app.OnboardingKeeper.OnRecvPacket(suite.ctx, packet, expAck)
