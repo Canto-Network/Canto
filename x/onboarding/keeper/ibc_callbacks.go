@@ -9,7 +9,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	vestexported "github.com/cosmos/cosmos-sdk/x/auth/vesting/exported"
 	transfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
 	channeltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
 	"github.com/cosmos/ibc-go/v3/modules/core/exported"
@@ -68,11 +67,7 @@ func (k Keeper) OnRecvPacket(
 	//get the recipient account
 	account := k.accountKeeper.GetAccount(ctx, recipient)
 
-	// onboarding is not supported for vesting or module accounts
-	if _, isVestingAcc := account.(vestexported.VestingAccount); isVestingAcc {
-		return ack
-	}
-
+	// onboarding is not supported for module accounts
 	if _, isModuleAccount := account.(authtypes.ModuleAccountI); isModuleAccount {
 		return ack
 	}
@@ -96,10 +91,10 @@ func (k Keeper) OnRecvPacket(
 
 	autoSwapThreshold := k.GetParams(ctx).AutoSwapThreshold
 	swapCoins := sdk.NewCoin(standardDenom, autoSwapThreshold)
-	standardCoinBalance := k.bankKeeper.GetBalance(ctx, recipient, standardDenom)
+	standardCoinBalance := k.bankKeeper.SpendableCoins(ctx, recipient).AmountOf(standardDenom)
 	swappedAmount := sdk.ZeroInt()
 
-	if standardCoinBalance.Amount.LT(autoSwapThreshold) {
+	if standardCoinBalance.LT(autoSwapThreshold) {
 		swappedAmount, err = k.coinswapKeeper.TradeInputForExactOutput(ctx, coinswaptypes.Input{Coin: transferredCoin, Address: recipient.String()}, coinswaptypes.Output{Coin: swapCoins, Address: recipient.String()})
 		if err != nil {
 			logger.Error("failed to swap coins", "error", err)

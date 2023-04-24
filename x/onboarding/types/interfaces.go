@@ -56,6 +56,7 @@ type BankKeeper interface {
 	MintCoins(ctx sdk.Context, name string, amt sdk.Coins) error
 	SendCoins(ctx sdk.Context, fromAddr sdk.AccAddress, toAddr sdk.AccAddress, amt sdk.Coins) error
 	BlockedAddr(addr sdk.AccAddress) bool
+	SpendableCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
 }
 
 // AccountKeeper defines the expected account keeper

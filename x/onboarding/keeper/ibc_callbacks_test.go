@@ -141,25 +141,6 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 			sdk.ZeroInt(),
 		},
 		{
-			"continue - receiver is a vesting account",
-			func() {
-				// Set vesting account
-				bacc := authtypes.NewBaseAccount(secpAddr, nil, 0, 0)
-				acc := vestingtypes.NewClawbackVestingAccount(bacc, secpAddr, nil, suite.ctx.BlockTime(), nil, nil)
-
-				suite.app.AccountKeeper.SetAccount(suite.ctx, acc)
-
-				transfer := transfertypes.NewFungibleTokenPacketData(denom, "100", secpAddrCosmos, secpAddrcanto)
-				bz := transfertypes.ModuleCdc.MustMarshalJSON(&transfer)
-				packet = channeltypes.NewPacket(bz, 100, transfertypes.PortID, sourceChannel, transfertypes.PortID, cantoChannel, timeoutHeight, 0)
-			},
-			true,
-			sdk.NewCoins(sdk.NewCoin("acanto", sdk.ZeroInt())),
-			sdk.NewCoin("acanto", sdk.ZeroInt()),
-			sdk.NewCoin(uusdcIbcdenom, transferAmount),
-			sdk.ZeroInt(),
-		},
-		{
 			"continue - receiver is a module account",
 			func() {
 				distrAcc := suite.app.AccountKeeper.GetModuleAccount(suite.ctx, distrtypes.ModuleName)
@@ -301,6 +282,26 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 			"swap / convert remaining ibc token - swap and erc20 conversion are successful (ibc token balance is bigger than 0)",
 			func() {
 				cantoChannel = "channel-0"
+				transferAmount = sdk.NewIntWithDecimal(25, 6)
+				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, secpAddrcanto)
+				bz := transfertypes.ModuleCdc.MustMarshalJSON(&transfer)
+				packet = channeltypes.NewPacket(bz, 100, transfertypes.PortID, sourceChannel, transfertypes.PortID, cantoChannel, timeoutHeight, 0)
+			},
+			true,
+			sdk.NewCoins(sdk.NewCoin("acanto", sdk.ZeroInt()), sdk.NewCoin(uusdcIbcdenom, sdk.NewIntWithDecimal(1, 6))),
+			sdk.NewCoin("acanto", sdk.NewIntWithDecimal(4, 18)),
+			sdk.NewCoin(uusdcIbcdenom, sdk.NewIntWithDecimal(1, 6)),
+			sdk.NewInt(20998399),
+		},
+		{
+			"swap / convert remaining ibc token - receiver is a vesting account",
+			func() {
+				// Set vesting account
+				bacc := authtypes.NewBaseAccount(secpAddr, nil, 0, 0)
+				acc := vestingtypes.NewClawbackVestingAccount(bacc, secpAddr, nil, suite.ctx.BlockTime(), nil, nil)
+
+				suite.app.AccountKeeper.SetAccount(suite.ctx, acc)
+
 				transferAmount = sdk.NewIntWithDecimal(25, 6)
 				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, secpAddrcanto)
 				bz := transfertypes.ModuleCdc.MustMarshalJSON(&transfer)
