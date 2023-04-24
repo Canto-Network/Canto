@@ -12,6 +12,7 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/evmos/ethermint/crypto/ethsecp256k1"
 	"github.com/stretchr/testify/mock"
 	"math/big"
 	"time"
@@ -73,8 +74,13 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 	// secp256k1 account
 	secpPk := secp256k1.GenPrivKey()
 	secpAddr := sdk.AccAddress(secpPk.PubKey().Address())
-	secpAddrcanto := secpAddr.String()
 	secpAddrCosmos := sdk.MustBech32ifyAddressBytes(sdk.Bech32MainPrefix, secpAddr)
+
+	// ethsecp256k1 account
+	ethPk, err := ethsecp256k1.GenerateKey()
+	suite.Require().Nil(err)
+	ethsecpAddr := sdk.AccAddress(ethPk.PubKey().Address())
+	ethsecpAddrcanto := sdk.AccAddress(ethPk.PubKey().Address()).String()
 
 	// Setup Cosmos <=> canto IBC relayer
 	denom := "uUSDC"
@@ -102,7 +108,7 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 		{
 			"fail - invalid sender - missing '1' ",
 			func() {
-				transfer := transfertypes.NewFungibleTokenPacketData(denom, "100", "canto", secpAddrcanto)
+				transfer := transfertypes.NewFungibleTokenPacketData(denom, "100", "canto", ethsecpAddrcanto)
 				bz := transfertypes.ModuleCdc.MustMarshalJSON(&transfer)
 				packet = channeltypes.NewPacket(bz, 100, transfertypes.PortID, sourceChannel, transfertypes.PortID, cantoChannel, timeoutHeight, 0)
 			},
@@ -115,7 +121,7 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 		{
 			"fail - invalid sender - invalid bech32",
 			func() {
-				transfer := transfertypes.NewFungibleTokenPacketData(denom, "100", "badba1sv9m0g7ycejwr3s369km58h5qe7xj77hvcxrms", secpAddrcanto)
+				transfer := transfertypes.NewFungibleTokenPacketData(denom, "100", "badba1sv9m0g7ycejwr3s369km58h5qe7xj77hvcxrms", ethsecpAddrcanto)
 				bz := transfertypes.ModuleCdc.MustMarshalJSON(&transfer)
 				packet = channeltypes.NewPacket(bz, 100, transfertypes.PortID, sourceChannel, transfertypes.PortID, cantoChannel, timeoutHeight, 0)
 			},
@@ -176,7 +182,7 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 				denom = "uUSDT"
 				ibcDenom = uusdtIbcdenom
 
-				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, secpAddrcanto)
+				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, ethsecpAddrcanto)
 				bz := transfertypes.ModuleCdc.MustMarshalJSON(&transfer)
 				packet = channeltypes.NewPacket(bz, 100, transfertypes.PortID, sourceChannel, transfertypes.PortID, cantoChannel, timeoutHeight, 0)
 			},
@@ -193,7 +199,7 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 				denom = "uUSDT"
 				ibcDenom = uusdtIbcdenom
 
-				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, secpAddrcanto)
+				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, ethsecpAddrcanto)
 				bz := transfertypes.ModuleCdc.MustMarshalJSON(&transfer)
 				packet = channeltypes.NewPacket(bz, 100, transfertypes.PortID, sourceChannel, transfertypes.PortID, cantoChannel, timeoutHeight, 0)
 			},
@@ -210,7 +216,7 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 				ibcDenom = uusdcIbcdenom
 
 				transferAmount = sdk.NewIntWithDecimal(1, 6)
-				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, secpAddrcanto)
+				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, ethsecpAddrcanto)
 				bz := transfertypes.ModuleCdc.MustMarshalJSON(&transfer)
 				packet = channeltypes.NewPacket(bz, 100, transfertypes.PortID, sourceChannel, transfertypes.PortID, cantoChannel, timeoutHeight, 0)
 			},
@@ -224,7 +230,7 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 			"no swap / convert all transferred amount - acanto balance is already bigger than threshold",
 			func() {
 				transferAmount = sdk.NewIntWithDecimal(25, 6)
-				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, secpAddrcanto)
+				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, ethsecpAddrcanto)
 				bz := transfertypes.ModuleCdc.MustMarshalJSON(&transfer)
 				packet = channeltypes.NewPacket(bz, 100, transfertypes.PortID, sourceChannel, transfertypes.PortID, cantoChannel, timeoutHeight, 0)
 			},
@@ -239,7 +245,7 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 			func() {
 				cantoChannel = "channel-100"
 				transferAmount = sdk.NewIntWithDecimal(25, 6)
-				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, secpAddrcanto)
+				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, ethsecpAddrcanto)
 				bz := transfertypes.ModuleCdc.MustMarshalJSON(&transfer)
 				packet = channeltypes.NewPacket(bz, 100, transfertypes.PortID, sourceChannel, transfertypes.PortID, cantoChannel, timeoutHeight, 0)
 			},
@@ -254,7 +260,7 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 			func() {
 				cantoChannel = "channel-0"
 				transferAmount = sdk.NewIntWithDecimal(25, 6)
-				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, secpAddrcanto)
+				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, ethsecpAddrcanto)
 				bz := transfertypes.ModuleCdc.MustMarshalJSON(&transfer)
 				packet = channeltypes.NewPacket(bz, 100, transfertypes.PortID, sourceChannel, transfertypes.PortID, cantoChannel, timeoutHeight, 0)
 			},
@@ -268,7 +274,7 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 			"swap / convert remaining ibc token - swap and erc20 conversion are successful (acanto balance is positive but less than threshold)",
 			func() {
 				transferAmount = sdk.NewIntWithDecimal(25, 6)
-				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, secpAddrcanto)
+				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, ethsecpAddrcanto)
 				bz := transfertypes.ModuleCdc.MustMarshalJSON(&transfer)
 				packet = channeltypes.NewPacket(bz, 100, transfertypes.PortID, sourceChannel, transfertypes.PortID, cantoChannel, timeoutHeight, 0)
 			},
@@ -283,7 +289,7 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 			func() {
 				cantoChannel = "channel-0"
 				transferAmount = sdk.NewIntWithDecimal(25, 6)
-				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, secpAddrcanto)
+				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, ethsecpAddrcanto)
 				bz := transfertypes.ModuleCdc.MustMarshalJSON(&transfer)
 				packet = channeltypes.NewPacket(bz, 100, transfertypes.PortID, sourceChannel, transfertypes.PortID, cantoChannel, timeoutHeight, 0)
 			},
@@ -303,7 +309,7 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 				suite.app.AccountKeeper.SetAccount(suite.ctx, acc)
 
 				transferAmount = sdk.NewIntWithDecimal(25, 6)
-				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, secpAddrcanto)
+				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, ethsecpAddrcanto)
 				bz := transfertypes.ModuleCdc.MustMarshalJSON(&transfer)
 				packet = channeltypes.NewPacket(bz, 100, transfertypes.PortID, sourceChannel, transfertypes.PortID, cantoChannel, timeoutHeight, 0)
 			},
@@ -317,7 +323,7 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 			"swap / convert remaining ibc token - swap and erc20 conversion are successful (acanto and ibc token balance is bigger than 0)",
 			func() {
 				transferAmount = sdk.NewIntWithDecimal(25, 6)
-				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, secpAddrcanto)
+				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, ethsecpAddrcanto)
 				bz := transfertypes.ModuleCdc.MustMarshalJSON(&transfer)
 				packet = channeltypes.NewPacket(bz, 100, transfertypes.PortID, sourceChannel, transfertypes.PortID, cantoChannel, timeoutHeight, 0)
 			},
@@ -335,7 +341,7 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 				suite.app.CoinswapKeeper.SetParams(suite.ctx, coinswapParams)
 
 				transferAmount = sdk.NewIntWithDecimal(25, 6)
-				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, secpAddrcanto)
+				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, ethsecpAddrcanto)
 				bz := transfertypes.ModuleCdc.MustMarshalJSON(&transfer)
 				packet = channeltypes.NewPacket(bz, 100, transfertypes.PortID, sourceChannel, transfertypes.PortID, cantoChannel, timeoutHeight, 0)
 			},
@@ -350,7 +356,7 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 			func() {
 				cantoChannel = "channel-0"
 				transferAmount = sdk.NewIntWithDecimal(25, 6)
-				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, secpAddrcanto)
+				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, ethsecpAddrcanto)
 				bz := transfertypes.ModuleCdc.MustMarshalJSON(&transfer)
 				packet = channeltypes.NewPacket(bz, 100, transfertypes.PortID, sourceChannel, transfertypes.PortID, cantoChannel, timeoutHeight, 0)
 
@@ -444,9 +450,9 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 			suite.app.OnboardingKeeper = keeper.NewKeeper(sp, suite.app.AccountKeeper, suite.app.BankKeeper, suite.app.IBCKeeper.ChannelKeeper, mockTransferKeeper, suite.app.CoinswapKeeper, suite.app.Erc20Keeper)
 
 			// Fund receiver account with canto, IBC vouchers
-			testutil.FundAccount(suite.app.BankKeeper, suite.ctx, secpAddr, tc.receiverBalance)
+			testutil.FundAccount(suite.app.BankKeeper, suite.ctx, ethsecpAddr, tc.receiverBalance)
 			// Fund receiver account with the transferred amount
-			testutil.FundAccount(suite.app.BankKeeper, suite.ctx, secpAddr, sdk.NewCoins(sdk.NewCoin(ibcDenom, transferAmount)))
+			testutil.FundAccount(suite.app.BankKeeper, suite.ctx, ethsecpAddr, sdk.NewCoins(sdk.NewCoin(ibcDenom, transferAmount)))
 
 			// Perform IBC callback
 			ack := suite.app.OnboardingKeeper.OnRecvPacket(suite.ctx, packet, expAck)
@@ -460,14 +466,14 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 			}
 
 			// Check balances
-			cantoBalance := suite.app.BankKeeper.GetBalance(suite.ctx, secpAddr, "acanto")
-			voucherBalance := suite.app.BankKeeper.GetBalance(suite.ctx, secpAddr, ibcDenom)
+			cantoBalance := suite.app.BankKeeper.GetBalance(suite.ctx, ethsecpAddr, "acanto")
+			voucherBalance := suite.app.BankKeeper.GetBalance(suite.ctx, ethsecpAddr, ibcDenom)
 			erc20balance := big.NewInt(0)
 
 			if ibcDenom == uusdcIbcdenom {
-				erc20balance = suite.app.Erc20Keeper.BalanceOf(suite.ctx, contracts.ERC20MinterBurnerDecimalsContract.ABI, usdcPair.GetERC20Contract(), common.BytesToAddress(secpAddr.Bytes()))
+				erc20balance = suite.app.Erc20Keeper.BalanceOf(suite.ctx, contracts.ERC20MinterBurnerDecimalsContract.ABI, usdcPair.GetERC20Contract(), common.BytesToAddress(ethsecpAddr.Bytes()))
 			} else {
-				erc20balance = suite.app.Erc20Keeper.BalanceOf(suite.ctx, contracts.ERC20MinterBurnerDecimalsContract.ABI, usdtPair.GetERC20Contract(), common.BytesToAddress(secpAddr.Bytes()))
+				erc20balance = suite.app.Erc20Keeper.BalanceOf(suite.ctx, contracts.ERC20MinterBurnerDecimalsContract.ABI, usdtPair.GetERC20Contract(), common.BytesToAddress(ethsecpAddr.Bytes()))
 			}
 
 			suite.Require().Equal(tc.expCantoBalance, cantoBalance)
