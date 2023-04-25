@@ -3,8 +3,6 @@ package types
 import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"time"
-
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
@@ -13,13 +11,10 @@ var (
 	ParamStoreKeyEnableOnboarding     = []byte("EnableOnboarding")
 	ParamStoreKeyAutoSwapThreshold    = []byte("AutoSwapThreshold")
 	ParamsStoreKeyWhitelistedChannels = []byte("WhitelistedChannels")
+	DefaultAutoSwapThreshold          = sdk.NewIntWithDecimal(4, 18) // 4 Canto
+	DefaultWhitelistedChannels        = []string{"channel-0"}
 )
 
-// DefaultPacketTimeoutDuration defines the default packet timeout for outgoing
-// IBC transfers
-var DefaultPacketTimeoutDuration = 4 * time.Hour
-var DefaultAutoSwapThreshold = sdk.NewIntWithDecimal(4, 18) // 4 Canto
-var DefaultWhitelistedChannels = []string{"channel-0"}
 var _ paramtypes.ParamSet = &Params{}
 
 // ParamKeyTable returns the parameter key table.

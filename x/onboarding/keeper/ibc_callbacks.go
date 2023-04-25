@@ -98,18 +98,18 @@ func (k Keeper) OnRecvPacket(
 		swappedAmount, err = k.coinswapKeeper.TradeInputForExactOutput(ctx, coinswaptypes.Input{Coin: transferredCoin, Address: recipient.String()}, coinswaptypes.Output{Coin: swapCoins, Address: recipient.String()})
 		if err != nil {
 			logger.Error("failed to swap coins", "error", err)
+		} else {
+			ctx.EventManager().EmitEvent(
+				sdk.NewEvent(
+					coinswaptypes.EventTypeSwap,
+					sdk.NewAttribute(coinswaptypes.AttributeValueAmount, swappedAmount.String()),
+					sdk.NewAttribute(coinswaptypes.AttributeValueSender, recipient.String()),
+					sdk.NewAttribute(coinswaptypes.AttributeValueRecipient, recipient.String()),
+					sdk.NewAttribute(coinswaptypes.AttributeValueIsBuyOrder, strconv.FormatBool(true)),
+					sdk.NewAttribute(coinswaptypes.AttributeValueTokenPair, coinswaptypes.GetTokenPairByDenom(transferredCoin.Denom, swapCoins.Denom)),
+				),
+			)
 		}
-
-		ctx.EventManager().EmitEvent(
-			sdk.NewEvent(
-				coinswaptypes.EventTypeSwap,
-				sdk.NewAttribute(coinswaptypes.AttributeValueAmount, swappedAmount.String()),
-				sdk.NewAttribute(coinswaptypes.AttributeValueSender, recipient.String()),
-				sdk.NewAttribute(coinswaptypes.AttributeValueRecipient, recipient.String()),
-				sdk.NewAttribute(coinswaptypes.AttributeValueIsBuyOrder, strconv.FormatBool(true)),
-				sdk.NewAttribute(coinswaptypes.AttributeValueTokenPair, coinswaptypes.GetTokenPairByDenom(transferredCoin.Denom, swapCoins.Denom)),
-			),
-		)
 	}
 
 	//convert coins to ERC20 token
