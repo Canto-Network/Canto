@@ -7,7 +7,6 @@ import (
 	erc20types "github.com/Canto-Network/Canto/v7/x/erc20/types"
 	"github.com/Canto-Network/Canto/v7/x/onboarding/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	transfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
 	channeltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
@@ -29,6 +28,8 @@ func (k Keeper) OnRecvPacket(
 	logger := k.Logger(ctx)
 
 	// It always returns original ACK
+	// meaning that even if the swap or conversion fails, it does not revert IBC transfer
+	// and the asset transferred to the Canto network will still remain in the Canto network
 
 	params := k.GetParams(ctx)
 	if !params.EnableOnboarding {
@@ -51,17 +52,6 @@ func (k Keeper) OnRecvPacket(
 	_, recipient, senderBech32, recipientBech32, err := ibc.GetTransferSenderRecipient(packet)
 	if err != nil {
 		return channeltypes.NewErrorAcknowledgement(err.Error())
-	}
-
-	// return error ACK if the address is on the deny list
-	if k.bankKeeper.BlockedAddr(recipient) {
-		return channeltypes.NewErrorAcknowledgement(
-			sdkerrors.Wrapf(
-				types.ErrBlockedAddress,
-				"recipient (%s) address are in the deny list for sending and receiving transfers",
-				recipientBech32,
-			).Error(),
-		)
 	}
 
 	//get the recipient account

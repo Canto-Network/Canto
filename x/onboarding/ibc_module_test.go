@@ -6,6 +6,7 @@ import (
 	coinswaptypes "github.com/Canto-Network/Canto/v7/x/coinswap/types"
 	inflationtypes "github.com/Canto-Network/Canto/v7/x/inflation/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	ibcgotesting "github.com/cosmos/ibc-go/v3/testing"
 
 	"github.com/ethereum/go-ethereum/common"
 	"testing"
@@ -164,6 +165,24 @@ func (suite *TransferTestSuite) TestHandleMsgTransfer() {
 	suite.Require().True(before.IsZero())
 	suite.Require().Equal(coinSentFromAToB.Amount.Sub(swapAmount), sdk.NewIntFromBigInt(balanceErc20))
 
+	// IBC transfer to blocked address
+	blockedAddr := "canto10d07y265gmmuvt4z0w9aw880jnsr700jg5j4zm"
+	coinToSendToB = suite.chainA.GetSimApp().BankKeeper.GetBalance(suite.chainA.GetContext(), suite.chainA.SenderAccount.GetAddress(), sdk.DefaultBondDenom)
+	msg = types.NewMsgTransfer(path.EndpointA.ChannelConfig.PortID, path.EndpointA.ChannelID, coinToSendToB, suite.chainA.SenderAccount.GetAddress().String(), blockedAddr, timeoutHeight, 0)
+
+	res, err = suite.chainA.SendMsgs(msg)
+	suite.Require().NoError(err) // message committed
+
+	packet, err = ibctesting.ParsePacketFromEvents(res.GetEvents())
+	suite.Require().NoError(err)
+
+	// relay send
+	res, err = onboardingtest.RelayPacket(path, packet)
+	suite.Require().NoError(err)
+	ack, err := ibcgotesting.ParseAckFromEvents(res.GetEvents())
+	suite.Require().NoError(err)
+	suite.Require().Equal(ack, []byte(`{"error":"ABCI code: 4: error handling packet on destination chain: see events for details"}`))
+
 	// Send again from chainA to chainB
 	// auto swap should not happen
 	// auto convert all transferred IBC vouchers to ERC20
@@ -199,6 +218,7 @@ func (suite *TransferTestSuite) TestHandleMsgTransfer() {
 	suite.Require().Equal(balanceCantoBefore, balanceCanto)
 	suite.Require().Equal(balanceVoucherBefore, balanceVoucher)
 	suite.Require().Equal(sdk.NewIntFromBigInt(balanceErc20Before).Add(coinSentFromAToB.Amount).Sub(swapAmount), sdk.NewIntFromBigInt(balanceErc20))
+
 }
 
 func TestTransferTestSuite(t *testing.T) {
