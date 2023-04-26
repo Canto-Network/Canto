@@ -1,0 +1,164 @@
+package keeper
+
+import (
+	errorsmod "cosmossdk.io/errors"
+	"github.com/Canto-Network/Canto/v6/ibc"
+	erc20types "github.com/Canto-Network/Canto/v6/x/erc20/types"
+	"github.com/Canto-Network/Canto/v6/x/onboarding/types"
+	coinswaptypes "github.com/b-harvest/coinswap/modules/coinswap/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	vestexported "github.com/cosmos/cosmos-sdk/x/auth/vesting/exported"
+	transfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
+	channeltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
+	"github.com/cosmos/ibc-go/v3/modules/core/exported"
+	"github.com/ethereum/go-ethereum/common"
+)
+
+// OnRecvPacket performs an IBC receive callback.
+// It swaps the transferred IBC denom to acanto and
+// convert the remaining balance to ERC20 tokens.
+// If the balance of acanto is greater than the predefined value,
+// the swap is omitted and the entire transferred amount is converted to ERC20.
+func (k Keeper) OnRecvPacket(
+	ctx sdk.Context,
+	packet channeltypes.Packet,
+	ack exported.Acknowledgement,
+) exported.Acknowledgement {
+	logger := k.Logger(ctx)
+
+	// It always returns original ACK
+
+	params := k.GetParams(ctx)
+	if !params.EnableOnboarding {
+		return ack
+	}
+
+	// check source channel is in the whitelist channels
+	var found bool
+	for _, s := range params.WhitelistedChannels {
+		if s == packet.DestinationChannel {
+			found = true
+		}
+	}
+
+	if !found {
+		return ack
+	}
+
+	// Get addresses in `canto1` and the original bech32 format
+	sender, recipient, senderBech32, recipientBech32, err := ibc.GetTransferSenderRecipient(packet)
+	if err != nil {
+		return channeltypes.NewErrorAcknowledgement(err.Error())
+	}
+
+	// return error ACK if the address is on the deny list
+	if k.bankKeeper.BlockedAddr(sender) || k.bankKeeper.BlockedAddr(recipient) {
+		return channeltypes.NewErrorAcknowledgement(
+			sdkerrors.Wrapf(
+				types.ErrBlockedAddress,
+				"sender (%s) or recipient (%s) address are in the deny list for sending and receiving transfers",
+				senderBech32, recipientBech32,
+			).Error(),
+		)
+	}
+
+	//get the recipient account
+	account := k.accountKeeper.GetAccount(ctx, recipient)
+
+	// onboarding is not supported for vesting or module accounts
+	if _, isVestingAcc := account.(vestexported.VestingAccount); isVestingAcc {
+		return ack
+	}
+
+	if _, isModuleAccount := account.(authtypes.ModuleAccountI); isModuleAccount {
+		return ack
+	}
+
+	standardDenom := k.coinswapKeeper.GetStandardDenom(ctx)
+
+	var data transfertypes.FungibleTokenPacketData
+	if err = transfertypes.ModuleCdc.UnmarshalJSON(packet.GetData(), &data); err != nil {
+		// NOTE: shouldn't happen as the packet has already
+		// been decoded on ICS20 transfer logic
+		err = errorsmod.Wrapf(types.ErrInvalidType, "cannot unmarshal ICS-20 transfer packet data")
+		return channeltypes.NewErrorAcknowledgement(err.Error())
+	}
+
+	// parse the transferred denom
+	transferredCoin := ibc.GetReceivedCoin(
+		packet.SourcePort, packet.SourceChannel,
+		packet.DestinationPort, packet.DestinationChannel,
+		data.Denom, data.Amount,
+	)
+
+	autoSwapThreshold := k.GetParams(ctx).AutoSwapThreshold
+	swapCoins := sdk.NewCoin(standardDenom, autoSwapThreshold)
+	standardCoinBalance := k.bankKeeper.GetBalance(ctx, recipient, standardDenom)
+	swappedAmount := sdk.ZeroInt()
+
+	if standardCoinBalance.Amount.LT(autoSwapThreshold) {
+		swappedAmount, err = k.coinswapKeeper.TradeInputForExactOutput(ctx, coinswaptypes.Input{Coin: transferredCoin, Address: recipient.String()}, coinswaptypes.Output{Coin: swapCoins, Address: recipient.String()})
+		if err != nil {
+			logger.Error("failed to swap coins", "error", err)
+		}
+	}
+
+	//convert coins to ERC20 token
+	pairID := k.erc20Keeper.GetTokenPairID(ctx, transferredCoin.Denom)
+	if len(pairID) == 0 {
+		// short-circuit: if the denom is not registered, conversion will fail
+		// so we can continue with the rest of the stack
+		return ack
+	}
+
+	pair, _ := k.erc20Keeper.GetTokenPair(ctx, pairID)
+	if !pair.Enabled {
+		// no-op: continue with the rest of the stack without conversion
+		return ack
+	}
+
+	convertCoin := sdk.NewCoin(transferredCoin.Denom, transferredCoin.Amount.Sub(swappedAmount))
+
+	// Build MsgConvertCoin, from recipient to recipient since IBC transfer already occurred
+	convertMsg := erc20types.NewMsgConvertCoin(convertCoin, common.BytesToAddress(recipient.Bytes()), recipient)
+
+	// NOTE: we don't use ValidateBasic the msg since we've already validated
+	// the ICS20 packet data
+
+	// Use MsgConvertCoin to convert the Cosmos Coin to an ERC20
+	if _, err = k.erc20Keeper.ConvertCoin(sdk.WrapSDKContext(ctx), convertMsg); err != nil {
+		logger.Error("failed to convert coins", "error", err)
+		return ack
+	}
+
+	logger.Info(
+		"coinswap and erc20 conversion completed",
+		"sender", senderBech32,
+		"receiver", recipientBech32,
+		"source-port", packet.SourcePort,
+		"source-channel", packet.SourceChannel,
+		"dest-port", packet.DestinationPort,
+		"dest-channel", packet.DestinationChannel,
+		"swap amount", swappedAmount,
+		"convert amount", convertCoin.Amount,
+	)
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeOnboarding,
+			sdk.NewAttribute(sdk.AttributeKeySender, senderBech32),
+			sdk.NewAttribute(transfertypes.AttributeKeyReceiver, recipientBech32),
+			sdk.NewAttribute(channeltypes.AttributeKeySrcChannel, packet.SourceChannel),
+			sdk.NewAttribute(channeltypes.AttributeKeySrcPort, packet.SourcePort),
+			sdk.NewAttribute(channeltypes.AttributeKeyDstPort, packet.DestinationPort),
+			sdk.NewAttribute(channeltypes.AttributeKeyDstChannel, packet.DestinationChannel),
+			sdk.NewAttribute(types.AttributeKeySwapAmount, swappedAmount.String()),
+			sdk.NewAttribute(types.AttributeKeyConvertAmount, convertCoin.Amount.String()),
+		),
+	)
+
+	// return original acknowledgement
+	return ack
+}
