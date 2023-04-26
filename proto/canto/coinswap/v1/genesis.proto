@@ -1,0 +1,16 @@
+syntax = "proto3";
+package canto.coinswap.v1;
+
+import "gogoproto/gogo.proto";
+import "canto/coinswap/v1/coinswap.proto";
+
+option go_package = "github.com/Canto-Network/Canto/v7/x/coinswap/types";
+
+// GenesisState defines the coinswap module's genesis state
+message GenesisState {
+  Params params = 1 [ (gogoproto.nullable) = false ];
+  string standard_denom = 2
+      [ (gogoproto.moretags) = "yaml:\"standard_denom\"" ];
+  repeated Pool pool = 3 [ (gogoproto.nullable) = false ];
+  uint64 sequence = 4;
+}
