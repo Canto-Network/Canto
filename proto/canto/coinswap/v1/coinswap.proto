@@ -34,7 +34,7 @@ message Pool {
 // Params defines token module's parameters
 message Params {
   option (gogoproto.equal) = true;
-  //  option (gogoproto.goproto_stringer) = false;
+  option (gogoproto.goproto_stringer) = false;
 
   cosmos.base.v1beta1.Coin fee = 1 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
