@@ -14,6 +14,7 @@ import (
 	channeltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
 	"github.com/cosmos/ibc-go/v3/modules/core/exported"
 	"github.com/ethereum/go-ethereum/common"
+	"strconv"
 )
 
 // OnRecvPacket performs an IBC receive callback.
@@ -47,19 +48,19 @@ func (k Keeper) OnRecvPacket(
 		return ack
 	}
 
-	// Get addresses in `canto1` and the original bech32 format
-	sender, recipient, senderBech32, recipientBech32, err := ibc.GetTransferSenderRecipient(packet)
+	// Get recipient addresses in `canto1` and the original bech32 format
+	_, recipient, senderBech32, recipientBech32, err := ibc.GetTransferSenderRecipient(packet)
 	if err != nil {
 		return channeltypes.NewErrorAcknowledgement(err.Error())
 	}
 
 	// return error ACK if the address is on the deny list
-	if k.bankKeeper.BlockedAddr(sender) || k.bankKeeper.BlockedAddr(recipient) {
+	if k.bankKeeper.BlockedAddr(recipient) {
 		return channeltypes.NewErrorAcknowledgement(
 			sdkerrors.Wrapf(
 				types.ErrBlockedAddress,
-				"sender (%s) or recipient (%s) address are in the deny list for sending and receiving transfers",
-				senderBech32, recipientBech32,
+				"recipient (%s) address are in the deny list for sending and receiving transfers",
+				recipientBech32,
 			).Error(),
 		)
 	}
@@ -103,6 +104,17 @@ func (k Keeper) OnRecvPacket(
 		if err != nil {
 			logger.Error("failed to swap coins", "error", err)
 		}
+
+		ctx.EventManager().EmitEvent(
+			sdk.NewEvent(
+				coinswaptypes.EventTypeSwap,
+				sdk.NewAttribute(coinswaptypes.AttributeValueAmount, swappedAmount.String()),
+				sdk.NewAttribute(coinswaptypes.AttributeValueSender, recipient.String()),
+				sdk.NewAttribute(coinswaptypes.AttributeValueRecipient, recipient.String()),
+				sdk.NewAttribute(coinswaptypes.AttributeValueIsBuyOrder, strconv.FormatBool(true)),
+				sdk.NewAttribute(coinswaptypes.AttributeValueTokenPair, coinswaptypes.GetTokenPairByDenom(transferredCoin.Denom, swapCoins.Denom)),
+			),
+		)
 	}
 
 	//convert coins to ERC20 token
