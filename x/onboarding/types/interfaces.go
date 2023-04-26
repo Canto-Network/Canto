@@ -2,7 +2,7 @@ package types
 
 import (
 	"context"
-	erc20types "github.com/Canto-Network/Canto/v6/x/erc20/types"
+	erc20types "github.com/Canto-Network/Canto/v7/x/erc20/types"
 	coinswaptypes "github.com/b-harvest/coinswap/modules/coinswap/types"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"

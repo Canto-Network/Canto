@@ -1,10 +1,10 @@
 package keeper_test
 
 import (
-	"github.com/Canto-Network/Canto/v6/app"
-	"github.com/Canto-Network/Canto/v6/contracts"
-	"github.com/Canto-Network/Canto/v6/x/erc20/types"
-	onboardingtest "github.com/Canto-Network/Canto/v6/x/onboarding/testutil"
+	"github.com/Canto-Network/Canto/v7/app"
+	"github.com/Canto-Network/Canto/v7/contracts"
+	"github.com/Canto-Network/Canto/v7/x/erc20/types"
+	onboardingtest "github.com/Canto-Network/Canto/v7/x/onboarding/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/common"
 	. "github.com/onsi/ginkgo/v2"

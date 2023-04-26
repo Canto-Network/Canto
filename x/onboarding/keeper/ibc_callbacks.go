@@ -2,9 +2,9 @@ package keeper
 
 import (
 	errorsmod "cosmossdk.io/errors"
-	"github.com/Canto-Network/Canto/v6/ibc"
-	erc20types "github.com/Canto-Network/Canto/v6/x/erc20/types"
-	"github.com/Canto-Network/Canto/v6/x/onboarding/types"
+	"github.com/Canto-Network/Canto/v7/ibc"
+	erc20types "github.com/Canto-Network/Canto/v7/x/erc20/types"
+	"github.com/Canto-Network/Canto/v7/x/onboarding/types"
 	coinswaptypes "github.com/b-harvest/coinswap/modules/coinswap/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"

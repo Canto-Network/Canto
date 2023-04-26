@@ -25,7 +25,7 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/Canto-Network/Canto/v6/ibc/testing/simapp/helpers"
+	"github.com/Canto-Network/Canto/v7/ibc/testing/simapp/helpers"
 )
 
 // DefaultConsensusParams defines the default Tendermint consensus params used in

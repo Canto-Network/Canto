@@ -11,8 +11,8 @@ import (
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 
-	"github.com/Canto-Network/Canto/v6/contracts"
-	"github.com/Canto-Network/Canto/v6/x/erc20/types"
+	"github.com/Canto-Network/Canto/v7/contracts"
+	"github.com/Canto-Network/Canto/v7/x/erc20/types"
 )
 
 var _ evmtypes.EvmHooks = Hooks{}
@@ -32,8 +32,8 @@ func (k Keeper) Hooks() Hooks {
 // the module account address. This hook applies to both token pairs that have
 // been registered through a native Cosmos coin or an ERC20 token. If token pair
 // has been registered with:
-//  - coin -> burn tokens and transfer escrowed coins on module to sender
-//  - token -> escrow tokens on module account and mint & transfer coins to sender
+//   - coin -> burn tokens and transfer escrowed coins on module to sender
+//   - token -> escrow tokens on module account and mint & transfer coins to sender
 //
 // Note that the PostTxProcessing hook is only called by sending an EVM
 // transaction that triggers `ApplyTransaction`. A cosmos tx with a

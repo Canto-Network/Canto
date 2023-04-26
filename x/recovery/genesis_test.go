@@ -15,9 +15,9 @@ import (
 	"github.com/evmos/ethermint/tests"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
-	"github.com/Canto-Network/Canto/v6/app"
-	"github.com/Canto-Network/Canto/v6/x/recovery"
-	"github.com/Canto-Network/Canto/v6/x/recovery/types"
+	"github.com/Canto-Network/Canto/v7/app"
+	"github.com/Canto-Network/Canto/v7/x/recovery"
+	"github.com/Canto-Network/Canto/v7/x/recovery/types"
 )
 
 type GenesisTestSuite struct {
