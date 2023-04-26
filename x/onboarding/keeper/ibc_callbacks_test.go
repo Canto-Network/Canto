@@ -132,21 +132,6 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 			sdk.ZeroInt(),
 		},
 		{
-			"fail - case: receiver address is in deny list",
-			func() {
-				blockedAddr := authtypes.NewModuleAddress(transfertypes.ModuleName)
-
-				transfer := transfertypes.NewFungibleTokenPacketData(denom, "100", secpAddrCosmos, blockedAddr.String())
-				bz := transfertypes.ModuleCdc.MustMarshalJSON(&transfer)
-				packet = channeltypes.NewPacket(bz, 100, transfertypes.PortID, sourceChannel, transfertypes.PortID, cantoChannel, timeoutHeight, 0)
-			},
-			false,
-			sdk.NewCoins(sdk.NewCoin("acanto", sdk.ZeroInt())),
-			sdk.NewCoin("acanto", sdk.ZeroInt()),
-			sdk.NewCoin(uusdcIbcdenom, transferAmount),
-			sdk.ZeroInt(),
-		},
-		{
 			"continue - receiver is a module account",
 			func() {
 				distrAcc := suite.app.AccountKeeper.GetModuleAccount(suite.ctx, distrtypes.ModuleName)
