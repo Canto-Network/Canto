@@ -1,10 +1,10 @@
 package v7
 
 import (
-	coinswapkeeper "github.com/Canto-Network/Canto/v7/x/coinswap/keeper"
-	coinswaptypes "github.com/Canto-Network/Canto/v7/x/coinswap/types"
-	onboardingkeeper "github.com/Canto-Network/Canto/v7/x/onboarding/keeper"
-	onboardingtypes "github.com/Canto-Network/Canto/v7/x/onboarding/types"
+	coinswapkeeper "github.com/Canto-Network/Canto/v6/x/coinswap/keeper"
+	coinswaptypes "github.com/Canto-Network/Canto/v6/x/coinswap/types"
+	onboardingkeeper "github.com/Canto-Network/Canto/v6/x/onboarding/keeper"
+	onboardingtypes "github.com/Canto-Network/Canto/v6/x/onboarding/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"

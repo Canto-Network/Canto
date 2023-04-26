@@ -3,7 +3,7 @@ package canto.govshuttle.v1;
 
 // this line is used by starport scaffolding # proto/tx/import
 
-option go_package = "github.com/Canto-Network/Canto/v7/x/govshuttle/types";
+option go_package = "github.com/Canto-Network/Canto/v6/x/govshuttle/types";
 
 // Msg defines the Msg service.
 service Msg {

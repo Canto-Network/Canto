@@ -7,7 +7,7 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
-	"github.com/Canto-Network/Canto/v7/x/coinswap/types"
+	"github.com/Canto-Network/Canto/v6/x/coinswap/types"
 )
 
 // ParamChanges defines the parameters that can be modified by param change proposals

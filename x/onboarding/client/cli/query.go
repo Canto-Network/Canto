@@ -7,7 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/spf13/cobra"
 
-	"github.com/Canto-Network/Canto/v7/x/onboarding/types"
+	"github.com/Canto-Network/Canto/v6/x/onboarding/types"
 )
 
 // GetQueryCmd returns the parent command for all onboarding CLI query commands.

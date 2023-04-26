@@ -1,7 +1,7 @@
 package keeper_test
 
 import (
-	_ "github.com/Canto-Network/Canto/v7/x/csr/keeper"
+	_ "github.com/Canto-Network/Canto/v6/x/csr/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

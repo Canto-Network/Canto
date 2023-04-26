@@ -19,9 +19,9 @@ import (
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/Canto-Network/Canto/v7/x/csr/client/cli"
-	"github.com/Canto-Network/Canto/v7/x/csr/keeper"
-	"github.com/Canto-Network/Canto/v7/x/csr/types"
+	"github.com/Canto-Network/Canto/v6/x/csr/client/cli"
+	"github.com/Canto-Network/Canto/v6/x/csr/keeper"
+	"github.com/Canto-Network/Canto/v6/x/csr/types"
 )
 
 var (

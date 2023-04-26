@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/Canto-Network/Canto/v7/x/csr/types"
+	"github.com/Canto-Network/Canto/v6/x/csr/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

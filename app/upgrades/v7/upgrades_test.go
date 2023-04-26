@@ -1,9 +1,9 @@
 package v7_test
 
 import (
-	v7 "github.com/Canto-Network/Canto/v7/app/upgrades/v7"
-	coinswaptypes "github.com/Canto-Network/Canto/v7/x/coinswap/types"
-	onboardingtypes "github.com/Canto-Network/Canto/v7/x/onboarding/types"
+	v7 "github.com/Canto-Network/Canto/v6/app/upgrades/v7"
+	coinswaptypes "github.com/Canto-Network/Canto/v6/x/coinswap/types"
+	onboardingtypes "github.com/Canto-Network/Canto/v6/x/onboarding/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/evmos/ethermint/crypto/ethsecp256k1"
@@ -17,7 +17,7 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
-	chain "github.com/Canto-Network/Canto/v7/app"
+	chain "github.com/Canto-Network/Canto/v6/app"
 )
 
 type UpgradeTestSuite struct {

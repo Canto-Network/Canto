@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/Canto-Network/Canto/v7/x/coinswap/types"
+	"github.com/Canto-Network/Canto/v6/x/coinswap/types"
 )
 
 type msgServer struct {

@@ -26,8 +26,8 @@ import (
 
 	"github.com/cosmos/ibc-go/v3/modules/core/keeper"
 
-	cantoapp "github.com/Canto-Network/Canto/v7/app"
-	"github.com/Canto-Network/Canto/v7/ibc/testing/simapp"
+	cantoapp "github.com/Canto-Network/Canto/v6/app"
+	"github.com/Canto-Network/Canto/v6/ibc/testing/simapp"
 
 	ethermint "github.com/evmos/ethermint/types"
 )

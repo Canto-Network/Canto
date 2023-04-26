@@ -18,9 +18,9 @@ import (
 	tmversion "github.com/tendermint/tendermint/proto/tendermint/version"
 	"github.com/tendermint/tendermint/version"
 
-	"github.com/Canto-Network/Canto/v7/app"
-	epochstypes "github.com/Canto-Network/Canto/v7/x/epochs/types"
-	"github.com/Canto-Network/Canto/v7/x/inflation/types"
+	"github.com/Canto-Network/Canto/v6/app"
+	epochstypes "github.com/Canto-Network/Canto/v6/x/epochs/types"
+	"github.com/Canto-Network/Canto/v6/x/inflation/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/ethereum/go-ethereum/common"

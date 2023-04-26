@@ -7,7 +7,7 @@ import (
 
 	"github.com/tendermint/tendermint/libs/log"
 
-	"github.com/Canto-Network/Canto/v7/x/inflation/types"
+	"github.com/Canto-Network/Canto/v6/x/inflation/types"
 )
 
 // Keeper of the inflation store

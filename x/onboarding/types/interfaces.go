@@ -2,8 +2,8 @@ package types
 
 import (
 	"context"
-	coinswaptypes "github.com/Canto-Network/Canto/v7/x/coinswap/types"
-	erc20types "github.com/Canto-Network/Canto/v7/x/erc20/types"
+	coinswaptypes "github.com/Canto-Network/Canto/v6/x/coinswap/types"
+	erc20types "github.com/Canto-Network/Canto/v6/x/erc20/types"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
