@@ -284,6 +284,5 @@ func (k Keeper) GetIBCDenomDestinationIdentifiers(ctx sdk.Context, denom, sender
 			"channel ID '%s': %s", destinationChannel, err.Error(),
 		)
 	}
-
 	return destinationPort, destinationChannel, nil
 }

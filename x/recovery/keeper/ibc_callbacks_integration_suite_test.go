@@ -13,9 +13,8 @@ import (
 	transfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
 	clienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
 	channeltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
-	ibcgotesting "github.com/cosmos/ibc-go/v3/testing"
 
-	ibctesting "github.com/Canto-Network/Canto/v6/ibc/testing"
+	ibcgotesting "github.com/Canto-Network/Canto/v6/ibc/testing"
 
 	"github.com/Canto-Network/Canto/v6/app"
 	inflationtypes "github.com/Canto-Network/Canto/v6/x/inflation/types"
@@ -50,8 +49,8 @@ func TestIBCTestingSuite(t *testing.T) {
 
 func (suite *IBCTestingSuite) SetupTest() {
 	// initializes 3 test chains
-	suite.coordinator = ibctesting.NewCoordinator(suite.T(), 1, 2)
-	suite.cantoChain = suite.coordinator.GetChain(ibcgotesting.GetChainID(1))
+	suite.coordinator = ibcgotesting.NewCoordinator(suite.T(), 1, 2)
+	suite.cantoChain = suite.coordinator.GetChain(ibcgotesting.GetChainIDCanto(1))
 	suite.IBCOsmosisChain = suite.coordinator.GetChain(ibcgotesting.GetChainID(2))
 	suite.IBCCosmosChain = suite.coordinator.GetChain(ibcgotesting.GetChainID(3))
 	suite.coordinator.CommitNBlocks(suite.cantoChain, 2)
@@ -86,9 +85,9 @@ func (suite *IBCTestingSuite) SetupTest() {
 	params.EnableRecovery = true
 	suite.cantoChain.App.(*app.Canto).RecoveryKeeper.SetParams(suite.cantoChain.GetContext(), params)
 
-	suite.pathOsmosiscanto = ibctesting.NewTransferPath(suite.IBCOsmosisChain, suite.cantoChain) // clientID, connectionID, channelID empty
-	suite.pathCosmoscanto = ibctesting.NewTransferPath(suite.IBCCosmosChain, suite.cantoChain)
-	suite.pathOsmosisCosmos = ibctesting.NewTransferPath(suite.IBCCosmosChain, suite.IBCOsmosisChain)
+	suite.pathOsmosiscanto = ibcgotesting.NewTransferPath(suite.IBCOsmosisChain, suite.cantoChain) // clientID, connectionID, channelID empty
+	suite.pathCosmoscanto = ibcgotesting.NewTransferPath(suite.IBCCosmosChain, suite.cantoChain)
+	suite.pathOsmosisCosmos = ibcgotesting.NewTransferPath(suite.IBCCosmosChain, suite.IBCOsmosisChain)
 	suite.coordinator.Setup(suite.pathOsmosiscanto) // clientID, connectionID, channelID filled
 	suite.coordinator.Setup(suite.pathCosmoscanto)
 	suite.coordinator.Setup(suite.pathOsmosisCosmos)
