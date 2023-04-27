@@ -2,7 +2,9 @@ package v7
 
 import (
 	coinswapkeeper "github.com/Canto-Network/Canto/v7/x/coinswap/keeper"
+	coinswaptypes "github.com/Canto-Network/Canto/v7/x/coinswap/types"
 	onboardingkeeper "github.com/Canto-Network/Canto/v7/x/onboarding/keeper"
+	onboardingtypes "github.com/Canto-Network/Canto/v7/x/onboarding/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
@@ -23,18 +25,10 @@ func CreateUpgradeHandler(
 			return nil, err
 		}
 
-		params := onboardingKeeper.GetParams(ctx)
-		params.WhitelistedChannels = []string{"channel-0"}
-		params.AutoSwapThreshold = sdk.NewIntWithDecimal(4, 18)
-		onboardingKeeper.SetParams(ctx, params)
+		onboardingParams := onboardingtypes.DefaultParams()
+		onboardingKeeper.SetParams(ctx, onboardingParams)
 
-		coinswapParams := coinswapKeeper.GetParams(ctx)
-		coinswapParams.PoolCreationFee = sdk.NewCoin("acanto", sdk.ZeroInt())
-		coinswapParams.MaxSwapAmount = sdk.NewCoins(
-			sdk.NewCoin(UsdcIBCDenom, sdk.NewIntWithDecimal(10, 6)),
-			sdk.NewCoin(UsdtIBCDenom, sdk.NewIntWithDecimal(10, 6)),
-			sdk.NewCoin(EthIBCDenom, sdk.NewIntWithDecimal(1, 17)),
-		)
+		coinswapParams := coinswaptypes.DefaultParams()
 		coinswapKeeper.SetParams(ctx, coinswapParams)
 		coinswapKeeper.SetStandardDenom(ctx, "acanto")
 

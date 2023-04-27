@@ -73,13 +73,9 @@ func (s *UpgradeTestSuite) TestUpgradeV6() {
 			func() {
 				coinswapParams := s.app.CoinswapKeeper.GetParams(s.ctx)
 				s.Require().EqualValues(
-					coinswapParams.PoolCreationFee, sdk.NewCoin("acanto", sdk.ZeroInt()))
+					coinswapParams.PoolCreationFee, coinswaptypes.DefaultPoolCreationFee)
 				s.Require().EqualValues(
-					coinswapParams.MaxSwapAmount, sdk.NewCoins(
-						sdk.NewCoin(v7.UsdcIBCDenom, sdk.NewIntWithDecimal(10, 6)),
-						sdk.NewCoin(v7.UsdtIBCDenom, sdk.NewIntWithDecimal(10, 6)),
-						sdk.NewCoin(v7.EthIBCDenom, sdk.NewIntWithDecimal(1, 17)),
-					))
+					coinswapParams.MaxSwapAmount, coinswaptypes.DefaultMaxSwapAmount)
 				s.Require().EqualValues(
 					coinswapParams.MaxStandardCoinPerPool, coinswaptypes.DefaultMaxStandardCoinPerPool)
 				s.Require().EqualValues(

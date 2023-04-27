@@ -9,6 +9,12 @@ import (
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
+const (
+	UsdcIBCDenom = "ibc/17CD484EE7D9723B847D95015FA3EBD1572FD13BC84FB838F55B18A57450F25B"
+	UsdtIBCDenom = "ibc/4F6A2DEFEA52CD8D90966ADCB2BD0593D3993AB0DF7F6AEB3EFD6167D79237B0"
+	EthIBCDenom  = "ibc/DC186CA7A8C009B43774EBDC825C935CABA9743504CE6037507E6E5CCE12858A"
+)
+
 // Parameter store keys
 var (
 	KeyFee                    = []byte("Fee")                    // fee key
@@ -22,7 +28,11 @@ var (
 	DefaultPoolCreationFee        = sdk.NewInt64Coin(sdk.DefaultBondDenom, 0)
 	DefaultTaxRate                = sdk.NewDecWithPrec(0, 0)
 	DefaultMaxStandardCoinPerPool = sdk.NewIntWithDecimal(10000, 18)
-	DefaultMaxSwapAmount          = sdk.NewCoins()
+	DefaultMaxSwapAmount          = sdk.NewCoins(
+		sdk.NewCoin(UsdcIBCDenom, sdk.NewIntWithDecimal(10, 6)),
+		sdk.NewCoin(UsdtIBCDenom, sdk.NewIntWithDecimal(10, 6)),
+		sdk.NewCoin(EthIBCDenom, sdk.NewIntWithDecimal(1, 17)),
+	)
 )
 
 // NewParams is the coinswap params constructor
