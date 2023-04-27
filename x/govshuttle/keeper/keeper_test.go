@@ -43,7 +43,7 @@ func TestKeeperTestSuite(t *testing.T) {
 	suite.Run(t, s)
 }
 
-// Test Helpers
+//Test Helpers
 func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 	checkTx := false
 

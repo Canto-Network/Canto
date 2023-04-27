@@ -18,15 +18,17 @@ import (
 	tmversion "github.com/tendermint/tendermint/proto/tendermint/version"
 	"github.com/tendermint/tendermint/version"
 
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/evmos/ethermint/crypto/ethsecp256k1"
+	evm "github.com/evmos/ethermint/x/evm/types"
+
 	"github.com/Canto-Network/Canto/v6/app"
 	epochstypes "github.com/Canto-Network/Canto/v6/x/epochs/types"
 	"github.com/Canto-Network/Canto/v6/x/inflation/types"
+
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/ethereum/go-ethereum/common"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
-	"github.com/evmos/ethermint/crypto/ethsecp256k1"
-	evm "github.com/evmos/ethermint/x/evm/types"
 )
 
 var denomMint = "acanto"

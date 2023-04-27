@@ -1,24 +1,26 @@
 package onboarding_test
 
 import (
-	"github.com/Canto-Network/Canto/v6/app"
-	"github.com/Canto-Network/Canto/v6/contracts"
-	coinswaptypes "github.com/Canto-Network/Canto/v6/x/coinswap/types"
-	inflationtypes "github.com/Canto-Network/Canto/v6/x/inflation/types"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	ibcgotesting "github.com/cosmos/ibc-go/v3/testing"
-
-	"github.com/ethereum/go-ethereum/common"
 	"testing"
 	"time"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
 
-	ibctesting "github.com/Canto-Network/Canto/v6/ibc/testing"
-	onboardingtest "github.com/Canto-Network/Canto/v6/x/onboarding/testutil"
+	"github.com/ethereum/go-ethereum/common"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	ibcgotesting "github.com/cosmos/ibc-go/v3/testing"
+
 	"github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
 	clienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
+
+	"github.com/Canto-Network/Canto/v6/app"
+	"github.com/Canto-Network/Canto/v6/contracts"
+	ibctesting "github.com/Canto-Network/Canto/v6/ibc/testing"
+	coinswaptypes "github.com/Canto-Network/Canto/v6/x/coinswap/types"
+	inflationtypes "github.com/Canto-Network/Canto/v6/x/inflation/types"
+	onboardingtest "github.com/Canto-Network/Canto/v6/x/onboarding/testutil"
 )
 
 var (

@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	v7 "github.com/Canto-Network/Canto/v6/app/upgrades/v7"
 	"io"
 	"net/http"
 	"os"
@@ -152,6 +151,7 @@ import (
 	v3 "github.com/Canto-Network/Canto/v6/app/upgrades/v3"
 	v4 "github.com/Canto-Network/Canto/v6/app/upgrades/v4"
 	v5 "github.com/Canto-Network/Canto/v6/app/upgrades/v5"
+	v7 "github.com/Canto-Network/Canto/v6/app/upgrades/v7"
 )
 
 func init() {

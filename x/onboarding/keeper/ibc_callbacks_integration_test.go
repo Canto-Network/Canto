@@ -1,14 +1,16 @@
 package keeper_test
 
 import (
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ethereum/go-ethereum/common"
+
 	"github.com/Canto-Network/Canto/v6/app"
 	"github.com/Canto-Network/Canto/v6/contracts"
 	"github.com/Canto-Network/Canto/v6/x/erc20/types"
 	onboardingtest "github.com/Canto-Network/Canto/v6/x/onboarding/testutil"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ethereum/go-ethereum/common"
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Onboarding: Performing an IBC Transfer followed by autoswap and convert", Ordered, func() {

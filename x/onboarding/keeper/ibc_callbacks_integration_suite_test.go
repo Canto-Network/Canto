@@ -5,27 +5,24 @@ import (
 	"testing"
 	"time"
 
-	coinswaptypes "github.com/Canto-Network/Canto/v6/x/coinswap/types"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-
-	erc20types "github.com/Canto-Network/Canto/v6/x/erc20/types"
-	inflationtypes "github.com/Canto-Network/Canto/v6/x/inflation/types"
-
 	"github.com/stretchr/testify/suite"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
+
 	transfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
 	clienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
 	channeltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
 
-	ibcgotesting "github.com/Canto-Network/Canto/v6/ibc/testing"
-	onboardingtest "github.com/Canto-Network/Canto/v6/x/onboarding/testutil"
-
-	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
-
 	"github.com/Canto-Network/Canto/v6/app"
+	ibcgotesting "github.com/Canto-Network/Canto/v6/ibc/testing"
+	coinswaptypes "github.com/Canto-Network/Canto/v6/x/coinswap/types"
+	erc20types "github.com/Canto-Network/Canto/v6/x/erc20/types"
+	inflationtypes "github.com/Canto-Network/Canto/v6/x/inflation/types"
+	onboardingtest "github.com/Canto-Network/Canto/v6/x/onboarding/testutil"
 	"github.com/Canto-Network/Canto/v6/x/onboarding/types"
 )
 

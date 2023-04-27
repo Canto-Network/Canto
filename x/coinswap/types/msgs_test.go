@@ -3,8 +3,9 @@ package types
 import (
 	"testing"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/tendermint/tendermint/crypto/tmhash"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var (

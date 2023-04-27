@@ -125,7 +125,7 @@ Where metadata.json contains (example):
 	return cmd
 }
 
-// Register TreasuryProposal submit cmd
+//Register TreasuryProposal submit cmd
 func NewTreasuryProposalCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "treasury-proposal [metadata]",

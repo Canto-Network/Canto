@@ -2,22 +2,18 @@ package keeper_test
 
 import (
 	"fmt"
-	"github.com/Canto-Network/Canto/v6/contracts"
-	coinswaptypes "github.com/Canto-Network/Canto/v6/x/coinswap/types"
-	inflationtypes "github.com/Canto-Network/Canto/v6/x/inflation/types"
-	vestingtypes "github.com/Canto-Network/Canto/v6/x/vesting/types"
+	"math/big"
+	"time"
+
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/evmos/ethermint/crypto/ethsecp256k1"
+	"github.com/stretchr/testify/mock"
+
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/evmos/ethermint/crypto/ethsecp256k1"
-	"github.com/stretchr/testify/mock"
-	"math/big"
-	"time"
-
-	"github.com/Canto-Network/Canto/v6/testutil"
 
 	transfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
 	clienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
@@ -25,10 +21,15 @@ import (
 	ibcgotesting "github.com/cosmos/ibc-go/v3/testing"
 	ibcmock "github.com/cosmos/ibc-go/v3/testing/mock"
 
+	"github.com/Canto-Network/Canto/v6/contracts"
+	"github.com/Canto-Network/Canto/v6/testutil"
+	coinswaptypes "github.com/Canto-Network/Canto/v6/x/coinswap/types"
 	erc20types "github.com/Canto-Network/Canto/v6/x/erc20/types"
+	inflationtypes "github.com/Canto-Network/Canto/v6/x/inflation/types"
 	"github.com/Canto-Network/Canto/v6/x/onboarding/keeper"
 	onboardingtest "github.com/Canto-Network/Canto/v6/x/onboarding/testutil"
 	"github.com/Canto-Network/Canto/v6/x/onboarding/types"
+	vestingtypes "github.com/Canto-Network/Canto/v6/x/vesting/types"
 )
 
 var (

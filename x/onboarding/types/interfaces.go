@@ -2,12 +2,12 @@ package types
 
 import (
 	"context"
-	coinswaptypes "github.com/Canto-Network/Canto/v6/x/coinswap/types"
-	erc20types "github.com/Canto-Network/Canto/v6/x/erc20/types"
+	"math/big"
+
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
+
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
-	"math/big"
 
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 
@@ -17,6 +17,9 @@ import (
 	transfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
 	clienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
 	channeltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
+
+	coinswaptypes "github.com/Canto-Network/Canto/v6/x/coinswap/types"
+	erc20types "github.com/Canto-Network/Canto/v6/x/erc20/types"
 )
 
 type Erc20Keeper interface {

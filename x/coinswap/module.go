@@ -21,7 +21,6 @@ import (
 
 	"github.com/Canto-Network/Canto/v6/x/coinswap/client/cli"
 	"github.com/Canto-Network/Canto/v6/x/coinswap/client/rest"
-
 	"github.com/Canto-Network/Canto/v6/x/coinswap/keeper"
 	"github.com/Canto-Network/Canto/v6/x/coinswap/simulation"
 	"github.com/Canto-Network/Canto/v6/x/coinswap/types"

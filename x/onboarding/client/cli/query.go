@@ -3,9 +3,10 @@ package cli
 import (
 	"context"
 
+	"github.com/spf13/cobra"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/spf13/cobra"
 
 	"github.com/Canto-Network/Canto/v6/x/onboarding/types"
 )

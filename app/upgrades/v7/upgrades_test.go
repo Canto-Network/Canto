@@ -1,23 +1,26 @@
 package v7_test
 
 import (
-	v7 "github.com/Canto-Network/Canto/v6/app/upgrades/v7"
-	coinswaptypes "github.com/Canto-Network/Canto/v6/x/coinswap/types"
-	onboardingtypes "github.com/Canto-Network/Canto/v6/x/onboarding/types"
-	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/evmos/ethermint/crypto/ethsecp256k1"
-	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 	"testing"
 	"time"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	"github.com/stretchr/testify/suite"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+
+	"github.com/evmos/ethermint/crypto/ethsecp256k1"
+	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
+
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	chain "github.com/Canto-Network/Canto/v6/app"
+	v7 "github.com/Canto-Network/Canto/v6/app/upgrades/v7"
+	coinswaptypes "github.com/Canto-Network/Canto/v6/x/coinswap/types"
+	onboardingtypes "github.com/Canto-Network/Canto/v6/x/onboarding/types"
 )
 
 type UpgradeTestSuite struct {

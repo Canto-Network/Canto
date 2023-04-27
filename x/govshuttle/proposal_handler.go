@@ -8,7 +8,7 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 )
 
-// Return governance handler to process Compound Proposal
+//Return governance handler to process Compound Proposal
 func NewgovshuttleProposalHandler(k *keeper.Keeper) govtypes.Handler {
 	return func(ctx sdk.Context, content govtypes.Content) error {
 		switch c := content.(type) {
@@ -36,7 +36,7 @@ func handleLendingMarketProposal(ctx sdk.Context, k *keeper.Keeper, p *types.Len
 	return nil
 }
 
-// governance proposal handler
+//governance proposal handler
 func handleTreasuryProposal(ctx sdk.Context, k *keeper.Keeper, tp *types.TreasuryProposal) error {
 	err := tp.ValidateBasic()
 	if err != nil {

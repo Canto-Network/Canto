@@ -19,8 +19,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// / Load in all of the test contracts that will be used in the integration tests
-//
+/// Load in all of the test contracts that will be used in the integration tests
 //go:embed test_contracts/compiled_contracts/factoryContract.json
 var factoryContractJson []byte // nolint: golint
 var factoryContract evmtypes.CompiledContract
