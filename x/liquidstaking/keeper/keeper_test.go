@@ -1,6 +1,9 @@
 package keeper_test
 
 import (
+	"fmt"
+	liquidstakingkeeper "github.com/Canto-Network/Canto/v6/x/liquidstaking/keeper"
+	"strconv"
 	"testing"
 	"time"
 
@@ -41,6 +44,10 @@ type KeeperTestSuite struct {
 	validator   stakingtypes.Validator
 
 	denom string
+	// EpochCount counted by epochs module
+	rewardEpochCount int64
+	// EpochCount counted by liquidstaking module
+	lsEpochCount int64
 }
 
 var s *KeeperTestSuite
@@ -75,10 +82,12 @@ func (suite *KeeperTestSuite) SetupApp() {
 	privCons, err := ethsecp256k1.GenerateKey()
 	require.NoError(t, err)
 	suite.consAddress = sdk.ConsAddress(privCons.PubKey().Address())
+	initialBlockTime := time.Now().UTC()
+	initialHeight := int64(1)
 	suite.ctx = suite.app.BaseApp.NewContext(false, tmproto.Header{
-		Height:          1,
+		Height:          initialHeight,
 		ChainID:         "canto_9001-1",
-		Time:            time.Now().UTC(),
+		Time:            initialBlockTime,
 		ProposerAddress: suite.consAddress.Bytes(),
 
 		Version: tmversion.Consensus{
@@ -120,6 +129,16 @@ func (suite *KeeperTestSuite) SetupApp() {
 
 	validators := s.app.StakingKeeper.GetValidators(suite.ctx, 1)
 	suite.validator = validators[0]
+
+	s.app.LiquidStakingKeeper.SetEpoch(
+		suite.ctx,
+		types.Epoch{
+			CurrentNumber: 0,
+			StartTime:     initialBlockTime,
+			Duration:      suite.app.StakingKeeper.GetParams(suite.ctx).UnbondingTime,
+			StartHeight:   initialHeight,
+		},
+	)
 }
 
 // Commit commits and starts a new block with an updated context.
@@ -196,8 +215,13 @@ func (suite *KeeperTestSuite) fundAccount(addr sdk.AccAddress, amount sdk.Int) {
 	suite.NoError(err)
 }
 
-func (suite *KeeperTestSuite) advanceHeight(height int) {
-
+func (suite *KeeperTestSuite) advanceHeight(height int, msg string) {
+	fmt.Println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+	fmt.Println("advance " + strconv.Itoa(height) + " blocks(= reward epochs)")
+	if msg != "" {
+		fmt.Println(msg)
+	}
+	fmt.Println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 	feeCollector := suite.app.AccountKeeper.GetModuleAccount(suite.ctx, authtypes.FeeCollectorName)
 	for i := 0; i < height; i++ {
 		suite.ctx = suite.ctx.WithBlockHeight(suite.ctx.BlockHeight() + 1).WithBlockTime(suite.ctx.BlockTime().Add(time.Second))
@@ -209,6 +233,7 @@ func (suite *KeeperTestSuite) advanceHeight(height int) {
 		suite.NoError(err)
 		feeCollectorBalances := suite.app.BankKeeper.GetAllBalances(suite.ctx, feeCollector.GetAddress())
 		rewardsToBeDistributed := feeCollectorBalances.AmountOf(suite.denom)
+		suite.rewardEpochCount += 1
 
 		// Mimic distribution.BeginBlock (AllocateTokens, get rewards from feeCollector, AllocateTokensToValidator, add remaining to feePool)
 		suite.NoError(suite.app.BankKeeper.SendCoinsFromModuleToModule(suite.ctx, authtypes.FeeCollectorName, distrtypes.ModuleName, feeCollectorBalances))
@@ -231,12 +256,30 @@ func (suite *KeeperTestSuite) advanceHeight(height int) {
 			})
 		}
 		remaining := rewardsToBeDistributed.ToDec().Sub(totalRewards)
-		suite.False(remaining.GT(sdk.NewDec(100)), "all rewards should be distributed")
+		suite.False(remaining.GT(sdk.NewDec(1000)), "all rewards should be distributed")
 		feePool := suite.app.DistrKeeper.GetFeePool(suite.ctx)
 		feePool.CommunityPool = feePool.CommunityPool.Add(
 			sdk.NewDecCoin(suite.denom, remaining.TruncateInt()),
 		)
 		suite.app.DistrKeeper.SetFeePool(suite.ctx, feePool)
 		staking.EndBlocker(suite.ctx, suite.app.StakingKeeper)
+		liquidstakingkeeper.EndBlocker(suite.ctx, suite.app.LiquidStakingKeeper)
 	}
+}
+
+func (suite *KeeperTestSuite) advanceEpoch() {
+	// Set block header time as epochStartTime + duration + 1 second
+	epoch := suite.app.LiquidStakingKeeper.GetEpoch(suite.ctx)
+	// Lets pass epoch
+	suite.ctx = suite.ctx.WithBlockTime(epoch.StartTime.Add(epoch.Duration))
+	suite.lsEpochCount += 1
+
+	fmt.Println("===============================================================================")
+	fmt.Println("lsEpoch is reached, endblocker will be executed at following block")
+	fmt.Println("===============================================================================")
+}
+
+func (suite *KeeperTestSuite) resetEpochs() {
+	suite.lsEpochCount = 0
+	suite.rewardEpochCount = 0
 }

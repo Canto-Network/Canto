@@ -21,9 +21,9 @@ func (k Keeper) GetWithdrawInsuranceRequest(ctx sdk.Context, id uint64) (req typ
 	return req, true
 }
 
-func (k Keeper) DeleteWithdrawInsuranceRequest(ctx sdk.Context, id uint64) {
+func (k Keeper) DeleteWithdrawInsuranceRequest(ctx sdk.Context, insuranceId uint64) {
 	store := ctx.KVStore(k.storeKey)
-	store.Delete(types.GetWithdrawInsuranceRequestKey(id))
+	store.Delete(types.GetWithdrawInsuranceRequestKey(insuranceId))
 }
 
 func (k Keeper) IterateWithdrawInsuranceRequests(ctx sdk.Context, cb func(req types.WithdrawInsuranceRequest) (stop bool)) {

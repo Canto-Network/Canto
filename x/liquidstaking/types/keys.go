@@ -30,24 +30,24 @@ const (
 	prefixInsurancesByProviderIndex
 	prefixWithdrawInsuranceRequest
 	prefixPreviousInsuranceIndex
-	prefixUnpairingForUnstakeChunkInfo
+	prefixUnpairingForUnstakingChunkInfo
 	prefixLiquidUnstakeKey
 	prefixEpoch
 )
 
 // KVStore key prefixes
 var (
-	KeyPrefixLastChunkId                  = []byte{prefixLastChunkId}
-	KeyPrefixLastInsuranceId              = []byte{prefixLastInsuranceId}
-	KeyPrefixChunk                        = []byte{prefixChunk}
-	KeyPrefixInsurance                    = []byte{prefixInsurance}
-	KeyPrefixPairingInsuranceIndex        = []byte{prefixPairingInsuranceIndex}
-	KeyPrefixInsurancesByProviderIndex    = []byte{prefixInsurancesByProviderIndex}
-	KeyPrefixWithdrawInsuranceRequest     = []byte{prefixWithdrawInsuranceRequest}
-	KeyPrefixUnpairingForUnstakeChunkInfo = []byte{prefixUnpairingForUnstakeChunkInfo}
-	KeyPrefixLiquidUnstakeKey             = []byte{prefixLiquidUnstakeKey}
-	KeyPrefixEpoch                        = []byte{prefixEpoch}
-	KeyLiquidBondDenom                    = []byte{prefixLiquidBondDenom}
+	KeyPrefixLastChunkId                    = []byte{prefixLastChunkId}
+	KeyPrefixLastInsuranceId                = []byte{prefixLastInsuranceId}
+	KeyPrefixChunk                          = []byte{prefixChunk}
+	KeyPrefixInsurance                      = []byte{prefixInsurance}
+	KeyPrefixPairingInsuranceIndex          = []byte{prefixPairingInsuranceIndex}
+	KeyPrefixInsurancesByProviderIndex      = []byte{prefixInsurancesByProviderIndex}
+	KeyPrefixWithdrawInsuranceRequest       = []byte{prefixWithdrawInsuranceRequest}
+	KeyPrefixUnpairingForUnstakingChunkInfo = []byte{prefixUnpairingForUnstakingChunkInfo}
+	KeyPrefixLiquidUnstakeKey               = []byte{prefixLiquidUnstakeKey}
+	KeyPrefixEpoch                          = []byte{prefixEpoch}
+	KeyLiquidBondDenom                      = []byte{prefixLiquidBondDenom}
 )
 
 func GetChunkKey(chunkId uint64) []byte {
@@ -70,8 +70,8 @@ func GetWithdrawInsuranceRequestKey(insuranceId uint64) []byte {
 	return append(KeyPrefixWithdrawInsuranceRequest, sdk.Uint64ToBigEndian(insuranceId)...)
 }
 
-func GetUnpairingForUnstakeChunkInfoKey(chunkId uint64) []byte {
-	return append(KeyPrefixUnpairingForUnstakeChunkInfo, sdk.Uint64ToBigEndian(chunkId)...)
+func GetUnpairingForUnstakingChunkInfoKey(chunkId uint64) []byte {
+	return append(KeyPrefixUnpairingForUnstakingChunkInfo, sdk.Uint64ToBigEndian(chunkId)...)
 }
 
 func ParseInsurancesByProviderIndexKey(key []byte) (providerAddress sdk.AccAddress, insuranceId uint64) {

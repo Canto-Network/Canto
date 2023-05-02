@@ -23,7 +23,7 @@ func (k Keeper) LiquidUnstake(goCtx context.Context, msg *types.MsgLiquidUnstake
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// TODO: Publish events using returned values
-	_, err := k.QueueLiquidUnstake(ctx, msg)
+	_, _, err := k.QueueLiquidUnstake(ctx, msg)
 	if err != nil {
 		return nil, err
 	}

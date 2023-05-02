@@ -2,9 +2,11 @@ package types
 
 import (
 	"fmt"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"sort"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"sort"
 )
 
 const (
@@ -40,6 +42,8 @@ func (i *Insurance) GetValidator() sdk.ValAddress {
 	return valAddr
 }
 
+// SortInsurances sorts insurances by fee rate and id
+// If descending is true, it sorts in descending order which means the highest fee rate comes first.
 // TODO: Need memory profiling
 // This can be called multiple times and there are local assignments for i, j Insurance
 // readable but worried for memory usage
@@ -78,4 +82,14 @@ func (i *Insurance) Equal(other Insurance) bool {
 
 func (i *Insurance) SetStatus(status InsuranceStatus) {
 	i.Status = status
+}
+
+func (i *Insurance) Validate(lastInsuranceId uint64) error {
+	if i.Id > lastInsuranceId {
+		return sdkerrors.Wrapf(ErrInvalidInsuranceId, "insurance id must be %d or less", lastInsuranceId)
+	}
+	if i.Status == INSURANCE_STATUS_UNSPECIFIED {
+		return ErrInvalidInsuranceStatus
+	}
+	return nil
 }

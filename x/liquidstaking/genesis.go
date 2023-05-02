@@ -9,8 +9,29 @@ import (
 // InitGenesis initializes the capability module's state from a provided genesis
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
-	k.SetLiquidBondDenom(ctx, genState.LiquidBondDenom)
+	if err := genState.Validate(); err != nil {
+		panic(err)
+	}
 	k.SetParams(ctx, genState.Params)
+	k.SetEpoch(ctx, genState.Epoch)
+	k.SetLiquidBondDenom(ctx, genState.LiquidBondDenom)
+	k.SetLastChunkId(ctx, genState.LastChunkId)
+	k.SetLastInsuranceId(ctx, genState.LastInsuranceId)
+	for _, chunk := range genState.Chunks {
+		k.SetChunk(ctx, chunk)
+	}
+	for _, insurance := range genState.Insurances {
+		k.SetInsurance(ctx, insurance)
+	}
+	for _, pendingLiquidUnstake := range genState.PendingLiquidUnstakes {
+		k.SetPendingLiquidUnstake(ctx, pendingLiquidUnstake)
+	}
+	for _, UnpairingForUnstakingChunkInfo := range genState.UnpairingForUnstakingChunkInfos {
+		k.SetUnpairingForUnstakingChunkInfo(ctx, UnpairingForUnstakingChunkInfo)
+	}
+	for _, request := range genState.WithdrawInsuranceRequests {
+		k.SetWithdrawInsuranceRequest(ctx, request)
+	}
 }
 
 // ExportGenesis returns the capability module's exported genesis.
@@ -39,7 +60,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.Chunks = chunks
 	genesis.Insurances = insurances
 	genesis.PendingLiquidUnstakes = k.GetAllPendingLiquidUnstake(ctx)
-	genesis.UnpairingForUnstakeChunkInfos = k.GetAllUnpairingForUnstakeChunkInfos(ctx)
+	genesis.UnpairingForUnstakingChunkInfos = k.GetAllUnpairingForUnstakingChunkInfos(ctx)
 	genesis.WithdrawInsuranceRequests = k.GetAllWithdrawInsuranceRequests(ctx)
 
 	return genesis

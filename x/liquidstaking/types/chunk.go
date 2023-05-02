@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	ethermint "github.com/evmos/ethermint/types"
@@ -35,4 +36,18 @@ func (c *Chunk) Equal(other Chunk) bool {
 
 func (c *Chunk) SetStatus(status ChunkStatus) {
 	c.Status = status
+}
+
+func (c *Chunk) Validate(lastChunkId uint64) error {
+	if c.Id > lastChunkId {
+		return sdkerrors.Wrapf(
+			ErrInvalidChunkId,
+			"chunk id must be %d or less",
+			lastChunkId,
+		)
+	}
+	if c.Status == CHUNK_STATUS_UNSPECIFIED {
+		return ErrInvalidChunkStatus
+	}
+	return nil
 }

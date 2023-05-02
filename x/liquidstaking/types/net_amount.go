@@ -28,6 +28,13 @@ func (nas NetAmountState) Equal(nas2 NetAmountState) bool {
 		nas.TotalRemainingRewards.Equal(nas2.TotalRemainingRewards) &&
 		nas.TotalLiquidTokens.Equal(nas2.TotalLiquidTokens) &&
 		nas.TotalInsuranceTokens.Equal(nas2.TotalInsuranceTokens) &&
+		nas.TotalInsuranceCommissions.Equal(nas2.TotalInsuranceCommissions) &&
+		nas.TotalPairedInsuranceTokens.Equal(nas2.TotalPairedInsuranceTokens) &&
+		nas.TotalPairedInsuranceCommissions.Equal(nas2.TotalPairedInsuranceCommissions) &&
+		nas.TotalUnpairingInsuranceTokens.Equal(nas2.TotalUnpairingInsuranceTokens) &&
+		nas.TotalUnpairingInsuranceCommissions.Equal(nas2.TotalUnpairingInsuranceCommissions) &&
+		nas.TotalUnpairedInsuranceTokens.Equal(nas2.TotalUnpairedInsuranceTokens) &&
+		nas.TotalUnpairedInsuranceCommissions.Equal(nas2.TotalUnpairedInsuranceCommissions) &&
 		nas.TotalUnbondingBalance.Equal(nas2.TotalUnbondingBalance) &&
 		nas.NetAmount.Equal(nas2.NetAmount) &&
 		nas.MintRate.Equal(nas2.MintRate) &&
@@ -40,7 +47,15 @@ func (nas NetAmountState) IsZeroState() bool {
 		nas.TotalDelShares.IsZero() &&
 		nas.TotalRemainingRewards.IsZero() &&
 		nas.TotalLiquidTokens.IsZero() &&
-		nas.TotalInsuranceTokens.IsZero() &&
+		// Currently total insurances includes Pairing insurances, so we should skip this
+		//nas.TotalInsuranceTokens.IsZero() &&
+		//nas.TotalInsuranceCommissions.IsZero() &&
+		nas.TotalPairedInsuranceTokens.IsZero() &&
+		nas.TotalPairedInsuranceCommissions.IsZero() &&
+		nas.TotalUnpairingInsuranceTokens.IsZero() &&
+		nas.TotalUnpairingInsuranceCommissions.IsZero() &&
+		nas.TotalUnpairedInsuranceTokens.IsZero() &&
+		nas.TotalUnpairedInsuranceCommissions.IsZero() &&
 		nas.TotalUnbondingBalance.IsZero() &&
 		nas.NetAmount.IsZero() &&
 		nas.MintRate.IsZero() &&
@@ -56,6 +71,13 @@ func (nas NetAmountState) String() string {
 	  TotalRemainingRewards: %s	
 	  TotalLiquidTokens:     %s	
 	  TotalInsuranceTokens:  %s
+	  TotalInsuranceCommissons: %s
+	  TotalPairedInsuranceTokens: %s
+	  TotalPairedInsuranceCommissons: %s
+      TotalUnpairingInsuranceTokens: %s
+      TotalUnpairingInsuranceCommissons: %s
+	  TotalUnpairedInsuranceTokens: %s
+	  TotalUnpairedInsuranceCommissons: %s
 	  TotalUnbondingBalance: %s
 	  NetAmount:             %s
 	  MintRate:              %s
@@ -66,6 +88,13 @@ func (nas NetAmountState) String() string {
 		nas.TotalRemainingRewards,
 		nas.TotalLiquidTokens,
 		nas.TotalInsuranceTokens,
+		nas.TotalInsuranceCommissions,
+		nas.TotalPairedInsuranceTokens,
+		nas.TotalPairedInsuranceCommissions,
+		nas.TotalUnpairingInsuranceTokens,
+		nas.TotalUnpairingInsuranceCommissions,
+		nas.TotalUnpairedInsuranceTokens,
+		nas.TotalUnpairedInsuranceCommissions,
 		nas.TotalUnbondingBalance,
 		nas.NetAmount,
 		nas.MintRate,

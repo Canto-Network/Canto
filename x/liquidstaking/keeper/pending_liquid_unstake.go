@@ -5,6 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+// TODO: Use key with chunk id
 func (k Keeper) SetPendingLiquidUnstake(ctx sdk.Context, pendingLiquidUnstake types.PendingLiquidUnstake) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshal(&pendingLiquidUnstake)

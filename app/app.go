@@ -225,7 +225,7 @@ var (
 		erc20types.ModuleName:          {authtypes.Minter, authtypes.Burner},
 		csrtypes.ModuleName:            {authtypes.Minter, authtypes.Burner},
 		govshuttletypes.ModuleName:     {authtypes.Minter, authtypes.Burner},
-		liquidstakingtypes.ModuleName:  {authtypes.Minter},
+		liquidstakingtypes.ModuleName:  {authtypes.Minter, authtypes.Burner},
 	}
 
 	// module accounts that are allowed to receive tokens
@@ -725,6 +725,7 @@ func NewCanto(
 		// NOTE: staking requires the claiming hook
 		stakingtypes.ModuleName,
 		slashingtypes.ModuleName,
+		liquidstakingtypes.ModuleName,
 		govtypes.ModuleName,
 		ibchost.ModuleName,
 		// Ethermint modules
@@ -751,7 +752,6 @@ func NewCanto(
 		csrtypes.ModuleName,
 		// NOTE: crisis module must go at the end to check for invariants on each module
 		crisistypes.ModuleName,
-		liquidstakingtypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
