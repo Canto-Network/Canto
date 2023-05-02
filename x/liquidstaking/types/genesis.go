@@ -7,7 +7,6 @@ func NewGenesisState(
 	lastChunkId, lastInsuranceId uint64,
 	chunks []Chunk,
 	insurances []Insurance,
-	pendingUnstakes []PendingLiquidUnstake,
 	infos []UnpairingForUnstakingChunkInfo,
 	reqs []WithdrawInsuranceRequest,
 ) GenesisState {
@@ -19,7 +18,6 @@ func NewGenesisState(
 		LastInsuranceId:                 lastInsuranceId,
 		Chunks:                          chunks,
 		Insurances:                      insurances,
-		PendingLiquidUnstakes:           pendingUnstakes,
 		UnpairingForUnstakingChunkInfos: infos,
 		WithdrawInsuranceRequests:       reqs,
 	}
@@ -34,7 +32,6 @@ func DefaultGenesisState() *GenesisState {
 		LastInsuranceId:                 0,
 		Chunks:                          []Chunk{},
 		Insurances:                      []Insurance{},
-		PendingLiquidUnstakes:           []PendingLiquidUnstake{},
 		UnpairingForUnstakingChunkInfos: []UnpairingForUnstakingChunkInfo{},
 		WithdrawInsuranceRequests:       []WithdrawInsuranceRequest{},
 	}
@@ -45,6 +42,7 @@ func (gs GenesisState) Validate() error {
 		return err
 	}
 	if err := gs.Epoch.Validate(); err != nil {
+		return err
 	}
 	if gs.LastChunkId < 0 {
 		return ErrInvalidLastChunkId
@@ -65,11 +63,6 @@ func (gs GenesisState) Validate() error {
 			return err
 		}
 		insuranceMap[insurance.Id] = insurance
-	}
-	for _, pendingUnstake := range gs.PendingLiquidUnstakes {
-		if err := pendingUnstake.Validate(chunkMap); err != nil {
-			return err
-		}
 	}
 	for _, info := range gs.UnpairingForUnstakingChunkInfos {
 		if err := info.Validate(chunkMap); err != nil {

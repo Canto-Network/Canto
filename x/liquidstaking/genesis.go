@@ -23,9 +23,6 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	for _, insurance := range genState.Insurances {
 		k.SetInsurance(ctx, insurance)
 	}
-	for _, pendingLiquidUnstake := range genState.PendingLiquidUnstakes {
-		k.SetPendingLiquidUnstake(ctx, pendingLiquidUnstake)
-	}
 	for _, UnpairingForUnstakingChunkInfo := range genState.UnpairingForUnstakingChunkInfos {
 		k.SetUnpairingForUnstakingChunkInfo(ctx, UnpairingForUnstakingChunkInfo)
 	}
@@ -59,7 +56,6 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.LastInsuranceId = k.GetLastInsuranceId(ctx)
 	genesis.Chunks = chunks
 	genesis.Insurances = insurances
-	genesis.PendingLiquidUnstakes = k.GetAllPendingLiquidUnstake(ctx)
 	genesis.UnpairingForUnstakingChunkInfos = k.GetAllUnpairingForUnstakingChunkInfos(ctx)
 	genesis.WithdrawInsuranceRequests = k.GetAllWithdrawInsuranceRequests(ctx)
 

@@ -14,15 +14,15 @@ service Msg {
   rpc LiquidUnstake(MsgLiquidUnstake) returns (MsgLiquidUnstakeResponse) {
     option (google.api.http).post = "/canto/liquidstaking/v1/tx/liquid_unstake";
   };
-  rpc InsuranceProvide(MsgInsuranceProvide)
-      returns (MsgInsuranceProvideResponse) {
+  rpc ProvideInsurance(MsgProvideInsurance)
+      returns (MsgProvideInsuranceResponse) {
     option (google.api.http).post =
-        "/canto/liquidstaking/v1/tx/insurance_provide";
+        "/canto/liquidstaking/v1/tx/provide_insurance";
   };
-  rpc CancelInsuranceProvide(MsgCancelInsuranceProvide)
-      returns (MsgCancelInsuranceProvideResponse) {
+  rpc CancelProvideInsurance(MsgCancelProvideInsurance)
+      returns (MsgCancelProvideInsuranceResponse) {
     option (google.api.http).post =
-        "/canto/liquidstaking/v1/tx/cancel_insurance_provide";
+        "/canto/liquidstaking/v1/tx/cancel_provide_insurance";
   };
   rpc DepositInsurance(MsgDepositInsurance)
       returns (MsgDepositInsuranceResponse) {
@@ -69,7 +69,7 @@ message MsgLiquidUnstake {
 
 message MsgLiquidUnstakeResponse {}
 
-message MsgInsuranceProvide {
+message MsgProvideInsurance {
   // provider_address is the address of the user who want to provide insurance.
   string provider_address = 1;
   // validator_address is the address of the validator to provide insurance.
@@ -86,9 +86,9 @@ message MsgInsuranceProvide {
   ];
 }
 
-message MsgInsuranceProvideResponse {}
+message MsgProvideInsuranceResponse {}
 
-message MsgCancelInsuranceProvide {
+message MsgCancelProvideInsurance {
   // provider_address is the address of the user who want to cancel the
   // insurance.
   string provider_address = 1;
@@ -97,7 +97,7 @@ message MsgCancelInsuranceProvide {
   uint64 id = 2;
 }
 
-message MsgCancelInsuranceProvideResponse {}
+message MsgCancelProvideInsuranceResponse {}
 
 message MsgDepositInsurance {
   // provider_address is the address of the user who

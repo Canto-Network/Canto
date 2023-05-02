@@ -8,8 +8,8 @@ import (
 var (
 	_ sdk.Msg = &MsgLiquidStake{}
 	_ sdk.Msg = &MsgLiquidUnstake{}
-	_ sdk.Msg = &MsgInsuranceProvide{}
-	_ sdk.Msg = &MsgCancelInsuranceProvide{}
+	_ sdk.Msg = &MsgProvideInsurance{}
+	_ sdk.Msg = &MsgCancelProvideInsurance{}
 	_ sdk.Msg = &MsgDepositInsurance{}
 	_ sdk.Msg = &MsgWithdrawInsurance{}
 	_ sdk.Msg = &MsgWithdrawInsuranceCommission{}
@@ -18,7 +18,7 @@ var (
 const (
 	TypeMsgLiquidStake                 = "liquid_stake"
 	TypeMsgLiquidUnstake               = "liquid_unstake"
-	TypeMsgInsuranceProvide            = "insurance_provide"
+	TypeMsgProvideInsurance            = "insurance_provide"
 	TypeMsgCancelInsurance             = "cancel_insurance"
 	TypeMsgDepositInsurance            = "deposit_insurance"
 	TypeMsgWithdrawInsurance           = "withdraw_insurance"
@@ -85,15 +85,15 @@ func (msg MsgLiquidUnstake) GetDelegator() sdk.AccAddress {
 	return addr
 }
 
-func NewMsgInsuranceProvide(providerAddress string, amount sdk.Coin) *MsgInsuranceProvide {
-	return &MsgInsuranceProvide{
+func NewMsgProvideInsurance(providerAddress string, amount sdk.Coin) *MsgProvideInsurance {
+	return &MsgProvideInsurance{
 		ProviderAddress: providerAddress,
 		Amount:          amount,
 	}
 }
-func (msg MsgInsuranceProvide) Route() string { return RouterKey }
-func (msg MsgInsuranceProvide) Type() string  { return TypeMsgInsuranceProvide }
-func (msg MsgInsuranceProvide) ValidateBasic() error {
+func (msg MsgProvideInsurance) Route() string { return RouterKey }
+func (msg MsgProvideInsurance) Type() string  { return TypeMsgProvideInsurance }
+func (msg MsgProvideInsurance) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.ProviderAddress); err != nil {
 		return sdkerrors.Wrapf(err, "invalid provider address %s", msg.ProviderAddress)
 	}
@@ -102,47 +102,47 @@ func (msg MsgInsuranceProvide) ValidateBasic() error {
 	}
 	return nil
 }
-func (msg MsgInsuranceProvide) GetSignBytes() []byte {
+func (msg MsgProvideInsurance) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
-func (msg MsgInsuranceProvide) GetSigners() []sdk.AccAddress {
+func (msg MsgProvideInsurance) GetSigners() []sdk.AccAddress {
 	funder := sdk.MustAccAddressFromBech32(msg.ProviderAddress)
 	return []sdk.AccAddress{funder}
 }
 
-func (msg MsgInsuranceProvide) GetProvider() sdk.AccAddress {
+func (msg MsgProvideInsurance) GetProvider() sdk.AccAddress {
 	addr := sdk.MustAccAddressFromBech32(msg.ProviderAddress)
 	return addr
 }
 
-func (msg MsgInsuranceProvide) GetValidator() sdk.ValAddress {
+func (msg MsgProvideInsurance) GetValidator() sdk.ValAddress {
 	addr, _ := sdk.ValAddressFromBech32(msg.ValidatorAddress)
 	return addr
 }
 
-func NewMsgCancelInsuranceProvide(providerAddress string, insuranceId uint64) *MsgCancelInsuranceProvide {
-	return &MsgCancelInsuranceProvide{
+func NewMsgCancelProvideInsurance(providerAddress string, insuranceId uint64) *MsgCancelProvideInsurance {
+	return &MsgCancelProvideInsurance{
 		ProviderAddress: providerAddress,
 		Id:              insuranceId,
 	}
 }
-func (msg MsgCancelInsuranceProvide) Route() string { return RouterKey }
-func (msg MsgCancelInsuranceProvide) Type() string  { return TypeMsgCancelInsurance }
-func (msg MsgCancelInsuranceProvide) ValidateBasic() error {
+func (msg MsgCancelProvideInsurance) Route() string { return RouterKey }
+func (msg MsgCancelProvideInsurance) Type() string  { return TypeMsgCancelInsurance }
+func (msg MsgCancelProvideInsurance) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.ProviderAddress); err != nil {
 		return sdkerrors.Wrapf(err, "invalid provider address %s", msg.ProviderAddress)
 	}
 	return nil
 }
-func (msg MsgCancelInsuranceProvide) GetSignBytes() []byte {
+func (msg MsgCancelProvideInsurance) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
-func (msg MsgCancelInsuranceProvide) GetSigners() []sdk.AccAddress {
+func (msg MsgCancelProvideInsurance) GetSigners() []sdk.AccAddress {
 	funder := sdk.MustAccAddressFromBech32(msg.ProviderAddress)
 	return []sdk.AccAddress{funder}
 }
 
-func (msg MsgCancelInsuranceProvide) GetProvider() sdk.AccAddress {
+func (msg MsgCancelProvideInsurance) GetProvider() sdk.AccAddress {
 	addr := sdk.MustAccAddressFromBech32(msg.ProviderAddress)
 	return addr
 }

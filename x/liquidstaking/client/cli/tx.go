@@ -29,8 +29,8 @@ func GetTxCmd() *cobra.Command {
 	cmd.AddCommand(
 		NewLiquidStakeCmd(),
 		NewLiquidUnstakeCmd(),
-		NewInsuranceProvideCmd(),
-		NewCancelInsuranceProvideCmd(),
+		NewProvideInsuranceCmd(),
+		NewCancelProvideInsuranceCmd(),
 		NewDepositInsuranceCmd(),
 		NewWithdrawInsuranceCmd(),
 		NewWithdrawInsuranceCommissionCmd(),
@@ -117,7 +117,7 @@ $ %s tx %s liquid-unstake 5000000acanto --from mykey
 	return cmd
 }
 
-func NewInsuranceProvideCmd() *cobra.Command {
+func NewProvideInsuranceCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "insurance-provide [amount]",
 		Args:  cobra.ExactArgs(1),
@@ -142,7 +142,7 @@ $ %s tx %s insurance-provide 50acanto --from mykey
 				return err
 			}
 
-			msg := types.NewMsgInsuranceProvide(clientCtx.GetFromAddress().String(), coin)
+			msg := types.NewMsgProvideInsurance(clientCtx.GetFromAddress().String(), coin)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -156,7 +156,7 @@ $ %s tx %s insurance-provide 50acanto --from mykey
 	return cmd
 }
 
-func NewCancelInsuranceProvideCmd() *cobra.Command {
+func NewCancelProvideInsuranceCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "cancel-insurance-provide",
 		Args:  cobra.ExactArgs(1),
@@ -182,7 +182,7 @@ $ %s tx %s cancel-insurance-provide 1 --from mykey
 				return err
 			}
 
-			msg := types.NewMsgCancelInsuranceProvide(clientCtx.GetFromAddress().String(), insuranceId)
+			msg := types.NewMsgCancelProvideInsurance(clientCtx.GetFromAddress().String(), insuranceId)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

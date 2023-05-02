@@ -24,8 +24,8 @@ var (
 const (
 	liquidStakeName                 = "liquidstaking/MsgLiquidStake"
 	liquidUnstakeName               = "liquidstaking/MsgLiquidUnstake"
-	insuranceProvideName            = "liquidstaking/MsgInsuranceProvide"
-	cancelInsuranceProvideName      = "liquidstaking/MsgCancelInsuranceProvide"
+	ProvideInsuranceName            = "liquidstaking/MsgProvideInsurance"
+	cancelProvideInsuranceName      = "liquidstaking/MsgCancelProvideInsurance"
 	depositInsuranceName            = "liquidstaking/MsgDepositInsurance"
 	withdrawInsuranceName           = "liquidstaking/MsgWithdrawInsurance"
 	withdrawInsuranceCommissionName = "liquidstaking/MsgWithdrawInsuranceCommission"
@@ -42,8 +42,8 @@ func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 		(*sdk.Msg)(nil),
 		&MsgLiquidStake{},
 		&MsgLiquidUnstake{},
-		&MsgInsuranceProvide{},
-		&MsgCancelInsuranceProvide{},
+		&MsgProvideInsurance{},
+		&MsgCancelProvideInsurance{},
 		&MsgDepositInsurance{},
 		&MsgWithdrawInsurance{},
 		&MsgWithdrawInsuranceCommission{},
@@ -58,8 +58,8 @@ func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgLiquidStake{}, liquidStakeName, nil)
 	cdc.RegisterConcrete(&MsgLiquidUnstake{}, liquidUnstakeName, nil)
-	cdc.RegisterConcrete(&MsgInsuranceProvide{}, insuranceProvideName, nil)
-	cdc.RegisterConcrete(&MsgCancelInsuranceProvide{}, cancelInsuranceProvideName, nil)
+	cdc.RegisterConcrete(&MsgProvideInsurance{}, ProvideInsuranceName, nil)
+	cdc.RegisterConcrete(&MsgCancelProvideInsurance{}, cancelProvideInsuranceName, nil)
 	cdc.RegisterConcrete(&MsgDepositInsurance{}, depositInsuranceName, nil)
 	cdc.RegisterConcrete(&MsgWithdrawInsurance{}, withdrawInsuranceName, nil)
 	cdc.RegisterConcrete(&MsgWithdrawInsuranceCommission{}, withdrawInsuranceCommissionName, nil)

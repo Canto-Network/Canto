@@ -2,10 +2,11 @@ package keeper_test
 
 import (
 	"fmt"
-	liquidstakingkeeper "github.com/Canto-Network/Canto/v6/x/liquidstaking/keeper"
 	"strconv"
 	"testing"
 	"time"
+
+	liquidstakingkeeper "github.com/Canto-Network/Canto/v6/x/liquidstaking/keeper"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -20,7 +21,6 @@ import (
 	"github.com/Canto-Network/Canto/v6/x/liquidstaking/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/evmos/ethermint/crypto/ethsecp256k1"
@@ -41,7 +41,7 @@ type KeeperTestSuite struct {
 	queryClient types.QueryClient
 	consAddress sdk.ConsAddress
 	address     common.Address
-	validator   stakingtypes.Validator
+	delegator   sdk.AccAddress
 
 	denom string
 	// EpochCount counted by epochs module
@@ -75,6 +75,7 @@ func (suite *KeeperTestSuite) SetupApp() {
 	priv, err := ethsecp256k1.GenerateKey()
 	require.NoError(t, err)
 
+	suite.delegator = priv.PubKey().Address().Bytes()
 	suite.address = common.BytesToAddress(priv.PubKey().Address().Bytes())
 	suite.denom = "acanto"
 
@@ -117,19 +118,6 @@ func (suite *KeeperTestSuite) SetupApp() {
 	stakingParams.BondDenom = suite.denom
 	suite.app.StakingKeeper.SetParams(suite.ctx, stakingParams)
 
-	// Set Validator
-	valAddr := sdk.ValAddress(suite.address.Bytes())
-	validator, err := stakingtypes.NewValidator(valAddr, privCons.PubKey(), stakingtypes.Description{})
-	require.NoError(t, err)
-
-	validator = stakingkeeper.TestingUpdateValidator(suite.app.StakingKeeper, suite.ctx, validator, true)
-	suite.app.StakingKeeper.AfterValidatorCreated(suite.ctx, validator.GetOperator())
-	err = suite.app.StakingKeeper.SetValidatorByConsAddr(suite.ctx, validator)
-	require.NoError(t, err)
-
-	validators := s.app.StakingKeeper.GetValidators(suite.ctx, 1)
-	suite.validator = validators[0]
-
 	s.app.LiquidStakingKeeper.SetEpoch(
 		suite.ctx,
 		types.Epoch{
@@ -170,24 +158,32 @@ func (suite *KeeperTestSuite) CreateValidators(powers []int64) (valAddrs []sdk.V
 		validator, err := stakingtypes.NewValidator(valAddr, priv.PubKey(), stakingtypes.Description{})
 		suite.NoError(err)
 
-		tokens := suite.app.StakingKeeper.TokensFromConsensusPower(suite.ctx, power)
-
-		// Mint tokens for not bonded pool
-		err = suite.app.BankKeeper.MintCoins(suite.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(suite.denom, tokens)))
-		suite.NoError(err)
-		err = suite.app.BankKeeper.SendCoinsFromModuleToModule(suite.ctx, types.ModuleName, notBondedPool.GetName(), sdk.NewCoins(sdk.NewCoin(suite.denom, tokens)))
-		suite.NoError(err)
-
 		validator, err = validator.SetInitialCommission(stakingtypes.NewCommission(sdk.NewDecWithPrec(10, 2), sdk.NewDecWithPrec(10, 2), sdk.NewDecWithPrec(10, 2)))
 		if err != nil {
 			return
 		}
-		validator, _ = validator.AddTokensFromDel(tokens)
-		validator = stakingkeeper.TestingUpdateValidator(suite.app.StakingKeeper, suite.ctx, validator, true)
-		suite.app.StakingKeeper.AfterValidatorCreated(suite.ctx, validator.GetOperator())
+		// added to avoid invariant check for delegation
+		// validator must have self delegation
 		suite.app.StakingKeeper.SetValidator(suite.ctx, validator)
 		suite.NoError(suite.app.StakingKeeper.SetValidatorByConsAddr(suite.ctx, validator))
+		suite.app.StakingKeeper.SetNewValidatorByPowerIndex(suite.ctx, validator)
+		suite.app.StakingKeeper.AfterValidatorCreated(suite.ctx, validator.GetOperator())
 		valAddrs = append(valAddrs, valAddr)
+
+		tokens := suite.app.StakingKeeper.TokensFromConsensusPower(suite.ctx, power)
+		err = suite.app.BankKeeper.MintCoins(suite.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(suite.denom, tokens)))
+		suite.NoError(err)
+		err = suite.app.BankKeeper.SendCoinsFromModuleToModule(suite.ctx, types.ModuleName, notBondedPool.GetName(), sdk.NewCoins(sdk.NewCoin(suite.denom, tokens)))
+		suite.NoError(err)
+		suite.app.StakingKeeper.DeleteValidatorByPowerIndex(suite.ctx, validator)
+		validator, addedShares := validator.AddTokensFromDel(tokens)
+		suite.app.StakingKeeper.SetValidator(suite.ctx, validator)
+		suite.app.StakingKeeper.SetValidatorByPowerIndex(suite.ctx, validator)
+
+		del := stakingtypes.NewDelegation(suite.delegator, validator.GetOperator(), addedShares)
+		suite.app.StakingKeeper.BeforeDelegationCreated(suite.ctx, suite.delegator, del.GetValidatorAddr())
+		suite.app.StakingKeeper.SetDelegation(suite.ctx, del)
+		suite.app.StakingKeeper.AfterDelegationModified(suite.ctx, suite.delegator, del.GetValidatorAddr())
 	}
 	suite.app.EndBlocker(suite.ctx, abci.RequestEndBlock{})
 	return
