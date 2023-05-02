@@ -18,9 +18,7 @@ message GenesisState {
   uint64 last_insurance_id = 5;
   repeated Chunk chunks = 6 [ (gogoproto.nullable) = false ];
   repeated Insurance insurances = 7 [ (gogoproto.nullable) = false ];
-  repeated WithdrawingInsurance withdrawing_insurances = 8
-      [ (gogoproto.nullable) = false ];
-  repeated LiquidUnstakeUnbondingDelegationInfo
-      liquid_unstake_unbonding_delegation_infos = 9
-      [ (gogoproto.nullable) = false ];
+  repeated PendingLiquidUnstake pending_liquid_unstakes = 8 [ (gogoproto.nullable) = false ];
+  repeated UnpairingForUnstakeChunkInfo unpairing_for_unstake_chunk_infos = 9 [ (gogoproto.nullable) = false ];
+  repeated WithdrawInsuranceRequest withdraw_insurance_requests = 10 [ (gogoproto.nullable) = false ];
 }

@@ -87,13 +87,16 @@ func TestSortInsurances(t *testing.T) {
 		a, b     types.Insurance
 		fn       func(validatorMap map[string]stakingtypes.Validator, a, b types.Insurance) bool
 		expected bool
+		descend  bool
 	}{
+		// ASCEND order
 		{
 			"same validator | same insurance fee | id a < b",
 			types.NewInsurance(1, "", val1Addr.String(), fivePercent),
 			types.NewInsurance(2, "", val1Addr.String(), fivePercent),
 			sameValidatorSameInsuranceFeeLessId,
 			true,
+			false,
 		},
 		{
 			"same validator | insurance fee a < b",
@@ -101,12 +104,39 @@ func TestSortInsurances(t *testing.T) {
 			types.NewInsurance(2, "", val1Addr.String(), fivePercent),
 			sameValidatorLessInsuranceFee,
 			true,
+			false,
 		},
 		{
-			"same insurance fee | less validator fee",
+			"same insurance fee | less validator fee a < b",
 			types.NewInsurance(1, "", val3Addr.String(), threePercent),
 			types.NewInsurance(2, "", val2Addr.String(), threePercent),
 			lessTotalFee,
+			true,
+			false,
+		},
+		// DESCEND order
+		{
+			"same validator | same insurance fee | id b < a",
+			types.NewInsurance(2, "", val1Addr.String(), fivePercent),
+			types.NewInsurance(1, "", val1Addr.String(), fivePercent),
+			sameValidatorSameInsuranceFeeLessId,
+			true,
+			true,
+		},
+		{
+			"same validator | insurance fee b < a",
+			types.NewInsurance(2, "", val1Addr.String(), fivePercent),
+			types.NewInsurance(1, "", val1Addr.String(), threePercent),
+			sameValidatorLessInsuranceFee,
+			true,
+			true,
+		},
+		{
+			"same insurance fee | more validator fee",
+			types.NewInsurance(2, "", val2Addr.String(), threePercent),
+			types.NewInsurance(1, "", val3Addr.String(), threePercent),
+			lessTotalFee,
+			true,
 			true,
 		},
 	}
@@ -114,9 +144,13 @@ func TestSortInsurances(t *testing.T) {
 	for _, tc := range cases {
 		tc := tc
 		t.Run(tc.desc, func(t *testing.T) {
-			insurances := []types.Insurance{tc.a, tc.b}
-			types.SortInsurances(validatorMap, insurances)
-			require.Equal(t, tc.expected, tc.fn(validatorMap, insurances[0], insurances[1]))
+			insurances := []types.Insurance{tc.b, tc.a}
+			types.SortInsurances(validatorMap, insurances, tc.descend)
+			if tc.descend {
+				require.Equal(t, tc.expected, tc.fn(validatorMap, insurances[1], insurances[0]))
+			} else {
+				require.Equal(t, tc.expected, tc.fn(validatorMap, insurances[0], insurances[1]))
+			}
 		})
 	}
 }

@@ -133,9 +133,10 @@ message ChunkResponse {
   cosmos.base.v1beta1.Coin accumulated_reward = 4
       [ (gogoproto.nullable) = false ];
   // Paired insurance
-  Insurance insurance = 5 [ (gogoproto.nullable) = false ];
+  Insurance paired_insurance = 5 [ (gogoproto.nullable) = false ];
+  Insurance unpairing_insurance = 6 [ (gogoproto.nullable) = false ];
   // Status of the chunk
-  ChunkStatus status = 6;
+  ChunkStatus status = 7;
 }
 
 message InsuranceResponse {

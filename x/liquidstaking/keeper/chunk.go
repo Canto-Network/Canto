@@ -85,6 +85,6 @@ func (k Keeper) GetLastChunkId(ctx sdk.Context) (id uint64) {
 
 func (k Keeper) getNextChunkIdWithUpdate(ctx sdk.Context) uint64 {
 	id := k.GetLastChunkId(ctx) + 1
-	k.SetLastChunkId(ctx, id+1)
+	k.SetLastChunkId(ctx, id)
 	return id
 }

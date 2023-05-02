@@ -2,6 +2,7 @@ package types
 
 import (
 	"bytes"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/address"
 )
@@ -27,25 +28,26 @@ const (
 	prefixInsurance
 	prefixPairingInsuranceIndex
 	prefixInsurancesByProviderIndex
-	prefixWithdrawingInsurance
+	prefixWithdrawInsuranceRequest
 	prefixPreviousInsuranceIndex
-	prefixLiquidUnstakeUnbondingDelegation
+	prefixUnpairingForUnstakeChunkInfo
+	prefixLiquidUnstakeKey
 	prefixEpoch
 )
 
 // KVStore key prefixes
 var (
-	KeyPrefixLastChunkId                      = []byte{prefixLastChunkId}
-	KeyPrefixLastInsuranceId                  = []byte{prefixLastInsuranceId}
-	KeyPrefixChunk                            = []byte{prefixChunk}
-	KeyPrefixInsurance                        = []byte{prefixInsurance}
-	KeyPrefixPairingInsuranceIndex            = []byte{prefixPairingInsuranceIndex}
-	KeyPrefixInsurancesByProviderIndex        = []byte{prefixInsurancesByProviderIndex}
-	KeyPrefixWithdrawingInsurance             = []byte{prefixWithdrawingInsurance}
-	KeyPrefixPreviousInsuranceIndex           = []byte{prefixPreviousInsuranceIndex}
-	KeyPrefixLiquidUnstakeUnbondingDelegation = []byte{prefixLiquidUnstakeUnbondingDelegation}
-	KeyPrefixEpoch                            = []byte{prefixEpoch}
-	KeyLiquidBondDenom                        = []byte{prefixLiquidBondDenom}
+	KeyPrefixLastChunkId                  = []byte{prefixLastChunkId}
+	KeyPrefixLastInsuranceId              = []byte{prefixLastInsuranceId}
+	KeyPrefixChunk                        = []byte{prefixChunk}
+	KeyPrefixInsurance                    = []byte{prefixInsurance}
+	KeyPrefixPairingInsuranceIndex        = []byte{prefixPairingInsuranceIndex}
+	KeyPrefixInsurancesByProviderIndex    = []byte{prefixInsurancesByProviderIndex}
+	KeyPrefixWithdrawInsuranceRequest     = []byte{prefixWithdrawInsuranceRequest}
+	KeyPrefixUnpairingForUnstakeChunkInfo = []byte{prefixUnpairingForUnstakeChunkInfo}
+	KeyPrefixLiquidUnstakeKey             = []byte{prefixLiquidUnstakeKey}
+	KeyPrefixEpoch                        = []byte{prefixEpoch}
+	KeyLiquidBondDenom                    = []byte{prefixLiquidBondDenom}
 )
 
 func GetChunkKey(chunkId uint64) []byte {
@@ -64,12 +66,12 @@ func GetInsurancesByProviderIndexKey(providerAddress sdk.AccAddress, insuranceId
 	return append(append(KeyPrefixInsurancesByProviderIndex, address.MustLengthPrefix(providerAddress)...), sdk.Uint64ToBigEndian(insuranceId)...)
 }
 
-func GetWithdrawingInsuranceKey(insuranceId uint64) []byte {
-	return append(KeyPrefixWithdrawingInsurance, sdk.Uint64ToBigEndian(insuranceId)...)
+func GetWithdrawInsuranceRequestKey(insuranceId uint64) []byte {
+	return append(KeyPrefixWithdrawInsuranceRequest, sdk.Uint64ToBigEndian(insuranceId)...)
 }
 
-func GetLiquidUnstakeUnbondingDelegationKey(chunkId uint64) []byte {
-	return append(KeyPrefixLiquidUnstakeUnbondingDelegation, sdk.Uint64ToBigEndian(chunkId)...)
+func GetUnpairingForUnstakeChunkInfoKey(chunkId uint64) []byte {
+	return append(KeyPrefixUnpairingForUnstakeChunkInfo, sdk.Uint64ToBigEndian(chunkId)...)
 }
 
 func ParseInsurancesByProviderIndexKey(key []byte) (providerAddress sdk.AccAddress, insuranceId uint64) {
@@ -90,4 +92,8 @@ func ParsePairingInsuranceIndexKey(key []byte) (insuranceId uint64) {
 
 	insuranceId = sdk.BigEndianToUint64(key[1:])
 	return
+}
+
+func GetPendingLiquidStakeKey(delegator sdk.AccAddress) []byte {
+	return append(KeyPrefixLiquidUnstakeKey, address.MustLengthPrefix(delegator)...)
 }

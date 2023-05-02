@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	ethermint "github.com/evmos/ethermint/types"
 )
@@ -14,9 +15,10 @@ var ChunkSize = sdk.TokensFromConsensusPower(5000000, ethermint.PowerReduction)
 
 func NewChunk(id uint64) Chunk {
 	return Chunk{
-		Id:          id,
-		InsuranceId: 0, // Not yet assigned
-		Status:      CHUNK_STATUS_PAIRING,
+		Id:                   id,
+		PairedInsuranceId:    0, // Not yet assigned
+		UnpairingInsuranceId: 0, // Not yet assigned
+		Status:               CHUNK_STATUS_PAIRING,
 	}
 }
 
@@ -26,7 +28,8 @@ func (c *Chunk) DerivedAddress() sdk.AccAddress {
 
 func (c *Chunk) Equal(other Chunk) bool {
 	return c.Id == other.Id &&
-		c.InsuranceId == other.InsuranceId &&
+		c.PairedInsuranceId == other.PairedInsuranceId &&
+		c.UnpairingInsuranceId == other.UnpairingInsuranceId &&
 		c.Status == other.Status
 }
 

@@ -23,6 +23,7 @@ message Epoch {
 // Params defines the parameters for the module.
 message Params { option (gogoproto.goproto_getters) = false; }
 
+// TODO: Update comments for each statuses
 // ChunkStatus defines the status of the chunk.
 enum ChunkStatus {
   option (gogoproto.goproto_enum_prefix) = false;
@@ -38,7 +39,7 @@ enum ChunkStatus {
   // For various reasons, the insurance paired to Chunk can be un-paired.
   // At this time, if there is no insurance candidate,
   // a chunk enters this status.
-  CHUNK_STATUS_UNPAIRING_FOR_REPAIRING = 3;
+  CHUNK_STATUS_UNPAIRING = 3;
   // When a delegator(= liquid staker) sends a MsgLiquidUnstake, the last ranked
   // paired chunk enters this status and waits until the un-bonding period times
   // out.
@@ -52,11 +53,13 @@ message Chunk {
   // Id of the chunk
   uint64 id = 1;
   // Id of Paired insurance, 0 means no insurance
-  uint64 insurance_id = 2;
+  uint64 paired_insurance_id = 2;
+  uint64 unpairing_insurance_id = 3;
   // Status of the chunk
-  ChunkStatus status = 3;
+  ChunkStatus status = 4;
 }
 
+// TODO: Update comments for each statuses
 // InsuranceStatus defines the status of the insurance.
 enum InsuranceStatus {
   option (gogoproto.goproto_enum_prefix) = false;
@@ -74,7 +77,7 @@ enum InsuranceStatus {
   // For various reasons, the insurance paired to Chunk can enters this status.
   // The insurance in this status wait until
   // the paired chunk's un-bonding period times out.
-  INSURANCE_STATUS_UNPAIRING_FOR_REPAIRING = 3;
+  INSURANCE_STATUS_UNPAIRING = 3;
   // Insurance enters this status when msgServer receives MsgWithdrawInsurance.
   // The insurance waits until the paired chunk's un-bonding period times out.
   INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAW = 4;
@@ -82,7 +85,7 @@ enum InsuranceStatus {
   // cover slash. If not, the insurance enters this status. Insurance provider
   // can re-fill token amount of the insurance by sending MsgRefillInsurance or
   // cancel the insurance by sending MsgCancelInsuranceProvide.
-  INSURANCE_STATUS_VULNERABLE = 5;
+  INSURANCE_STATUS_UNPAIRED = 5;
 }
 
 // Insurance defines the insurance of the module.
@@ -185,37 +188,34 @@ message NetAmountState {
   ];
 }
 
-// LiquidUnstakeUnbondingDelegationInfo is created when liquid unstaker requests
-// a MsgLiquidUnstake. It exists to burn ls tokens in the amount calculated at
-// the mint rate at the time of the request, before returning native tokens that
-// have been bound since the end of the unbonding period.
-message LiquidUnstakeUnbondingDelegationInfo {
-  // The id of chunk in UnpairingForUnstake status.
+message PendingLiquidUnstake {
+  option (gogoproto.equal)            = false;
+  option (gogoproto.goproto_getters)  = false;
+
+  // The id of chunk
   uint64 chunk_id = 1;
-  // The address of liquid unstaker
+  // Address of delegator
   string delegator_address = 2;
-  // The address of the validator
-  string validator_address = 3;
-  // The amount of ls tokens to be burned
-  // This is calculated by the mint rate at the time of the request
-  string burn_amount = 4 [
+  // Amount of ls tokens to burn
+  string escrowed_lstokens = 3 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
     (gogoproto.nullable) = false
   ];
-  // The unix time for unbonding completion
-  google.protobuf.Timestamp completion_time = 5
-      [ (gogoproto.nullable) = false, (gogoproto.stdtime) = true ];
 }
 
-// WithdrawalInsurance is created when insurance provider requests a
-// MsgWithdrawInsurance. Actual withdrawal is done after completion_time.
-message WithdrawingInsurance {
-  // Id of the insurance
+message UnpairingForUnstakeChunkInfo {
+  // The id of chunk
+  uint64 chunk_id = 1;
+  // Address of delegator
+  string delegator_address = 2;
+  // Amount of ls tokens to burn
+  string escrowed_lstokens = 3 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message WithdrawInsuranceRequest {
+  // The id of insurance
   uint64 insurance_id = 1;
-  // Id of the chunk
-  uint64 chunk_id = 2;
-  // The unix time for unbonding completion
-  // Insurance is withdrawn after completion_time
-  google.protobuf.Timestamp completion_time = 3
-      [ (gogoproto.nullable) = false, (gogoproto.stdtime) = true ];
 }

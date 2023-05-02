@@ -130,7 +130,7 @@ import (
 	vestingkeeper "github.com/Canto-Network/Canto/v6/x/vesting/keeper"
 	vestingtypes "github.com/Canto-Network/Canto/v6/x/vesting/types"
 
-	//govshuttle imports
+	// govshuttle imports
 	"github.com/Canto-Network/Canto/v6/x/govshuttle"
 	govshuttleclient "github.com/Canto-Network/Canto/v6/x/govshuttle/client"
 	govshuttlekeeper "github.com/Canto-Network/Canto/v6/x/govshuttle/keeper"
@@ -225,7 +225,7 @@ var (
 		erc20types.ModuleName:          {authtypes.Minter, authtypes.Burner},
 		csrtypes.ModuleName:            {authtypes.Minter, authtypes.Burner},
 		govshuttletypes.ModuleName:     {authtypes.Minter, authtypes.Burner},
-		liquidstakingtypes.ModuleName:  {authtypes.Minter, authtypes.Burner},
+		liquidstakingtypes.ModuleName:  {authtypes.Minter},
 	}
 
 	// module accounts that are allowed to receive tokens
@@ -348,7 +348,7 @@ func NewCanto(
 		evmtypes.StoreKey, feemarkettypes.StoreKey,
 		// Canto keys
 		inflationtypes.StoreKey, erc20types.StoreKey,
-		epochstypes.StoreKey, vestingtypes.StoreKey, recoverytypes.StoreKey, //recoverytypes.StoreKe
+		epochstypes.StoreKey, vestingtypes.StoreKey, recoverytypes.StoreKey, // recoverytypes.StoreKe
 		feestypes.StoreKey,
 		csrtypes.StoreKey,
 		govshuttletypes.StoreKey,
@@ -504,7 +504,7 @@ func NewCanto(
 
 	app.GovKeeper = *govKeeper.SetHooks(
 		govtypes.NewMultiGovHooks(
-		//insert Gov hooks here
+		// insert Gov hooks here
 		),
 	)
 
@@ -543,7 +543,7 @@ func NewCanto(
 
 	app.TransferKeeper = ibctransferkeeper.NewKeeper(
 		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName), app.RecoveryKeeper,
-		//nil, // ICS4 Wrapper: claims IBC middleware
+		// nil, // ICS4 Wrapper: claims IBC middleware
 		app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
 		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
 	)

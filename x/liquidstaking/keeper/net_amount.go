@@ -3,6 +3,7 @@ package keeper
 import (
 	"github.com/Canto-Network/Canto/v6/x/liquidstaking/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
 // TODO: Discuss with taeyoung what values should be used for meaningful testing
@@ -20,8 +21,8 @@ func (k Keeper) GetNetAmountState(ctx sdk.Context) (nas types.NetAmountState) {
 		balance := k.bankKeeper.GetBalance(ctx, chunk.DerivedAddress(), k.stakingKeeper.BondDenom(ctx))
 		totalChunksBalance = totalChunksBalance.Add(balance.Amount.ToDec())
 
-		insurance, _ := k.GetInsurance(ctx, chunk.InsuranceId)
-		valAddr, err := sdk.ValAddressFromBech32(insurance.ValidatorAddress)
+		pairedInsurance, _ := k.GetInsurance(ctx, chunk.PairedInsuranceId)
+		valAddr, err := sdk.ValAddressFromBech32(pairedInsurance.ValidatorAddress)
 		if err != nil {
 			return true, err
 		}
@@ -38,12 +39,12 @@ func (k Keeper) GetNetAmountState(ctx sdk.Context) (nas types.NetAmountState) {
 		delReward := k.distributionKeeper.CalculateDelegationRewards(cachedCtx, validator, delegation, endingPeriod)
 		totalRemainingRewards = totalRemainingRewards.Add(delReward.AmountOf(bondDenom))
 
-		ubds := k.stakingKeeper.GetAllUnbondingDelegations(ctx, chunk.DerivedAddress())
-		for _, ubd := range ubds {
+		k.stakingKeeper.IterateDelegatorUnbondingDelegations(ctx, chunk.DerivedAddress(), func(ubd stakingtypes.UnbondingDelegation) (stop bool) {
 			for _, entry := range ubd.Entries {
 				totalUnbondingBalance = totalUnbondingBalance.Add(entry.Balance.ToDec())
 			}
-		}
+			return false
+		})
 		return false, nil
 	})
 	if err != nil {
@@ -63,13 +64,14 @@ func (k Keeper) GetNetAmountState(ctx sdk.Context) (nas types.NetAmountState) {
 	}
 
 	nas = types.NetAmountState{
-		LsTokensTotalSupply:   k.bankKeeper.GetSupply(ctx, liquidBondDenom).Amount,
-		TotalChunksBalance:    totalChunksBalance.TruncateInt(),
-		TotalDelShares:        totalDelShares,
-		TotalRemainingRewards: totalRemainingRewards,
-		TotalLiquidTokens:     totalLiquidTokens,
-		TotalInsuranceTokens:  totalInsuranceTokens,
-		TotalUnbondingBalance: totalUnbondingBalance.TruncateInt(),
+		LsTokensTotalSupply:    k.bankKeeper.GetSupply(ctx, liquidBondDenom).Amount,
+		TotalChunksBalance:     totalChunksBalance.TruncateInt(),
+		TotalDelShares:         totalDelShares,
+		TotalRemainingRewards:  totalRemainingRewards,
+		TotalLiquidTokens:      totalLiquidTokens,
+		TotalInsuranceTokens:   totalInsuranceTokens,
+		TotalUnbondingBalance:  totalUnbondingBalance.TruncateInt(),
+		RewardModuleAccBalance: k.bankKeeper.GetBalance(ctx, types.RewardPool, bondDenom).Amount,
 	}
 
 	nas.NetAmount = nas.CalcNetAmount(k.bankKeeper.GetBalance(ctx, types.RewardPool, bondDenom).Amount)

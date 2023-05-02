@@ -4,6 +4,7 @@ import (
 	"github.com/Canto-Network/Canto/v6/x/liquidstaking/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/address"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	gogotypes "github.com/gogo/protobuf/types"
 )
 
@@ -57,6 +58,33 @@ func (k Keeper) DeleteInsurance(ctx sdk.Context, id uint64) {
 	insurance, _ := k.GetInsurance(ctx, id)
 	store.Delete(types.GetInsuranceKey(insurance.Id))
 	store.Delete(types.GetInsurancesByProviderIndexKey(sdk.AccAddress(insurance.ProviderAddress), insurance.Id))
+}
+
+func (k Keeper) getPairingInsurances(ctx sdk.Context) (
+	pairingInsurances []types.Insurance,
+	validatorMap map[string]stakingtypes.Validator,
+) {
+	validatorMap = make(map[string]stakingtypes.Validator)
+	err := k.IteratePairingInsurances(ctx, func(insurance types.Insurance) (bool, error) {
+		if _, ok := validatorMap[insurance.ValidatorAddress]; !ok {
+			validator, found := k.stakingKeeper.GetValidator(ctx, insurance.GetValidator())
+			valid, err := k.isValidValidator(ctx, validator, found)
+			if err != nil {
+				return false, nil
+			}
+			if valid {
+				validatorMap[insurance.ValidatorAddress] = validator
+			} else {
+				return false, nil
+			}
+		}
+		pairingInsurances = append(pairingInsurances, insurance)
+		return false, nil
+	})
+	if err != nil {
+		return nil, nil
+	}
+	return
 }
 
 func (k Keeper) IterateAllInsurances(ctx sdk.Context, cb func(insurance types.Insurance) (stop bool, err error)) error {
@@ -134,8 +162,7 @@ func (k Keeper) GetLastInsuranceId(ctx sdk.Context) (id uint64) {
 }
 
 func (k Keeper) getNextInsuranceIdWithUpdate(ctx sdk.Context) uint64 {
-	id := k.GetLastInsuranceId(ctx)
-	id++
+	id := k.GetLastInsuranceId(ctx) + 1
 	k.SetLastInsuranceId(ctx, id)
 	return id
 }

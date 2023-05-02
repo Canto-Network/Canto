@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+
 	"github.com/Canto-Network/Canto/v6/x/liquidstaking/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -130,17 +131,19 @@ func (k Keeper) States(c context.Context, _ *types.QueryStatesRequest) (*types.Q
 }
 
 func chunkToChunkResponse(ctx sdk.Context, k Keeper, chunk types.Chunk) types.ChunkResponse {
-	insurance, _ := k.GetInsurance(ctx, chunk.InsuranceId)
-	del, _ := k.stakingKeeper.GetDelegation(ctx, chunk.DerivedAddress(), sdk.ValAddress(insurance.ValidatorAddress))
-	val, _ := k.stakingKeeper.GetValidator(ctx, sdk.ValAddress(insurance.ValidatorAddress))
+	pairedInsurance, _ := k.GetInsurance(ctx, chunk.PairedInsuranceId)
+	unpairingInsurance, _ := k.GetInsurance(ctx, chunk.UnpairingInsuranceId)
+	del, _ := k.stakingKeeper.GetDelegation(ctx, chunk.DerivedAddress(), sdk.ValAddress(pairedInsurance.ValidatorAddress))
+	val, _ := k.stakingKeeper.GetValidator(ctx, sdk.ValAddress(pairedInsurance.ValidatorAddress))
 
 	return types.ChunkResponse{
-		Id:                chunk.Id,
-		Tokens:            val.TokensFromShares(del.Shares),
-		Shares:            del.Shares,
-		AccumulatedReward: k.bankKeeper.GetBalance(ctx, chunk.DerivedAddress(), k.stakingKeeper.BondDenom(ctx)),
-		Insurance:         insurance,
-		Status:            chunk.Status,
+		Id:                 chunk.Id,
+		Tokens:             val.TokensFromShares(del.Shares),
+		Shares:             del.Shares,
+		AccumulatedReward:  k.bankKeeper.GetBalance(ctx, chunk.DerivedAddress(), k.stakingKeeper.BondDenom(ctx)),
+		PairedInsurance:    pairedInsurance,
+		UnpairingInsurance: unpairingInsurance,
+		Status:             chunk.Status,
 	}
 }
 

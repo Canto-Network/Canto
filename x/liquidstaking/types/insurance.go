@@ -43,7 +43,7 @@ func (i *Insurance) GetValidator() sdk.ValAddress {
 // TODO: Need memory profiling
 // This can be called multiple times and there are local assignments for i, j Insurance
 // readable but worried for memory usage
-func SortInsurances(validatorMap map[string]stakingtypes.Validator, insurances []Insurance) {
+func SortInsurances(validatorMap map[string]stakingtypes.Validator, insurances []Insurance, descending bool) {
 	sort.Slice(insurances, func(i, j int) bool {
 		iInsurance := insurances[i]
 		jInsurance := insurances[j]
@@ -55,7 +55,13 @@ func SortInsurances(validatorMap map[string]stakingtypes.Validator, insurances [
 		jFee := jValidator.Commission.Rate.Add(jInsurance.FeeRate)
 
 		if !iFee.Equal(jFee) {
+			if descending {
+				return iFee.GT(jFee)
+			}
 			return iFee.LT(jFee)
+		}
+		if descending {
+			return iInsurance.Id > jInsurance.Id
 		}
 		return iInsurance.Id < jInsurance.Id
 	})

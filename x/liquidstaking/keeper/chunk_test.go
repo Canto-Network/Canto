@@ -14,7 +14,8 @@ func (suite *KeeperTestSuite) TestChunkSetGet() {
 	for _, chunk := range chunks {
 		id := chunk.Id
 		status := chunk.Status
-		insuranceId := chunk.InsuranceId
+		pairedInsuranceId := chunk.PairedInsuranceId
+		unpairingInsuranceId := chunk.UnpairingInsuranceId
 		// Get chunk from the store
 		result, found := suite.app.LiquidStakingKeeper.GetChunk(suite.ctx, id)
 
@@ -22,7 +23,8 @@ func (suite *KeeperTestSuite) TestChunkSetGet() {
 		suite.Require().True(found)
 		suite.Require().Equal(result.Id, id)
 		suite.Require().Equal(result.Status, status)
-		suite.Require().Equal(result.InsuranceId, insuranceId)
+		suite.Require().Equal(result.PairedInsuranceId, pairedInsuranceId)
+		suite.Require().Equal(result.UnpairingInsuranceId, unpairingInsuranceId)
 	}
 }
 

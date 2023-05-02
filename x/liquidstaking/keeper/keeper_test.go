@@ -1,13 +1,14 @@
 package keeper_test
 
 import (
+	"testing"
+	"time"
+
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	ethermint "github.com/evmos/ethermint/types"
-	"testing"
-	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -183,12 +184,16 @@ func (suite *KeeperTestSuite) AddTestAddrs(accNum int, amount sdk.Int) ([]sdk.Ac
 		balances = append(balances, sdk.NewCoin(suite.denom, amount))
 
 		// fund each account
-		err := suite.app.BankKeeper.MintCoins(suite.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(suite.denom, amount)))
-		suite.NoError(err)
-		err = suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, addr, sdk.NewCoins(sdk.NewCoin(suite.denom, amount)))
-		suite.NoError(err)
+		suite.fundAccount(addr, amount)
 	}
 	return addrs, balances
+}
+
+func (suite *KeeperTestSuite) fundAccount(addr sdk.AccAddress, amount sdk.Int) {
+	err := suite.app.BankKeeper.MintCoins(suite.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(suite.denom, amount)))
+	suite.NoError(err)
+	err = suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, addr, sdk.NewCoins(sdk.NewCoin(suite.denom, amount)))
+	suite.NoError(err)
 }
 
 func (suite *KeeperTestSuite) advanceHeight(height int) {
