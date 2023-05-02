@@ -2,3 +2,4 @@
 .testnets
 .bencher
 DS_Store
+node_modules

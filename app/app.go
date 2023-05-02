@@ -140,6 +140,10 @@ import (
 	csrkeeper "github.com/Canto-Network/Canto/v6/x/csr/keeper"
 	csrtypes "github.com/Canto-Network/Canto/v6/x/csr/types"
 
+	"github.com/Canto-Network/Canto/v6/x/liquidstaking"
+	liquidstakingkeeper "github.com/Canto-Network/Canto/v6/x/liquidstaking/keeper"
+	liquidstakingtypes "github.com/Canto-Network/Canto/v6/x/liquidstaking/types"
+
 	v2 "github.com/Canto-Network/Canto/v6/app/upgrades/v2"
 	v3 "github.com/Canto-Network/Canto/v6/app/upgrades/v3"
 	v4 "github.com/Canto-Network/Canto/v6/app/upgrades/v4"
@@ -205,6 +209,7 @@ var (
 		epochs.AppModuleBasic{},
 		recovery.AppModuleBasic{},
 		fees.AppModuleBasic{},
+		liquidstaking.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -220,6 +225,7 @@ var (
 		erc20types.ModuleName:          {authtypes.Minter, authtypes.Burner},
 		csrtypes.ModuleName:            {authtypes.Minter, authtypes.Burner},
 		govshuttletypes.ModuleName:     {authtypes.Minter, authtypes.Burner},
+		liquidstakingtypes.ModuleName:  {authtypes.Minter, authtypes.Burner},
 	}
 
 	// module accounts that are allowed to receive tokens
@@ -278,14 +284,15 @@ type Canto struct {
 	FeeMarketKeeper feemarketkeeper.Keeper
 
 	// Canto keepers
-	InflationKeeper  inflationkeeper.Keeper
-	Erc20Keeper      erc20keeper.Keeper
-	EpochsKeeper     epochskeeper.Keeper
-	VestingKeeper    vestingkeeper.Keeper
-	RecoveryKeeper   *recoverykeeper.Keeper
-	FeesKeeper       feeskeeper.Keeper
-	GovshuttleKeeper govshuttlekeeper.Keeper
-	CSRKeeper        csrkeeper.Keeper
+	InflationKeeper     inflationkeeper.Keeper
+	Erc20Keeper         erc20keeper.Keeper
+	EpochsKeeper        epochskeeper.Keeper
+	VestingKeeper       vestingkeeper.Keeper
+	RecoveryKeeper      *recoverykeeper.Keeper
+	FeesKeeper          feeskeeper.Keeper
+	GovshuttleKeeper    govshuttlekeeper.Keeper
+	CSRKeeper           csrkeeper.Keeper
+	LiquidStakingKeeper liquidstakingkeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -345,6 +352,7 @@ func NewCanto(
 		feestypes.StoreKey,
 		csrtypes.StoreKey,
 		govshuttletypes.StoreKey,
+		liquidstakingtypes.StoreKey,
 	)
 
 	// Add the EVM transient store key
@@ -442,6 +450,11 @@ func NewCanto(
 		authtypes.FeeCollectorName,
 	)
 
+	app.LiquidStakingKeeper = liquidstakingkeeper.NewKeeper(
+		keys[liquidstakingtypes.StoreKey], appCodec, app.GetSubspace(liquidstakingtypes.ModuleName),
+		app.AccountKeeper, app.BankKeeper, app.DistrKeeper, &stakingKeeper, app.SlashingKeeper,
+	)
+
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	// NOTE: Distr, Slashing and Claim must be created before calling the Hooks method to avoid returning a Keeper without its table generated
@@ -449,6 +462,7 @@ func NewCanto(
 		stakingtypes.NewMultiStakingHooks(
 			app.DistrKeeper.Hooks(),
 			app.SlashingKeeper.Hooks(),
+			app.LiquidStakingKeeper.Hooks(),
 		),
 	)
 
@@ -621,6 +635,7 @@ func NewCanto(
 		fees.NewAppModule(app.FeesKeeper, app.AccountKeeper),
 		govshuttle.NewAppModule(app.GovshuttleKeeper, app.AccountKeeper),
 		csr.NewAppModule(app.CSRKeeper, app.AccountKeeper),
+		liquidstaking.NewAppModule(app.LiquidStakingKeeper, app.AccountKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -639,6 +654,7 @@ func NewCanto(
 		distrtypes.ModuleName,
 		slashingtypes.ModuleName,
 		evidencetypes.ModuleName,
+		liquidstakingtypes.ModuleName,
 		stakingtypes.ModuleName,
 		ibchost.ModuleName,
 		// no-op modules
@@ -680,6 +696,7 @@ func NewCanto(
 		slashingtypes.ModuleName,
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
+		liquidstakingtypes.ModuleName,
 		authz.ModuleName,
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
@@ -734,6 +751,7 @@ func NewCanto(
 		csrtypes.ModuleName,
 		// NOTE: crisis module must go at the end to check for invariants on each module
 		crisistypes.ModuleName,
+		liquidstakingtypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -766,6 +784,7 @@ func NewCanto(
 		evm.NewAppModule(app.EvmKeeper, app.AccountKeeper),
 		epochs.NewAppModule(appCodec, app.EpochsKeeper),
 		feemarket.NewAppModule(app.FeeMarketKeeper),
+		liquidstaking.NewAppModule(app.LiquidStakingKeeper, app.AccountKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()
@@ -1050,6 +1069,7 @@ func initParamsKeeper(
 	paramsKeeper.Subspace(feestypes.ModuleName)
 	paramsKeeper.Subspace(govshuttletypes.ModuleName)
 	paramsKeeper.Subspace(csrtypes.ModuleName)
+	paramsKeeper.Subspace(liquidstakingtypes.ModuleName)
 	return paramsKeeper
 }
 

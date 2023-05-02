@@ -1,0 +1,221 @@
+syntax = "proto3";
+package canto.liquidstaking.v1;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "cosmos_proto/cosmos.proto";
+
+option go_package = "github.com/Canto-Network/Canto/v6/x/liquidstaking/types";
+
+// Epoch defines the epoch of the module.
+message Epoch {
+  uint64 current_number = 1;
+  google.protobuf.Timestamp epoch_start_time = 2
+      [ (gogoproto.stdtime) = true, (gogoproto.nullable) = false ];
+  google.protobuf.Duration epoch_duration = 3
+      [ (gogoproto.stdduration) = true, (gogoproto.nullable) = false ];
+  int64 epoch_start_height = 4;
+  uint64 epoch_chunk_size = 5;
+  uint64 epoch_max_paired_chunk = 6;
+}
+
+// Params defines the parameters for the module.
+message Params { option (gogoproto.goproto_getters) = false; }
+
+// ChunkStatus defines the status of the chunk.
+enum ChunkStatus {
+  option (gogoproto.goproto_enum_prefix) = false;
+
+  CHUNK_STATUS_UNSPECIFIED = 0;
+  // Default status of a chunk when a msgServer receives MsgLiquidStake.
+  // This status indicates that the chunk is ready to be paired
+  // with an insurance.
+  CHUNK_STATUS_PAIRING = 1;
+  // This status indicates that the chunk is paired with an insurance
+  // which has the lowest fee rate.
+  CHUNK_STATUS_PAIRED = 2;
+  // For various reasons, the insurance paired to Chunk can be un-paired.
+  // At this time, if there is no insurance candidate,
+  // a chunk enters this status.
+  CHUNK_STATUS_UNPAIRING_FOR_REPAIRING = 3;
+  // When a delegator(= liquid staker) sends a MsgLiquidUnstake, the last ranked
+  // paired chunk enters this status and waits until the un-bonding period times
+  // out.
+  CHUNK_STATUS_UNPAIRING_FOR_UNSTAKE = 4;
+}
+
+// Chunk defines the chunk of the module.
+message Chunk {
+  option (gogoproto.goproto_getters) = false;
+
+  // Id of the chunk
+  uint64 id = 1;
+  // Id of Paired insurance, 0 means no insurance
+  uint64 insurance_id = 2;
+  // Status of the chunk
+  ChunkStatus status = 3;
+}
+
+// InsuranceStatus defines the status of the insurance.
+enum InsuranceStatus {
+  option (gogoproto.goproto_enum_prefix) = false;
+
+  INSURANCE_STATUS_UNSPECIFIED = 0;
+  // Default status of an insurance when a msgServer receives
+  // MsgInsuranceProvide. This status indicates that
+  // the insurance is ready to be paired with a chunk.
+  INSURANCE_STATUS_PAIRING = 1;
+  // This status indicates that the insurance is paired with a chunk.
+  // While the insurance is in this status, it serves as a form of protection
+  // for the chunk by insuring it against unexpected loss that may occur due to
+  // validator slashing.
+  INSURANCE_STATUS_PAIRED = 2;
+  // For various reasons, the insurance paired to Chunk can enters this status.
+  // The insurance in this status wait until
+  // the paired chunk's un-bonding period times out.
+  INSURANCE_STATUS_UNPAIRING_FOR_REPAIRING = 3;
+  // Insurance enters this status when msgServer receives MsgWithdrawInsurance.
+  // The insurance waits until the paired chunk's un-bonding period times out.
+  INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAW = 4;
+  // Every begin block, the module checks all insurances have enough balance to
+  // cover slash. If not, the insurance enters this status. Insurance provider
+  // can re-fill token amount of the insurance by sending MsgRefillInsurance or
+  // cancel the insurance by sending MsgCancelInsuranceProvide.
+  INSURANCE_STATUS_VULNERABLE = 5;
+}
+
+// Insurance defines the insurance of the module.
+message Insurance {
+  option (gogoproto.goproto_getters) = false;
+
+  // Id of the insurance
+  uint64 id = 1;
+  // Address of the validator
+  string validator_address = 2;
+  // Address of the insurance provider
+  string provider_address = 3;
+  // Fee rate of the insurance
+  string fee_rate = 4 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+  // Id of Paired chunk, 0 means no chunk
+  uint64 chunk_id = 5;
+  // Status of the insurance
+  InsuranceStatus status = 6;
+}
+
+// NetAmountState is type for net amount raw data and mint rate, This is a value
+// that depends on the several module state every time, so it is used only for
+// calculation and query and is not stored in kv.
+message NetAmountState {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = true;
+  option (gogoproto.goproto_stringer) = false;
+
+  // Calculated by (total supply of ls tokens) / NetAmount
+  string mint_rate = 1 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // Total supply of ls tokens
+  // e.g. 100 ls tokens minted -> 10 ls tokens burned, then total supply is 90
+  // ls tokens
+  string ls_tokens_total_supply = 2 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // Calculated by reward module account's native token balance + all paired
+  // chunk's native token balance + all delegation tokens of paired chunks
+  // last Epoch + all unbonding delegation tokens of unpairing chunks
+  string net_amount = 3 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // Total shares of all paired chunks
+  string total_del_shares = 4 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // The cumulative reward of all chunks delegations from the last distribution
+  string total_remaining_rewards = 5 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // Sum of the balances of all chunks.
+  // Note: Paired chunks can be pairing status for various reasons (such as lack
+  // of insurance). In such cases, the delegated native tokens returns to the
+  // balance of DerivedAddress(Chunk.Id) after un-bonding period is finished.
+  string total_chunks_balance = 6 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // The token amount worth of all delegation shares of all paired chunks
+  // (slashing applied amount)
+  string total_liquid_tokens = 7 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // The sum of all paired insurances' amount (=
+  // DerivedAddress(Insurance.Id).Balance)
+  string total_insurance_tokens = 8 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // The sum of unbonding balance of all chunks in UnpairingForRepairing and
+  // UnpairingForUnstake
+  string total_unbonding_balance = 9 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // Balance of reward module account
+  string reward_module_acc_balance = 10 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// LiquidUnstakeUnbondingDelegationInfo is created when liquid unstaker requests
+// a MsgLiquidUnstake. It exists to burn ls tokens in the amount calculated at
+// the mint rate at the time of the request, before returning native tokens that
+// have been bound since the end of the unbonding period.
+message LiquidUnstakeUnbondingDelegationInfo {
+  // The id of chunk in UnpairingForUnstake status.
+  uint64 chunk_id = 1;
+  // The address of liquid unstaker
+  string delegator_address = 2;
+  // The address of the validator
+  string validator_address = 3;
+  // The amount of ls tokens to be burned
+  // This is calculated by the mint rate at the time of the request
+  string burn_amount = 4 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
+    (gogoproto.nullable) = false
+  ];
+  // The unix time for unbonding completion
+  google.protobuf.Timestamp completion_time = 5
+      [ (gogoproto.nullable) = false, (gogoproto.stdtime) = true ];
+}
+
+// WithdrawalInsurance is created when insurance provider requests a
+// MsgWithdrawInsurance. Actual withdrawal is done after completion_time.
+message WithdrawingInsurance {
+  // Id of the insurance
+  uint64 insurance_id = 1;
+  // Id of the chunk
+  uint64 chunk_id = 2;
+  // The unix time for unbonding completion
+  // Insurance is withdrawn after completion_time
+  google.protobuf.Timestamp completion_time = 3
+      [ (gogoproto.nullable) = false, (gogoproto.stdtime) = true ];
+}
