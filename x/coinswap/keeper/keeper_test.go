@@ -124,6 +124,51 @@ func setupWithGenesisAccounts() *app.Canto {
 	return app
 }
 
+func (suite *TestSuite) TestAmountOf() {
+
+	MaxSwapAmount := sdk.Coins{
+		sdk.NewInt64Coin("ibc/FBEEDF2F566CF2568921399BD092363FCC45EB53278A3A09318C4348AAE2B27F", 1000000),
+		sdk.NewInt64Coin("ibc/4B32742658E7D16C1F77468D0DC35178731D694DEB17378242647EA02622EF64", 1000000),
+	}
+
+	searchDenom := "ibc/FBEEDF2F566CF2568921399BD092363FCC45EB53278A3A09318C4348AAE2B27F"
+
+	var amount sdk.Int
+
+	cases := []struct {
+		name           string
+		malleate       func()
+		expectedAmount sdk.Int
+	}{
+		{
+			"AmountOf doesn't work for some denoms",
+			func() {
+				amount = MaxSwapAmount.AmountOf(searchDenom)
+			},
+			// expectedAmount should be 1000000, because of the bug in AmountOf function
+			// it returns 0 for some denoms.
+			sdk.NewInt(0),
+		},
+		{
+			"manual search for denom works",
+			func() {
+
+				for _, coin := range MaxSwapAmount {
+					if coin.Denom == searchDenom {
+						amount = coin.Amount
+						break
+					}
+				}
+			},
+			sdk.NewInt(1000000),
+		},
+	}
+	for _, tc := range cases {
+		tc.malleate()
+		suite.Equal(tc.expectedAmount, amount, tc.name)
+	}
+}
+
 func (suite *TestSuite) TestLiquidity() {
 	params := types.Params{
 		Fee:                    sdk.NewDec(0),

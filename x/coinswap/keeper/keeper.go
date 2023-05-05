@@ -111,7 +111,16 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg *types.MsgAddLiquidity) (sdk.C
 	params := k.GetParams(ctx)
 
 	// check if a denom exists in the max swap amount params
-	if !params.MaxSwapAmount.AmountOf(msg.MaxToken.Denom).IsPositive() {
+	var found bool
+
+	for _, coin := range params.MaxSwapAmount {
+		if coin.Denom == msg.MaxToken.Denom {
+			found = true
+			break
+		}
+	}
+
+	if !found {
 		return sdk.Coin{}, sdkerrors.Wrapf(types.ErrInvalidDenom,
 			"MaxToken %s is not registered in max swap amount", msg.MaxToken.Denom)
 	}
