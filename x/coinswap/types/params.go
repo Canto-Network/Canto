@@ -142,6 +142,10 @@ func validateMaxSwapAmount(i interface{}) error {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
 
+	if err := v.Validate(); err != nil {
+		return err
+	}
+
 	for _, coin := range v {
 		// do something with the coin object, such as print its denomination and amount
 		if err := sdk.ValidateDenom(coin.Denom); err != nil {
