@@ -15,13 +15,17 @@ import (
 // 1. Send commission to insurance based on chunk reward.
 // 2. Deduct dynamic fee from remaining and burn it.
 // 3. Send rest of rewards to reward module account.
-func (k Keeper) CollectRewardAndFee(ctx sdk.Context, chunk types.Chunk, insurance types.Insurance) {
+func (k Keeper) CollectRewardAndFee(
+	ctx sdk.Context,
+	dynamicFeeRate sdk.Dec,
+	chunk types.Chunk,
+	insurance types.Insurance,
+) {
 	delegationRewards := k.bankKeeper.GetAllBalances(ctx, chunk.DerivedAddress())
 	insuranceCommissions := make(sdk.Coins, delegationRewards.Len())
 	dynamicFees := make(sdk.Coins, delegationRewards.Len())
 	remainingRewards := make(sdk.Coins, delegationRewards.Len())
 
-	feeRate := k.CalcDynamicFeeRate(ctx)
 	for i, delReward := range delegationRewards {
 		if delReward.IsZero() {
 			continue
@@ -32,7 +36,7 @@ func (k Keeper) CollectRewardAndFee(ctx sdk.Context, chunk types.Chunk, insuranc
 			insuranceCommission,
 		)
 		pureReward := delReward.Amount.Sub(insuranceCommission)
-		dynamicFee := pureReward.ToDec().Mul(feeRate).Ceil().TruncateInt()
+		dynamicFee := pureReward.ToDec().Mul(dynamicFeeRate).Ceil().TruncateInt()
 		remainingReward := pureReward.Sub(dynamicFee)
 		dynamicFees[i] = sdk.NewCoin(
 			delReward.Denom,
@@ -82,6 +86,7 @@ func (k Keeper) CollectRewardAndFee(ctx sdk.Context, chunk types.Chunk, insuranc
 // DistributeReward withdraws delegation rewards from all paired chunks
 // Keeper.CollectRewardAndFee will be called during withdrawing process.
 func (k Keeper) DistributeReward(ctx sdk.Context) {
+	feeRate := k.CalcDynamicFeeRate(ctx)
 	err := k.IterateAllChunks(ctx, func(chunk types.Chunk) (bool, error) {
 		var insurance types.Insurance
 		var found bool
@@ -101,15 +106,21 @@ func (k Keeper) DistributeReward(ctx sdk.Context) {
 		}
 		// TODO: remove print when go to production
 		fmt.Printf("Chunk %d Balance Before Withdraw Delegation Rewards\n", chunk.Id)
-		fmt.Println(k.bankKeeper.GetBalance(ctx, chunk.DerivedAddress(), "acanto").String())
+		// TODO: remove when go to production
+		bal := k.bankKeeper.GetBalance(ctx, chunk.DerivedAddress(), "acanto")
+		if bal.IsPositive() {
+			panic("chunk %d balance is not zero")
+		}
+		fmt.Println(bal.String())
 		_, err = k.distributionKeeper.WithdrawDelegationRewards(ctx, chunk.DerivedAddress(), validator.GetOperator())
+		// chunk balance -> chunk reward address
 		if err != nil {
 			return true, err
 		}
 		fmt.Printf("Chunk %d Balance After Withdraw Delegation Rewards\n", chunk.Id)
 		fmt.Println(k.bankKeeper.GetBalance(ctx, chunk.DerivedAddress(), "acanto").String())
 
-		k.CollectRewardAndFee(ctx, chunk, insurance)
+		k.CollectRewardAndFee(ctx, feeRate, chunk, insurance)
 		return false, nil
 	})
 	if err != nil {
@@ -186,12 +197,7 @@ func (k Keeper) HandleQueuedLiquidUnstakes(ctx sdk.Context) ([]types.Chunk, erro
 		if err != nil {
 			return nil, err
 		}
-		chunk.SetStatus(types.CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING)
-		chunk.UnpairingInsuranceId = chunk.PairedInsuranceId
-		chunk.PairedInsuranceId = 0
-		insurance.SetStatus(types.INSURANCE_STATUS_UNPAIRING)
-		k.SetChunk(ctx, chunk)
-		k.SetInsurance(ctx, insurance)
+		_, chunk = k.startUnpairingForLiquidUnstake(ctx, insurance, chunk)
 		unstakedChunks = append(unstakedChunks, chunk)
 	}
 	return unstakedChunks, nil
@@ -837,6 +843,67 @@ func (k Keeper) DoDepositInsurance(ctx sdk.Context, msg *types.MsgDepositInsuran
 	return
 }
 
+// DoClaimDiscountedReward claims discounted reward by paying lstoken.
+func (k Keeper) DoClaimDiscountedReward(ctx sdk.Context, msg *types.MsgClaimDiscountedReward) (err error) {
+	if err = k.ShouldBeLiquidBondDenom(ctx, msg.Amount.Denom); err != nil {
+		return
+	}
+
+	discountRate := k.CalcDiscountRate(ctx)
+	// discount rate >= minimum discount rate
+	// if discount rate(e.g. 10%) is lower than minimum discount rate(e.g. 20%), then it is not profitable to claim reward.
+	if discountRate.LT(msg.MinimumDiscountRate) {
+		err = sdkerrors.Wrapf(types.ErrDiscountRateTooLow, "current discount rate: %s", discountRate)
+		return
+	}
+	nas := k.GetNetAmountState(ctx)
+	discountedMintRate := nas.MintRate.Mul(sdk.OneDec().Sub(discountRate))
+
+	var claimableAmt sdk.Coin
+	var burnAmt sdk.Coin
+
+	claimableAmt = k.bankKeeper.GetBalance(ctx, types.RewardPool, k.stakingKeeper.BondDenom(ctx))
+	burnAmt = msg.Amount
+
+	// claim amount = (ls token amount / discounted mint rate)
+	claimAmt := burnAmt.Amount.ToDec().Quo(discountedMintRate).TruncateInt()
+	// Requester can claim only up to claimable amount
+	if claimAmt.GT(claimableAmt.Amount) {
+		// requester cannot claim more than claimable amount
+		claimAmt = claimableAmt.Amount
+		// burn amount = (claim amount * discounted mint rate)
+		burnAmt.Amount = claimAmt.ToDec().Mul(discountedMintRate).Ceil().TruncateInt()
+	}
+
+	if err = k.burnLsTokens(ctx, msg.GetRequestser(), burnAmt); err != nil {
+		return
+	}
+	// send claimAmt to requester (error)
+	if err = k.bankKeeper.SendCoins(
+		ctx,
+		types.RewardPool,
+		msg.GetRequestser(),
+		sdk.NewCoins(claimableAmt),
+	); err != nil {
+		return
+	}
+	return
+}
+
+// CalcDiscountRate calculates the current discount rate.
+// reward module account's balance / (num paired chunks * chunk size)
+func (k Keeper) CalcDiscountRate(ctx sdk.Context) sdk.Dec {
+	accumulated := k.bankKeeper.GetBalance(ctx, types.RewardPool, k.stakingKeeper.BondDenom(ctx))
+	numPairedChunks := k.getNumPairedChunks(ctx)
+	if accumulated.IsZero() || numPairedChunks == 0 {
+		return sdk.ZeroDec()
+	}
+	discountRate := accumulated.Amount.ToDec().Quo(
+		sdk.NewInt(numPairedChunks).Mul(types.ChunkSize).ToDec(),
+	)
+	return sdk.MinDec(discountRate, types.MaximumDiscountRate)
+}
+
 func (k Keeper) SetLiquidBondDenom(ctx sdk.Context, denom string) {
 	store := ctx.KVStore(k.storeKey)
 	store.Set(types.KeyLiquidBondDenom, []byte(denom))
@@ -874,7 +941,7 @@ func (k Keeper) IsValidValidator(ctx sdk.Context, validator stakingtypes.Validat
 func (k Keeper) GetMinimumRequirements(ctx sdk.Context) (oneChunkAmount, slashingCoverage sdk.Coin) {
 	bondDenom := k.stakingKeeper.BondDenom(ctx)
 	oneChunkAmount = sdk.NewCoin(bondDenom, types.ChunkSize)
-	fraction := sdk.MustNewDecFromStr(types.SlashFraction)
+	fraction := sdk.MustNewDecFromStr(types.MinimumCollateral)
 	slashingCoverage = sdk.NewCoin(bondDenom, oneChunkAmount.Amount.ToDec().Mul(fraction).TruncateInt())
 	return
 }
@@ -910,6 +977,25 @@ func (k Keeper) burnEscrowedLsTokens(ctx sdk.Context, lsTokensToBurn sdk.Coin) e
 	if err := k.bankKeeper.SendCoinsFromAccountToModule(
 		ctx,
 		types.LsTokenEscrowAcc,
+		types.ModuleName,
+		sdk.NewCoins(lsTokensToBurn),
+	); err != nil {
+		return err
+	}
+	if err := k.bankKeeper.BurnCoins(ctx, types.ModuleName, sdk.NewCoins(lsTokensToBurn)); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (k Keeper) burnLsTokens(ctx sdk.Context, from sdk.AccAddress, lsTokensToBurn sdk.Coin) error {
+	if err := k.ShouldBeLiquidBondDenom(ctx, lsTokensToBurn.Denom); err != nil {
+		return err
+	}
+
+	if err := k.bankKeeper.SendCoinsFromAccountToModule(
+		ctx,
+		from,
 		types.ModuleName,
 		sdk.NewCoins(lsTokensToBurn),
 	); err != nil {
@@ -1240,38 +1326,40 @@ func (k Keeper) IsSufficientInsurance(ctx sdk.Context, insurance types.Insurance
 	return true
 }
 
-// IsInvalidInsurance checks whether the validator of insurance is tombstoned or not
-func (k Keeper) IsInvalidInsurance(ctx sdk.Context, insurance types.Insurance) bool {
-	validator, found := k.stakingKeeper.GetValidator(ctx, insurance.GetValidator())
-	err := k.IsValidValidator(ctx, validator, found)
-	if err == types.ErrTombstonedValidator {
-		return true
-	}
-	return false
-}
-
 // GetAvailableChunkSlots returns a number of chunk which can be paired.
 func (k Keeper) GetAvailableChunkSlots(ctx sdk.Context) sdk.Int {
-	var numPairedChunks int64 = 0
-	k.IterateAllChunks(ctx, func(chunk types.Chunk) (bool, error) {
-		if chunk.Status != types.CHUNK_STATUS_PAIRED {
-			return false, nil
-		}
-		numPairedChunks++
-		return false, nil
-	})
-	return k.MaxPairedChunks(ctx).Sub(sdk.NewInt(numPairedChunks))
+	return k.MaxPairedChunks(ctx).Sub(sdk.NewInt(k.getNumPairedChunks(ctx)))
 }
 
 // startUnpairing changes status of insurance and chunk to unpairing.
 // Actual unpairing process including un-delegate chunk will be done after ranking in EndBlocker.
-func (k Keeper) startUnpairing(ctx sdk.Context, insurance types.Insurance, chunk types.Chunk) {
+func (k Keeper) startUnpairing(
+	ctx sdk.Context,
+	insurance types.Insurance,
+	chunk types.Chunk,
+) {
 	insurance.SetStatus(types.INSURANCE_STATUS_UNPAIRING)
 	chunk.UnpairingInsuranceId = chunk.PairedInsuranceId
 	chunk.PairedInsuranceId = 0
 	chunk.SetStatus(types.CHUNK_STATUS_UNPAIRING)
 	k.SetChunk(ctx, chunk)
 	k.SetInsurance(ctx, insurance)
+}
+
+// startUnpairingForLiquidUnstake changes status of insurance to unpairing and
+// chunk to UnpairingForUnstaking.
+func (k Keeper) startUnpairingForLiquidUnstake(
+	ctx sdk.Context,
+	insurance types.Insurance,
+	chunk types.Chunk,
+) (types.Insurance, types.Chunk) {
+	chunk.SetStatus(types.CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING)
+	chunk.UnpairingInsuranceId = chunk.PairedInsuranceId
+	chunk.PairedInsuranceId = types.Empty
+	insurance.SetStatus(types.INSURANCE_STATUS_UNPAIRING)
+	k.SetChunk(ctx, chunk)
+	k.SetInsurance(ctx, insurance)
+	return insurance, chunk
 }
 
 // withdrawInsurance withdraws insurance and commissions from insurance account immediately.
@@ -1330,4 +1418,15 @@ func (k Keeper) rePairChunkAndInsurance(ctx sdk.Context, chunk types.Chunk, newI
 	k.SetInsurance(ctx, outInsurance)
 	k.SetInsurance(ctx, newInsurance)
 	k.SetChunk(ctx, chunk)
+}
+
+func (k Keeper) getNumPairedChunks(ctx sdk.Context) (numPairedChunks int64) {
+	k.IterateAllChunks(ctx, func(chunk types.Chunk) (bool, error) {
+		if chunk.Status != types.CHUNK_STATUS_PAIRED {
+			return false, nil
+		}
+		numPairedChunks++
+		return false, nil
+	})
+	return
 }

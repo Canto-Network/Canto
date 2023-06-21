@@ -80,3 +80,12 @@ func (k Keeper) WithdrawInsuranceCommission(goCtx context.Context, msg *types.Ms
 	}
 	return &types.MsgWithdrawInsuranceCommissionResponse{}, nil
 }
+
+func (k Keeper) ClaimDiscountedReward(goCtx context.Context, msg *types.MsgClaimDiscountedReward) (*types.MsgClaimDiscountedRewardResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	err := k.DoClaimDiscountedReward(ctx, msg)
+	if err != nil {
+		return nil, err
+	}
+	return &types.MsgClaimDiscountedRewardResponse{}, nil
+}

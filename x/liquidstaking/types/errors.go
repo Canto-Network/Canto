@@ -30,4 +30,5 @@ var (
 	ErrInvalidLastChunkId                            = sdkerrors.Register(ModuleName, 30028, "last chunk id must positive")
 	ErrInvalidLastInsuranceId                        = sdkerrors.Register(ModuleName, 30029, "last insurance id must positive")
 	ErrAlreadyInQueue                                = sdkerrors.Register(ModuleName, 30030, "liquid ustaking is already in queue")
+	ErrDiscountRateTooLow                            = sdkerrors.Register(ModuleName, 30031, "discount rate must be gte than msg.minimum")
 )

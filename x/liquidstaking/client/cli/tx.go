@@ -46,7 +46,6 @@ func NewLiquidStakeCmd() *cobra.Command {
 		Short: "liquid stake",
 		Long: strings.TrimSpace(
 			fmt.Sprintf(`Liquid-stake coin.
-
 Example:
 $ %s tx %s liquid-stake 5000000acanto --from mykey
 `,
@@ -119,14 +118,14 @@ $ %s tx %s liquid-unstake 5000000acanto --from mykey
 
 func NewProvideInsuranceCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "insurance-provide [amount]",
-		Args:  cobra.ExactArgs(1),
+		Use:   "provide-insurance [validator-address] [amount] [fee-rate]",
+		Args:  cobra.ExactArgs(3),
 		Short: "insurance provide for chunk",
 		Long: strings.TrimSpace(
-			fmt.Sprintf(`Inusrance-provide for chunk.
+			fmt.Sprintf(`Provide insurance for chunk.
 
 Example:
-$ %s tx %s insurance-provide 50acanto --from mykey
+$ %s tx %s provide-insurance cantovaloper1gxl6usug4cz60yhpsjj7vw7vzysrz772yxjzsf 50acanto 0.01 --from mykey
 `,
 				version.AppName, types.ModuleName,
 			),
@@ -137,12 +136,22 @@ $ %s tx %s insurance-provide 50acanto --from mykey
 				return err
 			}
 
-			coin, err := sdk.ParseCoinNormalized(args[0])
+			val, err := sdk.ValAddressFromBech32(args[0])
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgProvideInsurance(clientCtx.GetFromAddress().String(), coin)
+			coin, err := sdk.ParseCoinNormalized(args[1])
+			if err != nil {
+				return err
+			}
+
+			feeRate, err := sdk.NewDecFromStr(args[2])
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgProvideInsurance(clientCtx.GetFromAddress().String(), val.String(), coin, feeRate)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

@@ -6,7 +6,6 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
-// TODO: Discuss with taeyoung what values should be used for meaningful testing
 func (k Keeper) GetNetAmountState(ctx sdk.Context) (nas types.NetAmountState) {
 	liquidBondDenom := k.GetLiquidBondDenom(ctx)
 	bondDenom := k.stakingKeeper.BondDenom(ctx)
@@ -105,9 +104,11 @@ func (k Keeper) GetNetAmountState(ctx sdk.Context) (nas types.NetAmountState) {
 		TotalUnpairedInsuranceTokens:       totalUnpairedInsuranceTokens,
 		TotalUnpairedInsuranceCommissions:  totalUnpairedInsuranceCommissions,
 		TotalUnbondingBalance:              totalUnbondingBalance.TruncateInt(),
-		RewardModuleAccBalance:             k.bankKeeper.GetBalance(ctx, types.RewardPool, bondDenom).Amount,
 	}
-
+	nas.RewardModuleAccBalance = k.bankKeeper.GetBalance(ctx, types.RewardPool, bondDenom).Amount
+	nas.UtilizationRatio = k.CalcUtilizationRatio(ctx)
+	nas.DiscountRate = k.CalcDiscountRate(ctx)
+	nas.FeeRate = k.CalcDynamicFeeRate(ctx)
 	nas.NetAmount = nas.CalcNetAmount(k.bankKeeper.GetBalance(ctx, types.RewardPool, bondDenom).Amount)
 	nas.MintRate = nas.CalcMintRate()
 	return

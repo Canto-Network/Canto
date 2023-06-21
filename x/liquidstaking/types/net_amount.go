@@ -48,8 +48,8 @@ func (nas NetAmountState) IsZeroState() bool {
 		nas.TotalRemainingRewards.IsZero() &&
 		nas.TotalLiquidTokens.IsZero() &&
 		// Currently total insurances includes Pairing insurances, so we should skip this
-		//nas.TotalInsuranceTokens.IsZero() &&
-		//nas.TotalInsuranceCommissions.IsZero() &&
+		// nas.TotalInsuranceTokens.IsZero() &&
+		// nas.TotalInsuranceCommissions.IsZero() &&
 		nas.TotalPairedInsuranceTokens.IsZero() &&
 		nas.TotalPairedInsuranceCommissions.IsZero() &&
 		nas.TotalUnpairingInsuranceTokens.IsZero() &&
@@ -59,7 +59,10 @@ func (nas NetAmountState) IsZeroState() bool {
 		nas.TotalUnbondingBalance.IsZero() &&
 		nas.NetAmount.IsZero() &&
 		nas.MintRate.IsZero() &&
-		nas.RewardModuleAccBalance.IsZero()
+		nas.RewardModuleAccBalance.IsZero() &&
+		nas.UtilizationRatio.IsZero() &&
+		nas.DiscountRate.IsZero() &&
+		nas.FeeRate.IsZero()
 }
 
 func (nas NetAmountState) String() string {
@@ -82,7 +85,11 @@ func (nas NetAmountState) String() string {
 	  TotalUnbondingBalance: %s
 	  NetAmount:             %s
 	  MintRate:              %s
-	  RewardModuleAccountBalance: %s`,
+	  RewardModuleAccountBalance: %s
+	  UtilizationRatio:      %s
+	  DiscountRate:          %s
+	  FeeRate:               %s
+`,
 		nas.LsTokensTotalSupply,
 		nas.TotalChunksBalance,
 		nas.TotalDelShares,
@@ -100,5 +107,9 @@ func (nas NetAmountState) String() string {
 		nas.TotalUnbondingBalance,
 		nas.NetAmount,
 		nas.MintRate,
-		nas.RewardModuleAccBalance)
+		nas.RewardModuleAccBalance,
+		nas.UtilizationRatio,
+		nas.DiscountRate,
+		nas.FeeRate,
+	)
 }

@@ -11,10 +11,10 @@ import (
 )
 
 const (
-	// TODO: use slashing module parameter
+	// MinimumCollateral is the minimum collateral rate for insurance to be paired.
+	// Insurance provider must provide collateral at least 7% of the chunk size tokens.
 	// TODO: limit changing slashing module parameter (it shouldn't be easy to change, maybe in AnteHandler which catch param change message and make it fail?)
-	// 7%
-	SlashFraction = "0.07"
+	MinimumCollateral = "0.07" // 7%
 )
 
 func NewInsurance(id uint64, providerAddress, validatorAddress string, feeRate sdk.Dec) Insurance {

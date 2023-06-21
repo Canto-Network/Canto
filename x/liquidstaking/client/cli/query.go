@@ -4,7 +4,10 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -27,9 +30,17 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 	cmd.AddCommand(
 		CmdQueryParams(),
 		CmdQueryEpoch(),
+		CmdQueryChunks(),
 		CmdQueryChunk(),
 		CmdQueryInsurances(),
 		CmdQueryInsurance(),
+		CmdQueryWithdrawInsuranceRequests(),
+		CmdQueryWithdrawInsuranceRequest(),
+		CmdQueryUnpairingForUnstakingChunkInfosRequests(),
+		CmdQueryUnpairingForUnstakingChunkInfosRequest(),
+		CmdQueryChunkSizeRequest(),
+		CmdQueryMinimumCollateral(),
+		CmdQueryStatesRequest(),
 	)
 
 	return cmd
@@ -95,10 +106,19 @@ func CmdQueryEpoch() *cobra.Command {
 // CmdQueryChunk implements a command that will return a Chunk given a chunk id
 func CmdQueryChunks() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "chunks",
-		Args:    cobra.ExactArgs(1),
-		Short:   "Query Chunks",
-		Example: fmt.Sprintf("query %s chunks --status", version.AppName),
+		Use:   "chunks [optional flags]",
+		Args:  cobra.ExactArgs(0),
+		Short: "Query all chunks",
+		Long: strings.TrimSpace(
+			fmt.Sprintf(`Query all chunks on a network.
+Example:
+$ %s query %s chunks
+$ %s query %s chunks --status [CHUNK_STATUS_PAIRING | CHUNK_STATUS_PAIRED | CHUNK_STATUS_UNPAIRING | CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING]
+`,
+				version.AppName, types.ModuleName,
+				version.AppName, types.ModuleName,
+			),
+		),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
@@ -110,10 +130,23 @@ func CmdQueryChunks() *cobra.Command {
 				return err
 			}
 
-			chunkStatusStr, _ := cmd.Flags().GetString(FlagChunkStatus)
 			request := &types.QueryChunksRequest{
-				Status:     types.ChunkStatus(types.ChunkStatus_value[chunkStatusStr]),
 				Pagination: pageRequest,
+			}
+			chunkStatusStr, _ := cmd.Flags().GetString(FlagChunkStatus)
+			if chunkStatusStr != "" {
+				status := types.ChunkStatus_value[chunkStatusStr]
+				if status == 0 {
+					return sdkerrors.Wrap(
+						sdkerrors.ErrInvalidRequest,
+						fmt.Sprintf("chunk status must be either %s, %s, %s, or %s",
+							types.ChunkStatus_name[1],
+							types.ChunkStatus_name[2],
+							types.ChunkStatus_name[3],
+							types.ChunkStatus_name[4]),
+					)
+				}
+				request.Status = types.ChunkStatus(status)
 			}
 
 			queryClient := types.NewQueryClient(clientCtx)
@@ -138,7 +171,7 @@ func CmdQueryChunk() *cobra.Command {
 		Use:     "chunk [chunkId]",
 		Args:    cobra.ExactArgs(1),
 		Short:   "Query the Chunk associated with a given chunk id",
-		Example: fmt.Sprintf("%s query liquidstaking chunk 1", version.AppName),
+		Example: fmt.Sprintf("%s query %s chunk 1", version.AppName, types.ModuleName),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
@@ -170,10 +203,25 @@ func CmdQueryChunk() *cobra.Command {
 // CmdQueryInsurances implements a command that will return insurances in liquidstaking module
 func CmdQueryInsurances() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "insurances",
-		Args:    cobra.ExactArgs(1),
-		Short:   "Query Insurances",
-		Example: fmt.Sprintf("query %s insurances --status <InsuranceStatus> --validator-address <validatorAddress> --provider-address <providerAddress>", version.AppName),
+		Use:   "insurances [optional flags]",
+		Args:  cobra.ExactArgs(0),
+		Short: "Query all insurances",
+		Long: strings.TrimSpace(
+			fmt.Sprintf(`Query all insurancces on a network.
+Example:
+$ %s query %s insurances --validator-address cantovaloper1gxl6usug4cz60yhpsjj7vw7vzysrz772yxjzsf
+$ %s query %s insurances --provider-address canto1czxcryk6qw30erz3dc6ucjcvl5kp88uk3k4cj8 
+$ %s query %s insurances --status [INSURANCE_STATUS_PAIRING | INSURANCE_STATUS_PAIRED | INSURANCE_STATUS_UNPAIRING | INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL, INSURANCE_STATUS_UNPAIRED]
+$ %s query %s insurances --validator-address cantovaloper1gxl6usug4cz60yhpsjj7vw7vzysrz772yxjzsf --provider-address canto1czxcryk6qw30erz3dc6ucjcvl5kp88uk3k4cj8 
+$ %s query %s insurances --validator-address cantovaloper1gxl6usug4cz60yhpsjj7vw7vzysrz772yxjzsf --provider-address canto1czxcryk6qw30erz3dc6ucjcvl5kp88uk3k4cj8 --status [INSURANCE_STATUS_PAIRING | INSURANCE_STATUS_PAIRED | INSURANCE_STATUS_UNPAIRING | INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL, INSURANCE_STATUS_UNPAIRED]
+`,
+				version.AppName, types.ModuleName,
+				version.AppName, types.ModuleName,
+				version.AppName, types.ModuleName,
+				version.AppName, types.ModuleName,
+				version.AppName, types.ModuleName,
+			),
+		),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
@@ -207,7 +255,7 @@ func CmdQueryInsurances() *cobra.Command {
 			return clientCtx.PrintProto(response)
 		},
 	}
-	cmd.Flags().AddFlagSet(flagSetChunks())
+	cmd.Flags().AddFlagSet(flagSetInsurances())
 	flags.AddQueryFlagsToCmd(cmd)
 	return cmd
 }
@@ -240,6 +288,288 @@ func CmdQueryInsurance() *cobra.Command {
 				return err
 			}
 
+			return clientCtx.PrintProto(response)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
+}
+
+// CmdQueryWithdrawInsuranceRequests CmdQueryWithdrawRequests implements a command that will return withdraw requests in liquidstaking module.
+func CmdQueryWithdrawInsuranceRequests() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "withdraw-insurance-requests [optional flags]",
+		Args:  cobra.ExactArgs(0),
+		Short: "Query all withdraw requests",
+		Long: strings.TrimSpace(
+			fmt.Sprintf(`Query details about all withdraw requests on a network.
+Example:
+$ %s query %s withdraw-insurance-requests 
+$ %s query %s withdraw-insurance-requests --provider-address canto1czxcryk6qw30erz3dc6ucjcvl5kp88uk3k4cj8
+`,
+				version.AppName, types.ModuleName,
+				version.AppName, types.ModuleName,
+			),
+		),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			pageRequest, err := client.ReadPageRequest(cmd.Flags())
+			if err != nil {
+				return err
+			}
+
+			request := &types.QueryWithdrawInsuranceRequestsRequest{
+				Pagination: pageRequest,
+			}
+
+			providerAddress, _ := cmd.Flags().GetString(FlagProviderAddress)
+			if providerAddress != "" {
+				_, err = sdk.AccAddressFromBech32(providerAddress)
+				if err != nil {
+					return err
+				}
+				request.ProviderAddress = providerAddress
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			// Query store
+			response, err := queryClient.WithdrawInsuranceRequests(context.Background(), request)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(response)
+		},
+	}
+	cmd.Flags().AddFlagSet(flagSetWithdrawInsuranceRequests())
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
+}
+
+// CmdQueryWithdrawInsuranceRequest CmdQueryWithdrawRequest implements a command that will return a withdraw request given an insurance id.
+func CmdQueryWithdrawInsuranceRequest() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "withdraw-insurance-request [insurance-id]",
+		Args:  cobra.ExactArgs(1),
+		Short: "Query the withdraw request associated with a given insurance id",
+		Long: strings.TrimSpace(
+			fmt.Sprintf(`Query details about a withdraw request on a network.	
+Example:
+$ %s query %s withdraw-insurance-request 1
+`,
+				version.AppName, types.ModuleName,
+			),
+		),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+			// arg must be converted to a uint
+			insuranceId, err := strconv.ParseUint(args[0], 10, 64)
+			if err != nil {
+				return err
+			}
+			queryClient := types.NewQueryClient(clientCtx)
+
+			request := &types.QueryWithdrawInsuranceRequestRequest{Id: insuranceId}
+			// Query store
+			response, err := queryClient.WithdrawInsuranceRequest(context.Background(), request)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(response)
+		},
+	}
+	return cmd
+}
+
+// CmdQueryUnpairingForUnstakingChunkInfosRequests implements a command that will return unpairing for unstaking chunk infos requests in liquidstaking module.
+func CmdQueryUnpairingForUnstakingChunkInfosRequests() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "unpairing-for-unstaking-chunk-infos [optional flags]",
+		Args:  cobra.ExactArgs(0),
+		Short: "Query all unpairing for unstaking chunk infos",
+		Long: strings.TrimSpace(
+			fmt.Sprintf(`Query details about all unpairing for unstaking chunk infos on a network.
+Example:
+$ %s query %s unpairing-for-unstaking-chunk-infos
+`,
+				version.AppName, types.ModuleName,
+			),
+		),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+			pageRequest, err := client.ReadPageRequest(cmd.Flags())
+
+			if err != nil {
+				return err
+			}
+			request := &types.QueryUnpairingForUnstakingChunkInfosRequest{
+				Pagination: pageRequest,
+			}
+			delegatorAddress, _ := cmd.Flags().GetString(FlagDelegatorAddress)
+			if delegatorAddress != "" {
+				_, err = sdk.AccAddressFromBech32(delegatorAddress)
+				if err != nil {
+					return err
+				}
+				request.DelegatorAddress = delegatorAddress
+			}
+			queryClient := types.NewQueryClient(clientCtx)
+			// Query store
+			response, err := queryClient.UnpairingForUnstakingChunkInfos(context.Background(), request)
+			if err != nil {
+				return err
+			}
+			return clientCtx.PrintProto(response)
+		},
+	}
+	cmd.Flags().AddFlagSet(flagSetUnstakingChunkInfoRequests())
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
+}
+
+// CmdQueryUnpairingForUnstakingChunkInfosRequest implements a command that will return unpairing for unstaking chunk info in liquidstaking module.
+func CmdQueryUnpairingForUnstakingChunkInfosRequest() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "unpairing-for-unstaking-chunk-info [chunk-id]",
+		Args:  cobra.ExactArgs(1),
+		Short: "Query the unpairing for unstaking chunk info associated with a given chunk id",
+		Long: strings.TrimSpace(
+			fmt.Sprintf(`Query details about a unpairing for unstaking chunk info on a network.
+Example:
+$ %s query %s unpairing-for-unstaking-chunk-info 1
+`,
+				version.AppName, types.ModuleName,
+			),
+		),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+			// arg must be converted to a uint
+			chunkId, err := strconv.ParseUint(args[0], 10, 64)
+			if err != nil {
+				return err
+			}
+			queryClient := types.NewQueryClient(clientCtx)
+			request := &types.QueryUnpairingForUnstakingChunkInfoRequest{Id: chunkId}
+			// Query store
+			response, err := queryClient.UnpairingForUnstakingChunkInfo(context.Background(), request)
+			if err != nil {
+				return err
+			}
+			return clientCtx.PrintProto(response)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
+}
+
+// CmdQueryChunkSizeRequest implements a command that will return chunk size in liquidstaking module.
+func CmdQueryChunkSizeRequest() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "chunk-size",
+		Args:  cobra.ExactArgs(0),
+		Short: "Query the chunk size tokens(=how many tokens are needed to create a chunk)",
+		Long: strings.TrimSpace(
+			fmt.Sprintf(`Query the chunk size on a network.
+Example:
+$ %s query %s chunk-size
+`,
+				version.AppName, types.ModuleName,
+			),
+		),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+			request := &types.QueryChunkSizeRequest{}
+			// Query store
+			response, err := queryClient.ChunkSize(context.Background(), request)
+			if err != nil {
+				return err
+			}
+			return clientCtx.PrintProto(response)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
+}
+
+func CmdQueryMinimumCollateral() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "minimum-collateral",
+		Args:  cobra.ExactArgs(0),
+		Short: "Query the minimum collateral",
+		Long: strings.TrimSpace(
+			fmt.Sprintf(`Query the minimum collateral on a network.
+Example:
+$ %s query %s minimum-collateral
+`,
+				version.AppName, types.ModuleName,
+			),
+		),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+			queryClient := types.NewQueryClient(clientCtx)
+			request := &types.QueryMinimumCollateralRequest{}
+			// Query store
+			response, err := queryClient.MinimumCollateral(context.Background(), request)
+			if err != nil {
+				return err
+			}
+			return clientCtx.PrintProto(response)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
+}
+
+// CmdQueryStatesRequest implements a command that will return states in liquidstaking module.
+func CmdQueryStatesRequest() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "states",
+		Args:  cobra.ExactArgs(0),
+		Short: "Query the states of liquid staking module",
+		Long: strings.TrimSpace(
+			fmt.Sprintf(`Query the states of liquid staking module on a network.
+Example:
+$ %s query %s states
+`,
+				version.AppName, types.ModuleName,
+			),
+		),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+			request := &types.QueryStatesRequest{}
+			// Query store
+			response, err := queryClient.States(context.Background(), request)
+			if err != nil {
+				return err
+			}
 			return clientCtx.PrintProto(response)
 		},
 	}

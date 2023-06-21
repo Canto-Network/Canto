@@ -2,11 +2,12 @@ package keeper_test
 
 import (
 	"fmt"
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking"
-	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	"strconv"
 	"testing"
 	"time"
+
+	"github.com/Canto-Network/Canto/v6/x/liquidstaking"
+	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 
 	liquidstakingkeeper "github.com/Canto-Network/Canto/v6/x/liquidstaking/keeper"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
@@ -35,6 +36,8 @@ import (
 	tmversion "github.com/tendermint/tendermint/proto/tendermint/version"
 	"github.com/tendermint/tendermint/version"
 )
+
+var DefaultInflationAmt = sdk.TokensFromConsensusPower(100, ethermint.PowerReduction)
 
 type KeeperTestSuite struct {
 	suite.Suite
@@ -245,22 +248,6 @@ func (suite *KeeperTestSuite) CreateValidators(
 	return
 }
 
-// TODO: Remove this function and usages. Use AddTestAddrsWithFunding instead
-// Add test addresses with funds
-func (suite *KeeperTestSuite) AddTestAddrs(accNum int, amount sdk.Int) ([]sdk.AccAddress, []sdk.Coin) {
-	addrs := make([]sdk.AccAddress, 0, accNum)
-	balances := make([]sdk.Coin, 0, accNum)
-	for i := 0; i < accNum; i++ {
-		addr := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address())
-		addrs = append(addrs, addr)
-		balances = append(balances, sdk.NewCoin(suite.denom, amount))
-
-		// fund each account
-		suite.fundAccount(suite.ctx, addr, amount)
-	}
-	return addrs, balances
-}
-
 // Add test addresses with funds
 func (suite *KeeperTestSuite) AddTestAddrsWithFunding(fundingAccount sdk.AccAddress, accNum int, amount sdk.Int) ([]sdk.AccAddress, []sdk.Coin) {
 	addrs := make([]sdk.AccAddress, 0, accNum)
@@ -282,100 +269,73 @@ func (suite *KeeperTestSuite) fundAccount(ctx sdk.Context, addr sdk.AccAddress, 
 	suite.NoError(err)
 }
 
-func (suite *KeeperTestSuite) advanceHeight(height int, msg string) {
+func (suite *KeeperTestSuite) advanceHeight(ctx sdk.Context, height int, msg string) sdk.Context {
 	fmt.Println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 	fmt.Println("advance " + strconv.Itoa(height) + " blocks(= reward epochs)")
 	if msg != "" {
 		fmt.Println(msg)
 	}
 	fmt.Println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-	feeCollector := suite.app.AccountKeeper.GetModuleAccount(suite.ctx, authtypes.FeeCollectorName)
+	feeCollector := suite.app.AccountKeeper.GetModuleAccount(ctx, authtypes.FeeCollectorName)
 	for i := 0; i < height; i++ {
-		suite.ctx = suite.ctx.WithBlockHeight(suite.ctx.BlockHeight() + 1).WithBlockTime(suite.ctx.BlockTime().Add(time.Second))
+		ctx = ctx.WithBlockHeight(ctx.BlockHeight() + 1).WithBlockTime(ctx.BlockTime().Add(time.Second))
 
 		// Mimic inflation module AfterEpochEnd Hook
 		// - Inflation happened in the end of epoch triggered by AfterEpochEnd hook of epochs module
-		mintedCoin := sdk.NewCoin(suite.denom, sdk.TokensFromConsensusPower(100, ethermint.PowerReduction)) // 100 Canto
-		_, _, err := suite.app.InflationKeeper.MintAndAllocateInflation(suite.ctx, mintedCoin)
+		mintedCoin := sdk.NewCoin(suite.denom, DefaultInflationAmt)
+		_, _, err := suite.app.InflationKeeper.MintAndAllocateInflation(ctx, mintedCoin)
 		suite.NoError(err)
-		feeCollectorBalances := suite.app.BankKeeper.GetAllBalances(suite.ctx, feeCollector.GetAddress())
+		feeCollectorBalances := suite.app.BankKeeper.GetAllBalances(ctx, feeCollector.GetAddress())
 		rewardsToBeDistributed := feeCollectorBalances.AmountOf(suite.denom)
 		suite.rewardEpochCount += 1
 
 		// Mimic distribution.BeginBlock (AllocateTokens, get rewards from feeCollector, AllocateTokensToValidator, add remaining to feePool)
-		suite.NoError(suite.app.BankKeeper.SendCoinsFromModuleToModule(suite.ctx, authtypes.FeeCollectorName, distrtypes.ModuleName, feeCollectorBalances))
+		suite.NoError(suite.app.BankKeeper.SendCoinsFromModuleToModule(ctx, authtypes.FeeCollectorName, distrtypes.ModuleName, feeCollectorBalances))
 
 		totalPower := int64(0)
-		suite.app.StakingKeeper.IterateBondedValidatorsByPower(suite.ctx, func(index int64, validator stakingtypes.ValidatorI) (stop bool) {
-			totalPower += validator.GetConsensusPower(suite.app.StakingKeeper.PowerReduction(suite.ctx))
+		suite.app.StakingKeeper.IterateBondedValidatorsByPower(ctx, func(index int64, validator stakingtypes.ValidatorI) (stop bool) {
+			totalPower += validator.GetConsensusPower(suite.app.StakingKeeper.PowerReduction(ctx))
 			return false
 		})
 
 		totalRewards := sdk.ZeroDec()
 		if totalPower != 0 {
-			fmt.Printf("totalPower: %d\n", totalPower)
-			suite.app.StakingKeeper.IterateBondedValidatorsByPower(suite.ctx, func(index int64, validator stakingtypes.ValidatorI) (stop bool) {
-				consPower := validator.GetConsensusPower(suite.app.StakingKeeper.PowerReduction(suite.ctx))
-				fmt.Printf("consPower of validator %s: %d\n", validator.GetOperator(), consPower)
+			suite.app.StakingKeeper.IterateBondedValidatorsByPower(ctx, func(index int64, validator stakingtypes.ValidatorI) (stop bool) {
+				consPower := validator.GetConsensusPower(suite.app.StakingKeeper.PowerReduction(ctx))
 				powerFraction := sdk.NewDec(consPower).QuoTruncate(sdk.NewDec(totalPower))
-				fmt.Printf("\tpowerFraction: %s\n", powerFraction.String())
 				reward := rewardsToBeDistributed.ToDec().MulTruncate(powerFraction)
-				fmt.Printf("\tcalcualted reward: %s\n", reward.String())
-				fmt.Printf("\tbalance before: %s\n", suite.app.BankKeeper.GetAllBalances(suite.ctx, sdk.AccAddress(validator.GetOperator())).String())
-				fmt.Printf("\tcommission before: %s\n", suite.app.DistrKeeper.GetValidatorAccumulatedCommission(suite.ctx, validator.GetOperator()).Commission.String())
-				fmt.Printf("\tcurrent reward before: %s\n", suite.app.DistrKeeper.GetValidatorCurrentRewards(suite.ctx, validator.GetOperator()).Rewards.String())
-				fmt.Printf("\tcumulative ratio before: %s\n", suite.app.DistrKeeper.GetValidatorCurrentRewards(suite.ctx, validator.GetOperator()).Rewards.QuoDec(validator.GetTokens().ToDec()).String())
-				fmt.Printf("\tvalidator current rewards before: %s\n",
-					suite.app.DistrKeeper.GetValidatorCurrentRewards(suite.ctx, validator.GetOperator()).Rewards.QuoDec(
-						validator.GetTokens().ToDec(),
-					).MulDec(
-						suite.app.DistrKeeper.GetValidatorCurrentRewards(suite.ctx, validator.GetOperator()).Rewards.AmountOf(suite.denom),
-					))
-				fmt.Printf("\tdelShares token value before: %s\n", validator.TokensFromSharesTruncated(types.ChunkSize.ToDec()).String())
-				suite.app.DistrKeeper.AllocateTokensToValidator(suite.ctx, validator, sdk.DecCoins{{Denom: suite.denom, Amount: reward}})
-				validator = suite.app.StakingKeeper.Validator(suite.ctx, validator.GetOperator())
-				fmt.Printf("\tbalance after: %s\n", suite.app.BankKeeper.GetAllBalances(suite.ctx, sdk.AccAddress(validator.GetOperator())).String())
-				fmt.Printf("\tcommission after: %s\n", suite.app.DistrKeeper.GetValidatorAccumulatedCommission(suite.ctx, validator.GetOperator()).Commission.String())
-				fmt.Printf("\tcurrent reward after: %s\n", suite.app.DistrKeeper.GetValidatorCurrentRewards(suite.ctx, validator.GetOperator()).Rewards.String())
-				cumulativeRatio := suite.app.DistrKeeper.GetValidatorCurrentRewards(suite.ctx, validator.GetOperator()).Rewards.QuoDec(validator.GetTokens().ToDec())
-				fmt.Printf("\tcumulative ratio after: %s\n", cumulativeRatio.String())
-				stake := validator.TokensFromSharesTruncated(types.ChunkSize.ToDec())
-				fmt.Printf("\tdelShares token value after: %s\n", stake.String())
-				finalRewards, _ := cumulativeRatio.MulDecTruncate(stake).TruncateDecimal() // finalRewards
-				fmt.Printf("\tcalculated del final rewards(stake x cumulativeRatio) and truncate deicmal: %s\n", finalRewards.String())
-				fmt.Printf("\tvalidator current rewards after: %s\n",
-					suite.app.DistrKeeper.GetValidatorCurrentRewards(suite.ctx, validator.GetOperator()).Rewards.QuoDec(
-						validator.GetTokens().ToDec(),
-					).MulDec(
-						suite.app.DistrKeeper.GetValidatorCurrentRewards(suite.ctx, validator.GetOperator()).Rewards.AmountOf(suite.denom),
-					))
+				suite.app.DistrKeeper.AllocateTokensToValidator(ctx, validator, sdk.DecCoins{{Denom: suite.denom, Amount: reward}})
+				validator = suite.app.StakingKeeper.Validator(ctx, validator.GetOperator())
 				totalRewards = totalRewards.Add(reward)
 				return false
 			})
 		}
 		remaining := rewardsToBeDistributed.ToDec().Sub(totalRewards)
 		suite.False(remaining.GT(sdk.NewDec(1000)), "all rewards should be distributed")
-		feePool := suite.app.DistrKeeper.GetFeePool(suite.ctx)
+		feePool := suite.app.DistrKeeper.GetFeePool(ctx)
 		feePool.CommunityPool = feePool.CommunityPool.Add(
 			sdk.NewDecCoin(suite.denom, remaining.TruncateInt()),
 		)
-		suite.app.DistrKeeper.SetFeePool(suite.ctx, feePool)
-		staking.EndBlocker(suite.ctx, suite.app.StakingKeeper)
-		liquidstaking.EndBlocker(suite.ctx, suite.app.LiquidStakingKeeper)
+		suite.app.DistrKeeper.SetFeePool(ctx, feePool)
+		staking.EndBlocker(ctx, suite.app.StakingKeeper)
+		liquidstaking.EndBlocker(ctx, suite.app.LiquidStakingKeeper)
 		suite.mustPassInvariants()
 	}
+	return ctx
 }
 
-func (suite *KeeperTestSuite) advanceEpoch() {
+func (suite *KeeperTestSuite) advanceEpoch(ctx sdk.Context) sdk.Context {
 	// Set block header time as epochStartTime + duration + 1 second
-	epoch := suite.app.LiquidStakingKeeper.GetEpoch(suite.ctx)
+	epoch := suite.app.LiquidStakingKeeper.GetEpoch(ctx)
 	// Lets pass epoch
-	suite.ctx = suite.ctx.WithBlockTime(epoch.StartTime.Add(epoch.Duration))
+	ctx = ctx.WithBlockTime(epoch.StartTime.Add(epoch.Duration))
 	suite.lsEpochCount += 1
 
 	fmt.Println("===============================================================================")
 	fmt.Println("lsEpoch is reached, endblocker will be executed at following block")
 	fmt.Println("===============================================================================")
+
+	return ctx
 }
 
 func (suite *KeeperTestSuite) resetEpochs() {
@@ -416,6 +376,7 @@ func (suite *KeeperTestSuite) setupLiquidStakeTestingEnv(env testingEnvOptions) 
 
 	bondDenom := suite.app.StakingKeeper.BondDenom(suite.ctx)
 	liquidBondDenom := suite.app.LiquidStakingKeeper.GetLiquidBondDenom(suite.ctx)
+	u := suite.app.LiquidStakingKeeper.CalcUtilizationRatio(suite.ctx)
 	fmt.Printf(`
 ===============================================================================
 Initial state of %s 
@@ -428,6 +389,9 @@ Initial state of %s
 - insurance fee ratesS: %s
 - bonded denom: %s
 - liquid bond denom: %s
+- funding account balance: %s
+- total supply: %s
+- utilization ratio: %s
 ===============================================================================
 `,
 		env.desc,
@@ -440,6 +404,9 @@ Initial state of %s
 		env.insuranceFeeRates,
 		bondDenom,
 		liquidBondDenom,
+		env.fundingAccountBalance,
+		suite.app.BankKeeper.GetSupply(suite.ctx, suite.denom).String(),
+		u.String(),
 	)
 	return testingEnv{
 		delegators,

@@ -9,6 +9,7 @@ const (
 	FlagInsuranceStatus  = "status"
 	FlagValidatorAddress = "validator-address"
 	FlagProviderAddress  = "provider-address"
+	FlagDelegatorAddress = "delegator-address"
 )
 
 func flagSetChunks() *flag.FlagSet {
@@ -25,6 +26,22 @@ func flagSetInsurances() *flag.FlagSet {
 	fs.String(FlagInsuranceStatus, "", "The insurance status")
 	fs.String(FlagValidatorAddress, "", "The bech-32 encoded address of the validator")
 	fs.String(FlagProviderAddress, "", "The bech-32 encoded address of the provider")
+
+	return fs
+}
+
+func flagSetWithdrawInsuranceRequests() *flag.FlagSet {
+	fs := flag.NewFlagSet("", flag.ContinueOnError)
+
+	fs.String(FlagProviderAddress, "", "The bech-32 encoded address of the provider")
+
+	return fs
+}
+
+func flagSetUnstakingChunkInfoRequests() *flag.FlagSet {
+	fs := flag.NewFlagSet("", flag.ContinueOnError)
+
+	fs.String(FlagDelegatorAddress, "", "The bech-32 encoded address of the delegator")
 
 	return fs
 }

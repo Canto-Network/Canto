@@ -41,6 +41,12 @@ service Msg {
     option (google.api.http).post =
         "/canto/liquidstaking/v1/tx/withdraw_insurance_commission";
   };
+
+  rpc ClaimDiscountedReward(MsgClaimDiscountedReward)
+      returns (MsgClaimDiscountedRewardResponse) {
+    option (google.api.http).post =
+        "/canto/liquidstaking/v1/tx/claim_discounted_reward";
+  };
 }
 
 message MsgLiquidStake {
@@ -133,3 +139,23 @@ message MsgWithdrawInsuranceCommission {
 }
 
 message MsgWithdrawInsuranceCommissionResponse {}
+
+message MsgClaimDiscountedReward {
+  // requester_address is the address of the user who want to claim the
+  // discounted reward.
+  string requester_address = 1;
+  // amount is maximum amount of lscanto willing to burn to get canto at
+  // discounted price.
+  string amount = 2 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
+    (gogoproto.nullable) = false
+  ];
+  // if current discount rate is lower than this value,
+  // msg will be rejected.
+  string minimum_discount_rate = 3 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message MsgClaimDiscountedRewardResponse {}
