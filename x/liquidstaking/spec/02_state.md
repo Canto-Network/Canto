@@ -157,21 +157,25 @@ type NetAmountState struct {
 
 # Store
 
+**The key retrieves liquid bond denom**
+
+- LiquidBondDenomKey: `[]byte{0x01} -> ProtocolBuffer(string)`
+
 **The key retrieves the latest chunk id**
-
-- LastChunkIdKey: `[]byte{0x01} -> ProtocolBuffer(uint64)`
-
-**The key retrieves the latest insurance id**
 
 - LastChunkIdKey: `[]byte{0x02} -> ProtocolBuffer(uint64)`
 
+**The key retrieves the latest insurance id**
+
+- LastChunkIdKey: `[]byte{0x03} -> ProtocolBuffer(uint64)`
+
 **The key retrieves the chunk with given id**
 
-- ChunkKey: `[]byte{0x03} | Chunk.Id -> ProtocolBuffer(Chunk)`
+- ChunkKey: `[]byte{0x04} | Chunk.Id -> ProtocolBuffer(Chunk)`
 
 **The key retrieves the insurance with given id**
 
-- InsuranceKey: `[]byte{0x04} | Insurance.Id -> ProtocolBuffer(Insurance)`
+- InsuranceKey: `[]byte{0x05} | Insurance.Id -> ProtocolBuffer(Insurance)`
 
 **The key retrieves the withdraw insurance request**
 
@@ -188,7 +192,3 @@ type NetAmountState struct {
 **The key retrieves the epoch**
 
 - EpochKey: `[]byte{0x09} -> ProtocolBuffer(Epoch)`
-
-**The key retrieves the liquid bond denom**
-
-- LiquidBondDenomKey: `[]byte{0xa} -> []byte{denom}`

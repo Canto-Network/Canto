@@ -118,7 +118,9 @@ func (AppModule) Name() string {
 }
 
 // RegisterInvariants registers the liquidstaking module's invariants.
-func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {}
+func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {
+	keeper.RegisterInvariants(ir, am.keeper)
+}
 
 // NewHandler returns nil - liquidstaking module doesn't expose tx gRPC endpoints
 func (am AppModule) NewHandler() sdk.Handler {

@@ -7,7 +7,6 @@ import (
 )
 
 func (nas NetAmountState) CalcNetAmount(rewardPoolBalance sdk.Int) sdk.Dec {
-	// TODO: Add reward module account's balance
 	return rewardPoolBalance.Add(nas.TotalChunksBalance).
 		Add(nas.TotalLiquidTokens).
 		Add(nas.TotalUnbondingBalance).ToDec().
@@ -26,6 +25,7 @@ func (nas NetAmountState) Equal(nas2 NetAmountState) bool {
 		nas.TotalChunksBalance.Equal(nas2.TotalChunksBalance) &&
 		nas.TotalDelShares.Equal(nas2.TotalDelShares) &&
 		nas.TotalRemainingRewards.Equal(nas2.TotalRemainingRewards) &&
+		nas.TotalRemainingInsuranceCommissions.Equal(nas2.TotalRemainingInsuranceCommissions) &&
 		nas.TotalLiquidTokens.Equal(nas2.TotalLiquidTokens) &&
 		nas.TotalInsuranceTokens.Equal(nas2.TotalInsuranceTokens) &&
 		nas.TotalInsuranceCommissions.Equal(nas2.TotalInsuranceCommissions) &&
@@ -69,6 +69,7 @@ func (nas NetAmountState) String() string {
 	  TotalChunksBalance:    %s	
 	  TotalDelShares:        %s
 	  TotalRemainingRewards: %s	
+      TotalRemainingInsuranceCommissions: %s
 	  TotalLiquidTokens:     %s	
 	  TotalInsuranceTokens:  %s
 	  TotalInsuranceCommissons: %s
@@ -86,6 +87,7 @@ func (nas NetAmountState) String() string {
 		nas.TotalChunksBalance,
 		nas.TotalDelShares,
 		nas.TotalRemainingRewards,
+		nas.TotalRemainingInsuranceCommissions,
 		nas.TotalLiquidTokens,
 		nas.TotalInsuranceTokens,
 		nas.TotalInsuranceCommissions,

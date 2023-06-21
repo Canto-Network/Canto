@@ -13,6 +13,7 @@ func (k Keeper) GetNetAmountState(ctx sdk.Context) (nas types.NetAmountState) {
 	totalDelShares := sdk.ZeroDec()
 	totalChunksBalance := sdk.NewDec(0)
 	totalRemainingRewards := sdk.ZeroDec()
+	totalRemainingInsuranceCommissions := sdk.ZeroDec()
 	totalLiquidTokens := sdk.ZeroInt()
 	totalInsuranceTokens := sdk.ZeroInt()
 	totalInsuranceCommissions := sdk.ZeroInt()
@@ -47,6 +48,7 @@ func (k Keeper) GetNetAmountState(ctx sdk.Context) (nas types.NetAmountState) {
 			endingPeriod := k.distributionKeeper.IncrementValidatorPeriod(cachedCtx, validator)
 			delReward := k.distributionKeeper.CalculateDelegationRewards(cachedCtx, validator, delegation, endingPeriod)
 			insuranceCommission := delReward.MulDec(pairedInsurance.FeeRate)
+			totalRemainingInsuranceCommissions = totalRemainingInsuranceCommissions.Add(insuranceCommission.AmountOf(bondDenom))
 			// insuranceCommission is not reward of module
 			pureReward := delReward.Sub(insuranceCommission)
 			totalRemainingRewards = totalRemainingRewards.Add(pureReward.AmountOf(bondDenom))
@@ -92,6 +94,7 @@ func (k Keeper) GetNetAmountState(ctx sdk.Context) (nas types.NetAmountState) {
 		TotalChunksBalance:                 totalChunksBalance.TruncateInt(),
 		TotalDelShares:                     totalDelShares,
 		TotalRemainingRewards:              totalRemainingRewards,
+		TotalRemainingInsuranceCommissions: totalRemainingInsuranceCommissions,
 		TotalLiquidTokens:                  totalLiquidTokens,
 		TotalInsuranceTokens:               totalInsuranceTokens,
 		TotalInsuranceCommissions:          totalInsuranceCommissions,

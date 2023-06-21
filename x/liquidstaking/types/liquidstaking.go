@@ -2,6 +2,8 @@ package types
 
 import sdk "github.com/cosmos/cosmos-sdk/types"
 
+const Empty uint64 = 0
+
 var DefaultLiquidBondDenom = "lscanto"
 var RewardPool = DeriveAddress(ModuleName, "RewardPool")
 var LsTokenEscrowAcc = DeriveAddress(ModuleName, "LsTokenEscrowAcc")

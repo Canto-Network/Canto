@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"fmt"
+
 	"github.com/Canto-Network/Canto/v6/x/liquidstaking/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -17,6 +19,9 @@ func (k Keeper) CollectReward(ctx sdk.Context, chunk types.Chunk, insurance type
 	insuranceCommissions := make(sdk.Coins, delegationRewards.Len())
 	pureRewards := make(sdk.Coins, delegationRewards.Len())
 	for i, delReward := range delegationRewards {
+		if delReward.IsZero() {
+			continue
+		}
 		insuranceCommission := delReward.Amount.ToDec().Mul(insurance.FeeRate).TruncateInt()
 		insuranceCommissions[i] = sdk.NewCoin(
 			delReward.Denom,
@@ -27,31 +32,26 @@ func (k Keeper) CollectReward(ctx sdk.Context, chunk types.Chunk, insurance type
 			delReward.Amount.Sub(insuranceCommission),
 		)
 	}
+	fmt.Printf("Collect Reward for validator: %s\n", insurance.GetValidator())
+	fmt.Printf("Pure Reward: %s\n", pureRewards.String())
 
-	if pureRewards.Len() == 1 {
-		inputs := []banktypes.Input{
-			banktypes.NewInput(chunk.DerivedAddress(), sdk.Coins{insuranceCommissions[0]}),
-			banktypes.NewInput(chunk.DerivedAddress(), sdk.Coins{pureRewards[0]}),
-		}
-		outputs := []banktypes.Output{
-			banktypes.NewOutput(insurance.FeePoolAddress(), sdk.Coins{insuranceCommissions[0]}),
-			banktypes.NewOutput(types.RewardPool, sdk.Coins{pureRewards[0]}),
-		}
-		if err := k.bankKeeper.InputOutputCoins(ctx, inputs, outputs); err != nil {
-			panic(err)
-		}
-	} else {
-		inputs := []banktypes.Input{
+	var inputs []banktypes.Input
+	var outputs []banktypes.Output
+	switch pureRewards.Len() {
+	case 0:
+		return
+	default:
+		inputs = []banktypes.Input{
 			banktypes.NewInput(chunk.DerivedAddress(), insuranceCommissions),
 			banktypes.NewInput(chunk.DerivedAddress(), pureRewards),
 		}
-		outputs := []banktypes.Output{
+		outputs = []banktypes.Output{
 			banktypes.NewOutput(insurance.FeePoolAddress(), insuranceCommissions),
 			banktypes.NewOutput(types.RewardPool, pureRewards),
 		}
-		if err := k.bankKeeper.InputOutputCoins(ctx, inputs, outputs); err != nil {
-			panic(err)
-		}
+	}
+	if err := k.bankKeeper.InputOutputCoins(ctx, inputs, outputs); err != nil {
+		panic(err)
 	}
 }
 
@@ -75,10 +75,15 @@ func (k Keeper) DistributeReward(ctx sdk.Context) {
 		if err == types.ErrNotFoundValidator {
 			return true, err
 		}
+		// TODO: remove print when go to production
+		fmt.Printf("Chunk %d Balance Before Withdraw Delegation Rewards\n", chunk.Id)
+		fmt.Println(k.bankKeeper.GetBalance(ctx, chunk.DerivedAddress(), "acanto").String())
 		_, err = k.distributionKeeper.WithdrawDelegationRewards(ctx, chunk.DerivedAddress(), validator.GetOperator())
 		if err != nil {
 			return true, err
 		}
+		fmt.Printf("Chunk %d Balance After Withdraw Delegation Rewards\n", chunk.Id)
+		fmt.Println(k.bankKeeper.GetBalance(ctx, chunk.DerivedAddress(), "acanto").String())
 
 		k.CollectReward(ctx, chunk, insurance)
 		return false, nil
@@ -231,6 +236,7 @@ func (k Keeper) GetAllRePairableChunksAndOutInsurances(ctx sdk.Context) (
 				return false, nil
 			}
 			outInsurances = append(outInsurances, insurance)
+			// TODO: we should consider damaged chunk...
 			rePairableChunks = append(rePairableChunks, chunk)
 		case types.CHUNK_STATUS_PAIRING:
 			rePairableChunks = append(rePairableChunks, chunk)
@@ -278,14 +284,13 @@ func (k Keeper) RankInsurances(ctx sdk.Context) (
 			validator, found := k.stakingKeeper.GetValidator(ctx, insurance.GetValidator())
 			err := k.IsValidValidator(ctx, validator, found)
 			if err != nil {
-				// CRITICAL & EDGE CASE:
-				// paired insurance must have valid validator
 				if insurance.Status == types.INSURANCE_STATUS_PAIRED {
+					// CRITICAL & EDGE CASE:
+					// paired insurance must have valid validator
 					return false, err
 				} else if insurance.Status == types.INSURANCE_STATUS_PAIRING {
 					// EDGE CASE:
 					// Skip pairing insurance which have invalid validator
-					// TODO: Delete pairing insurance?
 					return false, nil
 				}
 			}
@@ -399,16 +404,12 @@ func (k Keeper) RePairRankedInsurances(
 				// CRITICAL: Must be unpairing status
 				return sdkerrors.Wrapf(types.ErrInvalidChunkStatus, "chunkId: %d", outInsurance.ChunkId)
 			}
-			var shares sdk.Dec
-			if shares, err = k.stakingKeeper.ValidateUnbondAmount(
-				ctx,
-				chunk.DerivedAddress(),
-				outInsurance.GetValidator(),
-				types.ChunkSize,
-			); err != nil {
+			del, found := k.stakingKeeper.GetDelegation(ctx, chunk.DerivedAddress(), outInsurance.GetValidator())
+			if !found {
+				err = sdkerrors.Wrapf(types.ErrNotFoundDelegation, "delegator: %s, validator: %s", chunk.DerivedAddress(), outInsurance.GetValidator())
 				return
 			}
-			if _, err = k.stakingKeeper.Undelegate(ctx, chunk.DerivedAddress(), outInsurance.GetValidator(), shares); err != nil {
+			if _, err = k.stakingKeeper.Undelegate(ctx, chunk.DerivedAddress(), outInsurance.GetValidator(), del.GetShares()); err != nil {
 				return
 			}
 			continue
@@ -487,7 +488,6 @@ func (k Keeper) DoLiquidStake(ctx sdk.Context, msg *types.MsgLiquidStake) (chunk
 		return
 	}
 
-	// TODO: Must be proved that this is safe, we must call this before sending
 	nas := k.GetNetAmountState(ctx)
 	types.SortInsurances(validatorMap, pairingInsurances, false)
 	totalNewShares := sdk.ZeroDec()
@@ -918,18 +918,13 @@ func (k Keeper) completeInsuranceDuty(ctx sdk.Context, insurance types.Insurance
 		return chunk, insurance, sdkerrors.Wrapf(types.ErrNotFoundChunk, "chunk id: %d", insurance.ChunkId)
 	}
 
-	// TODO: instead of using 0, need some UppercaseName or method(e.g. SetNull)
 	// insurance duty is over
-	insurance.ChunkId = 0
+	insurance.ChunkId = types.Empty
 	insurance.SetStatus(types.INSURANCE_STATUS_UNPAIRED)
 
 	switch chunk.Status {
-	case types.CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING:
-		fallthrough
-	case types.CHUNK_STATUS_UNPAIRING:
-		fallthrough
-	case types.CHUNK_STATUS_PAIRED: // In this case, chunk got re-delegated at previous Epoch
-		chunk.UnpairingInsuranceId = 0
+	case types.CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING, types.CHUNK_STATUS_UNPAIRING, types.CHUNK_STATUS_PAIRED:
+		chunk.UnpairingInsuranceId = types.Empty
 	}
 
 	k.SetInsurance(ctx, insurance)
@@ -970,6 +965,7 @@ func (k Keeper) completeLiquidUnstake(ctx sdk.Context, chunk types.Chunk) error 
 		return sdkerrors.Wrapf(types.ErrNotFoundUnpairingForUnstakingChunkInfo, "chunk id: %d", chunk.Id)
 	}
 	lsTokensToBurn := info.EscrowedLstokens
+	unstakedTokens := sdk.NewCoin(bondDenom, types.ChunkSize)
 	penalty := types.ChunkSize.Sub(k.bankKeeper.GetBalance(ctx, chunk.DerivedAddress(), bondDenom).Amount)
 	if penalty.IsPositive() {
 		// send penalty to reward pool
@@ -995,6 +991,7 @@ func (k Keeper) completeLiquidUnstake(ctx sdk.Context, chunk types.Chunk) error 
 			return err
 		}
 		lsTokensToBurn = lsTokensToBurn.Sub(refund)
+		unstakedTokens.Amount = unstakedTokens.Amount.Sub(penalty)
 	}
 	// insurance duty is over
 	if chunk, unpairingInsurance, err = k.completeInsuranceDuty(ctx, unpairingInsurance); err != nil {
@@ -1003,11 +1000,16 @@ func (k Keeper) completeLiquidUnstake(ctx sdk.Context, chunk types.Chunk) error 
 	if err = k.burnEscrowedLsTokens(ctx, lsTokensToBurn); err != nil {
 		return err
 	}
+	// TODO: remove panic after fuzzing tests, it will be better to send chunk balance instead of unstakedTokens
+	chunkBalance := k.bankKeeper.GetBalance(ctx, chunk.DerivedAddress(), bondDenom)
+	if !types.ChunkSize.Sub(penalty).Equal(chunkBalance.Amount) {
+		panic("investigating it")
+	}
 	if err = k.bankKeeper.SendCoins(
 		ctx,
 		chunk.DerivedAddress(),
 		info.GetDelegator(),
-		sdk.NewCoins(sdk.NewCoin(bondDenom, types.ChunkSize)),
+		sdk.NewCoins(unstakedTokens),
 	); err != nil {
 		return err
 	}
@@ -1017,7 +1019,6 @@ func (k Keeper) completeLiquidUnstake(ctx sdk.Context, chunk types.Chunk) error 
 }
 
 // handleUnpairingChunk handles unpairing chunk which created previous epoch.
-// TODO: write TC for penalty situation
 func (k Keeper) handleUnpairingChunk(ctx sdk.Context, chunk types.Chunk) error {
 	if chunk.Status != types.CHUNK_STATUS_UNPAIRING {
 		return sdkerrors.Wrapf(types.ErrInvalidChunkStatus, "chunk id: %d, status: %s", chunk.Id, chunk.Status)
@@ -1035,15 +1036,23 @@ func (k Keeper) handleUnpairingChunk(ctx sdk.Context, chunk types.Chunk) error {
 	}
 
 	chunkBalance := k.bankKeeper.GetBalance(ctx, chunk.DerivedAddress(), bondDenom).Amount
+	insuranceBalance := k.bankKeeper.GetBalance(ctx, unpairingInsurance.DerivedAddress(), bondDenom).Amount
 	penalty := types.ChunkSize.Sub(chunkBalance)
 	if penalty.IsPositive() {
+		var sendAmount sdk.Coin
+		if penalty.GT(insuranceBalance) {
+			sendAmount = sdk.NewCoin(bondDenom, insuranceBalance)
+		} else {
+			sendAmount = sdk.NewCoin(bondDenom, penalty)
+		}
+
 		// Send penalty to chunk
 		// unpairing chunk must be not damaged to become pairing chunk
 		if err = k.bankKeeper.SendCoins(
 			ctx,
 			unpairingInsurance.DerivedAddress(),
 			chunk.DerivedAddress(),
-			sdk.NewCoins(sdk.NewCoin(bondDenom, penalty)),
+			sdk.NewCoins(sendAmount),
 		); err != nil {
 			return err
 		}
@@ -1064,16 +1073,19 @@ func (k Keeper) handleUnpairingChunk(ctx sdk.Context, chunk types.Chunk) error {
 		if err = k.bankKeeper.InputOutputCoins(ctx, inputs, outputs); err != nil {
 			return err
 		}
-		k.DeleteUnpairingForUnstakingChunkInfo(ctx, chunk.Id)
+		// insurance already sent all of its balance to chunk, so ok delete it
+		// TODO: k.DeleteInsurance(ctx, unpairingInsurance.Id)? there can be remaining commissions
 		k.DeleteChunk(ctx, chunk.Id)
 		return nil
 	}
 	chunk.SetStatus(types.CHUNK_STATUS_PAIRING)
 	k.SetChunk(ctx, chunk)
+	k.SetInsurance(ctx, unpairingInsurance)
 
 	return nil
 }
 
+// TODO: Unpairing insurance should cover infraction height before replacing.
 func (k Keeper) handlePairedChunk(ctx sdk.Context, chunk types.Chunk) error {
 	if chunk.Status != types.CHUNK_STATUS_PAIRED {
 		return sdkerrors.Wrapf(types.ErrInvalidChunkStatus, "chunk id: %d, status: %s", chunk.Id, chunk.Status)
@@ -1089,6 +1101,7 @@ func (k Keeper) handlePairedChunk(ctx sdk.Context, chunk types.Chunk) error {
 
 	validator, found := k.stakingKeeper.GetValidator(ctx, pairedInsurance.GetValidator())
 	err = k.IsValidValidator(ctx, validator, found)
+	// TODO: Should we un-pair insurances which have invalid validator?
 	if err == types.ErrNotFoundValidator {
 		return sdkerrors.Wrapf(err, "validator: %s", pairedInsurance.GetValidator())
 	}
@@ -1122,8 +1135,12 @@ func (k Keeper) handlePairedChunk(ctx sdk.Context, chunk types.Chunk) error {
 			// 1. Send penalty to chunk
 			// 2. chunk delegate additional tokens to validator
 
-			// TODO: penalty should be truncated or rounded?
-			penaltyCoin := sdk.NewCoin(bondDenom, penalty.TruncateInt())
+			var penaltyCoin sdk.Coin
+			if penalty.GT(penalty.TruncateDec()) {
+				penaltyCoin = sdk.NewCoin(bondDenom, penalty.Ceil().TruncateInt())
+			} else {
+				penaltyCoin = sdk.NewCoin(bondDenom, penalty.TruncateInt())
+			}
 			// send penalty to chunk
 			if err = k.bankKeeper.SendCoins(
 				ctx,
@@ -1151,10 +1168,10 @@ func (k Keeper) handlePairedChunk(ctx sdk.Context, chunk types.Chunk) error {
 		k.startUnpairing(ctx, pairedInsurance, chunk)
 	}
 
-	if k.IsInvalidInsurance(ctx, pairedInsurance) {
+	// TODO: use IsValidValidator but should it be handled above?
+	if err := k.IsValidValidator(ctx, validator, found); err != nil {
 		// Find all insurances which have same validator with this
 		var invalidInsurances []types.Insurance
-		invalidInsurances = append(invalidInsurances, pairedInsurance)
 		if err = k.IterateAllInsurances(ctx, func(insurance types.Insurance) (bool, error) {
 			if insurance.Status != types.INSURANCE_STATUS_PAIRED {
 				return false, nil

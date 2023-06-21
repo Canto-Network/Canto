@@ -26,4 +26,4 @@ All delegation rewards are collected at every `liquidstaking` module epoch, whic
 
 ## Reward Withdrawal (WIP)
 
-The rewards accumulated on the **reward module account** can be withdrawn by an arbitrager who has lsToken, at a discounted price.
+The rewards accumulated on the **reward module account** can be withdrawn by anyone who has lsToken, at a discounted price.

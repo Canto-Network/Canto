@@ -45,7 +45,9 @@ type MsgLiquidUnstake struct {
 
 ### MsgProvideInsurance
 
-Provide insurance to cover slashing penalties for chunks and to receive commission.
+Provide insurance to cover slashing penalties for chunks and to receive commission. 
+* 9% of chunk size tokens is recommended for the `msg.Amount`.
+* 7% is minimum collateral for the chunk size tokens.
 
 ```go
 type MsgProvideInsurance struct {
@@ -59,7 +61,7 @@ type MsgProvideInsurance struct {
 **msg is failed if:**
 
 - `msg.Amount` is not bond denom
-- `msg.Amount` must be bigger than minimum coverage
+- `msg.Amount` must be bigger than minimum collateral (7% of chunk size tokens)
 - `msg.ValidatorAddress` is not valid validator
 
 ### MsgCancelProvideInsurance

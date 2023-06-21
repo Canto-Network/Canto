@@ -26,6 +26,27 @@ func (k Keeper) DeleteUnpairingForUnstakingChunkInfo(ctx sdk.Context, id uint64)
 	store.Delete(types.GetUnpairingForUnstakingChunkInfoKey(id))
 }
 
+func (k Keeper) IterateAllUnpairingForUnstakingChunkInfos(ctx sdk.Context, cb func(info types.UnpairingForUnstakingChunkInfo) (stop bool, err error)) error {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.KeyPrefixUnpairingForUnstakingChunkInfo)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var info types.UnpairingForUnstakingChunkInfo
+		k.cdc.MustUnmarshal(iterator.Value(), &info)
+
+		stop, err := cb(info)
+		if err != nil {
+			return err
+		}
+		if stop {
+			break
+		}
+	}
+
+	return nil
+}
+
 func (k Keeper) GetAllUnpairingForUnstakingChunkInfos(ctx sdk.Context) []types.UnpairingForUnstakingChunkInfo {
 	var infos []types.UnpairingForUnstakingChunkInfo
 
