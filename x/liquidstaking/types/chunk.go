@@ -2,17 +2,14 @@ package types
 
 import (
 	"fmt"
+
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	ethermint "github.com/evmos/ethermint/types"
 )
 
-const (
-	MaxPairedChunks = 10
-)
-
-var ChunkSize = sdk.TokensFromConsensusPower(5000000, ethermint.PowerReduction)
+var ChunkSize = sdk.TokensFromConsensusPower(250_000, ethermint.PowerReduction)
 
 func NewChunk(id uint64) Chunk {
 	return Chunk{
@@ -50,4 +47,8 @@ func (c *Chunk) Validate(lastChunkId uint64) error {
 		return ErrInvalidChunkStatus
 	}
 	return nil
+}
+
+func (c *Chunk) HasPairedInsurance() bool {
+	return c.PairedInsuranceId != Empty
 }

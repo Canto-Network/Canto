@@ -68,11 +68,6 @@ service Query {
         "/canto/liquidstaking/v1/unpairing_for_unstaking_chunk_infos/{id}";
   }
 
-  rpc MaxPairedChunks(QueryMaxPairedChunksRequest)
-      returns (QueryMaxPairedChunksResponse) {
-    option (google.api.http).get = "/canto/liquidstaking/v1/max_paired_chunks";
-  }
-
   rpc ChunkSize(QueryChunkSizeRequest) returns (QueryChunkSizeResponse) {
     option (google.api.http).get = "/canto/liquidstaking/v1/chunk_size";
   }
@@ -241,9 +236,6 @@ message QueryUnpairingForUnstakingChunkInfoResponse {
   ResponseUnpairingForUnstakingChunkInfo info = 1
       [ (gogoproto.nullable) = false ];
 }
-
-message QueryMaxPairedChunksRequest {}
-message QueryMaxPairedChunksResponse { uint64 max_paired_chunks = 1; }
 
 message QueryChunkSizeRequest {}
 message QueryChunkSizeResponse { uint64 chunk_size = 1; }

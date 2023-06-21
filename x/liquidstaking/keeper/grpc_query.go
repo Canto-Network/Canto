@@ -207,10 +207,6 @@ func (k Keeper) UnpairingForUnstakingChunkInfo(c context.Context, req *types.Que
 	}, nil
 }
 
-func (k Keeper) MaxPairedChunks(_ context.Context, _ *types.QueryMaxPairedChunksRequest) (*types.QueryMaxPairedChunksResponse, error) {
-	return &types.QueryMaxPairedChunksResponse{MaxPairedChunks: types.MaxPairedChunks}, nil
-}
-
 func (k Keeper) ChunkSize(_ context.Context, _ *types.QueryChunkSizeRequest) (*types.QueryChunkSizeResponse, error) {
 	return &types.QueryChunkSizeResponse{ChunkSize: types.ChunkSize.Uint64()}, nil
 }

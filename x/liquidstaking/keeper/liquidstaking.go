@@ -10,14 +10,18 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
-// CollectReward collects reward of chunk and
-// distribute to reward module account and insurance
-// 1. Send commission to insurance based on chunk reward
-// 2. Send rest of rewards to reward module account
-func (k Keeper) CollectReward(ctx sdk.Context, chunk types.Chunk, insurance types.Insurance) {
+// CollectRewardAndFee collects reward of chunk and
+// distribute to a module(=fee), reward pool and insurance.
+// 1. Send commission to insurance based on chunk reward.
+// 2. Deduct dynamic fee from remaining and burn it.
+// 3. Send rest of rewards to reward module account.
+func (k Keeper) CollectRewardAndFee(ctx sdk.Context, chunk types.Chunk, insurance types.Insurance) {
 	delegationRewards := k.bankKeeper.GetAllBalances(ctx, chunk.DerivedAddress())
 	insuranceCommissions := make(sdk.Coins, delegationRewards.Len())
-	pureRewards := make(sdk.Coins, delegationRewards.Len())
+	dynamicFees := make(sdk.Coins, delegationRewards.Len())
+	remainingRewards := make(sdk.Coins, delegationRewards.Len())
+
+	feeRate := k.CalcDynamicFeeRate(ctx)
 	for i, delReward := range delegationRewards {
 		if delReward.IsZero() {
 			continue
@@ -27,27 +31,47 @@ func (k Keeper) CollectReward(ctx sdk.Context, chunk types.Chunk, insurance type
 			delReward.Denom,
 			insuranceCommission,
 		)
-		pureRewards[i] = sdk.NewCoin(
+		pureReward := delReward.Amount.Sub(insuranceCommission)
+		dynamicFee := pureReward.ToDec().Mul(feeRate).Ceil().TruncateInt()
+		remainingReward := pureReward.Sub(dynamicFee)
+		dynamicFees[i] = sdk.NewCoin(
 			delReward.Denom,
-			delReward.Amount.Sub(insuranceCommission),
+			dynamicFee,
+		)
+		remainingRewards[i] = sdk.NewCoin(
+			delReward.Denom,
+			remainingReward,
 		)
 	}
 	fmt.Printf("Collect Reward for validator: %s\n", insurance.GetValidator())
-	fmt.Printf("Pure Reward: %s\n", pureRewards.String())
+	fmt.Printf("Delegation Reward: %s\n", delegationRewards.String())
+	fmt.Printf("Insurance Commission: %s\n", insuranceCommissions.String())
+	fmt.Printf("Dynamic Fee: %s\n", dynamicFees.String())
+	fmt.Printf("Reamining Reward: %s\n", remainingRewards.String())
 
 	var inputs []banktypes.Input
 	var outputs []banktypes.Output
-	switch pureRewards.Len() {
+	switch remainingRewards.Len() {
 	case 0:
 		return
 	default:
+		if !dynamicFees.IsZero() {
+			// Collect dynamic fee and burn it first.
+			if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, chunk.DerivedAddress(), types.ModuleName, dynamicFees); err != nil {
+				panic(err)
+			}
+			if err := k.bankKeeper.BurnCoins(ctx, types.ModuleName, dynamicFees); err != nil {
+				panic(err)
+			}
+		}
+
 		inputs = []banktypes.Input{
 			banktypes.NewInput(chunk.DerivedAddress(), insuranceCommissions),
-			banktypes.NewInput(chunk.DerivedAddress(), pureRewards),
+			banktypes.NewInput(chunk.DerivedAddress(), remainingRewards),
 		}
 		outputs = []banktypes.Output{
 			banktypes.NewOutput(insurance.FeePoolAddress(), insuranceCommissions),
-			banktypes.NewOutput(types.RewardPool, pureRewards),
+			banktypes.NewOutput(types.RewardPool, remainingRewards),
 		}
 	}
 	if err := k.bankKeeper.InputOutputCoins(ctx, inputs, outputs); err != nil {
@@ -56,7 +80,7 @@ func (k Keeper) CollectReward(ctx sdk.Context, chunk types.Chunk, insurance type
 }
 
 // DistributeReward withdraws delegation rewards from all paired chunks
-// Keeper.CollectReward will be called during withdrawing process.
+// Keeper.CollectRewardAndFee will be called during withdrawing process.
 func (k Keeper) DistributeReward(ctx sdk.Context) {
 	err := k.IterateAllChunks(ctx, func(chunk types.Chunk) (bool, error) {
 		var insurance types.Insurance
@@ -85,7 +109,7 @@ func (k Keeper) DistributeReward(ctx sdk.Context) {
 		fmt.Printf("Chunk %d Balance After Withdraw Delegation Rewards\n", chunk.Id)
 		fmt.Println(k.bankKeeper.GetBalance(ctx, chunk.DerivedAddress(), "acanto").String())
 
-		k.CollectReward(ctx, chunk, insurance)
+		k.CollectRewardAndFee(ctx, chunk, insurance)
 		return false, nil
 	})
 	if err != nil {
@@ -233,10 +257,13 @@ func (k Keeper) GetAllRePairableChunksAndOutInsurances(ctx sdk.Context) (
 			}
 			_, found = k.stakingKeeper.GetUnbondingDelegation(ctx, chunk.DerivedAddress(), insurance.GetValidator())
 			if found {
+				// unbonding of chunk is triggered because insurance cannot cover the penalty of chunk.
+				// In next epoch, insurance send all of it's balance to chunk
+				// and all balances of chunk will go to reward pool.
+				// After that, insurance will be unpaired also.
 				return false, nil
 			}
 			outInsurances = append(outInsurances, insurance)
-			// TODO: we should consider damaged chunk...
 			rePairableChunks = append(rePairableChunks, chunk)
 		case types.CHUNK_STATUS_PAIRING:
 			rePairableChunks = append(rePairableChunks, chunk)
@@ -447,23 +474,6 @@ func (k Keeper) DoLiquidStake(ctx sdk.Context, msg *types.MsgLiquidStake) (chunk
 	delAddr := msg.GetDelegator()
 	amount := msg.Amount
 
-	// Check if max paired chunk size is exceeded or not
-	currenPairedChunks := 0
-	err = k.IterateAllChunks(ctx, func(chunk types.Chunk) (bool, error) {
-		if chunk.Status == types.CHUNK_STATUS_PAIRED {
-			currenPairedChunks++
-		}
-		return false, nil
-	})
-	if err != nil {
-		return
-	}
-	availableChunks := types.MaxPairedChunks - currenPairedChunks
-	if availableChunks <= 0 {
-		err = sdkerrors.Wrapf(types.ErrMaxPairedChunkSizeExceeded, "current paired chunk size: %d", currenPairedChunks)
-		return
-	}
-
 	if err = k.ShouldBeBondDenom(ctx, amount.Denom); err != nil {
 		return
 	}
@@ -472,12 +482,14 @@ func (k Keeper) DoLiquidStake(ctx sdk.Context, msg *types.MsgLiquidStake) (chunk
 		return
 	}
 	chunksToCreate := amount.Amount.Quo(types.ChunkSize).Int64()
-	if chunksToCreate > int64(availableChunks) {
+
+	availableChunkSlots := k.GetAvailableChunkSlots(ctx).Int64()
+	if (availableChunkSlots - chunksToCreate) < 0 {
 		err = sdkerrors.Wrapf(
 			types.ErrExceedAvailableChunks,
 			"requested chunks to create: %d, available chunks: %d",
 			chunksToCreate,
-			availableChunks,
+			availableChunkSlots,
 		)
 		return
 	}
@@ -1019,6 +1031,7 @@ func (k Keeper) completeLiquidUnstake(ctx sdk.Context, chunk types.Chunk) error 
 }
 
 // handleUnpairingChunk handles unpairing chunk which created previous epoch.
+// Those chunks completed their unbonding already.
 func (k Keeper) handleUnpairingChunk(ctx sdk.Context, chunk types.Chunk) error {
 	if chunk.Status != types.CHUNK_STATUS_UNPAIRING {
 		return sdkerrors.Wrapf(types.ErrInvalidChunkStatus, "chunk id: %d, status: %s", chunk.Id, chunk.Status)
@@ -1031,8 +1044,13 @@ func (k Keeper) handleUnpairingChunk(ctx sdk.Context, chunk types.Chunk) error {
 	if !found {
 		return sdkerrors.Wrapf(types.ErrNotFoundInsurance, "insurance id: %d", chunk.UnpairingInsuranceId)
 	}
-	if chunk.PairedInsuranceId != 0 {
+	if chunk.HasPairedInsurance() {
 		return sdkerrors.Wrapf(types.ErrUnpairingChunkHavePairedChunk, "paired insurance id: %d", chunk.PairedInsuranceId)
+	}
+	if _, found = k.stakingKeeper.GetUnbondingDelegation(ctx, chunk.DerivedAddress(), unpairingInsurance.GetValidator()); found {
+		// UnbondingDelegation must be removed by staking keeper EndBlocker
+		// because Endblocker of liquidstaking module is called after staking module.
+		return sdkerrors.Wrapf(types.ErrUnbondingDelegationNotRemoved, "chunk id: %d", chunk.Id)
 	}
 
 	chunkBalance := k.bankKeeper.GetBalance(ctx, chunk.DerivedAddress(), bondDenom).Amount
@@ -1073,14 +1091,17 @@ func (k Keeper) handleUnpairingChunk(ctx sdk.Context, chunk types.Chunk) error {
 		if err = k.bankKeeper.InputOutputCoins(ctx, inputs, outputs); err != nil {
 			return err
 		}
-		// insurance already sent all of its balance to chunk, so ok delete it
-		// TODO: k.DeleteInsurance(ctx, unpairingInsurance.Id)? there can be remaining commissions
 		k.DeleteChunk(ctx, chunk.Id)
+		// Insurance already sent all of its balance to chunk, but we cannot delete it yet
+		// because it can have remaining commissions.
+		if k.bankKeeper.GetAllBalances(ctx, unpairingInsurance.FeePoolAddress()).IsZero() {
+			// if insurance has no commissions, we can delete it
+			k.DeleteInsurance(ctx, unpairingInsurance.Id)
+		}
 		return nil
 	}
 	chunk.SetStatus(types.CHUNK_STATUS_PAIRING)
 	k.SetChunk(ctx, chunk)
-	k.SetInsurance(ctx, unpairingInsurance)
 
 	return nil
 }
@@ -1130,6 +1151,14 @@ func (k Keeper) handlePairedChunk(ctx sdk.Context, chunk types.Chunk) error {
 		if penalty.GT(insuranceBalance.Amount.ToDec()) {
 			insuranceOutOfBalance = true
 			k.startUnpairing(ctx, pairedInsurance, chunk)
+			// start unbonding of chunk because it is damaged
+			if _, err = k.stakingKeeper.Undelegate(
+				ctx, chunk.DerivedAddress(),
+				validator.GetOperator(),
+				delegation.GetShares(),
+			); err != nil {
+				return err
+			}
 		} else {
 			// Insurance can cover penalty
 			// 1. Send penalty to chunk
@@ -1219,6 +1248,19 @@ func (k Keeper) IsInvalidInsurance(ctx sdk.Context, insurance types.Insurance) b
 		return true
 	}
 	return false
+}
+
+// GetAvailableChunkSlots returns a number of chunk which can be paired.
+func (k Keeper) GetAvailableChunkSlots(ctx sdk.Context) sdk.Int {
+	var numPairedChunks int64 = 0
+	k.IterateAllChunks(ctx, func(chunk types.Chunk) (bool, error) {
+		if chunk.Status != types.CHUNK_STATUS_PAIRED {
+			return false, nil
+		}
+		numPairedChunks++
+		return false, nil
+	})
+	return k.MaxPairedChunks(ctx).Sub(sdk.NewInt(numPairedChunks))
 }
 
 // startUnpairing changes status of insurance and chunk to unpairing.

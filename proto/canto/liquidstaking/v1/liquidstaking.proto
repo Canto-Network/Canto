@@ -18,8 +18,61 @@ message Epoch {
   int64 start_height = 4;
 }
 
+// DynamicFeeRate defines parameters realated with dynamic fee rate mechanism.
+message DynamicFeeRate {
+  // minimum fee rate
+  string r0 = 1 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // Softcap for utilization ratio. If the utilization ratio is below this
+  // value, fee rate is R0.
+  string u_soft_cap = 2 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // Hardcap for utilization ratio. If the utilization ratio cannot bigger than
+  // this value.
+  string u_hard_cap = 3 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // Optimal utilization ratio.
+  string u_optimal = 4 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // If the current utilization ratio is between softcap and optimal, fee rate
+  // increases at a slow pace.
+  string slope1 = 5 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // If the current utilization ratio is above optimal, fee rate increases at a
+  // faster pace.
+  string slope2 = 6 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // Maximum fee rate.
+  string max_fee_rate = 7 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+}
+
 // Params defines the parameters for the module.
-message Params { option (gogoproto.goproto_getters) = false; }
+message Params {
+  option (gogoproto.goproto_getters) = false;
+
+  DynamicFeeRate dynamic_fee_rate = 1 [ (gogoproto.nullable) = false ];
+}
 
 // ChunkStatus defines the status of the chunk.
 enum ChunkStatus {

@@ -65,6 +65,8 @@ type testingEnvOptions struct {
 	fixedInsuranceFeeRate sdk.Dec
 	insuranceFeeRates     []sdk.Dec
 	numPairedChunks       int
+	// this field influences the total supply of the testing environment
+	fundingAccountBalance sdk.Int
 }
 
 // testingEnv is used to store the testing environment for liquidstaking
@@ -243,6 +245,7 @@ func (suite *KeeperTestSuite) CreateValidators(
 	return
 }
 
+// TODO: Remove this function and usages. Use AddTestAddrsWithFunding instead
 // Add test addresses with funds
 func (suite *KeeperTestSuite) AddTestAddrs(accNum int, amount sdk.Int) ([]sdk.AccAddress, []sdk.Coin) {
 	addrs := make([]sdk.AccAddress, 0, accNum)
@@ -253,15 +256,29 @@ func (suite *KeeperTestSuite) AddTestAddrs(accNum int, amount sdk.Int) ([]sdk.Ac
 		balances = append(balances, sdk.NewCoin(suite.denom, amount))
 
 		// fund each account
-		suite.fundAccount(addr, amount)
+		suite.fundAccount(suite.ctx, addr, amount)
 	}
 	return addrs, balances
 }
 
-func (suite *KeeperTestSuite) fundAccount(addr sdk.AccAddress, amount sdk.Int) {
-	err := suite.app.BankKeeper.MintCoins(suite.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(suite.denom, amount)))
+// Add test addresses with funds
+func (suite *KeeperTestSuite) AddTestAddrsWithFunding(fundingAccount sdk.AccAddress, accNum int, amount sdk.Int) ([]sdk.AccAddress, []sdk.Coin) {
+	addrs := make([]sdk.AccAddress, 0, accNum)
+	balances := make([]sdk.Coin, 0, accNum)
+	for i := 0; i < accNum; i++ {
+		addr := sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address())
+		addrs = append(addrs, addr)
+		balances = append(balances, sdk.NewCoin(suite.denom, amount))
+
+		suite.app.BankKeeper.SendCoins(suite.ctx, fundingAccount, addr, sdk.NewCoins(sdk.NewCoin(suite.denom, amount)))
+	}
+	return addrs, balances
+}
+
+func (suite *KeeperTestSuite) fundAccount(ctx sdk.Context, addr sdk.AccAddress, amount sdk.Int) {
+	err := suite.app.BankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(suite.denom, amount)))
 	suite.NoError(err)
-	err = suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, addr, sdk.NewCoins(sdk.NewCoin(suite.denom, amount)))
+	err = suite.app.BankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, sdk.NewCoins(sdk.NewCoin(suite.denom, amount)))
 	suite.NoError(err)
 }
 
@@ -308,24 +325,30 @@ func (suite *KeeperTestSuite) advanceHeight(height int, msg string) {
 				fmt.Printf("\tcommission before: %s\n", suite.app.DistrKeeper.GetValidatorAccumulatedCommission(suite.ctx, validator.GetOperator()).Commission.String())
 				fmt.Printf("\tcurrent reward before: %s\n", suite.app.DistrKeeper.GetValidatorCurrentRewards(suite.ctx, validator.GetOperator()).Rewards.String())
 				fmt.Printf("\tcumulative ratio before: %s\n", suite.app.DistrKeeper.GetValidatorCurrentRewards(suite.ctx, validator.GetOperator()).Rewards.QuoDec(validator.GetTokens().ToDec()).String())
-				fmt.Printf("\tkkkbefore: %s\n",
+				fmt.Printf("\tvalidator current rewards before: %s\n",
 					suite.app.DistrKeeper.GetValidatorCurrentRewards(suite.ctx, validator.GetOperator()).Rewards.QuoDec(
 						validator.GetTokens().ToDec(),
 					).MulDec(
 						suite.app.DistrKeeper.GetValidatorCurrentRewards(suite.ctx, validator.GetOperator()).Rewards.AmountOf(suite.denom),
 					))
+				fmt.Printf("\tdelShares token value before: %s\n", validator.TokensFromSharesTruncated(types.ChunkSize.ToDec()).String())
 				suite.app.DistrKeeper.AllocateTokensToValidator(suite.ctx, validator, sdk.DecCoins{{Denom: suite.denom, Amount: reward}})
+				validator = suite.app.StakingKeeper.Validator(suite.ctx, validator.GetOperator())
 				fmt.Printf("\tbalance after: %s\n", suite.app.BankKeeper.GetAllBalances(suite.ctx, sdk.AccAddress(validator.GetOperator())).String())
 				fmt.Printf("\tcommission after: %s\n", suite.app.DistrKeeper.GetValidatorAccumulatedCommission(suite.ctx, validator.GetOperator()).Commission.String())
 				fmt.Printf("\tcurrent reward after: %s\n", suite.app.DistrKeeper.GetValidatorCurrentRewards(suite.ctx, validator.GetOperator()).Rewards.String())
-				fmt.Printf("\tcumulative ratio after: %s\n", suite.app.DistrKeeper.GetValidatorCurrentRewards(suite.ctx, validator.GetOperator()).Rewards.QuoDec(validator.GetTokens().ToDec()).String())
-				fmt.Printf("\tkkkbefore: %s\n",
+				cumulativeRatio := suite.app.DistrKeeper.GetValidatorCurrentRewards(suite.ctx, validator.GetOperator()).Rewards.QuoDec(validator.GetTokens().ToDec())
+				fmt.Printf("\tcumulative ratio after: %s\n", cumulativeRatio.String())
+				stake := validator.TokensFromSharesTruncated(types.ChunkSize.ToDec())
+				fmt.Printf("\tdelShares token value after: %s\n", stake.String())
+				finalRewards, _ := cumulativeRatio.MulDecTruncate(stake).TruncateDecimal() // finalRewards
+				fmt.Printf("\tcalculated del final rewards(stake x cumulativeRatio) and truncate deicmal: %s\n", finalRewards.String())
+				fmt.Printf("\tvalidator current rewards after: %s\n",
 					suite.app.DistrKeeper.GetValidatorCurrentRewards(suite.ctx, validator.GetOperator()).Rewards.QuoDec(
 						validator.GetTokens().ToDec(),
 					).MulDec(
 						suite.app.DistrKeeper.GetValidatorCurrentRewards(suite.ctx, validator.GetOperator()).Rewards.AmountOf(suite.denom),
 					))
-
 				totalRewards = totalRewards.Add(reward)
 				return false
 			})
@@ -372,6 +395,8 @@ func (suite *KeeperTestSuite) mustPassInvariants() {
 // - balance of provider is oneInsurance amount of tokens
 func (suite *KeeperTestSuite) setupLiquidStakeTestingEnv(env testingEnvOptions) testingEnv {
 	suite.resetEpochs()
+	suite.fundAccount(suite.ctx, fundingAccount, env.fundingAccountBalance)
+
 	if env.fixedPower > 0 {
 		env.powers = make([]int64, env.numVals)
 		for i := range env.powers {
@@ -380,11 +405,11 @@ func (suite *KeeperTestSuite) setupLiquidStakeTestingEnv(env testingEnvOptions) 
 	}
 	valAddrs, pubKeys := suite.CreateValidators(env.powers, env.fixedValFeeRate, env.valFeeRates)
 	oneChunk, oneInsurance := suite.app.LiquidStakingKeeper.GetMinimumRequirements(suite.ctx)
-	providers, providerBalances := suite.AddTestAddrs(env.numInsurances, oneInsurance.Amount)
+	providers, providerBalances := suite.AddTestAddrsWithFunding(fundingAccount, env.numInsurances, oneInsurance.Amount)
 	insurances := suite.provideInsurances(suite.ctx, providers, valAddrs, providerBalances, env.fixedInsuranceFeeRate, env.insuranceFeeRates)
 
 	// create numPairedChunks delegators
-	delegators, delegatorBalances := suite.AddTestAddrs(env.numPairedChunks, oneChunk.Amount)
+	delegators, delegatorBalances := suite.AddTestAddrsWithFunding(fundingAccount, env.numPairedChunks, oneChunk.Amount)
 	nas := suite.app.LiquidStakingKeeper.GetNetAmountState(suite.ctx)
 	suite.True(nas.IsZeroState(), "nothing happened yet so it must be zero state")
 	pairedChunks := suite.liquidStakes(suite.ctx, delegators, delegatorBalances)

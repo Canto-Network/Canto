@@ -30,7 +30,7 @@ func (k Keeper) GetNetAmountState(ctx sdk.Context) (nas types.NetAmountState) {
 		totalChunksBalance = totalChunksBalance.Add(balance.Amount.ToDec())
 
 		if chunk.PairedInsuranceId != 0 {
-			// chunk is paired which meanas have delegation
+			// chunk is paired which means have delegation
 			pairedInsurance, _ := k.GetInsurance(ctx, chunk.PairedInsuranceId)
 			valAddr, err := sdk.ValAddressFromBech32(pairedInsurance.ValidatorAddress)
 			if err != nil {

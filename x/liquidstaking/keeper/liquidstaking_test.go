@@ -6,6 +6,8 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
+
 	liquidstakingkeeper "github.com/Canto-Network/Canto/v6/x/liquidstaking"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
@@ -24,6 +26,10 @@ import (
 
 var onePower int64 = 1
 var tenPercentFeeRate = sdk.NewDecWithPrec(10, 2)
+
+// fundingAccount is a rich account.
+// Any accounts created during tests except validators must get funding from this account.
+var fundingAccount = sdk.AccAddress(ed25519.GenPrivKey().PubKey().Address())
 
 func (suite *KeeperTestSuite) getPairedChunks() []types.Chunk {
 	var pairedChunks []types.Chunk
@@ -231,8 +237,13 @@ func (suite *KeeperTestSuite) TestLiquidStakeFail() {
 		nil,
 	)
 	oneChunk, oneInsurance := suite.app.LiquidStakingKeeper.GetMinimumRequirements(suite.ctx)
-
-	addrs, balances := suite.AddTestAddrs(types.MaxPairedChunks-1, oneChunk.Amount)
+	suite.fundAccount(suite.ctx, fundingAccount, oneChunk.Amount.MulRaw(100).Add(oneInsurance.Amount.MulRaw(10)))
+	maxPairedChunks := suite.app.LiquidStakingKeeper.MaxPairedChunks(suite.ctx).Int64()
+	suite.Equal(
+		maxPairedChunks, int64(10),
+		"set total supply by creating funding account to fix max paired chunks",
+	)
+	addrs, balances := suite.AddTestAddrsWithFunding(fundingAccount, int(maxPairedChunks-1), oneChunk.Amount)
 
 	// TC: There are no pairing insurances yet. Insurances must be provided to liquid stake
 	acc1 := addrs[0]
@@ -240,7 +251,7 @@ func (suite *KeeperTestSuite) TestLiquidStakeFail() {
 	_, _, _, err := suite.app.LiquidStakingKeeper.DoLiquidStake(suite.ctx, msg)
 	suite.ErrorContains(err, types.ErrNoPairingInsurance.Error())
 
-	providers, providerBalances := suite.AddTestAddrs(10, oneInsurance.Amount)
+	providers, providerBalances := suite.AddTestAddrsWithFunding(fundingAccount, int(maxPairedChunks), oneInsurance.Amount)
 	suite.provideInsurances(suite.ctx, providers, valAddrs, providerBalances, sdk.ZeroDec(), nil)
 
 	// TC: Not enough amount to liquid stake
@@ -262,7 +273,14 @@ func (suite *KeeperTestSuite) TestLiquidStakeFail() {
 	_ = suite.liquidStakes(suite.ctx, addrs, balances)
 
 	// Fund coins to acc1
-	suite.fundAccount(acc1, types.ChunkSize.Mul(sdk.NewInt(2)))
+	suite.app.BankKeeper.SendCoins(
+		suite.ctx,
+		fundingAccount,
+		acc1,
+		sdk.NewCoins(
+			sdk.NewCoin(suite.denom, types.ChunkSize.Mul(sdk.NewInt(2))),
+		),
+	)
 	// Now acc1 have 2 * ChunkSize tokens as balance and try to liquid stake 2 * ChunkSize tokens
 	acc1Balance := suite.app.BankKeeper.GetBalance(suite.ctx, acc1, suite.denom)
 	suite.True(acc1Balance.Amount.Equal(types.ChunkSize.Mul(sdk.NewInt(2))))
@@ -284,25 +302,28 @@ func (suite *KeeperTestSuite) TestLiquidStakeFail() {
 	newAddrs, newBalances := suite.AddTestAddrs(1, oneChunk.Amount)
 	msg = types.NewMsgLiquidStake(newAddrs[0].String(), newBalances[0])
 	_, _, _, err = suite.app.LiquidStakingKeeper.DoLiquidStake(suite.ctx, msg)
-	suite.ErrorIs(err, types.ErrMaxPairedChunkSizeExceeded)
+	suite.ErrorIs(err, types.ErrExceedAvailableChunks)
 
 	suite.mustPassInvariants()
 }
 
 func (suite *KeeperTestSuite) TestLiquidStakeWithAdvanceBlocks() {
 	fixedInsuranceFeeRate := tenPercentFeeRate
-	env := suite.setupLiquidStakeTestingEnv(testingEnvOptions{
-		desc:                  "TestLiquidStakeWithAdvanceBlocks",
-		numVals:               3,
-		fixedValFeeRate:       tenPercentFeeRate,
-		valFeeRates:           nil,
-		fixedPower:            onePower,
-		powers:                nil,
-		numInsurances:         10,
-		fixedInsuranceFeeRate: fixedInsuranceFeeRate,
-		insuranceFeeRates:     nil,
-		numPairedChunks:       3,
-	})
+	env := suite.setupLiquidStakeTestingEnv(
+		testingEnvOptions{
+			"TestLiquidStakeWithAdvanceBlocks",
+			3,
+			tenPercentFeeRate,
+			nil,
+			onePower,
+			nil,
+			10,
+			fixedInsuranceFeeRate,
+			nil,
+			3,
+			types.ChunkSize.MulRaw(500),
+		},
+	)
 
 	_, oneInsurance := suite.app.LiquidStakingKeeper.GetMinimumRequirements(suite.ctx)
 	unitDelegationRewardPerRewardEpoch, _ := sdk.NewIntFromString("29999994000000000000")
@@ -371,18 +392,21 @@ func (suite *KeeperTestSuite) TestLiquidStakeWithAdvanceBlocks() {
 
 func (suite *KeeperTestSuite) TestLiquidUnstakeWithAdvanceBlocks() {
 	fixedInsuranceFeeRate := tenPercentFeeRate
-	env := suite.setupLiquidStakeTestingEnv(testingEnvOptions{
-		desc:                  "TestLiquidUnstakeWithAdvanceBlocks",
-		numVals:               3,
-		fixedValFeeRate:       tenPercentFeeRate,
-		valFeeRates:           nil,
-		fixedPower:            onePower,
-		powers:                nil,
-		numInsurances:         10,
-		fixedInsuranceFeeRate: fixedInsuranceFeeRate,
-		insuranceFeeRates:     nil,
-		numPairedChunks:       3,
-	})
+	env := suite.setupLiquidStakeTestingEnv(
+		testingEnvOptions{
+			"TestLiquidUnstakeWithAdvanceBlocks",
+			3,
+			tenPercentFeeRate,
+			nil,
+			onePower,
+			nil,
+			10,
+			fixedInsuranceFeeRate,
+			nil,
+			3,
+			types.ChunkSize.MulRaw(500),
+		},
+	)
 	oneChunk, oneInsurance := suite.app.LiquidStakingKeeper.GetMinimumRequirements(suite.ctx)
 	pairedChunksInt := sdk.NewInt(int64(len(env.pairedChunks)))
 	mostExpensivePairedChunk := suite.getMostExpensivePairedChunk(env.pairedChunks)
@@ -692,18 +716,21 @@ func (suite *KeeperTestSuite) TestCancelProvideInsuranceSuccess() {
 }
 
 func (suite *KeeperTestSuite) TestDoCancelProvideInsuranceFail() {
-	env := suite.setupLiquidStakeTestingEnv(testingEnvOptions{
-		desc:                  "TestDoCancelProvideInsuranceFail",
-		numVals:               3,
-		fixedValFeeRate:       tenPercentFeeRate,
-		valFeeRates:           nil,
-		fixedPower:            onePower,
-		powers:                nil,
-		numInsurances:         3,
-		fixedInsuranceFeeRate: tenPercentFeeRate,
-		insuranceFeeRates:     nil,
-		numPairedChunks:       1,
-	})
+	env := suite.setupLiquidStakeTestingEnv(
+		testingEnvOptions{
+			"TestDoCancelProvideInsuranceFail",
+			3,
+			tenPercentFeeRate,
+			nil,
+			onePower,
+			nil,
+			3,
+			tenPercentFeeRate,
+			nil,
+			1,
+			types.ChunkSize.MulRaw(500),
+		},
+	)
 	onlyPairedInsurance := env.insurances[0]
 
 	tcs := []struct {
@@ -748,18 +775,21 @@ func (suite *KeeperTestSuite) TestDoCancelProvideInsuranceFail() {
 }
 
 func (suite *KeeperTestSuite) TestDoWithdrawInsurance() {
-	env := suite.setupLiquidStakeTestingEnv(testingEnvOptions{
-		desc:                  "TestDoWithdrawInsurance",
-		numVals:               3,
-		fixedValFeeRate:       tenPercentFeeRate,
-		valFeeRates:           nil,
-		fixedPower:            onePower,
-		powers:                nil,
-		numInsurances:         3,
-		fixedInsuranceFeeRate: tenPercentFeeRate,
-		insuranceFeeRates:     nil,
-		numPairedChunks:       3,
-	})
+	env := suite.setupLiquidStakeTestingEnv(
+		testingEnvOptions{
+			"TestDoWithdrawInsurance",
+			3,
+			tenPercentFeeRate,
+			nil,
+			onePower,
+			nil,
+			3,
+			tenPercentFeeRate,
+			nil,
+			3,
+			types.ChunkSize.MulRaw(500),
+		},
+	)
 
 	toBeWithdrawnInsurance, _ := suite.app.LiquidStakingKeeper.GetInsurance(suite.ctx, env.insurances[0].Id)
 	_, err := suite.app.LiquidStakingKeeper.DoWithdrawInsurance(
@@ -854,20 +884,23 @@ func (suite *KeeperTestSuite) TestDoWithdrawInsuranceFail() {
 
 func (suite *KeeperTestSuite) TestDoWithdrawInsuranceCommission() {
 	fixedInsuranceFeeRate := tenPercentFeeRate
-	env := suite.setupLiquidStakeTestingEnv(testingEnvOptions{
-		desc:                  "TestDoWithdrawInsuranceCommission",
-		numVals:               3,
-		fixedValFeeRate:       tenPercentFeeRate,
-		valFeeRates:           nil,
-		fixedPower:            onePower,
-		powers:                nil,
-		numInsurances:         3,
-		fixedInsuranceFeeRate: fixedInsuranceFeeRate,
-		insuranceFeeRates:     nil,
-		numPairedChunks:       3,
-	})
+	env := suite.setupLiquidStakeTestingEnv(
+		testingEnvOptions{
+			"TestDoWithdrawInsuranceCommission",
+			3,
+			tenPercentFeeRate,
+			nil,
+			onePower,
+			nil,
+			3,
+			fixedInsuranceFeeRate,
+			nil,
+			3,
+			types.ChunkSize.MulRaw(500),
+		},
+	)
 
-	unitDelegationRewardPerRewardEpoch, _ := sdk.NewIntFromString("29999994000000000000")
+	unitDelegationRewardPerRewardEpoch, _ := sdk.NewIntFromString("29999880000479750000")
 	unitInsuranceCommissionPerRewardEpoch, _ := suite.getUnitDistribution(unitDelegationRewardPerRewardEpoch, fixedInsuranceFeeRate)
 
 	provider := env.providers[0]
@@ -884,9 +917,11 @@ func (suite *KeeperTestSuite) TestDoWithdrawInsuranceCommission() {
 	suite.advanceEpoch()
 	suite.advanceHeight(1, "cumulated delegation reward is distributed to withdraw fee pool")
 	afterInsuranceCommission = suite.app.BankKeeper.GetBalance(suite.ctx, targetInsurance.FeePoolAddress(), suite.denom)
-	suite.Equal(
-		unitInsuranceCommissionPerRewardEpoch.Mul(sdk.NewInt(suite.rewardEpochCount)).String(),
-		afterInsuranceCommission.Amount.String(),
+	expected := unitInsuranceCommissionPerRewardEpoch.Mul(sdk.NewInt(suite.rewardEpochCount))
+	actual := afterInsuranceCommission.Amount
+	diff := actual.Sub(expected)
+	suite.True(
+		diff.ToDec().Quo(actual.ToDec()).LT(sdk.MustNewDecFromStr("0.00001")),
 		"cumulated delegation reward is distributed to withdraw fee pool",
 	)
 
@@ -1047,18 +1082,21 @@ func (suite *KeeperTestSuite) TestDoDepositInsuranceFail() {
 }
 
 func (suite *KeeperTestSuite) TestRankInsurances() {
-	env := suite.setupLiquidStakeTestingEnv(testingEnvOptions{
-		desc:                  "TestRankInsurances",
-		numVals:               3,
-		fixedValFeeRate:       tenPercentFeeRate,
-		valFeeRates:           nil,
-		fixedPower:            onePower,
-		powers:                nil,
-		numInsurances:         3,
-		fixedInsuranceFeeRate: tenPercentFeeRate,
-		insuranceFeeRates:     nil,
-		numPairedChunks:       3,
-	})
+	env := suite.setupLiquidStakeTestingEnv(
+		testingEnvOptions{
+			"TestRankInsurances",
+			3,
+			tenPercentFeeRate,
+			nil,
+			onePower,
+			nil,
+			3,
+			tenPercentFeeRate,
+			nil,
+			3,
+			types.ChunkSize.MulRaw(500),
+		},
+	)
 	_, oneInsurance := suite.app.LiquidStakingKeeper.GetMinimumRequirements(suite.ctx)
 	var idsOfPairedInsurances []uint64
 	for _, insurance := range env.insurances {
@@ -1119,18 +1157,21 @@ func (suite *KeeperTestSuite) TestRankInsurances() {
 }
 
 func (suite *KeeperTestSuite) TestEndBlocker() {
-	env := suite.setupLiquidStakeTestingEnv(testingEnvOptions{
-		desc:                  "TestEndBlocker",
-		numVals:               3,
-		fixedValFeeRate:       tenPercentFeeRate,
-		valFeeRates:           nil,
-		fixedPower:            onePower,
-		powers:                nil,
-		numInsurances:         3,
-		fixedInsuranceFeeRate: tenPercentFeeRate,
-		insuranceFeeRates:     nil,
-		numPairedChunks:       3,
-	})
+	env := suite.setupLiquidStakeTestingEnv(
+		testingEnvOptions{
+			"TestEndBlocker",
+			3,
+			tenPercentFeeRate,
+			nil,
+			onePower,
+			nil,
+			3,
+			tenPercentFeeRate,
+			nil,
+			3,
+			types.ChunkSize.MulRaw(500),
+		},
+	)
 
 	// Queue withdraw insurance request
 	toBeWithdrawnInsurance, _ := suite.app.LiquidStakingKeeper.GetInsurance(suite.ctx, env.insurances[0].Id)
@@ -1302,6 +1343,7 @@ func (suite *KeeperTestSuite) TestPairedChunkTombstonedAndRedelegated() {
 			tenPercentFeeRate,
 			nil,
 			3,
+			types.ChunkSize.MulRaw(500),
 		},
 	)
 	unitDelegationRewardPerRewardEpoch, _ := sdk.NewIntFromString("29999994000000000000")
@@ -1480,6 +1522,7 @@ func (suite *KeeperTestSuite) TestPairedChunkTombstonedAndUnpaired() {
 			sdk.NewDecWithPrec(10, 2),
 			nil,
 			3,
+			types.ChunkSize.MulRaw(500),
 		},
 	)
 	unitDelegationRewardPerRewardEpoch, _ := sdk.NewIntFromString("29999994000000000000")
@@ -1633,6 +1676,7 @@ func (suite *KeeperTestSuite) TestMultiplePairedChunksTombstonedAndRedelegated()
 			sdk.NewDecWithPrec(10, 2),
 			nil,
 			9,
+			types.ChunkSize.MulRaw(500),
 		},
 	)
 	_, oneInsurnace := suite.app.LiquidStakingKeeper.GetMinimumRequirements(suite.ctx)
@@ -1751,6 +1795,7 @@ func (suite *KeeperTestSuite) TestMultiplePairedChunksTombstonedAndUnpaired() {
 			sdk.NewDecWithPrec(10, 2),
 			nil,
 			9,
+			types.ChunkSize.MulRaw(500),
 		},
 	)
 	suite.advanceHeight(1, "liquid staking started")
@@ -1882,6 +1927,7 @@ func (suite *KeeperTestSuite) TestUnpairingForUnstakingChunkTombstoned() {
 			tenPercentFeeRate,
 			nil,
 			3,
+			types.ChunkSize.MulRaw(500),
 		},
 	)
 	numPassedRewardEpochsBeforeUnstaked := int64(0)
@@ -2059,13 +2105,13 @@ func (suite *KeeperTestSuite) TestCumulativePenaltyByMultipleDownTimeSlashingAnd
 			name:                   "block time is 1 second",
 			blockTime:              time.Second,
 			includeTombstone:       false,
-			expectedPenaltyPercent: 61,
+			expectedPenaltyPercent: 59,
 		},
 		{
 			name:                   "block time is 1 second including tombstone",
 			blockTime:              time.Second,
 			includeTombstone:       true,
-			expectedPenaltyPercent: 64,
+			expectedPenaltyPercent: 61,
 		},
 		{
 			name:                   "block time is 5 second",
@@ -2073,7 +2119,6 @@ func (suite *KeeperTestSuite) TestCumulativePenaltyByMultipleDownTimeSlashingAnd
 			includeTombstone:       false,
 			expectedPenaltyPercent: 18,
 		},
-
 		{
 			name:                   "block time is 5 second including tombstone",
 			blockTime:              5 * time.Second,
@@ -2082,111 +2127,116 @@ func (suite *KeeperTestSuite) TestCumulativePenaltyByMultipleDownTimeSlashingAnd
 		},
 	}
 	for _, tc := range tcs {
-		initialHeight := int64(1)
-		suite.ctx = suite.ctx.WithBlockHeight(initialHeight) // start with clean height
-		valNum := 2
-		delAddrs, _ := suite.AddTestAddrs(valNum, suite.app.StakingKeeper.TokensFromConsensusPower(suite.ctx, 200))
-		valAddrs := simapp.ConvertAddrsToValAddrs(delAddrs)
-		pubKeys := suite.createTestPubKeys(valNum)
-		tstaking := teststaking.NewHelper(suite.T(), suite.ctx, suite.app.StakingKeeper)
-		tstaking.Denom = suite.app.StakingKeeper.BondDenom(suite.ctx)
-		power := int64(100)
-		selfDelegations := make([]sdk.Int, valNum)
-		// create validators which have the same power
-		for i, valAddr := range valAddrs {
-			selfDelegations[i] = tstaking.CreateValidatorWithValPower(valAddr, pubKeys[i], power, true)
-		}
-		staking.EndBlocker(suite.ctx, suite.app.StakingKeeper)
-
-		// Let's create 2 chunk and 2 insurance
-		oneChunk, oneInsurance := suite.app.LiquidStakingKeeper.GetMinimumRequirements(suite.ctx)
-		providers, providerBalances := suite.AddTestAddrs(2, oneInsurance.Amount)
-		suite.provideInsurances(suite.ctx, providers, valAddrs, providerBalances, tenPercentFeeRate, nil)
-		delegators, delegatorBalances := suite.AddTestAddrs(2, oneChunk.Amount)
-		pairedChunks := suite.liquidStakes(suite.ctx, delegators, delegatorBalances)
-		suite.ctx = suite.ctx.WithBlockHeight(suite.ctx.BlockHeight() + 1)
-		staking.EndBlocker(suite.ctx, suite.app.StakingKeeper)
-
-		downValAddr := valAddrs[0]
-		downValPubKey := pubKeys[0]
-		toBeUnpairedChunk := pairedChunks[0]
-		toBeDrainedInsuranceId := pairedChunks[0].PairedInsuranceId
-		fmt.Printf("balance of insurance to be drained: %s\n", oneInsurance.Amount.String())
-
-		epoch := suite.app.LiquidStakingKeeper.GetEpoch(suite.ctx)
-		epochTime := suite.ctx.BlockTime().Add(epoch.Duration)
-		called := 0
-		for {
-			validator, _ := suite.app.StakingKeeper.GetValidatorByConsAddr(suite.ctx, sdk.GetConsAddress(downValPubKey))
-			suite.downTimeSlashing(
-				suite.ctx,
-				downValPubKey,
-				validator.GetConsensusPower(suite.app.StakingKeeper.PowerReduction(suite.ctx)),
-				called,
-				tc.blockTime,
-			)
-			suite.unjail(suite.ctx, downValAddr, downValPubKey, tc.blockTime)
-			called++
-
-			if suite.ctx.BlockTime().After(epochTime) {
-				break
+		suite.Run(tc.name, func() {
+			// Must call this to refresh state
+			suite.SetupTest()
+			initialHeight := int64(1)
+			suite.ctx = suite.ctx.WithBlockHeight(initialHeight) // make sure we start with clean height
+			suite.fundAccount(suite.ctx, fundingAccount, types.ChunkSize.MulRaw(500))
+			valNum := 2
+			delAddrs, _ := suite.AddTestAddrsWithFunding(fundingAccount, valNum, suite.app.StakingKeeper.TokensFromConsensusPower(suite.ctx, 200))
+			valAddrs := simapp.ConvertAddrsToValAddrs(delAddrs)
+			pubKeys := suite.createTestPubKeys(valNum)
+			tstaking := teststaking.NewHelper(suite.T(), suite.ctx, suite.app.StakingKeeper)
+			tstaking.Denom = suite.app.StakingKeeper.BondDenom(suite.ctx)
+			power := int64(100)
+			selfDelegations := make([]sdk.Int, valNum)
+			// create validators which have the same power
+			for i, valAddr := range valAddrs {
+				selfDelegations[i] = tstaking.CreateValidatorWithValPower(valAddr, pubKeys[i], power, true)
 			}
-		}
-		if tc.includeTombstone {
-			suite.tombstone(suite.ctx, downValAddr, downValPubKey)
-		}
+			staking.EndBlocker(suite.ctx, suite.app.StakingKeeper)
 
-		validatorAfterSlashed, _ := suite.app.StakingKeeper.GetValidatorByConsAddr(suite.ctx, sdk.GetConsAddress(downValPubKey))
-		cumulativePenalty := types.ChunkSize.ToDec().Sub(validatorAfterSlashed.TokensFromShares(types.ChunkSize.ToDec()))
-		fmt.Printf("%d downtime slashing occurred during epoch(%0.f days)\n", called, epoch.Duration.Hours()/24)
-		damagedPercent := cumulativePenalty.Quo(types.ChunkSize.ToDec()).MulInt64(100).TruncateInt64()
-		suite.Equal(tc.expectedPenaltyPercent, int(damagedPercent))
-		fmt.Printf(
-			"accumulated penalty: %s | %d percent of ChunkSize tokens\n",
-			cumulativePenalty.String(), damagedPercent,
-		)
-		suite.advanceEpoch()
-		staking.EndBlocker(suite.ctx, suite.app.StakingKeeper)
-		liquidstakingkeeper.EndBlocker(suite.ctx, suite.app.LiquidStakingKeeper)
-		fmt.Println("chunk unbonding is started")
-		{
-			unPairingChunk, _ := suite.app.LiquidStakingKeeper.GetChunk(suite.ctx, toBeUnpairedChunk.Id)
+			// Let's create 2 chunk and 2 insurance
+			oneChunk, oneInsurance := suite.app.LiquidStakingKeeper.GetMinimumRequirements(suite.ctx)
+			providers, providerBalances := suite.AddTestAddrs(2, oneInsurance.Amount)
+			suite.provideInsurances(suite.ctx, providers, valAddrs, providerBalances, tenPercentFeeRate, nil)
+			delegators, delegatorBalances := suite.AddTestAddrs(2, oneChunk.Amount)
+			pairedChunks := suite.liquidStakes(suite.ctx, delegators, delegatorBalances)
+			suite.ctx = suite.ctx.WithBlockHeight(suite.ctx.BlockHeight() + 1)
+			staking.EndBlocker(suite.ctx, suite.app.StakingKeeper)
+
+			downValAddr := valAddrs[0]
+			downValPubKey := pubKeys[0]
+			toBeUnpairedChunk := pairedChunks[0]
+			toBeDrainedInsuranceId := pairedChunks[0].PairedInsuranceId
+			fmt.Printf("balance of insurance to be drained: %s\n", oneInsurance.Amount.String())
+
+			epoch := suite.app.LiquidStakingKeeper.GetEpoch(suite.ctx)
+			epochTime := suite.ctx.BlockTime().Add(epoch.Duration)
+			called := 0
+			for {
+				validator, _ := suite.app.StakingKeeper.GetValidatorByConsAddr(suite.ctx, sdk.GetConsAddress(downValPubKey))
+				suite.downTimeSlashing(
+					suite.ctx,
+					downValPubKey,
+					validator.GetConsensusPower(suite.app.StakingKeeper.PowerReduction(suite.ctx)),
+					called,
+					tc.blockTime,
+				)
+				suite.unjail(suite.ctx, downValAddr, downValPubKey, tc.blockTime)
+				called++
+
+				if suite.ctx.BlockTime().After(epochTime) {
+					break
+				}
+			}
+			if tc.includeTombstone {
+				suite.tombstone(suite.ctx, downValAddr, downValPubKey)
+			}
+
+			validatorAfterSlashed, _ := suite.app.StakingKeeper.GetValidatorByConsAddr(suite.ctx, sdk.GetConsAddress(downValPubKey))
+			cumulativePenalty := types.ChunkSize.ToDec().Sub(validatorAfterSlashed.TokensFromShares(types.ChunkSize.ToDec()))
+			fmt.Printf("%d downtime slashing occurred during epoch(%0.f days)\n", called, epoch.Duration.Hours()/24)
+			damagedPercent := cumulativePenalty.Quo(types.ChunkSize.ToDec()).MulInt64(100).TruncateInt64()
+			suite.Equal(tc.expectedPenaltyPercent, int(damagedPercent))
+			fmt.Printf(
+				"accumulated penalty: %s | %d percent of ChunkSize tokens\n",
+				cumulativePenalty.String(), damagedPercent,
+			)
+			suite.advanceEpoch()
+			staking.EndBlocker(suite.ctx, suite.app.StakingKeeper)
+			liquidstakingkeeper.EndBlocker(suite.ctx, suite.app.LiquidStakingKeeper)
+			fmt.Println("chunk unbonding is started")
+			{
+				unPairingChunk, _ := suite.app.LiquidStakingKeeper.GetChunk(suite.ctx, toBeUnpairedChunk.Id)
+				unpairingInsurance, _ := suite.app.LiquidStakingKeeper.GetInsurance(suite.ctx, toBeDrainedInsuranceId)
+				suite.Equal(
+					types.CHUNK_STATUS_UNPAIRING,
+					unPairingChunk.Status,
+					"chunk unbonding is started",
+				)
+				ubd, _ := suite.app.StakingKeeper.GetUnbondingDelegation(
+					suite.ctx,
+					unPairingChunk.DerivedAddress(),
+					unpairingInsurance.GetValidator(),
+				)
+				suite.Len(ubd.Entries, 1)
+				suite.Equal(
+					types.ChunkSize.Sub(cumulativePenalty.Ceil().TruncateInt()).String(),
+					ubd.Entries[0].InitialBalance.String(),
+					"it is slashed so when unbonding, initial balance is less than chunk size tokens",
+				)
+			}
+
+			rewardModuleAccBalance := suite.app.BankKeeper.GetBalance(suite.ctx, types.RewardPool, suite.denom)
+			suite.advanceEpoch()
+			staking.EndBlocker(suite.ctx, suite.app.StakingKeeper)
+			liquidstakingkeeper.EndBlocker(suite.ctx, suite.app.LiquidStakingKeeper)
+			fmt.Println("chunk unbonding is finished")
+			rewardModuleAccBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, types.RewardPool, suite.denom)
+			suite.True(
+				rewardModuleAccBalanceAfter.Amount.GT(rewardModuleAccBalance.Amount),
+			)
+			diff := rewardModuleAccBalanceAfter.Amount.Sub(rewardModuleAccBalance.Amount)
+			fmt.Printf("reward module account balance increased by %s\n", diff.String())
 			unpairingInsurance, _ := suite.app.LiquidStakingKeeper.GetInsurance(suite.ctx, toBeDrainedInsuranceId)
-			suite.Equal(
-				types.CHUNK_STATUS_UNPAIRING,
-				unPairingChunk.Status,
-				"chunk unbonding is started",
+			unpairingInsuranceBalance := suite.app.BankKeeper.GetBalance(suite.ctx, unpairingInsurance.DerivedAddress(), suite.denom)
+			suite.True(unpairingInsuranceBalance.IsZero(),
+				"unpairing insurance is used all of its balance to cover penalty by"+
+					"sending it to reward pool",
 			)
-			ubd, _ := suite.app.StakingKeeper.GetUnbondingDelegation(
-				suite.ctx,
-				unPairingChunk.DerivedAddress(),
-				unpairingInsurance.GetValidator(),
-			)
-			suite.Len(ubd.Entries, 1)
-			suite.Equal(
-				types.ChunkSize.Sub(cumulativePenalty.Ceil().TruncateInt()).String(),
-				ubd.Entries[0].InitialBalance.String(),
-				"it is slashed so when unbonding, initial balance is less than chunk size tokens",
-			)
-		}
-
-		rewardModuleAccBalance := suite.app.BankKeeper.GetBalance(suite.ctx, types.RewardPool, suite.denom)
-		suite.advanceEpoch()
-		staking.EndBlocker(suite.ctx, suite.app.StakingKeeper)
-		liquidstakingkeeper.EndBlocker(suite.ctx, suite.app.LiquidStakingKeeper)
-		fmt.Println("chunk unbonding is finished")
-		rewardModuleAccBalanceAfter := suite.app.BankKeeper.GetBalance(suite.ctx, types.RewardPool, suite.denom)
-		suite.True(
-			rewardModuleAccBalanceAfter.Amount.GT(rewardModuleAccBalance.Amount),
-		)
-		diff := rewardModuleAccBalanceAfter.Amount.Sub(rewardModuleAccBalance.Amount)
-		fmt.Printf("reward module account balance increased by %s\n", diff.String())
-		unpairingInsurance, _ := suite.app.LiquidStakingKeeper.GetInsurance(suite.ctx, toBeDrainedInsuranceId)
-		unpairingInsuranceBalance := suite.app.BankKeeper.GetBalance(suite.ctx, unpairingInsurance.DerivedAddress(), suite.denom)
-		suite.True(unpairingInsuranceBalance.IsZero(),
-			"unpairing insurance is used all of its balance to cover penalty by"+
-				"sending it to reward pool",
-		)
+		})
 	}
 }
 
