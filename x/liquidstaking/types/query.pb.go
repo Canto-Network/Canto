@@ -249,8 +249,8 @@ func (m *QueryChunksRequest) GetPagination() *query.PageRequest {
 }
 
 type QueryChunksResponse struct {
-	Chunks     []Chunk             `protobuf:"bytes,1,rep,name=chunks,proto3" json:"chunks"`
-	Pagination *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	Chunks     []QueryChunkResponse `protobuf:"bytes,1,rep,name=chunks,proto3" json:"chunks"`
+	Pagination *query.PageResponse  `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
 func (m *QueryChunksResponse) Reset()         { *m = QueryChunksResponse{} }
@@ -286,7 +286,7 @@ func (m *QueryChunksResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryChunksResponse proto.InternalMessageInfo
 
-func (m *QueryChunksResponse) GetChunks() []Chunk {
+func (m *QueryChunksResponse) GetChunks() []QueryChunkResponse {
 	if m != nil {
 		return m.Chunks
 	}
@@ -345,7 +345,8 @@ func (m *QueryChunkRequest) GetId() uint64 {
 }
 
 type QueryChunkResponse struct {
-	Chunk Chunk `protobuf:"bytes,1,opt,name=chunk,proto3" json:"chunk"`
+	Chunk          Chunk  `protobuf:"bytes,1,opt,name=chunk,proto3" json:"chunk"`
+	DerivedAddress string `protobuf:"bytes,2,opt,name=derived_address,json=derivedAddress,proto3" json:"derived_address,omitempty"`
 }
 
 func (m *QueryChunkResponse) Reset()         { *m = QueryChunkResponse{} }
@@ -386,6 +387,13 @@ func (m *QueryChunkResponse) GetChunk() Chunk {
 		return m.Chunk
 	}
 	return Chunk{}
+}
+
+func (m *QueryChunkResponse) GetDerivedAddress() string {
+	if m != nil {
+		return m.DerivedAddress
+	}
+	return ""
 }
 
 type QueryInsurancesRequest struct {
@@ -460,8 +468,8 @@ func (m *QueryInsurancesRequest) GetPagination() *query.PageRequest {
 }
 
 type QueryInsurancesResponse struct {
-	Insurances []Insurance         `protobuf:"bytes,1,rep,name=insurances,proto3" json:"insurances"`
-	Pagination *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	Insurances []QueryInsuranceResponse `protobuf:"bytes,1,rep,name=insurances,proto3" json:"insurances"`
+	Pagination *query.PageResponse      `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
 func (m *QueryInsurancesResponse) Reset()         { *m = QueryInsurancesResponse{} }
@@ -497,7 +505,7 @@ func (m *QueryInsurancesResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryInsurancesResponse proto.InternalMessageInfo
 
-func (m *QueryInsurancesResponse) GetInsurances() []Insurance {
+func (m *QueryInsurancesResponse) GetInsurances() []QueryInsuranceResponse {
 	if m != nil {
 		return m.Insurances
 	}
@@ -556,7 +564,9 @@ func (m *QueryInsuranceRequest) GetId() uint64 {
 }
 
 type QueryInsuranceResponse struct {
-	Insurance Insurance `protobuf:"bytes,1,opt,name=insurance,proto3" json:"insurance"`
+	Insurance      Insurance `protobuf:"bytes,1,opt,name=insurance,proto3" json:"insurance"`
+	DerivedAddress string    `protobuf:"bytes,2,opt,name=derived_address,json=derivedAddress,proto3" json:"derived_address,omitempty"`
+	FeePoolAddress string    `protobuf:"bytes,3,opt,name=fee_pool_address,json=feePoolAddress,proto3" json:"fee_pool_address,omitempty"`
 }
 
 func (m *QueryInsuranceResponse) Reset()         { *m = QueryInsuranceResponse{} }
@@ -599,94 +609,18 @@ func (m *QueryInsuranceResponse) GetInsurance() Insurance {
 	return Insurance{}
 }
 
-type ResponseWithdrawInsuranceRequest struct {
-	Request WithdrawInsuranceRequest `protobuf:"bytes,1,opt,name=request,proto3" json:"request"`
-}
-
-func (m *ResponseWithdrawInsuranceRequest) Reset()         { *m = ResponseWithdrawInsuranceRequest{} }
-func (m *ResponseWithdrawInsuranceRequest) String() string { return proto.CompactTextString(m) }
-func (*ResponseWithdrawInsuranceRequest) ProtoMessage()    {}
-func (*ResponseWithdrawInsuranceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a04856e9492a9fb6, []int{12}
-}
-func (m *ResponseWithdrawInsuranceRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ResponseWithdrawInsuranceRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ResponseWithdrawInsuranceRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *ResponseWithdrawInsuranceRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ResponseWithdrawInsuranceRequest.Merge(m, src)
-}
-func (m *ResponseWithdrawInsuranceRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *ResponseWithdrawInsuranceRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_ResponseWithdrawInsuranceRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ResponseWithdrawInsuranceRequest proto.InternalMessageInfo
-
-func (m *ResponseWithdrawInsuranceRequest) GetRequest() WithdrawInsuranceRequest {
+func (m *QueryInsuranceResponse) GetDerivedAddress() string {
 	if m != nil {
-		return m.Request
+		return m.DerivedAddress
 	}
-	return WithdrawInsuranceRequest{}
+	return ""
 }
 
-type ResponseUnpairingForUnstakingChunkInfo struct {
-	Info UnpairingForUnstakingChunkInfo `protobuf:"bytes,1,opt,name=info,proto3" json:"info"`
-}
-
-func (m *ResponseUnpairingForUnstakingChunkInfo) Reset() {
-	*m = ResponseUnpairingForUnstakingChunkInfo{}
-}
-func (m *ResponseUnpairingForUnstakingChunkInfo) String() string { return proto.CompactTextString(m) }
-func (*ResponseUnpairingForUnstakingChunkInfo) ProtoMessage()    {}
-func (*ResponseUnpairingForUnstakingChunkInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a04856e9492a9fb6, []int{13}
-}
-func (m *ResponseUnpairingForUnstakingChunkInfo) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ResponseUnpairingForUnstakingChunkInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ResponseUnpairingForUnstakingChunkInfo.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *ResponseUnpairingForUnstakingChunkInfo) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ResponseUnpairingForUnstakingChunkInfo.Merge(m, src)
-}
-func (m *ResponseUnpairingForUnstakingChunkInfo) XXX_Size() int {
-	return m.Size()
-}
-func (m *ResponseUnpairingForUnstakingChunkInfo) XXX_DiscardUnknown() {
-	xxx_messageInfo_ResponseUnpairingForUnstakingChunkInfo.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ResponseUnpairingForUnstakingChunkInfo proto.InternalMessageInfo
-
-func (m *ResponseUnpairingForUnstakingChunkInfo) GetInfo() UnpairingForUnstakingChunkInfo {
+func (m *QueryInsuranceResponse) GetFeePoolAddress() string {
 	if m != nil {
-		return m.Info
+		return m.FeePoolAddress
 	}
-	return UnpairingForUnstakingChunkInfo{}
+	return ""
 }
 
 type QueryWithdrawInsuranceRequestsRequest struct {
@@ -699,7 +633,7 @@ func (m *QueryWithdrawInsuranceRequestsRequest) Reset()         { *m = QueryWith
 func (m *QueryWithdrawInsuranceRequestsRequest) String() string { return proto.CompactTextString(m) }
 func (*QueryWithdrawInsuranceRequestsRequest) ProtoMessage()    {}
 func (*QueryWithdrawInsuranceRequestsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a04856e9492a9fb6, []int{14}
+	return fileDescriptor_a04856e9492a9fb6, []int{12}
 }
 func (m *QueryWithdrawInsuranceRequestsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -743,8 +677,8 @@ func (m *QueryWithdrawInsuranceRequestsRequest) GetPagination() *query.PageReque
 }
 
 type QueryWithdrawInsuranceRequestsResponse struct {
-	Requests   []ResponseWithdrawInsuranceRequest `protobuf:"bytes,1,rep,name=requests,proto3" json:"requests"`
-	Pagination *query.PageResponse                `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	WithdrawInsuranceRequests []WithdrawInsuranceRequest `protobuf:"bytes,1,rep,name=withdraw_insurance_requests,json=withdrawInsuranceRequests,proto3" json:"withdraw_insurance_requests"`
+	Pagination                *query.PageResponse        `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
 func (m *QueryWithdrawInsuranceRequestsResponse) Reset() {
@@ -753,7 +687,7 @@ func (m *QueryWithdrawInsuranceRequestsResponse) Reset() {
 func (m *QueryWithdrawInsuranceRequestsResponse) String() string { return proto.CompactTextString(m) }
 func (*QueryWithdrawInsuranceRequestsResponse) ProtoMessage()    {}
 func (*QueryWithdrawInsuranceRequestsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a04856e9492a9fb6, []int{15}
+	return fileDescriptor_a04856e9492a9fb6, []int{13}
 }
 func (m *QueryWithdrawInsuranceRequestsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -782,9 +716,9 @@ func (m *QueryWithdrawInsuranceRequestsResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryWithdrawInsuranceRequestsResponse proto.InternalMessageInfo
 
-func (m *QueryWithdrawInsuranceRequestsResponse) GetRequests() []ResponseWithdrawInsuranceRequest {
+func (m *QueryWithdrawInsuranceRequestsResponse) GetWithdrawInsuranceRequests() []WithdrawInsuranceRequest {
 	if m != nil {
-		return m.Requests
+		return m.WithdrawInsuranceRequests
 	}
 	return nil
 }
@@ -804,7 +738,7 @@ func (m *QueryWithdrawInsuranceRequestRequest) Reset()         { *m = QueryWithd
 func (m *QueryWithdrawInsuranceRequestRequest) String() string { return proto.CompactTextString(m) }
 func (*QueryWithdrawInsuranceRequestRequest) ProtoMessage()    {}
 func (*QueryWithdrawInsuranceRequestRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a04856e9492a9fb6, []int{16}
+	return fileDescriptor_a04856e9492a9fb6, []int{14}
 }
 func (m *QueryWithdrawInsuranceRequestRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -841,14 +775,14 @@ func (m *QueryWithdrawInsuranceRequestRequest) GetId() uint64 {
 }
 
 type QueryWithdrawInsuranceRequestResponse struct {
-	Request ResponseWithdrawInsuranceRequest `protobuf:"bytes,1,opt,name=request,proto3" json:"request"`
+	WithdrawInsuranceRequest WithdrawInsuranceRequest `protobuf:"bytes,1,opt,name=withdraw_insurance_request,json=withdrawInsuranceRequest,proto3" json:"withdraw_insurance_request"`
 }
 
 func (m *QueryWithdrawInsuranceRequestResponse) Reset()         { *m = QueryWithdrawInsuranceRequestResponse{} }
 func (m *QueryWithdrawInsuranceRequestResponse) String() string { return proto.CompactTextString(m) }
 func (*QueryWithdrawInsuranceRequestResponse) ProtoMessage()    {}
 func (*QueryWithdrawInsuranceRequestResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a04856e9492a9fb6, []int{17}
+	return fileDescriptor_a04856e9492a9fb6, []int{15}
 }
 func (m *QueryWithdrawInsuranceRequestResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -877,11 +811,11 @@ func (m *QueryWithdrawInsuranceRequestResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryWithdrawInsuranceRequestResponse proto.InternalMessageInfo
 
-func (m *QueryWithdrawInsuranceRequestResponse) GetRequest() ResponseWithdrawInsuranceRequest {
+func (m *QueryWithdrawInsuranceRequestResponse) GetWithdrawInsuranceRequest() WithdrawInsuranceRequest {
 	if m != nil {
-		return m.Request
+		return m.WithdrawInsuranceRequest
 	}
-	return ResponseWithdrawInsuranceRequest{}
+	return WithdrawInsuranceRequest{}
 }
 
 type QueryUnpairingForUnstakingChunkInfosRequest struct {
@@ -900,7 +834,7 @@ func (m *QueryUnpairingForUnstakingChunkInfosRequest) String() string {
 }
 func (*QueryUnpairingForUnstakingChunkInfosRequest) ProtoMessage() {}
 func (*QueryUnpairingForUnstakingChunkInfosRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a04856e9492a9fb6, []int{18}
+	return fileDescriptor_a04856e9492a9fb6, []int{16}
 }
 func (m *QueryUnpairingForUnstakingChunkInfosRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -951,8 +885,8 @@ func (m *QueryUnpairingForUnstakingChunkInfosRequest) GetPagination() *query.Pag
 }
 
 type QueryUnpairingForUnstakingChunkInfosResponse struct {
-	Infos      []ResponseUnpairingForUnstakingChunkInfo `protobuf:"bytes,1,rep,name=infos,proto3" json:"infos"`
-	Pagination *query.PageResponse                      `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	UnpairingForUnstakingChunkInfos []UnpairingForUnstakingChunkInfo `protobuf:"bytes,1,rep,name=unpairing_for_unstaking_chunk_infos,json=unpairingForUnstakingChunkInfos,proto3" json:"unpairing_for_unstaking_chunk_infos"`
+	Pagination                      *query.PageResponse              `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
 func (m *QueryUnpairingForUnstakingChunkInfosResponse) Reset() {
@@ -963,7 +897,7 @@ func (m *QueryUnpairingForUnstakingChunkInfosResponse) String() string {
 }
 func (*QueryUnpairingForUnstakingChunkInfosResponse) ProtoMessage() {}
 func (*QueryUnpairingForUnstakingChunkInfosResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a04856e9492a9fb6, []int{19}
+	return fileDescriptor_a04856e9492a9fb6, []int{17}
 }
 func (m *QueryUnpairingForUnstakingChunkInfosResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -992,9 +926,9 @@ func (m *QueryUnpairingForUnstakingChunkInfosResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryUnpairingForUnstakingChunkInfosResponse proto.InternalMessageInfo
 
-func (m *QueryUnpairingForUnstakingChunkInfosResponse) GetInfos() []ResponseUnpairingForUnstakingChunkInfo {
+func (m *QueryUnpairingForUnstakingChunkInfosResponse) GetUnpairingForUnstakingChunkInfos() []UnpairingForUnstakingChunkInfo {
 	if m != nil {
-		return m.Infos
+		return m.UnpairingForUnstakingChunkInfos
 	}
 	return nil
 }
@@ -1018,7 +952,7 @@ func (m *QueryUnpairingForUnstakingChunkInfoRequest) String() string {
 }
 func (*QueryUnpairingForUnstakingChunkInfoRequest) ProtoMessage() {}
 func (*QueryUnpairingForUnstakingChunkInfoRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a04856e9492a9fb6, []int{20}
+	return fileDescriptor_a04856e9492a9fb6, []int{18}
 }
 func (m *QueryUnpairingForUnstakingChunkInfoRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1055,7 +989,7 @@ func (m *QueryUnpairingForUnstakingChunkInfoRequest) GetId() uint64 {
 }
 
 type QueryUnpairingForUnstakingChunkInfoResponse struct {
-	Info ResponseUnpairingForUnstakingChunkInfo `protobuf:"bytes,1,opt,name=info,proto3" json:"info"`
+	UnpairingForUnstakingChunkInfo UnpairingForUnstakingChunkInfo `protobuf:"bytes,1,opt,name=unpairing_for_unstaking_chunk_info,json=unpairingForUnstakingChunkInfo,proto3" json:"unpairing_for_unstaking_chunk_info"`
 }
 
 func (m *QueryUnpairingForUnstakingChunkInfoResponse) Reset() {
@@ -1066,7 +1000,7 @@ func (m *QueryUnpairingForUnstakingChunkInfoResponse) String() string {
 }
 func (*QueryUnpairingForUnstakingChunkInfoResponse) ProtoMessage() {}
 func (*QueryUnpairingForUnstakingChunkInfoResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a04856e9492a9fb6, []int{21}
+	return fileDescriptor_a04856e9492a9fb6, []int{19}
 }
 func (m *QueryUnpairingForUnstakingChunkInfoResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1095,11 +1029,11 @@ func (m *QueryUnpairingForUnstakingChunkInfoResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryUnpairingForUnstakingChunkInfoResponse proto.InternalMessageInfo
 
-func (m *QueryUnpairingForUnstakingChunkInfoResponse) GetInfo() ResponseUnpairingForUnstakingChunkInfo {
+func (m *QueryUnpairingForUnstakingChunkInfoResponse) GetUnpairingForUnstakingChunkInfo() UnpairingForUnstakingChunkInfo {
 	if m != nil {
-		return m.Info
+		return m.UnpairingForUnstakingChunkInfo
 	}
-	return ResponseUnpairingForUnstakingChunkInfo{}
+	return UnpairingForUnstakingChunkInfo{}
 }
 
 type QueryChunkSizeRequest struct {
@@ -1109,7 +1043,7 @@ func (m *QueryChunkSizeRequest) Reset()         { *m = QueryChunkSizeRequest{} }
 func (m *QueryChunkSizeRequest) String() string { return proto.CompactTextString(m) }
 func (*QueryChunkSizeRequest) ProtoMessage()    {}
 func (*QueryChunkSizeRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a04856e9492a9fb6, []int{22}
+	return fileDescriptor_a04856e9492a9fb6, []int{20}
 }
 func (m *QueryChunkSizeRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1146,7 +1080,7 @@ func (m *QueryChunkSizeResponse) Reset()         { *m = QueryChunkSizeResponse{}
 func (m *QueryChunkSizeResponse) String() string { return proto.CompactTextString(m) }
 func (*QueryChunkSizeResponse) ProtoMessage()    {}
 func (*QueryChunkSizeResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a04856e9492a9fb6, []int{23}
+	return fileDescriptor_a04856e9492a9fb6, []int{21}
 }
 func (m *QueryChunkSizeResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1189,7 +1123,7 @@ func (m *QueryMinimumCollateralRequest) Reset()         { *m = QueryMinimumColla
 func (m *QueryMinimumCollateralRequest) String() string { return proto.CompactTextString(m) }
 func (*QueryMinimumCollateralRequest) ProtoMessage()    {}
 func (*QueryMinimumCollateralRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a04856e9492a9fb6, []int{24}
+	return fileDescriptor_a04856e9492a9fb6, []int{22}
 }
 func (m *QueryMinimumCollateralRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1226,7 +1160,7 @@ func (m *QueryMinimumCollateralResponse) Reset()         { *m = QueryMinimumColl
 func (m *QueryMinimumCollateralResponse) String() string { return proto.CompactTextString(m) }
 func (*QueryMinimumCollateralResponse) ProtoMessage()    {}
 func (*QueryMinimumCollateralResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a04856e9492a9fb6, []int{25}
+	return fileDescriptor_a04856e9492a9fb6, []int{23}
 }
 func (m *QueryMinimumCollateralResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1269,7 +1203,7 @@ func (m *QueryStatesRequest) Reset()         { *m = QueryStatesRequest{} }
 func (m *QueryStatesRequest) String() string { return proto.CompactTextString(m) }
 func (*QueryStatesRequest) ProtoMessage()    {}
 func (*QueryStatesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a04856e9492a9fb6, []int{26}
+	return fileDescriptor_a04856e9492a9fb6, []int{24}
 }
 func (m *QueryStatesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1306,7 +1240,7 @@ func (m *QueryStatesResponse) Reset()         { *m = QueryStatesResponse{} }
 func (m *QueryStatesResponse) String() string { return proto.CompactTextString(m) }
 func (*QueryStatesResponse) ProtoMessage()    {}
 func (*QueryStatesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a04856e9492a9fb6, []int{27}
+	return fileDescriptor_a04856e9492a9fb6, []int{25}
 }
 func (m *QueryStatesResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1355,8 +1289,6 @@ func init() {
 	proto.RegisterType((*QueryInsurancesResponse)(nil), "canto.liquidstaking.v1.QueryInsurancesResponse")
 	proto.RegisterType((*QueryInsuranceRequest)(nil), "canto.liquidstaking.v1.QueryInsuranceRequest")
 	proto.RegisterType((*QueryInsuranceResponse)(nil), "canto.liquidstaking.v1.QueryInsuranceResponse")
-	proto.RegisterType((*ResponseWithdrawInsuranceRequest)(nil), "canto.liquidstaking.v1.ResponseWithdrawInsuranceRequest")
-	proto.RegisterType((*ResponseUnpairingForUnstakingChunkInfo)(nil), "canto.liquidstaking.v1.ResponseUnpairingForUnstakingChunkInfo")
 	proto.RegisterType((*QueryWithdrawInsuranceRequestsRequest)(nil), "canto.liquidstaking.v1.QueryWithdrawInsuranceRequestsRequest")
 	proto.RegisterType((*QueryWithdrawInsuranceRequestsResponse)(nil), "canto.liquidstaking.v1.QueryWithdrawInsuranceRequestsResponse")
 	proto.RegisterType((*QueryWithdrawInsuranceRequestRequest)(nil), "canto.liquidstaking.v1.QueryWithdrawInsuranceRequestRequest")
@@ -1378,93 +1310,94 @@ func init() {
 }
 
 var fileDescriptor_a04856e9492a9fb6 = []byte{
-	// 1369 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x58, 0xcd, 0x6f, 0x1b, 0xd5,
-	0x17, 0xcd, 0x4b, 0x13, 0xff, 0x9a, 0xfb, 0x93, 0x4a, 0xfc, 0x5a, 0xda, 0xd4, 0x6a, 0x9d, 0x30,
-	0x6d, 0x13, 0xe2, 0xb4, 0x33, 0x24, 0x55, 0x43, 0x21, 0x1f, 0xb4, 0x71, 0x3f, 0xe8, 0x82, 0x92,
-	0xb8, 0x2a, 0x54, 0xdd, 0x58, 0x13, 0x7b, 0xe2, 0x8c, 0x62, 0xcf, 0x73, 0xe6, 0xc3, 0xa1, 0x41,
-	0x2c, 0x40, 0x42, 0x08, 0xb1, 0x41, 0x42, 0x42, 0x2a, 0xfd, 0x13, 0xd8, 0xb3, 0xe0, 0x2f, 0xe8,
-	0x06, 0xa9, 0x52, 0x17, 0xc0, 0x06, 0xa1, 0x84, 0x2d, 0x0b, 0xc4, 0x8a, 0x1d, 0xf2, 0x7b, 0xf7,
-	0x8d, 0x3d, 0x76, 0x9e, 0x67, 0x70, 0xb2, 0x6b, 0xde, 0xdc, 0x7b, 0xee, 0xb9, 0xe7, 0x5e, 0xbf,
-	0x39, 0x53, 0xd0, 0x4a, 0xa6, 0xe3, 0x33, 0xa3, 0x6a, 0x6f, 0x07, 0x76, 0xd9, 0xf3, 0xcd, 0x2d,
-	0xdb, 0xa9, 0x18, 0x8d, 0x59, 0x63, 0x3b, 0xb0, 0xdc, 0x27, 0x7a, 0xdd, 0x65, 0x3e, 0xa3, 0xa7,
-	0x79, 0x8c, 0x1e, 0x89, 0xd1, 0x1b, 0xb3, 0x99, 0x53, 0x15, 0x56, 0x61, 0x3c, 0xc4, 0x68, 0xfe,
-	0x4b, 0x44, 0x67, 0xce, 0x55, 0x18, 0xab, 0x54, 0x2d, 0xc3, 0xac, 0xdb, 0x86, 0xe9, 0x38, 0xcc,
-	0x37, 0x7d, 0x9b, 0x39, 0x1e, 0x3e, 0xcd, 0x96, 0x98, 0x57, 0x63, 0x9e, 0xb1, 0x6e, 0x7a, 0x96,
-	0xd1, 0x98, 0x5d, 0xb7, 0x7c, 0x73, 0xd6, 0x28, 0x31, 0xdb, 0xc1, 0xe7, 0xb9, 0xf6, 0xe7, 0x9c,
-	0x44, 0x18, 0x55, 0x37, 0x2b, 0xb6, 0xc3, 0xc1, 0xc2, 0xd8, 0x83, 0xb9, 0x47, 0x89, 0xf2, 0x58,
-	0xed, 0x14, 0xd0, 0xb5, 0x26, 0xda, 0xaa, 0xe9, 0x9a, 0x35, 0xaf, 0x60, 0x6d, 0x07, 0x96, 0xe7,
-	0x6b, 0x0f, 0xe0, 0x64, 0xe4, 0xd4, 0xab, 0x33, 0xc7, 0xb3, 0xe8, 0x22, 0xa4, 0xea, 0xfc, 0x64,
-	0x8c, 0x4c, 0x90, 0xd7, 0xff, 0x3f, 0x97, 0xd5, 0x0f, 0x56, 0x40, 0x17, 0x79, 0x2b, 0x43, 0xcf,
-	0x7f, 0x1b, 0x1f, 0x28, 0x60, 0x8e, 0x76, 0x12, 0xd2, 0x1c, 0xf4, 0x76, 0x9d, 0x95, 0x36, 0x65,
-	0xa5, 0xf7, 0xb1, 0x3e, 0x1e, 0x62, 0xa1, 0xb7, 0x60, 0xd8, 0x6a, 0x1e, 0x60, 0x9d, 0xf3, 0xaa,
-	0x3a, 0x3c, 0x0b, 0xcb, 0x88, 0x0c, 0xed, 0x29, 0x41, 0xc4, 0xfc, 0x66, 0xe0, 0x6c, 0xc9, 0x8e,
-	0xe8, 0x02, 0xa4, 0x3c, 0xdf, 0xf4, 0x03, 0x41, 0xfd, 0xc4, 0xdc, 0x05, 0x15, 0x24, 0x4f, 0x7b,
-	0xc0, 0x43, 0x0b, 0x98, 0x42, 0xef, 0x00, 0xb4, 0x44, 0x1e, 0x1b, 0xe4, 0x9c, 0x26, 0x75, 0x31,
-	0x11, 0xbd, 0x39, 0x11, 0x5d, 0xac, 0x05, 0x4e, 0x44, 0x5f, 0x35, 0x2b, 0x16, 0x16, 0x2e, 0xb4,
-	0x65, 0x6a, 0xcf, 0x08, 0xea, 0x2a, 0xb9, 0x61, 0xbb, 0x0b, 0x90, 0x2a, 0xf1, 0x93, 0x31, 0x32,
-	0x71, 0xac, 0x57, 0xbf, 0x3c, 0x4f, 0xca, 0x2a, 0x52, 0xe8, 0xdd, 0x03, 0xc8, 0x4d, 0xc5, 0x92,
-	0x13, 0x95, 0x23, 0xec, 0x2e, 0xe0, 0x7c, 0x78, 0x11, 0xa9, 0xdb, 0x09, 0x18, 0xb4, 0xcb, 0x5c,
-	0xb3, 0xa1, 0xc2, 0xa0, 0x5d, 0x0e, 0xe7, 0x85, 0x41, 0xad, 0x79, 0x71, 0x36, 0x71, 0xf3, 0x6a,
-	0xe7, 0x2f, 0x32, 0xb4, 0x7f, 0x08, 0x9c, 0xe6, 0x88, 0xf7, 0x1c, 0x2f, 0x70, 0x4d, 0xa7, 0x64,
-	0x85, 0x33, 0x7b, 0xa7, 0x63, 0x66, 0x53, 0x2a, 0xd8, 0x30, 0xb5, 0x63, 0x6e, 0x33, 0x90, 0x6e,
-	0x98, 0x55, 0xbb, 0x6c, 0xfa, 0xcc, 0x2d, 0x9a, 0xe5, 0xb2, 0x6b, 0x79, 0x1e, 0x57, 0x68, 0xa4,
-	0x30, 0x1a, 0x3e, 0xb8, 0x29, 0xce, 0xe9, 0x34, 0x8c, 0xd6, 0x5d, 0xd6, 0xb0, 0xcb, 0x56, 0x2b,
-	0xf6, 0x18, 0x8f, 0x7d, 0x45, 0x9e, 0xcb, 0xd0, 0xe8, 0x3e, 0x0c, 0xf5, 0xbd, 0x0f, 0xdf, 0x13,
-	0x38, 0xd3, 0xd5, 0x3b, 0x4a, 0x7a, 0x17, 0xc0, 0x0e, 0x4f, 0x71, 0x2f, 0x5e, 0x8b, 0x15, 0x00,
-	0xb5, 0x6d, 0x4b, 0x3d, 0xba, 0xfd, 0x98, 0x82, 0x57, 0xa3, 0x64, 0x55, 0x3b, 0x52, 0xec, 0x9c,
-	0x68, 0xd8, 0xd4, 0x6d, 0x18, 0x09, 0x99, 0xe1, 0xae, 0x24, 0xee, 0xa9, 0x95, 0xa9, 0xf9, 0x30,
-	0x21, 0x21, 0x3f, 0xb4, 0xfd, 0xcd, 0xb2, 0x6b, 0xee, 0x74, 0x91, 0x5a, 0x85, 0xff, 0xb9, 0xe2,
-	0x9f, 0x58, 0xe8, 0x0d, 0x55, 0x21, 0x15, 0x04, 0xd6, 0x95, 0x30, 0xda, 0x2e, 0x4c, 0xca, 0xaa,
-	0x0f, 0x9d, 0xba, 0x69, 0xbb, 0xb6, 0x53, 0xb9, 0xc3, 0xdc, 0x87, 0x0e, 0x62, 0xf1, 0xe5, 0xbe,
-	0xe7, 0x6c, 0x30, 0xba, 0x0a, 0x43, 0xb6, 0xb3, 0xc1, 0xb0, 0xf0, 0xbc, 0xaa, 0x70, 0x6f, 0x14,
-	0x2c, 0xcf, 0x91, 0xb4, 0xef, 0x08, 0x5c, 0xe2, 0x9a, 0xaa, 0xc8, 0x86, 0x3f, 0x9a, 0x83, 0xd6,
-	0x98, 0x24, 0x59, 0xe3, 0xfe, 0xaf, 0xb5, 0x9f, 0x08, 0x4c, 0xc6, 0x91, 0xc3, 0x05, 0x78, 0x0c,
-	0xc7, 0x51, 0x4e, 0xb9, 0xd3, 0xd7, 0x55, 0xea, 0xc4, 0x4d, 0x18, 0xf5, 0x09, 0xf1, 0x8e, 0x6e,
-	0xd1, 0xe7, 0xe1, 0x62, 0xcf, 0x76, 0x54, 0x7b, 0xff, 0x69, 0xdc, 0x90, 0x42, 0x19, 0x1e, 0x75,
-	0x2e, 0xe7, 0x61, 0x55, 0x08, 0x97, 0xf4, 0x47, 0x02, 0x33, 0x9c, 0x43, 0xef, 0xe5, 0x0a, 0xd7,
-	0x65, 0x06, 0xd2, 0x65, 0xab, 0x6a, 0x55, 0x22, 0x57, 0xa4, 0xd8, 0x97, 0xd1, 0xf0, 0x81, 0x5c,
-	0x98, 0xd3, 0x90, 0xda, 0x0e, 0xac, 0xc0, 0x2a, 0x73, 0x75, 0x8f, 0x17, 0xf0, 0xaf, 0x8e, 0x45,
-	0x3a, 0xd6, 0xf7, 0x22, 0xbd, 0x24, 0x70, 0x39, 0x19, 0xf9, 0x70, 0x9d, 0x86, 0x9b, 0x3f, 0x0f,
-	0xb9, 0x4b, 0xcb, 0x71, 0x2a, 0x26, 0xfa, 0xc5, 0x09, 0xc8, 0xa3, 0x5b, 0xa7, 0x45, 0xc8, 0x25,
-	0x68, 0x4a, 0xb5, 0x54, 0x5f, 0x24, 0x1b, 0x68, 0xdb, 0x6a, 0xb5, 0xdf, 0x3d, 0x47, 0xa3, 0x88,
-	0xb8, 0x83, 0xce, 0xe0, 0xfd, 0x2f, 0x1c, 0x92, 0xbd, 0x2b, 0x47, 0xa8, 0x3d, 0xc2, 0xfb, 0xbe,
-	0xed, 0x01, 0x92, 0x59, 0x06, 0xe0, 0x6f, 0xf9, 0xa2, 0x67, 0xef, 0xca, 0x0b, 0xff, 0x6c, 0x44,
-	0x43, 0xa9, 0x5e, 0x9e, 0xd9, 0x8e, 0xbc, 0xe8, 0x4b, 0x12, 0x47, 0x1b, 0x87, 0xf3, 0x1c, 0xf9,
-	0x3d, 0xdb, 0xb1, 0x6b, 0x41, 0x2d, 0xcf, 0xaa, 0x55, 0xd3, 0xb7, 0x5c, 0xb3, 0x2a, 0x4b, 0x7b,
-	0x90, 0x55, 0x05, 0x20, 0x85, 0x35, 0xa0, 0x35, 0xf1, 0xb0, 0x58, 0x0a, 0x9f, 0xe2, 0x38, 0xcf,
-	0x1d, 0x48, 0xe5, 0x96, 0x55, 0x6a, 0x63, 0x93, 0xae, 0x75, 0x42, 0x87, 0x9e, 0xb9, 0xe9, 0x36,
-	0x42, 0xb7, 0xa2, 0xd5, 0xd0, 0xdb, 0xc9, 0x53, 0xac, 0xff, 0x01, 0x8c, 0x3a, 0x96, 0x5f, 0x34,
-	0x6b, 0x2c, 0x70, 0xfc, 0x62, 0xd3, 0x98, 0x48, 0x21, 0x26, 0x55, 0xb3, 0xb9, 0x6f, 0xf9, 0x37,
-	0x79, 0x38, 0x87, 0x42, 0x1e, 0x27, 0x9c, 0xc8, 0xe9, 0xdc, 0x9f, 0x69, 0x18, 0xe6, 0xf5, 0xe8,
-	0x97, 0x04, 0x52, 0xc2, 0x70, 0xd3, 0x9c, 0x0a, 0xb2, 0xdb, 0xe3, 0x67, 0x66, 0x12, 0xc5, 0x8a,
-	0x2e, 0xb4, 0xc9, 0xcf, 0x5e, 0xfe, 0xf1, 0xcd, 0xe0, 0x04, 0xcd, 0x1a, 0x8a, 0x6f, 0x0b, 0xe1,
-	0xf1, 0xe9, 0xe7, 0x04, 0x86, 0xb9, 0x29, 0xa7, 0xd3, 0x3d, 0xe1, 0xdb, 0xbf, 0x01, 0x32, 0xb9,
-	0x24, 0xa1, 0x48, 0xe4, 0x12, 0x27, 0x32, 0x4e, 0xcf, 0xab, 0x88, 0xf0, 0xaf, 0x00, 0xae, 0x89,
-	0x30, 0xd9, 0x31, 0x9a, 0x44, 0xbe, 0x12, 0x62, 0x34, 0x89, 0xba, 0xf6, 0x78, 0x4d, 0xd0, 0xa0,
-	0x7f, 0x45, 0x60, 0x98, 0xa7, 0xc6, 0x68, 0xd2, 0xee, 0xbb, 0x33, 0xb9, 0x24, 0xa1, 0x48, 0x64,
-	0x86, 0x13, 0xb9, 0x44, 0x2f, 0xf4, 0x26, 0x62, 0x7c, 0x6c, 0x97, 0x3f, 0xa1, 0x4f, 0x09, 0x40,
-	0xcb, 0x6e, 0x52, 0xbd, 0x67, 0x9d, 0x2e, 0x4f, 0x9e, 0x31, 0x12, 0xc7, 0x23, 0xb9, 0x1c, 0x27,
-	0x77, 0x91, 0x6a, 0x2a, 0x72, 0x6d, 0x56, 0xf5, 0x19, 0x81, 0x91, 0x10, 0x82, 0x5e, 0x49, 0x56,
-	0x4a, 0x32, 0xd3, 0x93, 0x86, 0x23, 0x31, 0x83, 0x13, 0x9b, 0xa6, 0x53, 0xf1, 0xc4, 0x84, 0x72,
-	0x3f, 0x13, 0x38, 0xab, 0x74, 0x38, 0x74, 0xa9, 0x67, 0xf9, 0x38, 0xdb, 0x96, 0x59, 0xee, 0x37,
-	0x1d, 0xbb, 0x59, 0xe0, 0xdd, 0x5c, 0xa3, 0x57, 0x55, 0xdd, 0xec, 0x20, 0x44, 0x31, 0x6c, 0xab,
-	0x18, 0x3a, 0xa7, 0x5f, 0x09, 0x8c, 0x29, 0x8d, 0xf4, 0x62, 0x5f, 0xcc, 0x64, 0x5f, 0x4b, 0x7d,
-	0x66, 0x63, 0x5b, 0x37, 0x78, 0x5b, 0x6f, 0xd3, 0xeb, 0x7d, 0xb4, 0x25, 0xa6, 0xf6, 0x17, 0x81,
-	0xf1, 0x18, 0x3b, 0x41, 0xf3, 0x3d, 0x49, 0x26, 0x73, 0x52, 0x99, 0x5b, 0x87, 0x03, 0xc1, 0x86,
-	0xf3, 0xbc, 0xe1, 0x25, 0xba, 0xa0, 0x6a, 0x38, 0x90, 0x40, 0xc5, 0x0d, 0xe6, 0x16, 0x03, 0x09,
-	0x55, 0x14, 0xef, 0x59, 0x61, 0x5d, 0xfe, 0x26, 0x90, 0x8d, 0xf9, 0x44, 0x59, 0x39, 0x04, 0x5b,
-	0xd9, 0x71, 0xfe, 0x50, 0x18, 0xd8, 0xf0, 0xbb, 0xbc, 0xe1, 0x15, 0x7a, 0xe3, 0x10, 0x0d, 0x8b,
-	0x49, 0x7f, 0x4b, 0x60, 0x24, 0xb4, 0x20, 0x31, 0xb7, 0x47, 0xa7, 0x87, 0x89, 0xb9, 0x3d, 0xba,
-	0x9c, 0x4d, 0xfc, 0xb5, 0xd6, 0xf2, 0x3d, 0xf4, 0x07, 0x02, 0xe9, 0x2e, 0x83, 0x42, 0xaf, 0xf5,
-	0xac, 0xa8, 0x72, 0x3c, 0x99, 0xf9, 0xff, 0x9a, 0x86, 0x84, 0xe7, 0x38, 0xe1, 0xcb, 0x34, 0xa7,
-	0x22, 0xdc, 0xed, 0x92, 0xf8, 0x5b, 0x54, 0xd8, 0x99, 0x98, 0xb7, 0x68, 0xc4, 0x09, 0xc5, 0xbc,
-	0x45, 0xa3, 0xfe, 0x28, 0xfe, 0x2d, 0xca, 0x2d, 0x93, 0xb7, 0xb2, 0xf6, 0x7c, 0x2f, 0x4b, 0x5e,
-	0xec, 0x65, 0xc9, 0xef, 0x7b, 0x59, 0xf2, 0xf5, 0x7e, 0x76, 0xe0, 0xc5, 0x7e, 0x76, 0xe0, 0x97,
-	0xfd, 0xec, 0xc0, 0xe3, 0x37, 0x2b, 0xb6, 0xbf, 0x19, 0xac, 0xeb, 0x25, 0x56, 0x33, 0xf2, 0x4d,
-	0x8c, 0x2b, 0xf7, 0x2d, 0x7f, 0x87, 0xb9, 0x5b, 0xe2, 0x2f, 0xa3, 0x31, 0x6f, 0x7c, 0xd4, 0x01,
-	0xeb, 0x3f, 0xa9, 0x5b, 0xde, 0x7a, 0x8a, 0xff, 0x17, 0xe8, 0xd5, 0x7f, 0x03, 0x00, 0x00, 0xff,
-	0xff, 0xa4, 0xbb, 0x3a, 0x1f, 0xec, 0x15, 0x00, 0x00,
+	// 1384 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x58, 0x4b, 0x6f, 0x1b, 0x55,
+	0x14, 0xce, 0x4d, 0x1b, 0x8b, 0x9c, 0x4a, 0x69, 0x72, 0x5b, 0xda, 0xd4, 0xb4, 0x93, 0x32, 0x69,
+	0x93, 0xd6, 0x69, 0x3d, 0x24, 0x88, 0x20, 0x44, 0x1a, 0x68, 0x9c, 0xa4, 0x04, 0x44, 0x9b, 0xb8,
+	0x14, 0x10, 0x1b, 0x6b, 0xe2, 0xb9, 0x71, 0xae, 0x62, 0xcf, 0x75, 0xe6, 0xe1, 0xb4, 0x45, 0x6c,
+	0x10, 0x48, 0x3c, 0x36, 0x20, 0x24, 0xa4, 0x82, 0xd8, 0xb3, 0x66, 0x81, 0x2a, 0x7e, 0x41, 0x97,
+	0x95, 0xd8, 0xb0, 0x42, 0x28, 0xe9, 0x86, 0x7f, 0x00, 0xac, 0x90, 0xef, 0x9c, 0x19, 0x7b, 0x1c,
+	0xcf, 0x23, 0x4e, 0x76, 0xf5, 0x9d, 0xf3, 0xf8, 0xce, 0x77, 0xbe, 0xde, 0xf9, 0x26, 0xa0, 0x96,
+	0x75, 0xd3, 0x11, 0x5a, 0x95, 0x6f, 0xbb, 0xdc, 0xb0, 0x1d, 0x7d, 0x8b, 0x9b, 0x15, 0xad, 0x31,
+	0xad, 0x6d, 0xbb, 0xcc, 0x7a, 0x90, 0xaf, 0x5b, 0xc2, 0x11, 0xf4, 0x8c, 0x8c, 0xc9, 0x87, 0x62,
+	0xf2, 0x8d, 0xe9, 0xec, 0xe9, 0x8a, 0xa8, 0x08, 0x19, 0xa2, 0x35, 0xff, 0xe5, 0x45, 0x67, 0xcf,
+	0x57, 0x84, 0xa8, 0x54, 0x99, 0xa6, 0xd7, 0xb9, 0xa6, 0x9b, 0xa6, 0x70, 0x74, 0x87, 0x0b, 0xd3,
+	0xc6, 0xa7, 0x4a, 0x59, 0xd8, 0x35, 0x61, 0x6b, 0xeb, 0xba, 0xcd, 0xb4, 0xc6, 0xf4, 0x3a, 0x73,
+	0xf4, 0x69, 0xad, 0x2c, 0xb8, 0x89, 0xcf, 0x73, 0xed, 0xcf, 0x25, 0x88, 0x20, 0xaa, 0xae, 0x57,
+	0xb8, 0x29, 0x8b, 0x05, 0xb1, 0xdd, 0xb1, 0x87, 0x81, 0xca, 0x58, 0xf5, 0x34, 0xd0, 0xb5, 0x66,
+	0xb5, 0x55, 0xdd, 0xd2, 0x6b, 0x76, 0x91, 0x6d, 0xbb, 0xcc, 0x76, 0xd4, 0xbb, 0x70, 0x2a, 0x74,
+	0x6a, 0xd7, 0x85, 0x69, 0x33, 0x3a, 0x07, 0x99, 0xba, 0x3c, 0x19, 0x25, 0x17, 0xc9, 0x95, 0x13,
+	0x33, 0x4a, 0xbe, 0x3b, 0x03, 0x79, 0x2f, 0x6f, 0xe1, 0xf8, 0x93, 0x3f, 0xc7, 0xfa, 0x8a, 0x98,
+	0xa3, 0x9e, 0x82, 0x11, 0x59, 0x74, 0xa9, 0x2e, 0xca, 0x9b, 0x7e, 0xa7, 0x3b, 0xd8, 0x1f, 0x0f,
+	0xb1, 0xd1, 0x6b, 0x30, 0xc0, 0x9a, 0x07, 0xd8, 0xe7, 0x42, 0x54, 0x1f, 0x99, 0x85, 0x6d, 0xbc,
+	0x0c, 0xf5, 0x11, 0xc1, 0x8a, 0x85, 0x4d, 0xd7, 0xdc, 0xf2, 0x27, 0xa2, 0xaf, 0x43, 0xc6, 0x76,
+	0x74, 0xc7, 0xf5, 0xa0, 0x0f, 0xcd, 0x8c, 0x47, 0x95, 0x94, 0x69, 0x77, 0x65, 0x68, 0x11, 0x53,
+	0xe8, 0x32, 0x40, 0x8b, 0xe4, 0xd1, 0x7e, 0x89, 0x69, 0x22, 0xef, 0x6d, 0x24, 0xdf, 0xdc, 0x48,
+	0xde, 0x93, 0x05, 0x6e, 0x24, 0xbf, 0xaa, 0x57, 0x18, 0x36, 0x2e, 0xb6, 0x65, 0xaa, 0x3f, 0x13,
+	0xe4, 0xd5, 0xc7, 0x86, 0xe3, 0xbe, 0x05, 0x99, 0xb2, 0x3c, 0x19, 0x25, 0x17, 0x8f, 0x5d, 0x39,
+	0x31, 0x93, 0x8b, 0x02, 0xd7, 0x4a, 0xf6, 0x73, 0x7d, 0x8e, 0xbd, 0x7c, 0x7a, 0xab, 0x0b, 0xd2,
+	0xc9, 0x44, 0xa4, 0x5e, 0xa9, 0x10, 0xd4, 0x71, 0x5c, 0x16, 0x36, 0xf3, 0x48, 0x1c, 0x82, 0x7e,
+	0x6e, 0x48, 0x02, 0x8f, 0x17, 0xfb, 0xb9, 0xa1, 0xde, 0x6f, 0xa7, 0xba, 0x7d, 0x79, 0x12, 0x4d,
+	0xd2, 0xf2, 0x64, 0x96, 0xbf, 0x3c, 0x99, 0x41, 0x27, 0xe1, 0xa4, 0xc1, 0x2c, 0xde, 0x60, 0x46,
+	0x49, 0x37, 0x0c, 0x8b, 0xd9, 0xb6, 0x9c, 0x61, 0xb0, 0x38, 0x84, 0xc7, 0x37, 0xbd, 0x53, 0xf5,
+	0x5f, 0x02, 0x67, 0x64, 0xeb, 0x15, 0xd3, 0x76, 0x2d, 0xdd, 0x2c, 0xb3, 0x60, 0xd3, 0x6f, 0x74,
+	0x6c, 0x7a, 0x32, 0xaa, 0x7f, 0x90, 0xda, 0xb1, 0xed, 0x29, 0x18, 0x69, 0xe8, 0x55, 0x6e, 0xe8,
+	0x8e, 0xb0, 0x3a, 0x60, 0x0c, 0x07, 0x0f, 0x10, 0x08, 0xbd, 0x0a, 0xc3, 0x75, 0x4b, 0x34, 0xb8,
+	0xc1, 0x5a, 0xb1, 0xc7, 0x64, 0xec, 0x49, 0xff, 0xdc, 0x0f, 0x0d, 0xab, 0xe8, 0x78, 0xcf, 0x2a,
+	0x7a, 0x4c, 0xe0, 0xec, 0xbe, 0xd9, 0x91, 0xfb, 0xf7, 0x00, 0x78, 0x70, 0x8a, 0x6a, 0xca, 0xc7,
+	0xaa, 0x29, 0x28, 0xd2, 0xa1, 0xa8, 0xb6, 0x3a, 0x47, 0xa7, 0xaa, 0x49, 0x78, 0xbe, 0xb3, 0x69,
+	0x77, 0x65, 0xfd, 0xb2, 0x6f, 0xbf, 0xc1, 0x88, 0x4b, 0x30, 0x18, 0x40, 0x43, 0x89, 0xbd, 0x98,
+	0xb8, 0x62, 0x1c, 0xaa, 0x95, 0x99, 0x5a, 0x6a, 0xf4, 0x0a, 0x0c, 0x6f, 0x30, 0x56, 0xaa, 0x0b,
+	0x51, 0xed, 0xd8, 0xf0, 0xd0, 0x06, 0x63, 0xab, 0x42, 0x54, 0x7d, 0x51, 0xfe, 0x40, 0xe0, 0xb2,
+	0x04, 0xfd, 0x01, 0x77, 0x36, 0x0d, 0x4b, 0xdf, 0xe9, 0x1c, 0x33, 0xd0, 0x68, 0x37, 0xd5, 0x90,
+	0x34, 0xaa, 0xe9, 0xfd, 0xee, 0xf9, 0x9b, 0xc0, 0x44, 0x12, 0x38, 0x64, 0xb8, 0x01, 0x2f, 0xec,
+	0x60, 0x50, 0x29, 0x20, 0xac, 0x64, 0x61, 0x18, 0xaa, 0xea, 0xa5, 0x28, 0xce, 0xa3, 0xea, 0xe3,
+	0x0a, 0xce, 0xed, 0x44, 0xf5, 0x3f, 0x3a, 0x99, 0xcd, 0xc2, 0xa5, 0xd8, 0x51, 0xa3, 0x54, 0xf7,
+	0x53, 0xd2, 0x02, 0x03, 0x8a, 0x1c, 0xc8, 0x46, 0x53, 0x84, 0xaa, 0xec, 0x95, 0xa1, 0xd1, 0x28,
+	0x86, 0xd4, 0xdf, 0x08, 0x4c, 0x49, 0x7c, 0xf7, 0xcc, 0xba, 0xce, 0x2d, 0x6e, 0x56, 0x96, 0x85,
+	0x75, 0xcf, 0xc4, 0xd2, 0xf2, 0x3e, 0x5d, 0x31, 0x37, 0x44, 0x20, 0xb3, 0x29, 0x18, 0x31, 0x58,
+	0x95, 0x55, 0x42, 0x37, 0x99, 0xa7, 0xb3, 0xe1, 0xe0, 0x81, 0x2f, 0xb4, 0x33, 0x90, 0xd9, 0x76,
+	0x99, 0xcb, 0x0c, 0xc9, 0xfc, 0x73, 0x45, 0xfc, 0xd5, 0x21, 0xc0, 0x63, 0x3d, 0x0b, 0xf0, 0xb3,
+	0x7e, 0xb8, 0x96, 0x0e, 0x3c, 0x72, 0xfc, 0x15, 0x81, 0x71, 0xd7, 0x8f, 0x2d, 0x6d, 0x08, 0xab,
+	0xe4, 0xfa, 0xd1, 0x25, 0xf9, 0xba, 0x28, 0xf1, 0x66, 0x3c, 0xea, 0x71, 0x36, 0x8a, 0xed, 0xf8,
+	0x76, 0xc8, 0xf9, 0x98, 0x1b, 0x0f, 0xea, 0xe8, 0xb4, 0x39, 0x07, 0xb9, 0x14, 0x2c, 0x44, 0x29,
+	0xf4, 0x71, 0x3a, 0x05, 0x04, 0x1c, 0x7e, 0x41, 0x40, 0x4d, 0xe6, 0x10, 0x05, 0x7b, 0x38, 0x0a,
+	0x95, 0x78, 0x0a, 0xd5, 0xb3, 0x78, 0xf7, 0x7b, 0x06, 0x8b, 0x3f, 0x0c, 0x54, 0xfd, 0x21, 0x5e,
+	0xf5, 0x6d, 0x0f, 0x10, 0xfd, 0x3c, 0x80, 0x07, 0xd2, 0xe6, 0x0f, 0xfd, 0xbb, 0xfe, 0x5c, 0x88,
+	0x74, 0x9f, 0xee, 0x82, 0xe0, 0xa6, 0x7f, 0xc7, 0x97, 0xfd, 0x3a, 0xea, 0x18, 0x5c, 0x90, 0x95,
+	0xdf, 0xe5, 0x26, 0xaf, 0xb9, 0xb5, 0x82, 0xa8, 0x56, 0x75, 0x87, 0x59, 0x7a, 0xd5, 0x6f, 0x6d,
+	0x83, 0x12, 0x15, 0x80, 0x10, 0xd6, 0x80, 0xd6, 0xbc, 0x87, 0xa5, 0x72, 0xf0, 0x14, 0xf7, 0x7f,
+	0xbe, 0x2b, 0x94, 0x45, 0x56, 0x6e, 0x43, 0x33, 0x52, 0xeb, 0x2c, 0x1d, 0x58, 0xee, 0xa6, 0xed,
+	0x08, 0x6c, 0x8b, 0x5a, 0x43, 0x6b, 0xe8, 0x9f, 0x62, 0xff, 0xf7, 0x61, 0xd8, 0x64, 0x4e, 0x49,
+	0xaf, 0x09, 0xd7, 0x74, 0x4a, 0x4d, 0x87, 0xe2, 0x13, 0x31, 0x11, 0xb5, 0xad, 0xdb, 0xcc, 0xb9,
+	0x29, 0xc3, 0x65, 0x29, 0xc4, 0x31, 0x64, 0x86, 0x4e, 0x67, 0xbe, 0xa5, 0x30, 0x20, 0xfb, 0xd1,
+	0x2f, 0x09, 0x64, 0x3c, 0xbf, 0x4e, 0xe3, 0x7d, 0x67, 0xe8, 0x13, 0x21, 0x3b, 0x95, 0x2a, 0xd6,
+	0x9b, 0x42, 0x9d, 0xf8, 0xf4, 0xf7, 0x67, 0xdf, 0xf5, 0x5f, 0xa4, 0x8a, 0x16, 0xf1, 0x69, 0xe2,
+	0x7d, 0x22, 0xd0, 0xcf, 0x09, 0x0c, 0x48, 0x4f, 0x4f, 0xaf, 0xc6, 0x96, 0x6f, 0xff, 0x84, 0xc8,
+	0xe6, 0xd2, 0x84, 0x22, 0x90, 0xcb, 0x12, 0xc8, 0x18, 0xbd, 0x10, 0x05, 0x44, 0x7e, 0x44, 0x48,
+	0x4e, 0x3c, 0x8f, 0x4e, 0x53, 0x78, 0xf1, 0x94, 0x9c, 0x84, 0x4d, 0x7f, 0x32, 0x27, 0x68, 0xe9,
+	0xbf, 0x26, 0x30, 0x20, 0x53, 0x13, 0x38, 0x69, 0x77, 0xea, 0xd9, 0x03, 0x7c, 0x41, 0xa8, 0x53,
+	0x12, 0xc8, 0x65, 0x3a, 0x1e, 0x0f, 0x44, 0xfb, 0x98, 0x1b, 0x9f, 0xd0, 0x47, 0x04, 0xa0, 0xe5,
+	0x3b, 0x69, 0x4a, 0x6f, 0x19, 0x30, 0xa4, 0xa5, 0x8e, 0x47, 0x70, 0x39, 0x09, 0xee, 0x12, 0x55,
+	0xa3, 0xc0, 0xb5, 0xd9, 0xd4, 0x1f, 0x09, 0x0c, 0x06, 0x25, 0xe8, 0xf5, 0xb4, 0xb6, 0xd7, 0x43,
+	0x76, 0x40, 0x97, 0xac, 0x6a, 0x12, 0xd8, 0x55, 0x3a, 0x99, 0x0c, 0xcc, 0x63, 0x6e, 0x97, 0xc0,
+	0xb9, 0x48, 0xef, 0x45, 0x6f, 0xc4, 0xb6, 0x4f, 0x32, 0x94, 0xd9, 0xf9, 0x5e, 0xd3, 0x71, 0x9a,
+	0x65, 0x39, 0xcd, 0x9b, 0x74, 0x3e, 0xc5, 0x34, 0x31, 0xde, 0x90, 0x3e, 0x23, 0x30, 0x1a, 0xd5,
+	0x8d, 0xce, 0xf5, 0x04, 0xd2, 0x1f, 0xf1, 0x46, 0x8f, 0xd9, 0x38, 0xe1, 0x3b, 0x72, 0xc2, 0x25,
+	0x5a, 0x48, 0xb9, 0xaf, 0xd8, 0x31, 0xff, 0x21, 0x30, 0x96, 0x60, 0x63, 0x68, 0x21, 0x16, 0x6f,
+	0x3a, 0x07, 0x97, 0x5d, 0x3c, 0x5c, 0x11, 0x9c, 0xfd, 0x6d, 0x39, 0xfb, 0x22, 0x5d, 0x48, 0xf8,
+	0x1f, 0x9e, 0xc2, 0x6d, 0xd1, 0xff, 0x08, 0x28, 0xf1, 0x7d, 0xe9, 0xc2, 0x21, 0x40, 0xfb, 0x83,
+	0x17, 0x0e, 0x55, 0x03, 0xe7, 0xbe, 0x23, 0xe7, 0x5e, 0xa1, 0xb7, 0x52, 0xdc, 0x6c, 0xa9, 0x86,
+	0xff, 0x9e, 0xc0, 0x60, 0x60, 0x53, 0x12, 0x6e, 0x98, 0x4e, 0x9f, 0x93, 0x70, 0xc3, 0xec, 0x73,
+	0x3f, 0xc9, 0x57, 0x5f, 0xcb, 0x1b, 0xd1, 0x5f, 0x09, 0x8c, 0xec, 0x33, 0x31, 0xf4, 0x95, 0xd8,
+	0x8e, 0x51, 0xae, 0x28, 0x3b, 0x7b, 0xd0, 0x34, 0x04, 0x3c, 0x23, 0x01, 0x5f, 0xa3, 0xb9, 0x28,
+	0xc0, 0xfb, 0x9d, 0x94, 0x7c, 0xd3, 0x7a, 0x96, 0x27, 0xe1, 0x4d, 0x1b, 0x72, 0x4b, 0x09, 0x6f,
+	0xda, 0xb0, 0x87, 0x4a, 0x7e, 0xd3, 0x4a, 0x5b, 0x65, 0x2f, 0xac, 0x3d, 0xd9, 0x55, 0xc8, 0xd3,
+	0x5d, 0x85, 0xfc, 0xb5, 0xab, 0x90, 0x6f, 0xf6, 0x94, 0xbe, 0xa7, 0x7b, 0x4a, 0xdf, 0x1f, 0x7b,
+	0x4a, 0xdf, 0x47, 0xaf, 0x56, 0xb8, 0xb3, 0xe9, 0xae, 0xe7, 0xcb, 0xa2, 0xa6, 0x15, 0x9a, 0x35,
+	0xae, 0xdf, 0x66, 0xce, 0x8e, 0xb0, 0xb6, 0xbc, 0x5f, 0x5a, 0x63, 0x56, 0xbb, 0xdf, 0x51, 0xd6,
+	0x79, 0x50, 0x67, 0xf6, 0x7a, 0x46, 0xfe, 0x95, 0xf5, 0xe5, 0xff, 0x03, 0x00, 0x00, 0xff, 0xff,
+	0x9c, 0x05, 0x50, 0xbf, 0x4f, 0x16, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1490,18 +1423,22 @@ type QueryClient interface {
 	Insurances(ctx context.Context, in *QueryInsurancesRequest, opts ...grpc.CallOption) (*QueryInsurancesResponse, error)
 	// Insurance returns an insurance by id.
 	Insurance(ctx context.Context, in *QueryInsuranceRequest, opts ...grpc.CallOption) (*QueryInsuranceResponse, error)
-	// WithdrawInsuranceRequests returns all withdraw insurance requests on the module.
+	// WithdrawInsuranceRequests returns all withdraw insurance requests on the
+	// module.
 	WithdrawInsuranceRequests(ctx context.Context, in *QueryWithdrawInsuranceRequestsRequest, opts ...grpc.CallOption) (*QueryWithdrawInsuranceRequestsResponse, error)
 	// WithdrawInsuranceRequest returns a withdraw insurance request by id.
 	WithdrawInsuranceRequest(ctx context.Context, in *QueryWithdrawInsuranceRequestRequest, opts ...grpc.CallOption) (*QueryWithdrawInsuranceRequestResponse, error)
-	// UnpairingForUnstakingChunkInfos returns all unpairing for unstaking chunk infos on the module.
+	// UnpairingForUnstakingChunkInfos returns all unpairing for unstaking chunk
+	// infos on the module.
 	UnpairingForUnstakingChunkInfos(ctx context.Context, in *QueryUnpairingForUnstakingChunkInfosRequest, opts ...grpc.CallOption) (*QueryUnpairingForUnstakingChunkInfosResponse, error)
-	// UnpairingForUnstakingChunkInfo returns a unpairing for unstaking chunk info by id.
+	// UnpairingForUnstakingChunkInfo returns a unpairing for unstaking chunk info
+	// by id.
 	UnpairingForUnstakingChunkInfo(ctx context.Context, in *QueryUnpairingForUnstakingChunkInfoRequest, opts ...grpc.CallOption) (*QueryUnpairingForUnstakingChunkInfoResponse, error)
 	// ChunkSize returns the chunk size of the module.
 	ChunkSize(ctx context.Context, in *QueryChunkSizeRequest, opts ...grpc.CallOption) (*QueryChunkSizeResponse, error)
 	// MinimumCollateral returns the minimum collateral of the module.
-	// Insurance providers must provide collateral greater than or equal to the minimum collateral.
+	// Insurance providers must provide collateral greater than or equal to the
+	// minimum collateral.
 	MinimumCollateral(ctx context.Context, in *QueryMinimumCollateralRequest, opts ...grpc.CallOption) (*QueryMinimumCollateralResponse, error)
 	// States returns the states of the module.
 	States(ctx context.Context, in *QueryStatesRequest, opts ...grpc.CallOption) (*QueryStatesResponse, error)
@@ -1645,18 +1582,22 @@ type QueryServer interface {
 	Insurances(context.Context, *QueryInsurancesRequest) (*QueryInsurancesResponse, error)
 	// Insurance returns an insurance by id.
 	Insurance(context.Context, *QueryInsuranceRequest) (*QueryInsuranceResponse, error)
-	// WithdrawInsuranceRequests returns all withdraw insurance requests on the module.
+	// WithdrawInsuranceRequests returns all withdraw insurance requests on the
+	// module.
 	WithdrawInsuranceRequests(context.Context, *QueryWithdrawInsuranceRequestsRequest) (*QueryWithdrawInsuranceRequestsResponse, error)
 	// WithdrawInsuranceRequest returns a withdraw insurance request by id.
 	WithdrawInsuranceRequest(context.Context, *QueryWithdrawInsuranceRequestRequest) (*QueryWithdrawInsuranceRequestResponse, error)
-	// UnpairingForUnstakingChunkInfos returns all unpairing for unstaking chunk infos on the module.
+	// UnpairingForUnstakingChunkInfos returns all unpairing for unstaking chunk
+	// infos on the module.
 	UnpairingForUnstakingChunkInfos(context.Context, *QueryUnpairingForUnstakingChunkInfosRequest) (*QueryUnpairingForUnstakingChunkInfosResponse, error)
-	// UnpairingForUnstakingChunkInfo returns a unpairing for unstaking chunk info by id.
+	// UnpairingForUnstakingChunkInfo returns a unpairing for unstaking chunk info
+	// by id.
 	UnpairingForUnstakingChunkInfo(context.Context, *QueryUnpairingForUnstakingChunkInfoRequest) (*QueryUnpairingForUnstakingChunkInfoResponse, error)
 	// ChunkSize returns the chunk size of the module.
 	ChunkSize(context.Context, *QueryChunkSizeRequest) (*QueryChunkSizeResponse, error)
 	// MinimumCollateral returns the minimum collateral of the module.
-	// Insurance providers must provide collateral greater than or equal to the minimum collateral.
+	// Insurance providers must provide collateral greater than or equal to the
+	// minimum collateral.
 	MinimumCollateral(context.Context, *QueryMinimumCollateralRequest) (*QueryMinimumCollateralResponse, error)
 	// States returns the states of the module.
 	States(context.Context, *QueryStatesRequest) (*QueryStatesResponse, error)
@@ -2254,6 +2195,13 @@ func (m *QueryChunkResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if len(m.DerivedAddress) > 0 {
+		i -= len(m.DerivedAddress)
+		copy(dAtA[i:], m.DerivedAddress)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.DerivedAddress)))
+		i--
+		dAtA[i] = 0x12
+	}
 	{
 		size, err := m.Chunk.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
@@ -2418,74 +2366,22 @@ func (m *QueryInsuranceResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	_ = i
 	var l int
 	_ = l
+	if len(m.FeePoolAddress) > 0 {
+		i -= len(m.FeePoolAddress)
+		copy(dAtA[i:], m.FeePoolAddress)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.FeePoolAddress)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.DerivedAddress) > 0 {
+		i -= len(m.DerivedAddress)
+		copy(dAtA[i:], m.DerivedAddress)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.DerivedAddress)))
+		i--
+		dAtA[i] = 0x12
+	}
 	{
 		size, err := m.Insurance.MarshalToSizedBuffer(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = encodeVarintQuery(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0xa
-	return len(dAtA) - i, nil
-}
-
-func (m *ResponseWithdrawInsuranceRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ResponseWithdrawInsuranceRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ResponseWithdrawInsuranceRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	{
-		size, err := m.Request.MarshalToSizedBuffer(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = encodeVarintQuery(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0xa
-	return len(dAtA) - i, nil
-}
-
-func (m *ResponseUnpairingForUnstakingChunkInfo) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ResponseUnpairingForUnstakingChunkInfo) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ResponseUnpairingForUnstakingChunkInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	{
-		size, err := m.Info.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
@@ -2571,10 +2467,10 @@ func (m *QueryWithdrawInsuranceRequestsResponse) MarshalToSizedBuffer(dAtA []byt
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.Requests) > 0 {
-		for iNdEx := len(m.Requests) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.WithdrawInsuranceRequests) > 0 {
+		for iNdEx := len(m.WithdrawInsuranceRequests) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.Requests[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.WithdrawInsuranceRequests[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -2637,7 +2533,7 @@ func (m *QueryWithdrawInsuranceRequestResponse) MarshalToSizedBuffer(dAtA []byte
 	var l int
 	_ = l
 	{
-		size, err := m.Request.MarshalToSizedBuffer(dAtA[:i])
+		size, err := m.WithdrawInsuranceRequest.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
@@ -2733,10 +2629,10 @@ func (m *QueryUnpairingForUnstakingChunkInfosResponse) MarshalToSizedBuffer(dAtA
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.Infos) > 0 {
-		for iNdEx := len(m.Infos) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.UnpairingForUnstakingChunkInfos) > 0 {
+		for iNdEx := len(m.UnpairingForUnstakingChunkInfos) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.Infos[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.UnpairingForUnstakingChunkInfos[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -2799,7 +2695,7 @@ func (m *QueryUnpairingForUnstakingChunkInfoResponse) MarshalToSizedBuffer(dAtA 
 	var l int
 	_ = l
 	{
-		size, err := m.Info.MarshalToSizedBuffer(dAtA[:i])
+		size, err := m.UnpairingForUnstakingChunkInfo.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
@@ -3085,6 +2981,10 @@ func (m *QueryChunkResponse) Size() (n int) {
 	_ = l
 	l = m.Chunk.Size()
 	n += 1 + l + sovQuery(uint64(l))
+	l = len(m.DerivedAddress)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
 	return n
 }
 
@@ -3151,28 +3051,14 @@ func (m *QueryInsuranceResponse) Size() (n int) {
 	_ = l
 	l = m.Insurance.Size()
 	n += 1 + l + sovQuery(uint64(l))
-	return n
-}
-
-func (m *ResponseWithdrawInsuranceRequest) Size() (n int) {
-	if m == nil {
-		return 0
+	l = len(m.DerivedAddress)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
 	}
-	var l int
-	_ = l
-	l = m.Request.Size()
-	n += 1 + l + sovQuery(uint64(l))
-	return n
-}
-
-func (m *ResponseUnpairingForUnstakingChunkInfo) Size() (n int) {
-	if m == nil {
-		return 0
+	l = len(m.FeePoolAddress)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
 	}
-	var l int
-	_ = l
-	l = m.Info.Size()
-	n += 1 + l + sovQuery(uint64(l))
 	return n
 }
 
@@ -3199,8 +3085,8 @@ func (m *QueryWithdrawInsuranceRequestsResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if len(m.Requests) > 0 {
-		for _, e := range m.Requests {
+	if len(m.WithdrawInsuranceRequests) > 0 {
+		for _, e := range m.WithdrawInsuranceRequests {
 			l = e.Size()
 			n += 1 + l + sovQuery(uint64(l))
 		}
@@ -3230,7 +3116,7 @@ func (m *QueryWithdrawInsuranceRequestResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = m.Request.Size()
+	l = m.WithdrawInsuranceRequest.Size()
 	n += 1 + l + sovQuery(uint64(l))
 	return n
 }
@@ -3261,8 +3147,8 @@ func (m *QueryUnpairingForUnstakingChunkInfosResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if len(m.Infos) > 0 {
-		for _, e := range m.Infos {
+	if len(m.UnpairingForUnstakingChunkInfos) > 0 {
+		for _, e := range m.UnpairingForUnstakingChunkInfos {
 			l = e.Size()
 			n += 1 + l + sovQuery(uint64(l))
 		}
@@ -3292,7 +3178,7 @@ func (m *QueryUnpairingForUnstakingChunkInfoResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = m.Info.Size()
+	l = m.UnpairingForUnstakingChunkInfo.Size()
 	n += 1 + l + sovQuery(uint64(l))
 	return n
 }
@@ -3792,7 +3678,7 @@ func (m *QueryChunksResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Chunks = append(m.Chunks, Chunk{})
+			m.Chunks = append(m.Chunks, QueryChunkResponse{})
 			if err := m.Chunks[len(m.Chunks)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -3984,6 +3870,38 @@ func (m *QueryChunkResponse) Unmarshal(dAtA []byte) error {
 			if err := m.Chunk.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DerivedAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DerivedAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -4233,7 +4151,7 @@ func (m *QueryInsurancesResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Insurances = append(m.Insurances, Insurance{})
+			m.Insurances = append(m.Insurances, QueryInsuranceResponse{})
 			if err := m.Insurances[len(m.Insurances)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -4426,61 +4344,11 @@ func (m *QueryInsuranceResponse) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ResponseWithdrawInsuranceRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ResponseWithdrawInsuranceRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ResponseWithdrawInsuranceRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
+		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Request", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field DerivedAddress", wireType)
 			}
-			var msglen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowQuery
@@ -4490,80 +4358,29 @@ func (m *ResponseWithdrawInsuranceRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if msglen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthQuery
 			}
-			postIndex := iNdEx + msglen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthQuery
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.Request.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.DerivedAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ResponseUnpairingForUnstakingChunkInfo) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ResponseUnpairingForUnstakingChunkInfo: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ResponseUnpairingForUnstakingChunkInfo: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
+		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Info", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field FeePoolAddress", wireType)
 			}
-			var msglen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowQuery
@@ -4573,24 +4390,23 @@ func (m *ResponseUnpairingForUnstakingChunkInfo) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if msglen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthQuery
 			}
-			postIndex := iNdEx + msglen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthQuery
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.Info.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
+			m.FeePoolAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -4762,7 +4578,7 @@ func (m *QueryWithdrawInsuranceRequestsResponse) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Requests", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field WithdrawInsuranceRequests", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4789,8 +4605,8 @@ func (m *QueryWithdrawInsuranceRequestsResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Requests = append(m.Requests, ResponseWithdrawInsuranceRequest{})
-			if err := m.Requests[len(m.Requests)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.WithdrawInsuranceRequests = append(m.WithdrawInsuranceRequests, WithdrawInsuranceRequest{})
+			if err := m.WithdrawInsuranceRequests[len(m.WithdrawInsuranceRequests)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -4951,7 +4767,7 @@ func (m *QueryWithdrawInsuranceRequestResponse) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Request", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field WithdrawInsuranceRequest", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -4978,7 +4794,7 @@ func (m *QueryWithdrawInsuranceRequestResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.Request.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.WithdrawInsuranceRequest.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -5172,7 +4988,7 @@ func (m *QueryUnpairingForUnstakingChunkInfosResponse) Unmarshal(dAtA []byte) er
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Infos", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UnpairingForUnstakingChunkInfos", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -5199,8 +5015,8 @@ func (m *QueryUnpairingForUnstakingChunkInfosResponse) Unmarshal(dAtA []byte) er
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Infos = append(m.Infos, ResponseUnpairingForUnstakingChunkInfo{})
-			if err := m.Infos[len(m.Infos)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.UnpairingForUnstakingChunkInfos = append(m.UnpairingForUnstakingChunkInfos, UnpairingForUnstakingChunkInfo{})
+			if err := m.UnpairingForUnstakingChunkInfos[len(m.UnpairingForUnstakingChunkInfos)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -5361,7 +5177,7 @@ func (m *QueryUnpairingForUnstakingChunkInfoResponse) Unmarshal(dAtA []byte) err
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Info", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UnpairingForUnstakingChunkInfo", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -5388,7 +5204,7 @@ func (m *QueryUnpairingForUnstakingChunkInfoResponse) Unmarshal(dAtA []byte) err
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.Info.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.UnpairingForUnstakingChunkInfo.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

@@ -13,16 +13,18 @@ var (
 	_ sdk.Msg = &MsgDepositInsurance{}
 	_ sdk.Msg = &MsgWithdrawInsurance{}
 	_ sdk.Msg = &MsgWithdrawInsuranceCommission{}
+	_ sdk.Msg = &MsgClaimDiscountedReward{}
 )
 
 const (
 	TypeMsgLiquidStake                 = "liquid_stake"
 	TypeMsgLiquidUnstake               = "liquid_unstake"
-	TypeMsgProvideInsurance            = "insurance_provide"
-	TypeMsgCancelInsurance             = "cancel_insurance"
+	TypeMsgProvideInsurance            = "provide_insurance"
+	TypeMsgCancelProvideInsurance      = "cancel_provide_insurance"
 	TypeMsgDepositInsurance            = "deposit_insurance"
 	TypeMsgWithdrawInsurance           = "withdraw_insurance"
 	TypeMsgWithdrawInsuranceCommission = "withdraw_insurance_commission"
+	TypeMsgClaimDiscountedReward       = "claim_discounted_reward"
 )
 
 func NewMsgLiquidStake(delegatorAddress string, amount sdk.Coin) *MsgLiquidStake {
@@ -46,8 +48,8 @@ func (msg MsgLiquidStake) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 func (msg MsgLiquidStake) GetSigners() []sdk.AccAddress {
-	funder := sdk.MustAccAddressFromBech32(msg.DelegatorAddress)
-	return []sdk.AccAddress{funder}
+	delegator := sdk.MustAccAddressFromBech32(msg.DelegatorAddress)
+	return []sdk.AccAddress{delegator}
 }
 
 func (msg MsgLiquidStake) GetDelegator() sdk.AccAddress {
@@ -76,8 +78,8 @@ func (msg MsgLiquidUnstake) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 func (msg MsgLiquidUnstake) GetSigners() []sdk.AccAddress {
-	funder := sdk.MustAccAddressFromBech32(msg.DelegatorAddress)
-	return []sdk.AccAddress{funder}
+	delegator := sdk.MustAccAddressFromBech32(msg.DelegatorAddress)
+	return []sdk.AccAddress{delegator}
 }
 
 func (msg MsgLiquidUnstake) GetDelegator() sdk.AccAddress {
@@ -102,14 +104,17 @@ func (msg MsgProvideInsurance) ValidateBasic() error {
 	if !msg.Amount.IsValid() {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid amount %s", msg.Amount)
 	}
+	if msg.FeeRate.IsNil() {
+		return ErrInvalidFeeRate
+	}
 	return nil
 }
 func (msg MsgProvideInsurance) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 func (msg MsgProvideInsurance) GetSigners() []sdk.AccAddress {
-	funder := sdk.MustAccAddressFromBech32(msg.ProviderAddress)
-	return []sdk.AccAddress{funder}
+	provider := sdk.MustAccAddressFromBech32(msg.ProviderAddress)
+	return []sdk.AccAddress{provider}
 }
 
 func (msg MsgProvideInsurance) GetProvider() sdk.AccAddress {
@@ -129,7 +134,7 @@ func NewMsgCancelProvideInsurance(providerAddress string, insuranceId uint64) *M
 	}
 }
 func (msg MsgCancelProvideInsurance) Route() string { return RouterKey }
-func (msg MsgCancelProvideInsurance) Type() string  { return TypeMsgCancelInsurance }
+func (msg MsgCancelProvideInsurance) Type() string  { return TypeMsgCancelProvideInsurance }
 func (msg MsgCancelProvideInsurance) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.ProviderAddress); err != nil {
 		return sdkerrors.Wrapf(err, "invalid provider address %s", msg.ProviderAddress)
@@ -140,8 +145,8 @@ func (msg MsgCancelProvideInsurance) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 func (msg MsgCancelProvideInsurance) GetSigners() []sdk.AccAddress {
-	funder := sdk.MustAccAddressFromBech32(msg.ProviderAddress)
-	return []sdk.AccAddress{funder}
+	provider := sdk.MustAccAddressFromBech32(msg.ProviderAddress)
+	return []sdk.AccAddress{provider}
 }
 
 func (msg MsgCancelProvideInsurance) GetProvider() sdk.AccAddress {
@@ -171,8 +176,8 @@ func (msg MsgDepositInsurance) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 func (msg MsgDepositInsurance) GetSigners() []sdk.AccAddress {
-	funder := sdk.MustAccAddressFromBech32(msg.ProviderAddress)
-	return []sdk.AccAddress{funder}
+	provider := sdk.MustAccAddressFromBech32(msg.ProviderAddress)
+	return []sdk.AccAddress{provider}
 }
 
 func (msg MsgDepositInsurance) GetProvider() sdk.AccAddress {
@@ -242,7 +247,7 @@ func NewMsgClaimDiscountedReward(requesterAddress string, amount sdk.Coin, minim
 	}
 }
 func (msg MsgClaimDiscountedReward) Route() string { return RouterKey }
-func (msg MsgClaimDiscountedReward) Type() string  { return TypeMsgWithdrawInsurance }
+func (msg MsgClaimDiscountedReward) Type() string  { return TypeMsgClaimDiscountedReward }
 func (msg MsgClaimDiscountedReward) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.RequesterAddress); err != nil {
 		return sdkerrors.Wrapf(err, "invalid requester address %s", msg.RequesterAddress)

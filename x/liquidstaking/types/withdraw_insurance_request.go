@@ -18,3 +18,7 @@ func (wir *WithdrawInsuranceRequest) Validate(insuranceMap map[uint64]Insurance)
 	}
 	return nil
 }
+
+func (wir *WithdrawInsuranceRequest) Equal(other WithdrawInsuranceRequest) bool {
+	return wir.InsuranceId == other.InsuranceId
+}

@@ -408,47 +408,47 @@ type NetAmountState struct {
 	// chunk's native token balance + all delegation tokens of paired chunks
 	// last Epoch + all unbonding delegation tokens of unpairing chunks
 	NetAmount github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,3,opt,name=net_amount,json=netAmount,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"net_amount"`
+	// The token amount worth of all delegation shares of all paired chunks
+	// (slashing applied amount)
+	TotalLiquidTokens github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,4,opt,name=total_liquid_tokens,json=totalLiquidTokens,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"total_liquid_tokens"`
+	// Balance of reward module account
+	RewardModuleAccBalance github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,5,opt,name=reward_module_acc_balance,json=rewardModuleAccBalance,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"reward_module_acc_balance"`
+	// Fee rate applied when deduct module fee at epoch
+	FeeRate github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,6,opt,name=fee_rate,json=feeRate,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"fee_rate"`
+	// Utilization ratio
+	UtilizationRatio github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,7,opt,name=utilization_ratio,json=utilizationRatio,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"utilization_ratio"`
+	// How many chunks which can be created left?
+	RemainingChunkSlots github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,8,opt,name=remaining_chunk_slots,json=remainingChunkSlots,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"remaining_chunk_slots"`
+	// Discount rate applied when withdraw rewards
+	DiscountRate github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,9,opt,name=discount_rate,json=discountRate,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"discount_rate"`
+	// --- Chunk related fields
+	// The number of paired chunks
+	NumPairedChunks github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,10,opt,name=num_paired_chunks,json=numPairedChunks,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"num_paired_chunks"`
+	// Current chunk size tokens
+	ChunkSize github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,11,opt,name=chunk_size,json=chunkSize,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"chunk_size"`
 	// Total shares of all paired chunks
-	TotalDelShares github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,4,opt,name=total_del_shares,json=totalDelShares,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"total_del_shares"`
+	TotalDelShares github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,12,opt,name=total_del_shares,json=totalDelShares,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"total_del_shares"`
 	// The cumulative reward of all chunks delegations from the last distribution
-	TotalRemainingRewards github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,5,opt,name=total_remaining_rewards,json=totalRemainingRewards,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"total_remaining_rewards"`
-	// The cumulative commissions of all insurances
-	TotalRemainingInsuranceCommissions github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,6,opt,name=total_remaining_insurance_commissions,json=totalRemainingInsuranceCommissions,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"total_remaining_insurance_commissions"`
+	TotalRemainingRewards github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,13,opt,name=total_remaining_rewards,json=totalRemainingRewards,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"total_remaining_rewards"`
 	// Sum of the balances of all chunks.
 	// Note: Paired chunks can be pairing status for various reasons (such as lack
 	// of insurance). In such cases, the delegated native tokens returns to the
 	// balance of DerivedAddress(Chunk.Id) after un-bonding period is finished.
-	TotalChunksBalance github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,7,opt,name=total_chunks_balance,json=totalChunksBalance,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"total_chunks_balance"`
-	// The token amount worth of all delegation shares of all paired chunks
-	// (slashing applied amount)
-	TotalLiquidTokens github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,8,opt,name=total_liquid_tokens,json=totalLiquidTokens,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"total_liquid_tokens"`
-	// The sum of all insurances' amount (= DerivedAddress(Insurance.Id).Balance)
-	TotalInsuranceTokens github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,9,opt,name=total_insurance_tokens,json=totalInsuranceTokens,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"total_insurance_tokens"`
-	// The sum of all insurances' commissions
-	TotalInsuranceCommissions github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,10,opt,name=total_insurance_commissions,json=totalInsuranceCommissions,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"total_insurance_commissions"`
-	// The sum of all paired insurances' amount (=
-	// DerivedAddress(Insurance.Id).Balance)
-	TotalPairedInsuranceTokens github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,11,opt,name=total_paired_insurance_tokens,json=totalPairedInsuranceTokens,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"total_paired_insurance_tokens"`
-	// The sum of all paired insurances' commissions
-	TotalPairedInsuranceCommissions github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,12,opt,name=total_paired_insurance_commissions,json=totalPairedInsuranceCommissions,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"total_paired_insurance_commissions"`
-	// The sum of all unpairing insurances' amount (=
-	// DerivedAddress(Insurance.Id).Balance)
-	TotalUnpairingInsuranceTokens github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,13,opt,name=total_unpairing_insurance_tokens,json=totalUnpairingInsuranceTokens,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"total_unpairing_insurance_tokens"`
-	// The sum of all unpairing insurances' commissions
-	TotalUnpairingInsuranceCommissions github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,14,opt,name=total_unpairing_insurance_commissions,json=totalUnpairingInsuranceCommissions,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"total_unpairing_insurance_commissions"`
-	// The sum of all unpaired insurances' amount (=
-	// DerivedAddress(Insurance.Id).Balance)
-	TotalUnpairedInsuranceTokens github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,15,opt,name=total_unpaired_insurance_tokens,json=totalUnpairedInsuranceTokens,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"total_unpaired_insurance_tokens"`
-	// The sum of all unpaired insurances' commissions
-	TotalUnpairedInsuranceCommissions github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,16,opt,name=total_unpaired_insurance_commissions,json=totalUnpairedInsuranceCommissions,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"total_unpaired_insurance_commissions"`
+	TotalChunksBalance github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,14,opt,name=total_chunks_balance,json=totalChunksBalance,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"total_chunks_balance"`
 	// The sum of unbonding balance of all chunks in Unpairing and
 	// UnpairingForUnstaking
-	TotalUnbondingBalance github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,17,opt,name=total_unbonding_balance,json=totalUnbondingBalance,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"total_unbonding_balance"`
-	// Balance of reward module account
-	RewardModuleAccBalance github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,18,opt,name=reward_module_acc_balance,json=rewardModuleAccBalance,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"reward_module_acc_balance"`
-	UtilizationRatio       github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,19,opt,name=utilization_ratio,json=utilizationRatio,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"utilization_ratio"`
-	DiscountRate           github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,20,opt,name=discount_rate,json=discountRate,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"discount_rate"`
-	FeeRate                github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,21,opt,name=fee_rate,json=feeRate,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"fee_rate"`
+	TotalUnbondingChunksBalance github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,15,opt,name=total_unbonding_chunks_balance,json=totalUnbondingChunksBalance,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"total_unbonding_chunks_balance"`
+	// --- Insurance related fields
+	// The sum of all insurances' amount (= DerivedAddress(Insurance.Id).Balance)
+	TotalInsuranceTokens github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,16,opt,name=total_insurance_tokens,json=totalInsuranceTokens,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"total_insurance_tokens"`
+	// The sum of all paired insurances' amount (=
+	// DerivedAddress(Insurance.Id).Balance)
+	TotalPairedInsuranceTokens github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,17,opt,name=total_paired_insurance_tokens,json=totalPairedInsuranceTokens,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"total_paired_insurance_tokens"`
+	// The sum of all unpairing insurances' amount (=
+	// DerivedAddress(Insurance.Id).Balance)
+	TotalUnpairingInsuranceTokens github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,18,opt,name=total_unpairing_insurance_tokens,json=totalUnpairingInsuranceTokens,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"total_unpairing_insurance_tokens"`
+	// The cumulative commissions of all insurances
+	TotalRemainingInsuranceCommissions github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,19,opt,name=total_remaining_insurance_commissions,json=totalRemainingInsuranceCommissions,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"total_remaining_insurance_commissions"`
 }
 
 func (m *NetAmountState) Reset()      { *m = NetAmountState{} }
@@ -602,98 +602,97 @@ func init() {
 }
 
 var fileDescriptor_d5ab11aad71f7b33 = []byte{
-	// 1450 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x58, 0xcf, 0x6f, 0xdb, 0xc6,
-	0x12, 0x16, 0x6d, 0xd9, 0xb1, 0xc7, 0x8e, 0x22, 0xad, 0x1d, 0x47, 0x76, 0x1c, 0xc9, 0xd1, 0xcb,
-	0x0f, 0x27, 0x41, 0xa4, 0xc4, 0xef, 0xe1, 0x15, 0x48, 0xd1, 0x06, 0xb2, 0x64, 0xd7, 0x42, 0x1c,
-	0xc5, 0xa5, 0xec, 0xa6, 0x68, 0x8b, 0xb2, 0x6b, 0x72, 0x25, 0x11, 0x26, 0xb9, 0x0a, 0x77, 0x69,
-	0x27, 0xed, 0xa1, 0xe8, 0x2d, 0xc7, 0x1c, 0x03, 0xf4, 0x62, 0xa0, 0xb7, 0x1e, 0xfb, 0x17, 0xf4,
-	0x54, 0xe4, 0x98, 0x5b, 0x8b, 0x1e, 0xd2, 0xc2, 0xb9, 0xf4, 0xcf, 0x28, 0xb8, 0x4b, 0x52, 0x94,
-	0x2d, 0x03, 0x2d, 0x73, 0xb1, 0xcc, 0x9d, 0xd9, 0xef, 0x9b, 0x6f, 0x76, 0x76, 0x38, 0x12, 0xdc,
-	0xd4, 0xb1, 0xc3, 0x69, 0xc5, 0x32, 0x9f, 0x78, 0xa6, 0xc1, 0x38, 0xde, 0x33, 0x9d, 0x4e, 0x65,
-	0xff, 0xee, 0xe0, 0x42, 0xb9, 0xe7, 0x52, 0x4e, 0xd1, 0x9c, 0xf0, 0x2d, 0x0f, 0x9a, 0xf6, 0xef,
-	0x2e, 0xcc, 0x76, 0x68, 0x87, 0x0a, 0x97, 0x8a, 0xff, 0x9f, 0xf4, 0x5e, 0x28, 0x74, 0x28, 0xed,
-	0x58, 0xa4, 0x22, 0x9e, 0x76, 0xbd, 0x76, 0xc5, 0xf0, 0x5c, 0xcc, 0x4d, 0xea, 0x04, 0xf6, 0xe2,
-	0x71, 0x3b, 0x37, 0x6d, 0xc2, 0x38, 0xb6, 0x7b, 0x81, 0xc3, 0xbc, 0x4e, 0x99, 0x4d, 0x99, 0x26,
-	0x91, 0xe5, 0x83, 0x34, 0x95, 0x7e, 0x55, 0x60, 0x6c, 0xad, 0x47, 0xf5, 0x2e, 0xba, 0x0a, 0x19,
-	0xdd, 0x73, 0x5d, 0xe2, 0x70, 0xcd, 0xf1, 0xec, 0x5d, 0xe2, 0xe6, 0x95, 0x25, 0x65, 0x39, 0xad,
-	0x9e, 0x0d, 0x56, 0x9b, 0x62, 0x11, 0xd5, 0x00, 0x18, 0xc7, 0x2e, 0xd7, 0x7c, 0x92, 0xfc, 0xc8,
-	0x92, 0xb2, 0x3c, 0xb5, 0xb2, 0x50, 0x96, 0x11, 0x94, 0xc3, 0x08, 0xca, 0xdb, 0x61, 0x04, 0xab,
-	0x13, 0xaf, 0xde, 0x14, 0x53, 0x2f, 0xfe, 0x28, 0x2a, 0xea, 0xa4, 0xd8, 0xe7, 0x5b, 0xd0, 0x7d,
-	0x98, 0x08, 0x35, 0xe4, 0x47, 0x05, 0xc4, 0xfc, 0x09, 0x88, 0x7a, 0xe0, 0x20, 0x11, 0x5e, 0xfa,
-	0x08, 0xd1, 0x26, 0x74, 0x19, 0xa6, 0x65, 0x14, 0x5d, 0x62, 0x76, 0xba, 0x3c, 0x9f, 0x5e, 0x52,
-	0x96, 0x47, 0xd5, 0x29, 0xb1, 0xb6, 0x21, 0x96, 0x4a, 0xdf, 0xa7, 0x21, 0x53, 0x7f, 0xe6, 0x60,
-	0xdb, 0xd4, 0xd7, 0x09, 0x51, 0x31, 0x27, 0xe8, 0x43, 0x18, 0x71, 0xef, 0x08, 0x59, 0x93, 0xab,
-	0x65, 0x1f, 0xf5, 0xf7, 0x37, 0xc5, 0x6b, 0x1d, 0x93, 0x77, 0xbd, 0xdd, 0xb2, 0x4e, 0xed, 0x20,
-	0x33, 0xc1, 0xc7, 0x6d, 0x66, 0xec, 0x55, 0xf8, 0xb3, 0x1e, 0x61, 0xe5, 0x3a, 0xd1, 0xd5, 0x11,
-	0xf7, 0x0e, 0xda, 0x04, 0xf0, 0x34, 0x46, 0xdb, 0x5c, 0xd3, 0x71, 0x4f, 0x68, 0xff, 0xf7, 0x38,
-	0x13, 0x5e, 0x8b, 0xb6, 0x79, 0x0d, 0xf7, 0x24, 0x5a, 0x17, 0xbb, 0x86, 0x40, 0x1b, 0x4d, 0x88,
-	0xb6, 0x81, 0x5d, 0xc3, 0x47, 0x7b, 0x00, 0x93, 0x9e, 0x46, 0x7b, 0xdc, 0xb4, 0xb1, 0x25, 0xd2,
-	0x91, 0x04, 0xec, 0x91, 0xdc, 0x8f, 0xd6, 0x61, 0x9c, 0x59, 0xb4, 0x47, 0xee, 0xe6, 0xc7, 0x12,
-	0x21, 0x05, 0xbb, 0x23, 0x9c, 0x95, 0xfc, 0xf8, 0x3b, 0xe0, 0xac, 0xa0, 0x2d, 0x98, 0xb6, 0xf1,
-	0x53, 0xad, 0x4d, 0x88, 0xe6, 0x62, 0x4e, 0xf2, 0x67, 0x12, 0xa1, 0x81, 0x8d, 0x9f, 0x06, 0xa5,
-	0x50, 0x6a, 0xc3, 0xf8, 0x16, 0x76, 0xb1, 0xcd, 0xd0, 0x27, 0x90, 0x35, 0x64, 0x99, 0xf4, 0xf1,
-	0x15, 0x51, 0x93, 0xd7, 0xca, 0xc3, 0xaf, 0x69, 0x79, 0xb0, 0xac, 0x56, 0xd3, 0x7e, 0x1c, 0x6a,
-	0xc6, 0x18, 0x58, 0xbd, 0x97, 0x7e, 0x7e, 0x58, 0x4c, 0x95, 0x7e, 0x56, 0x60, 0xac, 0xd6, 0xf5,
-	0x9c, 0x3d, 0x94, 0x81, 0x11, 0xd3, 0x08, 0xee, 0xd4, 0x88, 0x69, 0xa0, 0x32, 0xcc, 0xf4, 0xb0,
-	0xe9, 0x12, 0x43, 0x33, 0x1d, 0xe6, 0xb9, 0xd8, 0xd1, 0x89, 0x66, 0x1a, 0xa2, 0xaa, 0xd2, 0x6a,
-	0x4e, 0x9a, 0x1a, 0xa1, 0xa5, 0x61, 0xa0, 0xff, 0xc1, 0x9c, 0xe7, 0xf8, 0xcb, 0xa6, 0xd3, 0x19,
-	0xdc, 0x32, 0x2a, 0xb6, 0xcc, 0x46, 0xd6, 0xf8, 0xae, 0xf7, 0x61, 0x9c, 0x71, 0xcc, 0x3d, 0x26,
-	0x6a, 0x22, 0xb3, 0xf2, 0x9f, 0xd3, 0x34, 0x89, 0x20, 0x5b, 0xc2, 0x55, 0x0d, 0xb6, 0x04, 0x12,
-	0x0e, 0x47, 0x60, 0x32, 0x82, 0x3c, 0x21, 0xe3, 0x16, 0xe4, 0xf6, 0xb1, 0x65, 0x1a, 0x98, 0x53,
-	0x57, 0xc3, 0x86, 0xe1, 0x12, 0xc6, 0xe4, 0xd5, 0x50, 0xb3, 0x91, 0xa1, 0x2a, 0xd7, 0xd1, 0x0d,
-	0xc8, 0xf6, 0x5c, 0xba, 0x6f, 0x1a, 0xa4, 0xef, 0x2b, 0x0a, 0x5f, 0x3d, 0x17, 0xae, 0x87, 0xae,
-	0x0d, 0x98, 0x88, 0x8e, 0x23, 0x59, 0x39, 0x9f, 0x69, 0x07, 0xd7, 0x7e, 0x1e, 0x26, 0x74, 0x5f,
-	0x9d, 0x9f, 0xab, 0x31, 0x11, 0xf8, 0x19, 0xf1, 0xdc, 0x30, 0xd0, 0xfd, 0x28, 0x3d, 0xe3, 0x22,
-	0x3d, 0xd7, 0x4f, 0x4b, 0x4f, 0x94, 0x80, 0xa1, 0x29, 0xfa, 0x29, 0x07, 0x99, 0x26, 0xe1, 0x55,
-	0x9b, 0x7a, 0x0e, 0xf7, 0x3d, 0x88, 0x7f, 0x1f, 0x6d, 0xd3, 0xe1, 0xfd, 0x7a, 0x4a, 0x70, 0x1f,
-	0x7d, 0x00, 0xa1, 0x40, 0x87, 0x39, 0x8b, 0x69, 0x9c, 0xee, 0x11, 0xc7, 0xff, 0xe0, 0xd8, 0xd2,
-	0x98, 0xd7, 0xeb, 0x59, 0xcf, 0x12, 0x34, 0xa1, 0x86, 0xc3, 0xd5, 0x19, 0x8b, 0x6d, 0x0b, 0xb0,
-	0x6d, 0x1f, 0xab, 0x25, 0xa0, 0xd0, 0x43, 0x00, 0x87, 0x70, 0x0d, 0x0b, 0x11, 0x09, 0xfb, 0xd1,
-	0xa4, 0x13, 0x66, 0x01, 0x7d, 0x0a, 0x59, 0x19, 0xa9, 0x41, 0x2c, 0x8d, 0x75, 0xb1, 0x4b, 0x58,
-	0xc2, 0x83, 0xcc, 0x08, 0x9c, 0x3a, 0xb1, 0x5a, 0x02, 0x05, 0xb5, 0xe1, 0x82, 0x44, 0x76, 0x89,
-	0x8d, 0x4d, 0xc7, 0xbf, 0x0f, 0x2e, 0x39, 0xc0, 0xae, 0xc1, 0x12, 0xb6, 0xab, 0xf3, 0x02, 0x4e,
-	0x0d, 0xd1, 0x54, 0x09, 0x86, 0xbe, 0x53, 0xe0, 0xea, 0x71, 0xa2, 0xfe, 0xc5, 0xd3, 0xa9, 0x6d,
-	0x9b, 0x8c, 0x99, 0xd4, 0x61, 0x09, 0xbb, 0x5b, 0x69, 0x90, 0x36, 0x2a, 0xb1, 0x5a, 0x1f, 0x19,
-	0x7d, 0x05, 0xb3, 0x32, 0x04, 0x51, 0xb1, 0x4c, 0xdb, 0xc5, 0x96, 0xef, 0x92, 0xa0, 0x03, 0xfa,
-	0xe7, 0x8e, 0x04, 0x96, 0xb8, 0xea, 0x6c, 0x55, 0x22, 0xa1, 0x2f, 0x61, 0x46, 0x32, 0xc8, 0x9a,
-	0x0f, 0xaa, 0x2c, 0x3f, 0x91, 0x88, 0x20, 0x27, 0xa0, 0x36, 0x05, 0x92, 0xac, 0x30, 0x64, 0xc0,
-	0x9c, 0xc4, 0xef, 0xa7, 0x2e, 0xa0, 0x98, 0x4c, 0x44, 0x21, 0xf3, 0x11, 0x25, 0x2b, 0x60, 0x71,
-	0xe0, 0xe2, 0x71, 0x96, 0xf8, 0x01, 0x41, 0x22, 0xaa, 0xf9, 0x41, 0xaa, 0xf8, 0xb9, 0x3c, 0x81,
-	0x4b, 0x92, 0xef, 0x44, 0x0f, 0x0f, 0xc4, 0x4d, 0x25, 0x62, 0x5c, 0x10, 0xa0, 0x5b, 0x83, 0xcd,
-	0x3f, 0x90, 0xf8, 0x0d, 0x94, 0x4e, 0xa1, 0x8c, 0x2b, 0x9d, 0x4e, 0xc4, 0x5b, 0x1c, 0xc6, 0x1b,
-	0xd7, 0x7b, 0x00, 0x4b, 0x92, 0x7c, 0xd8, 0x3b, 0x28, 0x90, 0x7c, 0x36, 0x11, 0xb5, 0xcc, 0xe3,
-	0xce, 0x89, 0x97, 0x57, 0xa0, 0xba, 0x7f, 0x09, 0x87, 0x31, 0xc7, 0x95, 0x67, 0x12, 0xd1, 0x97,
-	0x4e, 0xa1, 0x8f, 0x8b, 0xf7, 0xa0, 0x18, 0x0f, 0x61, 0xd8, 0x71, 0x9f, 0x4b, 0x44, 0xbe, 0x18,
-	0x23, 0x3f, 0x79, 0xe0, 0xdf, 0xc2, 0x95, 0x53, 0x69, 0xe3, 0xc2, 0xb3, 0x89, 0xb8, 0x2f, 0x0f,
-	0xe7, 0x8e, 0xeb, 0x8e, 0x1a, 0xad, 0xe7, 0xec, 0x52, 0xc7, 0xf0, 0x53, 0x1f, 0xf6, 0x9f, 0x5c,
-	0x22, 0xce, 0xf3, 0x01, 0x67, 0x80, 0x16, 0xb6, 0x20, 0x13, 0xe6, 0x65, 0x03, 0xd7, 0x6c, 0x6a,
-	0x78, 0x16, 0xd1, 0xb0, 0xae, 0x47, 0x4c, 0x28, 0x11, 0xd3, 0x9c, 0x04, 0x7c, 0x28, 0xf0, 0xaa,
-	0xba, 0x1e, 0x52, 0x7d, 0x0e, 0x39, 0x8f, 0x9b, 0x96, 0xf9, 0xb5, 0xf8, 0x1e, 0xa1, 0x89, 0xaf,
-	0x13, 0xf9, 0x99, 0x44, 0xed, 0x3b, 0x1b, 0x03, 0x52, 0xfd, 0xbf, 0xa8, 0x05, 0x67, 0x0d, 0x93,
-	0xe9, 0xfe, 0xeb, 0x4f, 0xbe, 0xf7, 0x67, 0x13, 0x01, 0x4f, 0x87, 0x20, 0xe2, 0xdd, 0x1f, 0x1f,
-	0x84, 0xce, 0xbf, 0xd3, 0x20, 0x74, 0x6f, 0xfa, 0xf9, 0x61, 0x51, 0x79, 0x79, 0x58, 0x4c, 0xfd,
-	0xe5, 0x0f, 0x2d, 0xbf, 0x28, 0x50, 0x88, 0xea, 0x7e, 0x9d, 0xba, 0x3b, 0x4e, 0x30, 0xef, 0x88,
-	0xf7, 0x43, 0xc3, 0x69, 0xd3, 0x81, 0xc9, 0x49, 0x19, 0x9c, 0x9c, 0x6e, 0x41, 0xce, 0x20, 0x16,
-	0xe9, 0x0c, 0x9b, 0xfb, 0x22, 0x43, 0x38, 0xcc, 0x7d, 0x01, 0x39, 0xc2, 0x74, 0x97, 0x1e, 0x10,
-	0x43, 0xb3, 0x58, 0x70, 0x65, 0xe4, 0x84, 0x51, 0x09, 0xc4, 0x5c, 0xff, 0x07, 0x62, 0x6a, 0xd4,
-	0x74, 0xd4, 0x6c, 0x88, 0xb4, 0x19, 0x00, 0x95, 0x3e, 0x80, 0xfc, 0x63, 0x93, 0x77, 0x0d, 0x17,
-	0x1f, 0x44, 0x65, 0xac, 0x92, 0x27, 0x1e, 0x61, 0xdc, 0xff, 0xa2, 0x38, 0x30, 0x2b, 0x4b, 0x15,
-	0x53, 0x66, 0x7f, 0x44, 0xbe, 0xf9, 0xa3, 0x02, 0x53, 0xb1, 0xe9, 0x17, 0x2d, 0x42, 0xbe, 0xb6,
-	0xb1, 0xd3, 0x7c, 0xa0, 0xb5, 0xb6, 0xab, 0xdb, 0x3b, 0x2d, 0x6d, 0xa7, 0xd9, 0xda, 0x5a, 0xab,
-	0x35, 0xd6, 0x1b, 0x6b, 0xf5, 0x6c, 0x0a, 0xe5, 0x61, 0x76, 0xc0, 0xba, 0x55, 0x6d, 0xa8, 0x8d,
-	0xe6, 0x47, 0x59, 0x05, 0x5d, 0x80, 0x99, 0x13, 0x96, 0xb5, 0x7a, 0x76, 0x04, 0x2d, 0xc0, 0xdc,
-	0x31, 0xc0, 0x70, 0xd3, 0x28, 0x5a, 0x86, 0x2b, 0xc3, 0x6d, 0xda, 0xfa, 0x23, 0xd5, 0xa7, 0xde,
-	0xae, 0x3e, 0xf0, 0x3d, 0xd3, 0x0b, 0xe9, 0xe7, 0x3f, 0x14, 0x52, 0x37, 0x8f, 0x14, 0x38, 0x77,
-	0x6c, 0x16, 0x45, 0x4b, 0xb0, 0xd8, 0x68, 0xb6, 0x76, 0xd4, 0x6a, 0xb3, 0xb6, 0x36, 0x3c, 0xe8,
-	0x45, 0xc8, 0x9f, 0xf0, 0xe8, 0x07, 0x7e, 0x11, 0x2e, 0x0c, 0xb5, 0x8a, 0xe0, 0x0b, 0xb0, 0x30,
-	0x04, 0xbc, 0x2f, 0xe0, 0x36, 0xdc, 0x38, 0xdd, 0x2e, 0x44, 0x3c, 0x6e, 0x6c, 0x6f, 0xd4, 0xd5,
-	0xea, 0xe3, 0xea, 0x66, 0x36, 0x8d, 0x2e, 0xc1, 0xfc, 0x29, 0xee, 0x6b, 0xf5, 0xec, 0x98, 0x14,
-	0xb9, 0xfa, 0xf1, 0xab, 0xa3, 0x82, 0xf2, 0xfa, 0xa8, 0xa0, 0xfc, 0x79, 0x54, 0x50, 0x5e, 0xbc,
-	0x2d, 0xa4, 0x5e, 0xbf, 0x2d, 0xa4, 0x7e, 0x7b, 0x5b, 0x48, 0x7d, 0xf6, 0x5e, 0xac, 0x4a, 0x6a,
-	0xfe, 0xa4, 0x7e, 0xbb, 0x49, 0xf8, 0x01, 0x75, 0xf7, 0xe4, 0x53, 0x65, 0xff, 0xff, 0x95, 0xa7,
-	0xc7, 0x7e, 0x82, 0x11, 0xa5, 0xb3, 0x3b, 0x2e, 0x7e, 0x57, 0xf8, 0xef, 0xdf, 0x01, 0x00, 0x00,
-	0xff, 0xff, 0x8a, 0xaa, 0xeb, 0x00, 0xa6, 0x11, 0x00, 0x00,
+	// 1427 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x98, 0x4d, 0x4f, 0x1b, 0x47,
+	0x18, 0xc7, 0xbd, 0x60, 0x08, 0x3c, 0x10, 0x63, 0x0f, 0x84, 0x2c, 0x24, 0x31, 0x94, 0x36, 0x09,
+	0x49, 0x14, 0x3b, 0xa1, 0x55, 0x2b, 0xa5, 0x6a, 0x23, 0x63, 0x43, 0xb1, 0x42, 0x1c, 0xba, 0x86,
+	0xa6, 0x4a, 0xab, 0x6e, 0x87, 0xdd, 0xb1, 0x3d, 0x62, 0x77, 0xc7, 0xd9, 0x99, 0x85, 0x24, 0xb7,
+	0xde, 0x72, 0xcc, 0x31, 0x52, 0x2f, 0x48, 0xbd, 0xf5, 0x53, 0xf4, 0x54, 0xe5, 0x98, 0x5b, 0xab,
+	0x1e, 0xd2, 0x8a, 0xa8, 0x52, 0x3f, 0x46, 0xb5, 0x33, 0xbb, 0x6b, 0xcc, 0x8b, 0xd4, 0x6e, 0x2e,
+	0x98, 0x9d, 0xe7, 0x99, 0xdf, 0xf3, 0xb2, 0xff, 0x79, 0xb1, 0xe1, 0xba, 0x85, 0x3d, 0xc1, 0xca,
+	0x0e, 0x7d, 0x1c, 0x50, 0x9b, 0x0b, 0xbc, 0x43, 0xbd, 0x76, 0x79, 0xf7, 0x76, 0xff, 0x40, 0xa9,
+	0xeb, 0x33, 0xc1, 0xd0, 0xb4, 0xf4, 0x2d, 0xf5, 0x9b, 0x76, 0x6f, 0xcf, 0x4e, 0xb5, 0x59, 0x9b,
+	0x49, 0x97, 0x72, 0xf8, 0x9f, 0xf2, 0x9e, 0x2d, 0xb6, 0x19, 0x6b, 0x3b, 0xa4, 0x2c, 0x9f, 0xb6,
+	0x83, 0x56, 0xd9, 0x0e, 0x7c, 0x2c, 0x28, 0xf3, 0x22, 0xfb, 0xdc, 0x51, 0xbb, 0xa0, 0x2e, 0xe1,
+	0x02, 0xbb, 0xdd, 0xc8, 0x61, 0xc6, 0x62, 0xdc, 0x65, 0xdc, 0x54, 0x64, 0xf5, 0xa0, 0x4c, 0x0b,
+	0xbf, 0x69, 0x30, 0xb4, 0xd2, 0x65, 0x56, 0x07, 0x5d, 0x86, 0x9c, 0x15, 0xf8, 0x3e, 0xf1, 0x84,
+	0xe9, 0x05, 0xee, 0x36, 0xf1, 0x75, 0x6d, 0x5e, 0x5b, 0xcc, 0x1a, 0x67, 0xa3, 0xd1, 0x86, 0x1c,
+	0x44, 0x55, 0x00, 0x2e, 0xb0, 0x2f, 0xcc, 0x30, 0x88, 0x3e, 0x30, 0xaf, 0x2d, 0x8e, 0x2d, 0xcd,
+	0x96, 0x54, 0x06, 0xa5, 0x38, 0x83, 0xd2, 0x66, 0x9c, 0xc1, 0xf2, 0xc8, 0xab, 0x37, 0x73, 0x99,
+	0x17, 0x7f, 0xce, 0x69, 0xc6, 0xa8, 0x9c, 0x17, 0x5a, 0xd0, 0x5d, 0x18, 0x89, 0x6b, 0xd0, 0x07,
+	0x25, 0x62, 0xe6, 0x18, 0xa2, 0x16, 0x39, 0x28, 0xc2, 0xcb, 0x90, 0x90, 0x4c, 0x42, 0xef, 0xc1,
+	0xb8, 0xca, 0xa2, 0x43, 0x68, 0xbb, 0x23, 0xf4, 0xec, 0xbc, 0xb6, 0x38, 0x68, 0x8c, 0xc9, 0xb1,
+	0x35, 0x39, 0xb4, 0xf0, 0x63, 0x16, 0x72, 0xb5, 0xa7, 0x1e, 0x76, 0xa9, 0xb5, 0x4a, 0x88, 0x81,
+	0x05, 0x41, 0x9f, 0xc3, 0x80, 0x7f, 0x4b, 0x96, 0x35, 0xba, 0x5c, 0x0a, 0xa9, 0x7f, 0xbc, 0x99,
+	0xbb, 0xd2, 0xa6, 0xa2, 0x13, 0x6c, 0x97, 0x2c, 0xe6, 0x46, 0x9d, 0x89, 0x3e, 0x6e, 0x72, 0x7b,
+	0xa7, 0x2c, 0x9e, 0x76, 0x09, 0x2f, 0xd5, 0x88, 0x65, 0x0c, 0xf8, 0xb7, 0xd0, 0x3a, 0x40, 0x60,
+	0x72, 0xd6, 0x12, 0xa6, 0x85, 0xbb, 0xb2, 0xf6, 0xff, 0xcf, 0x19, 0x09, 0x9a, 0xac, 0x25, 0xaa,
+	0xb8, 0xab, 0x68, 0x1d, 0xec, 0xdb, 0x92, 0x36, 0x98, 0x92, 0xb6, 0x86, 0x7d, 0x3b, 0xa4, 0xdd,
+	0x83, 0xd1, 0xc0, 0x64, 0x5d, 0x41, 0x5d, 0xec, 0xc8, 0x76, 0xa4, 0x81, 0x3d, 0x50, 0xf3, 0xd1,
+	0x2a, 0x0c, 0x73, 0x87, 0x75, 0xc9, 0x6d, 0x7d, 0x28, 0x15, 0x29, 0x9a, 0x9d, 0x70, 0x96, 0xf4,
+	0xe1, 0x77, 0xe0, 0x2c, 0xa1, 0x0d, 0x18, 0x77, 0xf1, 0x13, 0xb3, 0x45, 0x88, 0xe9, 0x63, 0x41,
+	0xf4, 0x33, 0xa9, 0x68, 0xe0, 0xe2, 0x27, 0x91, 0x14, 0x16, 0x5a, 0x30, 0xbc, 0x81, 0x7d, 0xec,
+	0x72, 0xf4, 0x15, 0xe4, 0x6d, 0x25, 0x93, 0x1e, 0x5f, 0x93, 0x9a, 0xbc, 0x52, 0x3a, 0x79, 0x99,
+	0x96, 0xfa, 0x65, 0xb5, 0x9c, 0x0d, 0xf3, 0x30, 0x72, 0x76, 0xdf, 0xe8, 0x9d, 0xec, 0xf3, 0xfd,
+	0xb9, 0xcc, 0xc2, 0x2f, 0x1a, 0x0c, 0x55, 0x3b, 0x81, 0xb7, 0x83, 0x72, 0x30, 0x40, 0xed, 0x68,
+	0x4d, 0x0d, 0x50, 0x1b, 0x95, 0x60, 0xb2, 0x8b, 0xa9, 0x4f, 0x6c, 0x93, 0x7a, 0x3c, 0xf0, 0xb1,
+	0x67, 0x11, 0x93, 0xda, 0x52, 0x55, 0x59, 0xa3, 0xa0, 0x4c, 0xf5, 0xd8, 0x52, 0xb7, 0xd1, 0x47,
+	0x30, 0x1d, 0x78, 0xe1, 0x30, 0xf5, 0xda, 0xfd, 0x53, 0x06, 0xe5, 0x94, 0xa9, 0xc4, 0x7a, 0x78,
+	0xd6, 0xa7, 0x30, 0xcc, 0x05, 0x16, 0x01, 0x97, 0x9a, 0xc8, 0x2d, 0xbd, 0x7f, 0x5a, 0x4d, 0x32,
+	0xc9, 0xa6, 0x74, 0x35, 0xa2, 0x29, 0x51, 0x09, 0xfb, 0x03, 0x30, 0x9a, 0x20, 0x8f, 0x95, 0x71,
+	0x03, 0x0a, 0xbb, 0xd8, 0xa1, 0x36, 0x16, 0xcc, 0x37, 0xb1, 0x6d, 0xfb, 0x84, 0x73, 0xb5, 0x34,
+	0x8c, 0x7c, 0x62, 0xa8, 0xa8, 0x71, 0x74, 0x0d, 0xf2, 0x5d, 0x9f, 0xed, 0x52, 0x9b, 0xf4, 0x7c,
+	0xa5, 0xf0, 0x8d, 0x89, 0x78, 0x3c, 0x76, 0xad, 0xc3, 0x48, 0xf2, 0x3a, 0xd2, 0xc9, 0xf9, 0x4c,
+	0x2b, 0x5a, 0xf6, 0x33, 0x30, 0x62, 0x85, 0xd5, 0x85, 0xbd, 0x1a, 0x92, 0x89, 0x9f, 0x91, 0xcf,
+	0x75, 0x1b, 0xdd, 0x4d, 0xda, 0x33, 0x2c, 0xdb, 0x73, 0xf5, 0xb4, 0xf6, 0x24, 0x0d, 0x38, 0xb1,
+	0x45, 0x7f, 0xe7, 0x20, 0xd7, 0x20, 0xa2, 0xe2, 0xb2, 0xc0, 0x13, 0xa1, 0x07, 0x09, 0xd7, 0xa3,
+	0x4b, 0x3d, 0xd1, 0xd3, 0x53, 0x8a, 0xf5, 0x18, 0x02, 0x64, 0x05, 0x16, 0x4c, 0x3b, 0xdc, 0x14,
+	0x6c, 0x87, 0x78, 0xe1, 0x87, 0xc0, 0x8e, 0xc9, 0x83, 0x6e, 0xd7, 0x79, 0x9a, 0x62, 0x13, 0xaa,
+	0x7b, 0xc2, 0x98, 0x74, 0xf8, 0xa6, 0x84, 0x6d, 0x86, 0xac, 0xa6, 0x44, 0xa1, 0xfb, 0x00, 0x1e,
+	0x11, 0x26, 0x96, 0x45, 0xa4, 0xdc, 0x8f, 0x46, 0xbd, 0xb8, 0x0b, 0xe8, 0x3b, 0x98, 0x54, 0x99,
+	0xaa, 0x5e, 0x46, 0xd9, 0xa7, 0x78, 0x97, 0x61, 0xc2, 0x05, 0x89, 0x5a, 0x97, 0x24, 0x95, 0x39,
+	0xa2, 0x30, 0xe3, 0x93, 0xbd, 0x70, 0xfb, 0x74, 0x99, 0x1d, 0x38, 0xc4, 0xc4, 0x96, 0x65, 0x6e,
+	0x63, 0x27, 0x7c, 0x49, 0x29, 0xb6, 0xad, 0x30, 0xca, 0xb4, 0x02, 0xde, 0x97, 0xbc, 0x8a, 0x65,
+	0x2d, 0x2b, 0x5a, 0x9f, 0x16, 0x87, 0xdf, 0x4d, 0x8b, 0xdf, 0x40, 0x21, 0x10, 0xd4, 0xa1, 0xcf,
+	0xe4, 0x39, 0x66, 0xca, 0xe3, 0x2c, 0xe5, 0x76, 0x96, 0x3f, 0x04, 0x32, 0xc2, 0xbf, 0x68, 0x1b,
+	0xce, 0xf9, 0xc4, 0xc5, 0xd4, 0x0b, 0xb7, 0x08, 0x25, 0x79, 0xee, 0x30, 0xc1, 0xf5, 0x91, 0x74,
+	0x2a, 0x49, 0x60, 0x6a, 0x73, 0x08, 0x51, 0xa8, 0x09, 0x67, 0x6d, 0xca, 0xad, 0xf0, 0x15, 0xab,
+	0x86, 0x8c, 0xa6, 0x4a, 0x7e, 0x3c, 0x86, 0xc8, 0xae, 0x3c, 0x82, 0x82, 0x17, 0xb8, 0x66, 0xb4,
+	0x1f, 0xca, 0xcc, 0xb9, 0x0e, 0xa9, 0x92, 0x9e, 0xf0, 0x02, 0x77, 0x43, 0x72, 0x64, 0xd2, 0x3c,
+	0x94, 0x75, 0xd4, 0x0a, 0xfa, 0x8c, 0xe8, 0x63, 0xa9, 0xa0, 0xa3, 0x92, 0xd0, 0xa4, 0xcf, 0x08,
+	0xfa, 0x1a, 0xf2, 0x4a, 0xd6, 0x36, 0x71, 0x4c, 0xde, 0xc1, 0x3e, 0xe1, 0xfa, 0x78, 0xaa, 0x16,
+	0xe4, 0x24, 0xa7, 0x46, 0x9c, 0xa6, 0xa4, 0xa0, 0x16, 0x9c, 0x57, 0xe4, 0xde, 0x3b, 0x54, 0x7a,
+	0xe4, 0xfa, 0xd9, 0x54, 0x01, 0xce, 0x49, 0x9c, 0x11, 0xd3, 0x0c, 0x05, 0x43, 0xdf, 0xc3, 0x94,
+	0x8a, 0xa3, 0xfa, 0x9c, 0xac, 0x99, 0x5c, 0xaa, 0xd6, 0x20, 0xc9, 0x52, 0xbd, 0x8e, 0xd7, 0x0b,
+	0x87, 0xa2, 0x8a, 0x10, 0x78, 0xdb, 0xcc, 0xb3, 0x13, 0x35, 0xf6, 0x62, 0x4d, 0xa4, 0x8a, 0x75,
+	0x41, 0x52, 0xb7, 0x62, 0x68, 0x7f, 0x50, 0x1b, 0xa6, 0x55, 0xd0, 0xde, 0xd9, 0x18, 0x6d, 0x39,
+	0xf9, 0x54, 0xc1, 0x54, 0x93, 0x92, 0x7d, 0x3f, 0xda, 0x75, 0x1e, 0xc3, 0x25, 0x15, 0xe5, 0xd8,
+	0xd9, 0x1d, 0x05, 0x2b, 0xa4, 0x0a, 0x36, 0x2b, 0xa1, 0x1b, 0xfd, 0x87, 0x7e, 0x14, 0x72, 0x0f,
+	0xe6, 0xe3, 0x6e, 0x1e, 0x3f, 0xfe, 0xa3, 0xa8, 0x28, 0x55, 0xd4, 0x4b, 0x51, 0x3f, 0x8f, 0xde,
+	0x1b, 0xa2, 0xc0, 0x3f, 0x68, 0x70, 0xf9, 0xa8, 0x22, 0x7b, 0x91, 0x2d, 0xe6, 0xba, 0x94, 0x73,
+	0xca, 0x3c, 0xae, 0x4f, 0xa6, 0xd2, 0xe7, 0x42, 0xbf, 0x3e, 0x93, 0xf0, 0xd5, 0x1e, 0xf9, 0xce,
+	0xf8, 0xf3, 0xfd, 0x39, 0xed, 0xe5, 0xfe, 0x5c, 0xe6, 0x9f, 0xf0, 0x9c, 0xfd, 0x55, 0x83, 0x62,
+	0x92, 0xee, 0x2a, 0xf3, 0xb7, 0xbc, 0xe8, 0x88, 0x96, 0x52, 0xa8, 0x7b, 0x2d, 0xd6, 0x77, 0xd8,
+	0x6b, 0xfd, 0x87, 0xfd, 0x0d, 0x28, 0xd8, 0xc4, 0x21, 0xed, 0x93, 0xae, 0x2a, 0x89, 0x21, 0xbe,
+	0x7f, 0x7c, 0x0b, 0x05, 0xc2, 0x2d, 0x9f, 0xed, 0x11, 0xdb, 0x74, 0x78, 0xd4, 0x66, 0x75, 0x28,
+	0x96, 0xa3, 0x3a, 0xaf, 0xfe, 0x87, 0x3a, 0xab, 0x8c, 0x7a, 0x46, 0x3e, 0x26, 0xad, 0x47, 0xa0,
+	0x85, 0xcf, 0x40, 0x7f, 0x48, 0x45, 0xc7, 0xf6, 0xf1, 0x5e, 0x52, 0xb6, 0x41, 0x1e, 0x07, 0x84,
+	0x8b, 0xf0, 0xbb, 0x4d, 0xdf, 0xf5, 0x4e, 0x55, 0x31, 0x46, 0x7b, 0xb7, 0xba, 0xeb, 0x3f, 0x6b,
+	0x30, 0x76, 0xe8, 0xc2, 0x86, 0x2e, 0x82, 0x5e, 0x5d, 0xdb, 0x6a, 0xdc, 0x33, 0x9b, 0x9b, 0x95,
+	0xcd, 0xad, 0xa6, 0xb9, 0xd5, 0x68, 0x6e, 0xac, 0x54, 0xeb, 0xab, 0xf5, 0x95, 0x5a, 0x3e, 0x83,
+	0x74, 0x98, 0xea, 0xb3, 0x6e, 0x54, 0xea, 0x46, 0xbd, 0xf1, 0x45, 0x5e, 0x43, 0xe7, 0x61, 0xf2,
+	0x98, 0x65, 0xa5, 0x96, 0x1f, 0x40, 0xb3, 0x30, 0x7d, 0x04, 0x18, 0x4f, 0x1a, 0x44, 0x8b, 0xf0,
+	0xc1, 0xc9, 0x36, 0x73, 0xf5, 0x81, 0x11, 0x86, 0xde, 0xac, 0xdc, 0x0b, 0x3d, 0xb3, 0xb3, 0xd9,
+	0xe7, 0x3f, 0x15, 0x33, 0xd7, 0x0f, 0x34, 0x98, 0x38, 0x72, 0x7d, 0x42, 0xf3, 0x70, 0xb1, 0xde,
+	0x68, 0x6e, 0x19, 0x95, 0x46, 0x75, 0xe5, 0xe4, 0xa4, 0x2f, 0x82, 0x7e, 0xcc, 0xa3, 0x97, 0xf8,
+	0x05, 0x38, 0x7f, 0xa2, 0x55, 0x26, 0x5f, 0x84, 0xd9, 0x13, 0xe0, 0xbd, 0x02, 0x6e, 0xc2, 0xb5,
+	0xd3, 0xed, 0xb2, 0x88, 0x87, 0xf5, 0xcd, 0xb5, 0x9a, 0x51, 0x79, 0x58, 0x59, 0xcf, 0x67, 0xd1,
+	0x25, 0x98, 0x39, 0xc5, 0x7d, 0xa5, 0x96, 0x1f, 0x52, 0x45, 0x2e, 0x7f, 0xf9, 0xea, 0xa0, 0xa8,
+	0xbd, 0x3e, 0x28, 0x6a, 0x7f, 0x1d, 0x14, 0xb5, 0x17, 0x6f, 0x8b, 0x99, 0xd7, 0x6f, 0x8b, 0x99,
+	0xdf, 0xdf, 0x16, 0x33, 0x8f, 0x3e, 0x39, 0xa4, 0x92, 0x6a, 0x78, 0xb9, 0xbc, 0xd9, 0x20, 0x62,
+	0x8f, 0xf9, 0x3b, 0xea, 0xa9, 0xbc, 0xfb, 0x71, 0xf9, 0xc9, 0x91, 0x5f, 0x0d, 0xa4, 0x74, 0xb6,
+	0x87, 0xe5, 0x57, 0xe1, 0x0f, 0xff, 0x0d, 0x00, 0x00, 0xff, 0xff, 0xa7, 0x3b, 0x39, 0x24, 0x59,
+	0x10, 0x00, 0x00,
 }
 
 func (m *Epoch) Marshal() (dAtA []byte, err error) {
@@ -997,33 +996,9 @@ func (m *NetAmountState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	var l int
 	_ = l
 	{
-		size := m.FeeRate.Size()
+		size := m.TotalRemainingInsuranceCommissions.Size()
 		i -= size
-		if _, err := m.FeeRate.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintLiquidstaking(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0x1
-	i--
-	dAtA[i] = 0xaa
-	{
-		size := m.DiscountRate.Size()
-		i -= size
-		if _, err := m.DiscountRate.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintLiquidstaking(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0x1
-	i--
-	dAtA[i] = 0xa2
-	{
-		size := m.UtilizationRatio.Size()
-		i -= size
-		if _, err := m.UtilizationRatio.MarshalTo(dAtA[i:]); err != nil {
+		if _, err := m.TotalRemainingInsuranceCommissions.MarshalTo(dAtA[i:]); err != nil {
 			return 0, err
 		}
 		i = encodeVarintLiquidstaking(dAtA, i, uint64(size))
@@ -1033,9 +1008,9 @@ func (m *NetAmountState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i--
 	dAtA[i] = 0x9a
 	{
-		size := m.RewardModuleAccBalance.Size()
+		size := m.TotalUnpairingInsuranceTokens.Size()
 		i -= size
-		if _, err := m.RewardModuleAccBalance.MarshalTo(dAtA[i:]); err != nil {
+		if _, err := m.TotalUnpairingInsuranceTokens.MarshalTo(dAtA[i:]); err != nil {
 			return 0, err
 		}
 		i = encodeVarintLiquidstaking(dAtA, i, uint64(size))
@@ -1045,9 +1020,9 @@ func (m *NetAmountState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i--
 	dAtA[i] = 0x92
 	{
-		size := m.TotalUnbondingBalance.Size()
+		size := m.TotalPairedInsuranceTokens.Size()
 		i -= size
-		if _, err := m.TotalUnbondingBalance.MarshalTo(dAtA[i:]); err != nil {
+		if _, err := m.TotalPairedInsuranceTokens.MarshalTo(dAtA[i:]); err != nil {
 			return 0, err
 		}
 		i = encodeVarintLiquidstaking(dAtA, i, uint64(size))
@@ -1057,9 +1032,9 @@ func (m *NetAmountState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i--
 	dAtA[i] = 0x8a
 	{
-		size := m.TotalUnpairedInsuranceCommissions.Size()
+		size := m.TotalInsuranceTokens.Size()
 		i -= size
-		if _, err := m.TotalUnpairedInsuranceCommissions.MarshalTo(dAtA[i:]); err != nil {
+		if _, err := m.TotalInsuranceTokens.MarshalTo(dAtA[i:]); err != nil {
 			return 0, err
 		}
 		i = encodeVarintLiquidstaking(dAtA, i, uint64(size))
@@ -1069,85 +1044,15 @@ func (m *NetAmountState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i--
 	dAtA[i] = 0x82
 	{
-		size := m.TotalUnpairedInsuranceTokens.Size()
+		size := m.TotalUnbondingChunksBalance.Size()
 		i -= size
-		if _, err := m.TotalUnpairedInsuranceTokens.MarshalTo(dAtA[i:]); err != nil {
+		if _, err := m.TotalUnbondingChunksBalance.MarshalTo(dAtA[i:]); err != nil {
 			return 0, err
 		}
 		i = encodeVarintLiquidstaking(dAtA, i, uint64(size))
 	}
 	i--
 	dAtA[i] = 0x7a
-	{
-		size := m.TotalUnpairingInsuranceCommissions.Size()
-		i -= size
-		if _, err := m.TotalUnpairingInsuranceCommissions.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintLiquidstaking(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0x72
-	{
-		size := m.TotalUnpairingInsuranceTokens.Size()
-		i -= size
-		if _, err := m.TotalUnpairingInsuranceTokens.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintLiquidstaking(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0x6a
-	{
-		size := m.TotalPairedInsuranceCommissions.Size()
-		i -= size
-		if _, err := m.TotalPairedInsuranceCommissions.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintLiquidstaking(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0x62
-	{
-		size := m.TotalPairedInsuranceTokens.Size()
-		i -= size
-		if _, err := m.TotalPairedInsuranceTokens.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintLiquidstaking(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0x5a
-	{
-		size := m.TotalInsuranceCommissions.Size()
-		i -= size
-		if _, err := m.TotalInsuranceCommissions.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintLiquidstaking(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0x52
-	{
-		size := m.TotalInsuranceTokens.Size()
-		i -= size
-		if _, err := m.TotalInsuranceTokens.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintLiquidstaking(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0x4a
-	{
-		size := m.TotalLiquidTokens.Size()
-		i -= size
-		if _, err := m.TotalLiquidTokens.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintLiquidstaking(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0x42
 	{
 		size := m.TotalChunksBalance.Size()
 		i -= size
@@ -1157,17 +1062,7 @@ func (m *NetAmountState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i = encodeVarintLiquidstaking(dAtA, i, uint64(size))
 	}
 	i--
-	dAtA[i] = 0x3a
-	{
-		size := m.TotalRemainingInsuranceCommissions.Size()
-		i -= size
-		if _, err := m.TotalRemainingInsuranceCommissions.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintLiquidstaking(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0x32
+	dAtA[i] = 0x72
 	{
 		size := m.TotalRemainingRewards.Size()
 		i -= size
@@ -1177,11 +1072,91 @@ func (m *NetAmountState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i = encodeVarintLiquidstaking(dAtA, i, uint64(size))
 	}
 	i--
-	dAtA[i] = 0x2a
+	dAtA[i] = 0x6a
 	{
 		size := m.TotalDelShares.Size()
 		i -= size
 		if _, err := m.TotalDelShares.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintLiquidstaking(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x62
+	{
+		size := m.ChunkSize.Size()
+		i -= size
+		if _, err := m.ChunkSize.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintLiquidstaking(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x5a
+	{
+		size := m.NumPairedChunks.Size()
+		i -= size
+		if _, err := m.NumPairedChunks.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintLiquidstaking(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x52
+	{
+		size := m.DiscountRate.Size()
+		i -= size
+		if _, err := m.DiscountRate.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintLiquidstaking(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x4a
+	{
+		size := m.RemainingChunkSlots.Size()
+		i -= size
+		if _, err := m.RemainingChunkSlots.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintLiquidstaking(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x42
+	{
+		size := m.UtilizationRatio.Size()
+		i -= size
+		if _, err := m.UtilizationRatio.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintLiquidstaking(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x3a
+	{
+		size := m.FeeRate.Size()
+		i -= size
+		if _, err := m.FeeRate.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintLiquidstaking(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x32
+	{
+		size := m.RewardModuleAccBalance.Size()
+		i -= size
+		if _, err := m.RewardModuleAccBalance.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintLiquidstaking(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x2a
+	{
+		size := m.TotalLiquidTokens.Size()
+		i -= size
+		if _, err := m.TotalLiquidTokens.MarshalTo(dAtA[i:]); err != nil {
 			return 0, err
 		}
 		i = encodeVarintLiquidstaking(dAtA, i, uint64(size))
@@ -1419,41 +1394,37 @@ func (m *NetAmountState) Size() (n int) {
 	n += 1 + l + sovLiquidstaking(uint64(l))
 	l = m.NetAmount.Size()
 	n += 1 + l + sovLiquidstaking(uint64(l))
+	l = m.TotalLiquidTokens.Size()
+	n += 1 + l + sovLiquidstaking(uint64(l))
+	l = m.RewardModuleAccBalance.Size()
+	n += 1 + l + sovLiquidstaking(uint64(l))
+	l = m.FeeRate.Size()
+	n += 1 + l + sovLiquidstaking(uint64(l))
+	l = m.UtilizationRatio.Size()
+	n += 1 + l + sovLiquidstaking(uint64(l))
+	l = m.RemainingChunkSlots.Size()
+	n += 1 + l + sovLiquidstaking(uint64(l))
+	l = m.DiscountRate.Size()
+	n += 1 + l + sovLiquidstaking(uint64(l))
+	l = m.NumPairedChunks.Size()
+	n += 1 + l + sovLiquidstaking(uint64(l))
+	l = m.ChunkSize.Size()
+	n += 1 + l + sovLiquidstaking(uint64(l))
 	l = m.TotalDelShares.Size()
 	n += 1 + l + sovLiquidstaking(uint64(l))
 	l = m.TotalRemainingRewards.Size()
 	n += 1 + l + sovLiquidstaking(uint64(l))
-	l = m.TotalRemainingInsuranceCommissions.Size()
-	n += 1 + l + sovLiquidstaking(uint64(l))
 	l = m.TotalChunksBalance.Size()
 	n += 1 + l + sovLiquidstaking(uint64(l))
-	l = m.TotalLiquidTokens.Size()
+	l = m.TotalUnbondingChunksBalance.Size()
 	n += 1 + l + sovLiquidstaking(uint64(l))
 	l = m.TotalInsuranceTokens.Size()
-	n += 1 + l + sovLiquidstaking(uint64(l))
-	l = m.TotalInsuranceCommissions.Size()
-	n += 1 + l + sovLiquidstaking(uint64(l))
+	n += 2 + l + sovLiquidstaking(uint64(l))
 	l = m.TotalPairedInsuranceTokens.Size()
-	n += 1 + l + sovLiquidstaking(uint64(l))
-	l = m.TotalPairedInsuranceCommissions.Size()
-	n += 1 + l + sovLiquidstaking(uint64(l))
+	n += 2 + l + sovLiquidstaking(uint64(l))
 	l = m.TotalUnpairingInsuranceTokens.Size()
-	n += 1 + l + sovLiquidstaking(uint64(l))
-	l = m.TotalUnpairingInsuranceCommissions.Size()
-	n += 1 + l + sovLiquidstaking(uint64(l))
-	l = m.TotalUnpairedInsuranceTokens.Size()
-	n += 1 + l + sovLiquidstaking(uint64(l))
-	l = m.TotalUnpairedInsuranceCommissions.Size()
 	n += 2 + l + sovLiquidstaking(uint64(l))
-	l = m.TotalUnbondingBalance.Size()
-	n += 2 + l + sovLiquidstaking(uint64(l))
-	l = m.RewardModuleAccBalance.Size()
-	n += 2 + l + sovLiquidstaking(uint64(l))
-	l = m.UtilizationRatio.Size()
-	n += 2 + l + sovLiquidstaking(uint64(l))
-	l = m.DiscountRate.Size()
-	n += 2 + l + sovLiquidstaking(uint64(l))
-	l = m.FeeRate.Size()
+	l = m.TotalRemainingInsuranceCommissions.Size()
 	n += 2 + l + sovLiquidstaking(uint64(l))
 	return n
 }
@@ -2483,142 +2454,6 @@ func (m *NetAmountState) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TotalDelShares", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowLiquidstaking
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthLiquidstaking
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthLiquidstaking
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.TotalDelShares.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TotalRemainingRewards", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowLiquidstaking
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthLiquidstaking
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthLiquidstaking
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.TotalRemainingRewards.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TotalRemainingInsuranceCommissions", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowLiquidstaking
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthLiquidstaking
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthLiquidstaking
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.TotalRemainingInsuranceCommissions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 7:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TotalChunksBalance", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowLiquidstaking
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthLiquidstaking
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthLiquidstaking
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.TotalChunksBalance.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 8:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field TotalLiquidTokens", wireType)
 			}
 			var stringLen uint64
@@ -2651,313 +2486,7 @@ func (m *NetAmountState) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 9:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TotalInsuranceTokens", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowLiquidstaking
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthLiquidstaking
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthLiquidstaking
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.TotalInsuranceTokens.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 10:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TotalInsuranceCommissions", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowLiquidstaking
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthLiquidstaking
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthLiquidstaking
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.TotalInsuranceCommissions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 11:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TotalPairedInsuranceTokens", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowLiquidstaking
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthLiquidstaking
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthLiquidstaking
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.TotalPairedInsuranceTokens.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 12:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TotalPairedInsuranceCommissions", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowLiquidstaking
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthLiquidstaking
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthLiquidstaking
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.TotalPairedInsuranceCommissions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 13:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TotalUnpairingInsuranceTokens", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowLiquidstaking
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthLiquidstaking
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthLiquidstaking
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.TotalUnpairingInsuranceTokens.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 14:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TotalUnpairingInsuranceCommissions", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowLiquidstaking
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthLiquidstaking
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthLiquidstaking
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.TotalUnpairingInsuranceCommissions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 15:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TotalUnpairedInsuranceTokens", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowLiquidstaking
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthLiquidstaking
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthLiquidstaking
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.TotalUnpairedInsuranceTokens.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 16:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TotalUnpairedInsuranceCommissions", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowLiquidstaking
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthLiquidstaking
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthLiquidstaking
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.TotalUnpairedInsuranceCommissions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 17:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TotalUnbondingBalance", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowLiquidstaking
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthLiquidstaking
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthLiquidstaking
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.TotalUnbondingBalance.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 18:
+		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RewardModuleAccBalance", wireType)
 			}
@@ -2991,7 +2520,41 @@ func (m *NetAmountState) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 19:
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FeeRate", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLiquidstaking
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLiquidstaking
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthLiquidstaking
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.FeeRate.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 7:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UtilizationRatio", wireType)
 			}
@@ -3025,7 +2588,41 @@ func (m *NetAmountState) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 20:
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RemainingChunkSlots", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLiquidstaking
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLiquidstaking
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthLiquidstaking
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.RemainingChunkSlots.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 9:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DiscountRate", wireType)
 			}
@@ -3059,9 +2656,9 @@ func (m *NetAmountState) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 21:
+		case 10:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FeeRate", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field NumPairedChunks", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -3089,7 +2686,313 @@ func (m *NetAmountState) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.FeeRate.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.NumPairedChunks.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ChunkSize", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLiquidstaking
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLiquidstaking
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthLiquidstaking
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.ChunkSize.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 12:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TotalDelShares", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLiquidstaking
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLiquidstaking
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthLiquidstaking
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.TotalDelShares.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 13:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TotalRemainingRewards", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLiquidstaking
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLiquidstaking
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthLiquidstaking
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.TotalRemainingRewards.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 14:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TotalChunksBalance", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLiquidstaking
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLiquidstaking
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthLiquidstaking
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.TotalChunksBalance.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 15:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TotalUnbondingChunksBalance", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLiquidstaking
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLiquidstaking
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthLiquidstaking
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.TotalUnbondingChunksBalance.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 16:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TotalInsuranceTokens", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLiquidstaking
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLiquidstaking
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthLiquidstaking
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.TotalInsuranceTokens.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 17:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TotalPairedInsuranceTokens", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLiquidstaking
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLiquidstaking
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthLiquidstaking
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.TotalPairedInsuranceTokens.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 18:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TotalUnpairingInsuranceTokens", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLiquidstaking
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLiquidstaking
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthLiquidstaking
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.TotalUnpairingInsuranceTokens.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 19:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TotalRemainingInsuranceCommissions", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLiquidstaking
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLiquidstaking
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthLiquidstaking
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.TotalRemainingInsuranceCommissions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

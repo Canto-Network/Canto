@@ -9,7 +9,7 @@ import (
 func (nas NetAmountState) CalcNetAmount(rewardPoolBalance sdk.Int) sdk.Dec {
 	return rewardPoolBalance.Add(nas.TotalChunksBalance).
 		Add(nas.TotalLiquidTokens).
-		Add(nas.TotalUnbondingBalance).ToDec().
+		Add(nas.TotalUnbondingChunksBalance).ToDec().
 		Add(nas.TotalRemainingRewards)
 }
 
@@ -21,95 +21,92 @@ func (nas NetAmountState) CalcMintRate() sdk.Dec {
 }
 
 func (nas NetAmountState) Equal(nas2 NetAmountState) bool {
-	return nas.LsTokensTotalSupply.Equal(nas2.LsTokensTotalSupply) &&
-		nas.TotalChunksBalance.Equal(nas2.TotalChunksBalance) &&
+	return nas.MintRate.Equal(nas2.MintRate) &&
+		nas.LsTokensTotalSupply.Equal(nas2.LsTokensTotalSupply) &&
+		nas.NetAmount.Equal(nas2.NetAmount) &&
+		nas.TotalLiquidTokens.Equal(nas2.TotalLiquidTokens) &&
+		nas.RewardModuleAccBalance.Equal(nas2.RewardModuleAccBalance) &&
+		nas.FeeRate.Equal(nas2.FeeRate) &&
+		nas.UtilizationRatio.Equal(nas2.UtilizationRatio) &&
+		nas.RemainingChunkSlots.Equal(nas2.RemainingChunkSlots) &&
+		nas.DiscountRate.Equal(nas2.DiscountRate) &&
 		nas.TotalDelShares.Equal(nas2.TotalDelShares) &&
 		nas.TotalRemainingRewards.Equal(nas2.TotalRemainingRewards) &&
-		nas.TotalRemainingInsuranceCommissions.Equal(nas2.TotalRemainingInsuranceCommissions) &&
-		nas.TotalLiquidTokens.Equal(nas2.TotalLiquidTokens) &&
+		nas.TotalChunksBalance.Equal(nas2.TotalChunksBalance) &&
+		nas.TotalUnbondingChunksBalance.Equal(nas2.TotalUnbondingChunksBalance) &&
 		nas.TotalInsuranceTokens.Equal(nas2.TotalInsuranceTokens) &&
-		nas.TotalInsuranceCommissions.Equal(nas2.TotalInsuranceCommissions) &&
 		nas.TotalPairedInsuranceTokens.Equal(nas2.TotalPairedInsuranceTokens) &&
-		nas.TotalPairedInsuranceCommissions.Equal(nas2.TotalPairedInsuranceCommissions) &&
 		nas.TotalUnpairingInsuranceTokens.Equal(nas2.TotalUnpairingInsuranceTokens) &&
-		nas.TotalUnpairingInsuranceCommissions.Equal(nas2.TotalUnpairingInsuranceCommissions) &&
-		nas.TotalUnpairedInsuranceTokens.Equal(nas2.TotalUnpairedInsuranceTokens) &&
-		nas.TotalUnpairedInsuranceCommissions.Equal(nas2.TotalUnpairedInsuranceCommissions) &&
-		nas.TotalUnbondingBalance.Equal(nas2.TotalUnbondingBalance) &&
-		nas.NetAmount.Equal(nas2.NetAmount) &&
-		nas.MintRate.Equal(nas2.MintRate) &&
-		nas.RewardModuleAccBalance.Equal(nas2.RewardModuleAccBalance)
+		nas.TotalRemainingInsuranceCommissions.Equal(nas2.TotalRemainingInsuranceCommissions) &&
+		nas.NumPairedChunks.Equal(nas2.NumPairedChunks)
+	// Don't check ChunkSize because it is constant defined in module.
 }
 
+// IsZeroState checks if the NetAmountState is initial state or not.
+// Some fields(e.g. TotalRemainingRewards) are not checked because they will rarely be zero.
 func (nas NetAmountState) IsZeroState() bool {
-	return nas.LsTokensTotalSupply.IsZero() &&
-		nas.TotalChunksBalance.IsZero() &&
+	return nas.MintRate.IsZero() &&
+		nas.LsTokensTotalSupply.IsZero() &&
+		nas.NetAmount.IsZero() &&
+		nas.TotalLiquidTokens.IsZero() &&
+		nas.RewardModuleAccBalance.IsZero() &&
+		nas.FeeRate.IsZero() &&
+		nas.UtilizationRatio.IsZero() &&
+		// As long as there is a total supply and a hard cap, this value will rarely be zero.
+		// So we skip this
+		// nas.RemainingChunkSlots.IsZero() &&
+		nas.DiscountRate.IsZero() &&
 		nas.TotalDelShares.IsZero() &&
 		nas.TotalRemainingRewards.IsZero() &&
-		nas.TotalLiquidTokens.IsZero() &&
-		// Currently total insurances includes Pairing insurances, so we should skip this
+		nas.TotalChunksBalance.IsZero() &&
+		nas.TotalUnbondingChunksBalance.IsZero() &&
+		nas.NumPairedChunks.IsZero() &&
+		// Don't check ChunkSize because it is constant defined in module.
+		// nas.ChunkSize
+		// Total insurances includes Pairing insurances, so we should skip this
 		// nas.TotalInsuranceTokens.IsZero() &&
-		// nas.TotalInsuranceCommissions.IsZero() &&
 		nas.TotalPairedInsuranceTokens.IsZero() &&
-		nas.TotalPairedInsuranceCommissions.IsZero() &&
 		nas.TotalUnpairingInsuranceTokens.IsZero() &&
-		nas.TotalUnpairingInsuranceCommissions.IsZero() &&
-		nas.TotalUnpairedInsuranceTokens.IsZero() &&
-		nas.TotalUnpairedInsuranceCommissions.IsZero() &&
-		nas.TotalUnbondingBalance.IsZero() &&
-		nas.NetAmount.IsZero() &&
-		nas.MintRate.IsZero() &&
-		nas.RewardModuleAccBalance.IsZero() &&
-		nas.UtilizationRatio.IsZero() &&
-		nas.DiscountRate.IsZero() &&
-		nas.FeeRate.IsZero()
+		nas.TotalRemainingInsuranceCommissions.IsZero()
 }
 
 func (nas NetAmountState) String() string {
 	// Print all fields with field name
 	return fmt.Sprintf(`NetAmountState:
-	  LsTokensTotalSupply:   %s
-	  TotalChunksBalance:    %s	
-	  TotalDelShares:        %s
-	  TotalRemainingRewards: %s	
-      TotalRemainingInsuranceCommissions: %s
-	  TotalLiquidTokens:     %s	
-	  TotalInsuranceTokens:  %s
-	  TotalInsuranceCommissons: %s
-	  TotalPairedInsuranceTokens: %s
-	  TotalPairedInsuranceCommissons: %s
-      TotalUnpairingInsuranceTokens: %s
-      TotalUnpairingInsuranceCommissons: %s
-	  TotalUnpairedInsuranceTokens: %s
-	  TotalUnpairedInsuranceCommissons: %s
-	  TotalUnbondingBalance: %s
-	  NetAmount:             %s
-	  MintRate:              %s
-	  RewardModuleAccountBalance: %s
-	  UtilizationRatio:      %s
-	  DiscountRate:          %s
-	  FeeRate:               %s
+	MintRate: %s
+	LsTokensTotalSupply:   %s
+	NetAmount: %s	
+	TotalLiquidTokens:     %s	
+	RewardModuleAccountBalance: %s
+	FeeRate:               %s
+	UtilizationRatio:      %s
+	RemainingChunkSlots:   %s
+	DiscountRate:          %s
+	TotalDelShares:        %s
+	TotalRemainingRewards: %s	
+	TotalChunksBalance:    %s	
+	TotalUnbondingBalance: %s
+	TotalInsuranceTokens:  %s
+	TotalPairedInsuranceTokens: %s
+    TotalUnpairingInsuranceTokens: %s
+    TotalRemainingInsuranceCommissions: %s
 `,
+		nas.MintRate,
 		nas.LsTokensTotalSupply,
-		nas.TotalChunksBalance,
+		nas.NetAmount,
+		nas.TotalLiquidTokens,
+		nas.RewardModuleAccBalance,
+		nas.FeeRate,
+		nas.UtilizationRatio,
+		nas.RemainingChunkSlots,
+		nas.DiscountRate,
 		nas.TotalDelShares,
 		nas.TotalRemainingRewards,
-		nas.TotalRemainingInsuranceCommissions,
-		nas.TotalLiquidTokens,
+		nas.TotalChunksBalance,
+		nas.TotalUnbondingChunksBalance,
 		nas.TotalInsuranceTokens,
-		nas.TotalInsuranceCommissions,
 		nas.TotalPairedInsuranceTokens,
-		nas.TotalPairedInsuranceCommissions,
 		nas.TotalUnpairingInsuranceTokens,
-		nas.TotalUnpairingInsuranceCommissions,
-		nas.TotalUnpairedInsuranceTokens,
-		nas.TotalUnpairedInsuranceCommissions,
-		nas.TotalUnbondingBalance,
-		nas.NetAmount,
-		nas.MintRate,
-		nas.RewardModuleAccBalance,
-		nas.UtilizationRatio,
-		nas.DiscountRate,
-		nas.FeeRate,
+		nas.TotalRemainingInsuranceCommissions,
 	)
 }

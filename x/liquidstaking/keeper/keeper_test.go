@@ -374,6 +374,11 @@ func (suite *KeeperTestSuite) setupLiquidStakeTestingEnv(env testingEnvOptions) 
 	suite.True(nas.IsZeroState(), "nothing happened yet so it must be zero state")
 	pairedChunks := suite.liquidStakes(suite.ctx, delegators, delegatorBalances)
 
+	// update insurance statuses because the status can be changed after liquid staking (pairing -> paired)
+	for i, insurance := range insurances {
+		insurances[i], _ = suite.app.LiquidStakingKeeper.GetInsurance(suite.ctx, insurance.Id)
+	}
+
 	bondDenom := suite.app.StakingKeeper.BondDenom(suite.ctx)
 	liquidBondDenom := suite.app.LiquidStakingKeeper.GetLiquidBondDenom(suite.ctx)
 	u := suite.app.LiquidStakingKeeper.CalcUtilizationRatio(suite.ctx)

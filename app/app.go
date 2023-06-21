@@ -804,6 +804,7 @@ func NewCanto(
 		BankKeeper:      app.BankKeeper,
 		EvmKeeper:       app.EvmKeeper,
 		StakingKeeper:   app.StakingKeeper,
+		SlashingKeeper:  &app.SlashingKeeper,
 		FeegrantKeeper:  app.FeeGrantKeeper,
 		IBCKeeper:       app.IBCKeeper,
 		FeeMarketKeeper: app.FeeMarketKeeper,

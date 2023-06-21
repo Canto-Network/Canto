@@ -12,6 +12,7 @@ option go_package = "github.com/Canto-Network/Canto/v6/x/liquidstaking/types";
 // TODO: Index keys and values will be determined after the query endpoints are
 // designed.
 
+// TODO: Add yaml for removing camel case
 // Query provides defines the gRPC querier service.
 service Query {
   // Params retrieves the total set of minting parameters.
@@ -43,33 +44,36 @@ service Query {
     option (google.api.http).get = "/canto/liquidstaking/v1/insurances/{id}";
   }
 
-  // WithdrawInsuranceRequests returns all withdraw insurance requests on the module.
+  // WithdrawInsuranceRequests returns all withdraw insurance requests on the
+  // module.
   rpc WithdrawInsuranceRequests(QueryWithdrawInsuranceRequestsRequest)
       returns (QueryWithdrawInsuranceRequestsResponse) {
     option (google.api.http).get =
-        "/canto/liquidstaking/v1/withdraw_insurance_requests";
+        "/canto/liquidstaking/v1/insurances/withdraw_insurance_requests";
   }
 
   // WithdrawInsuranceRequest returns a withdraw insurance request by id.
   rpc WithdrawInsuranceRequest(QueryWithdrawInsuranceRequestRequest)
       returns (QueryWithdrawInsuranceRequestResponse) {
     option (google.api.http).get =
-        "/canto/liquidstaking/v1/withdraw_insurance_requests/{id}";
+        "/canto/liquidstaking/v1/insurances/{id}/withdraw_insurance_requests";
   }
 
-  // UnpairingForUnstakingChunkInfos returns all unpairing for unstaking chunk infos on the module.
+  // UnpairingForUnstakingChunkInfos returns all unpairing for unstaking chunk
+  // infos on the module.
   rpc UnpairingForUnstakingChunkInfos(
       QueryUnpairingForUnstakingChunkInfosRequest)
       returns (QueryUnpairingForUnstakingChunkInfosResponse) {
     option (google.api.http).get =
-        "/canto/liquidstaking/v1/unpairing_for_unstaking_chunk_infos";
+        "/canto/liquidstaking/v1/chunks/unpairing_for_unstaking_chunk_infos";
   }
 
-  // UnpairingForUnstakingChunkInfo returns a unpairing for unstaking chunk info by id.
+  // UnpairingForUnstakingChunkInfo returns a unpairing for unstaking chunk info
+  // by id.
   rpc UnpairingForUnstakingChunkInfo(QueryUnpairingForUnstakingChunkInfoRequest)
       returns (QueryUnpairingForUnstakingChunkInfoResponse) {
-    option (google.api.http).get =
-        "/canto/liquidstaking/v1/unpairing_for_unstaking_chunk_infos/{id}";
+    option (google.api.http).get = "/canto/liquidstaking/v1/chunks/{id}/"
+                                   "unpairing_for_unstaking_chunk_infos";
   }
 
   // ChunkSize returns the chunk size of the module.
@@ -78,7 +82,8 @@ service Query {
   }
 
   // MinimumCollateral returns the minimum collateral of the module.
-  // Insurance providers must provide collateral greater than or equal to the minimum collateral.
+  // Insurance providers must provide collateral greater than or equal to the
+  // minimum collateral.
   rpc MinimumCollateral(QueryMinimumCollateralRequest)
       returns (QueryMinimumCollateralResponse) {
     option (google.api.http).get = "/canto/liquidstaking/v1/minimum_collateral";
@@ -114,7 +119,7 @@ message QueryChunksRequest {
 }
 
 message QueryChunksResponse {
-  repeated Chunk chunks = 1 [ (gogoproto.nullable) = false ];
+  repeated QueryChunkResponse chunks = 1 [ (gogoproto.nullable) = false ];
 
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
@@ -123,6 +128,7 @@ message QueryChunkRequest { uint64 id = 1; }
 
 message QueryChunkResponse {
   Chunk chunk = 1 [ (gogoproto.nullable) = false ];
+  string derived_address = 2;
 }
 
 message QueryInsurancesRequest {
@@ -137,7 +143,7 @@ message QueryInsurancesRequest {
 }
 
 message QueryInsurancesResponse {
-  repeated Insurance insurances = 1 [ (gogoproto.nullable) = false ];
+  repeated QueryInsuranceResponse insurances = 1 [ (gogoproto.nullable) = false ];
 
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
@@ -146,14 +152,8 @@ message QueryInsuranceRequest { uint64 id = 1; }
 
 message QueryInsuranceResponse {
   Insurance insurance = 1 [ (gogoproto.nullable) = false ];
-}
-
-message ResponseWithdrawInsuranceRequest {
-  WithdrawInsuranceRequest request = 1 [ (gogoproto.nullable) = false ];
-}
-
-message ResponseUnpairingForUnstakingChunkInfo {
-  UnpairingForUnstakingChunkInfo info = 1 [ (gogoproto.nullable) = false ];
+  string derived_address = 2;
+  string fee_pool_address = 3;
 }
 
 message QueryWithdrawInsuranceRequestsRequest {
@@ -164,14 +164,15 @@ message QueryWithdrawInsuranceRequestsRequest {
 }
 
 message QueryWithdrawInsuranceRequestsResponse {
-  repeated ResponseWithdrawInsuranceRequest requests = 1
+  repeated WithdrawInsuranceRequest withdraw_insurance_requests = 1
       [ (gogoproto.nullable) = false ];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 message QueryWithdrawInsuranceRequestRequest { uint64 id = 1; }
 message QueryWithdrawInsuranceRequestResponse {
-  ResponseWithdrawInsuranceRequest request = 1 [ (gogoproto.nullable) = false ];
+  WithdrawInsuranceRequest withdraw_insurance_request = 1
+      [ (gogoproto.nullable) = false ];
 }
 
 message QueryUnpairingForUnstakingChunkInfosRequest {
@@ -184,22 +185,27 @@ message QueryUnpairingForUnstakingChunkInfosRequest {
 }
 
 message QueryUnpairingForUnstakingChunkInfosResponse {
-  repeated ResponseUnpairingForUnstakingChunkInfo infos = 1
-      [ (gogoproto.nullable) = false ];
+  repeated UnpairingForUnstakingChunkInfo unpairing_for_unstaking_chunk_infos =
+      1 [ (gogoproto.nullable) = false ];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 message QueryUnpairingForUnstakingChunkInfoRequest { uint64 id = 1; }
 message QueryUnpairingForUnstakingChunkInfoResponse {
-  ResponseUnpairingForUnstakingChunkInfo info = 1
+  UnpairingForUnstakingChunkInfo unpairing_for_unstaking_chunk_info = 1
       [ (gogoproto.nullable) = false ];
 }
 
 message QueryChunkSizeRequest {}
-message QueryChunkSizeResponse { cosmos.base.v1beta1.Coin chunk_size = 1[(gogoproto.nullable) = false]; }
+message QueryChunkSizeResponse {
+  cosmos.base.v1beta1.Coin chunk_size = 1 [ (gogoproto.nullable) = false ];
+}
 
 message QueryMinimumCollateralRequest {}
-message QueryMinimumCollateralResponse { cosmos.base.v1beta1.DecCoin minimum_collateral = 2 [(gogoproto.nullable) = false]; }
+message QueryMinimumCollateralResponse {
+  cosmos.base.v1beta1.DecCoin minimum_collateral = 2
+      [ (gogoproto.nullable) = false ];
+}
 
 message QueryStatesRequest {}
 

@@ -1,6 +1,4 @@
-<!--
-order: 5
--->
+<!-- order: 5 -->
 
 # EndBlock
 
@@ -14,6 +12,7 @@ The end block logic is executed at the end of each epoch.
   - distribute reward
     - send insurance commission from chunk
       - insurance commission: `(balance of chunk) x insurance.FeeRate`
+    - burn fee calculated by `fee rate x (balance of chunk - insurance commission)` (Please check the `CalcDynamicFeeRate` in `dynamic_fee_rate.go` for detail.)
     - send rest of chunk balance to reward pool
 
 ## Cover slashing and handle mature unbondings
@@ -26,10 +25,9 @@ The end block logic is executed at the end of each epoch.
   - unpairing insurance send penalty to reward pool
   - refund lstokens corresponding penalty from ls token escrow acc
     - refund amount: `(penalty / (chunk size tokens)) x (ls tokens to burn)`
-- complete insurance duty
-  unpairing insurance already covered penalty
-- burn all escrowed LS tokens, except for those that have been refunded (if any).
-- delete tracking obj and chunk
+- complete unpairing insurance's duty because it already covered penalty
+- burn all escrowed LS tokens, except for those that have been refunded (if any)
+- delete tracking obj(=`UnpairingForUnstakingChunkInfo`) and chunk
 
 ### For all unpairing chunks
 
@@ -38,7 +36,7 @@ The end block logic is executed at the end of each epoch.
 - if penalty > 0
   - unpairing insurance send penalty to chunk
 - complete insurance duty because unpairing insurance already covered penalty
-- if chunk got damaged (unpairing insurance couldn’t cover fully)
+- if chunk got damaged (unpairing insurance could not cover fully)
   - send all chunk balances to reward pool because chunk is not valid anymore.
 - else(= chunk is fine)
   - state transition (`Unpairing → Pairing`)
@@ -57,20 +55,17 @@ The end block logic is executed at the end of each epoch.
 - if insurance is not sufficient after cover penalty
   - state transition of insurance (`Paired → Unpairing`)
   - state transition of chunk (`Paired → Unpairing`)
-- if tombstone happened
-  - for all paired insurances which directs tombstoned validator
-    - state transition of insurance (`Paired → Unpairing`)
-    - state transition of chunk (`Paired → Unpairing`
+- if tombstone happened or the validator it is paired is not valid
+  - state transition of insurance (`Paired → Unpairing`)
+  - state transition of chunk (`Paired → Unpairing`
 
 ## Handle Queued Liquid Unstakes
 
-- For all pending liquid unstakes (= plu)
-  - got chunk from plu.chunkId
+- For all UnpairingForUnstakingChunkInfos (= info)
+  - got chunk from info.chunkId
   - un-delegate chunk
   - state transition of insurance (`Paired → Unpairing`)
-  - state transition of chunk (`Paired → UnpairingForUnstake`)
-  - set unpairing for unstake info
-  - delete plu
+  - state transition of chunk (`Paired → UnpairingForUnstaking`)
 
 ## Handle Queued Withdraw Insurance Requests
 
@@ -78,6 +73,8 @@ The end block logic is executed at the end of each epoch.
   - got insurance from req.InsuranceId
   - state transition of insurance (`Paired → UnpairingForWithdrawal`)
   - state transition of chunk (`Paired → Unpairing`)
+    - if the status of chunk is `UnpairingForUnstaking`, just keep it as it is
+  - delete request
 
 ## Rank Insurances
 
@@ -106,11 +103,14 @@ The end block logic is executed at the end of each epoch.
 
 - create rank out insurance chunk map
   - key: insurance id which in **ranked out insurances**
-    - value: `Chunk`
+  - value: `Chunk`
 - for insurance in **newly ranked in insurances**
   - if there is a rank out insurance which have same validator
     - replace insurance id of chunk with new one because it directs same validator, we don’t have to re-delegate it
-      - state transition of chunk (`Paired | Unpairing → Paired`)
+      - state transition of rank out insurance (`Paired -> Unpairing`)
+        - if rank out insurance is withdrawing insurance, just keep it as it is 
+      - state transition of rank in insurance (`Pairing -> Paired`)
+      - state transition of chunk (`Paired | Unpairing → Paired`) and update paired and unpairing insurance ids
       - delete matched insurance from **rank out insurances**
   - if there is no rank out insurance which have same validator
     - add it to **new insurances with different validators**

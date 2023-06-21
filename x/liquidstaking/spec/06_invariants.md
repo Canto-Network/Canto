@@ -1,3 +1,5 @@
+<!-- order: 6 -->
+
 # Invariants
 
 This document describes the invariants of liquid staking module.

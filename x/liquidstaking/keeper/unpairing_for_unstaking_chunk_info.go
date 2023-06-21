@@ -47,8 +47,8 @@ func (k Keeper) IterateAllUnpairingForUnstakingChunkInfos(ctx sdk.Context, cb fu
 	return nil
 }
 
-func (k Keeper) GetAllUnpairingForUnstakingChunkInfos(ctx sdk.Context) []types.UnpairingForUnstakingChunkInfo {
-	var infos []types.UnpairingForUnstakingChunkInfo
+func (k Keeper) GetAllUnpairingForUnstakingChunkInfos(ctx sdk.Context) (infos []types.UnpairingForUnstakingChunkInfo) {
+	infos = []types.UnpairingForUnstakingChunkInfo{}
 
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, types.KeyPrefixUnpairingForUnstakingChunkInfo)

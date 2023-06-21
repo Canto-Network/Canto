@@ -30,9 +30,9 @@ func NativeTokenToLiquidStakeToken(
 func LiquidStakeTokenToNativeToken(
 	lsTokenAmount, lsTokenTotalSupplyAmount sdk.Int,
 	netAmount sdk.Dec,
-) (nativeTokenAmount sdk.Int) {
+) (nativeTokenAmount sdk.Dec) {
 	return lsTokenAmount.ToDec().
 		Mul(netAmount).
 		Quo(lsTokenTotalSupplyAmount.ToDec()).
-		TruncateInt()
+		TruncateDec()
 }

@@ -30,8 +30,19 @@ func (info *UnpairingForUnstakingChunkInfo) Validate(chunkMap map[uint64]Chunk) 
 			info.ChunkId,
 		)
 	}
-	if chunk.Status != CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING {
+	// Chunk related with this info must be in PAIRED or UNPAIRING_FOR_UNSTAKING statuses.
+	// PAIRED: unstaking request is just queued, not yet started.
+	// UNPAIRING_FOR_UNSTAKING: unstaking request is already started at latest epoch.
+	if chunk.Status != CHUNK_STATUS_PAIRED &&
+		chunk.Status != CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING {
 		return ErrInvalidChunkStatus
 	}
 	return nil
+}
+
+func (info *UnpairingForUnstakingChunkInfo) Equal(other UnpairingForUnstakingChunkInfo) bool {
+	return info.ChunkId == other.ChunkId &&
+		info.DelegatorAddress == other.DelegatorAddress &&
+		info.EscrowedLstokens.IsEqual(other.EscrowedLstokens)
+
 }

@@ -75,6 +75,15 @@ func (k Keeper) IterateAllInsurances(ctx sdk.Context, cb func(insurance types.In
 	return nil
 }
 
+func (k Keeper) GetAllInsurances(ctx sdk.Context) (insurances []types.Insurance) {
+	insurances = []types.Insurance{}
+	k.IterateAllInsurances(ctx, func(insurance types.Insurance) (stop bool, err error) {
+		insurances = append(insurances, insurance)
+		return false, nil
+	})
+	return
+}
+
 func (k Keeper) SetLastInsuranceId(ctx sdk.Context, id uint64) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshal(&gogotypes.UInt64Value{Value: id})

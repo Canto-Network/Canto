@@ -8,6 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	ibcante "github.com/cosmos/ibc-go/v3/modules/core/ante"
 	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
 
@@ -28,6 +29,7 @@ type HandlerOptions struct {
 	IBCKeeper       *ibckeeper.Keeper
 	FeeMarketKeeper evmtypes.FeeMarketKeeper
 	StakingKeeper   vestingtypes.StakingKeeper
+	SlashingKeeper  *slashingkeeper.Keeper
 	EvmKeeper       ethante.EVMKeeper
 	FeegrantKeeper  ante.FeegrantKeeper
 	SignModeHandler authsigning.SignModeHandler
@@ -46,6 +48,9 @@ func (options HandlerOptions) Validate() error {
 	}
 	if options.StakingKeeper == nil {
 		return sdkerrors.Wrap(sdkerrors.ErrLogic, "staking keeper is required for AnteHandler")
+	}
+	if options.SlashingKeeper == nil {
+		return sdkerrors.Wrap(sdkerrors.ErrLogic, "slashing keeper is required for AnteHandler")
 	}
 	if options.SignModeHandler == nil {
 		return sdkerrors.Wrap(sdkerrors.ErrLogic, "sign mode handler is required for ante builder")
@@ -93,6 +98,7 @@ func newCosmosAnteHandler(options HandlerOptions) sdk.AnteHandler {
 		ante.NewTxTimeoutHeightDecorator(),
 		ante.NewValidateMemoDecorator(options.AccountKeeper),
 		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
+		NewSlashingParamChangeLimitDecorator(options.SlashingKeeper, options.Cdc),
 		ante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper),
 		NewVestingDelegationDecorator(options.AccountKeeper, options.StakingKeeper, options.Cdc),
 		NewValidatorCommissionDecorator(options.Cdc),
@@ -122,6 +128,7 @@ func newCosmosAnteHandlerEip712(options HandlerOptions) sdk.AnteHandler {
 		ante.NewTxTimeoutHeightDecorator(),
 		ante.NewValidateMemoDecorator(options.AccountKeeper),
 		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
+		NewSlashingParamChangeLimitDecorator(options.SlashingKeeper, options.Cdc),
 		ante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper),
 		NewVestingDelegationDecorator(options.AccountKeeper, options.StakingKeeper, options.Cdc),
 		NewValidatorCommissionDecorator(options.Cdc),

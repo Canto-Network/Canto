@@ -34,6 +34,7 @@ func GetTxCmd() *cobra.Command {
 		NewDepositInsuranceCmd(),
 		NewWithdrawInsuranceCmd(),
 		NewWithdrawInsuranceCommissionCmd(),
+		NewClaimDiscountedRewardCmd(),
 	)
 
 	return cmd
@@ -97,7 +98,7 @@ $ %s tx %s liquid-unstake 5000000acanto --from mykey
 				return err
 			}
 
-			coin, err := sdk.ParseCoinNormalized(args[1])
+			coin, err := sdk.ParseCoinNormalized(args[0])
 			if err != nil {
 				return err
 			}
@@ -167,14 +168,14 @@ $ %s tx %s provide-insurance cantovaloper1gxl6usug4cz60yhpsjj7vw7vzysrz772yxjzsf
 
 func NewCancelProvideInsuranceCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "cancel-insurance-provide",
+		Use:   "cancel-provide-insurance [insurance-id]",
 		Args:  cobra.ExactArgs(1),
-		Short: "cancel insurance provide for chunk",
+		Short: "cancel providing insurance for chunk",
 		Long: strings.TrimSpace(
-			fmt.Sprintf(`Cancel-inusrance-provide for chunk.
+			fmt.Sprintf(`cancel providing insurance for chunk.
 
 Example:
-$ %s tx %s cancel-insurance-provide 1 --from mykey
+$ %s tx %s cancel-provide-insurance 1 --from mykey
 `,
 				version.AppName, types.ModuleName,
 			),
@@ -208,8 +209,8 @@ $ %s tx %s cancel-insurance-provide 1 --from mykey
 func NewDepositInsuranceCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "deposit-insurance",
-		Args:  cobra.ExactArgs(1),
-		Short: "deposit more coin to insurance",
+		Args:  cobra.ExactArgs(2),
+		Short: "deposit more coins to insurance",
 		Long: strings.TrimSpace(
 			fmt.Sprintf(`Deposit-inusrance.
 
@@ -299,7 +300,7 @@ func NewWithdrawInsuranceCommissionCmd() *cobra.Command {
 			fmt.Sprintf(`Withdraw-inusrance.
 
 Example:
-$ %s tx %s withdraw-insurance 1 --from mykey
+$ %s tx %s withdraw-insurance-commission 1 --from mykey
 `,
 				version.AppName, types.ModuleName,
 			),
@@ -317,6 +318,51 @@ $ %s tx %s withdraw-insurance 1 --from mykey
 			}
 
 			msg := types.NewMsgWithdrawInsuranceCommission(clientCtx.GetFromAddress().String(), insuranceId)
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func NewClaimDiscountedRewardCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "claim-discounted-reward",
+		Args:  cobra.ExactArgs(2),
+		Short: "claim discounted reward accumulated in reward pool",
+		Long: strings.TrimSpace(
+			fmt.Sprintf(`Claim discounted reward.
+
+Example:
+$ %s tx %s claim-discounted-reward 100lscanto 0.03 --from mykey
+`,
+				version.AppName, types.ModuleName,
+			),
+		),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			// arg must be converted to a uint
+			coin, err := sdk.ParseCoinNormalized(args[0])
+			if err != nil {
+				return err
+			}
+
+			minimumDiscountRate, err := sdk.NewDecFromStr(args[1])
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgClaimDiscountedReward(clientCtx.GetFromAddress().String(), coin, minimumDiscountRate)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

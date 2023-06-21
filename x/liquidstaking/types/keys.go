@@ -2,7 +2,6 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/address"
 )
 
 // constants
@@ -26,21 +25,19 @@ const (
 	prefixInsurance
 	prefixWithdrawInsuranceRequest
 	prefixUnpairingForUnstakingChunkInfo
-	prefixLiquidUnstakeKey
 	prefixEpoch
 )
 
 // KVStore key prefixes
 var (
+	KeyPrefixLiquidBondDenom                = []byte{prefixLiquidBondDenom}
 	KeyPrefixLastChunkId                    = []byte{prefixLastChunkId}
 	KeyPrefixLastInsuranceId                = []byte{prefixLastInsuranceId}
 	KeyPrefixChunk                          = []byte{prefixChunk}
 	KeyPrefixInsurance                      = []byte{prefixInsurance}
 	KeyPrefixWithdrawInsuranceRequest       = []byte{prefixWithdrawInsuranceRequest}
 	KeyPrefixUnpairingForUnstakingChunkInfo = []byte{prefixUnpairingForUnstakingChunkInfo}
-	KeyPrefixLiquidUnstakeKey               = []byte{prefixLiquidUnstakeKey}
 	KeyPrefixEpoch                          = []byte{prefixEpoch}
-	KeyLiquidBondDenom                      = []byte{prefixLiquidBondDenom}
 )
 
 func GetChunkKey(chunkId uint64) []byte {
@@ -57,8 +54,4 @@ func GetWithdrawInsuranceRequestKey(insuranceId uint64) []byte {
 
 func GetUnpairingForUnstakingChunkInfoKey(chunkId uint64) []byte {
 	return append(KeyPrefixUnpairingForUnstakingChunkInfo, sdk.Uint64ToBigEndian(chunkId)...)
-}
-
-func GetPendingLiquidStakeKey(delegator sdk.AccAddress) []byte {
-	return append(KeyPrefixLiquidUnstakeKey, address.MustLengthPrefix(delegator)...)
 }

@@ -3,7 +3,6 @@ package types
 import sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 var (
-	ErrMaxPairedChunkSizeExceeded                    = sdkerrors.Register(ModuleName, 30001, "reached maximum limit of paired chunk so cannot accept any more chunks.")
 	ErrNoPairingInsurance                            = sdkerrors.Register(ModuleName, 30002, "pairing insurance must exist to accept liquid stake request.")
 	ErrInvalidAmount                                 = sdkerrors.Register(ModuleName, 30003, "amount of coin must be multiple of the chunk size")
 	ErrTombstonedValidator                           = sdkerrors.Register(ModuleName, 30005, "validator is tombstoned")
@@ -27,8 +26,9 @@ var (
 	ErrInvalidInsuranceId                            = sdkerrors.Register(ModuleName, 30024, "invalid insurance id")
 	ErrNotFoundUnpairingForUnstakingChunkInfoChunkId = sdkerrors.Register(ModuleName, 30026, "unpairing for unstake chunk corresponding unpairing for unstaking info must exists")
 	ErrNotFoundWithdrawInsuranceRequestInsuranceId   = sdkerrors.Register(ModuleName, 30027, "insurance corresponding withdraw insurance request must exists")
-	ErrInvalidLastChunkId                            = sdkerrors.Register(ModuleName, 30028, "last chunk id must positive")
-	ErrInvalidLastInsuranceId                        = sdkerrors.Register(ModuleName, 30029, "last insurance id must positive")
 	ErrAlreadyInQueue                                = sdkerrors.Register(ModuleName, 30030, "liquid ustaking is already in queue")
 	ErrDiscountRateTooLow                            = sdkerrors.Register(ModuleName, 30031, "discount rate must be gte than msg.minimum")
+	ErrInvalidEpochDuration                          = sdkerrors.Register(ModuleName, 30032, "epoch duration must be same with unbonding time")
+	ErrInvalidEpochStartTime                         = sdkerrors.Register(ModuleName, 30033, "epoch start time must be before current time")
+	ErrInvalidFeeRate                                = sdkerrors.Register(ModuleName, 30034, "fee rate must not be nil")
 )

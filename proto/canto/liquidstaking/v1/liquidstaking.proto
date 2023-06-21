@@ -197,20 +197,65 @@ message NetAmountState {
     (gogoproto.nullable) = false
   ];
 
+  // The token amount worth of all delegation shares of all paired chunks
+  // (slashing applied amount)
+  string total_liquid_tokens = 4 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // Balance of reward module account
+  string reward_module_acc_balance = 5 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // Fee rate applied when deduct module fee at epoch
+  string fee_rate = 6 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // Utilization ratio
+  string utilization_ratio = 7 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // How many chunks which can be created left?
+  string remaining_chunk_slots = 8 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // Discount rate applied when withdraw rewards
+  string discount_rate = 9 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+
+  // --- Chunk related fields
+  // The number of paired chunks
+  string num_paired_chunks = 10 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // Current chunk size tokens
+  string chunk_size = 11 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ]
+  ;
   // Total shares of all paired chunks
-  string total_del_shares = 4 [
+  string total_del_shares = 12 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];
 
   // The cumulative reward of all chunks delegations from the last distribution
-  string total_remaining_rewards = 5 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
-    (gogoproto.nullable) = false
-  ];
-
-  // The cumulative commissions of all insurances
-  string total_remaining_insurance_commissions = 6 [
+  string total_remaining_rewards = 13 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];
@@ -219,93 +264,41 @@ message NetAmountState {
   // Note: Paired chunks can be pairing status for various reasons (such as lack
   // of insurance). In such cases, the delegated native tokens returns to the
   // balance of DerivedAddress(Chunk.Id) after un-bonding period is finished.
-  string total_chunks_balance = 7 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
-    (gogoproto.nullable) = false
-  ];
-
-  // The token amount worth of all delegation shares of all paired chunks
-  // (slashing applied amount)
-  string total_liquid_tokens = 8 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
-    (gogoproto.nullable) = false
-  ];
-
-  // The sum of all insurances' amount (= DerivedAddress(Insurance.Id).Balance)
-  string total_insurance_tokens = 9 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
-    (gogoproto.nullable) = false
-  ];
-
-  // The sum of all insurances' commissions
-  string total_insurance_commissions = 10 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
-    (gogoproto.nullable) = false
-  ];
-
-  // The sum of all paired insurances' amount (=
-  // DerivedAddress(Insurance.Id).Balance)
-  string total_paired_insurance_tokens = 11 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
-    (gogoproto.nullable) = false
-  ];
-
-  // The sum of all paired insurances' commissions
-  string total_paired_insurance_commissions = 12 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
-    (gogoproto.nullable) = false
-  ];
-
-  // The sum of all unpairing insurances' amount (=
-  // DerivedAddress(Insurance.Id).Balance)
-  string total_unpairing_insurance_tokens = 13 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
-    (gogoproto.nullable) = false
-  ];
-
-  // The sum of all unpairing insurances' commissions
-  string total_unpairing_insurance_commissions = 14 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
-    (gogoproto.nullable) = false
-  ];
-
-  // The sum of all unpaired insurances' amount (=
-  // DerivedAddress(Insurance.Id).Balance)
-  string total_unpaired_insurance_tokens = 15 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
-    (gogoproto.nullable) = false
-  ];
-
-  // The sum of all unpaired insurances' commissions
-  string total_unpaired_insurance_commissions = 16 [
+  string total_chunks_balance = 14 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
     (gogoproto.nullable) = false
   ];
 
   // The sum of unbonding balance of all chunks in Unpairing and
   // UnpairingForUnstaking
-  string total_unbonding_balance = 17 [
+  string total_unbonding_chunks_balance = 15 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
     (gogoproto.nullable) = false
   ];
 
-  // Balance of reward module account
-  string reward_module_acc_balance = 18 [
+  // --- Insurance related fields
+  // The sum of all insurances' amount (= DerivedAddress(Insurance.Id).Balance)
+  string total_insurance_tokens = 16 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
     (gogoproto.nullable) = false
   ];
 
-  string utilization_ratio = 19 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+  // The sum of all paired insurances' amount (=
+  // DerivedAddress(Insurance.Id).Balance)
+  string total_paired_insurance_tokens = 17 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
     (gogoproto.nullable) = false
   ];
 
-  string discount_rate = 20 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+  // The sum of all unpairing insurances' amount (=
+  // DerivedAddress(Insurance.Id).Balance)
+  string total_unpairing_insurance_tokens = 18 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
     (gogoproto.nullable) = false
   ];
 
-  string fee_rate = 21 [
+  // The cumulative commissions of all insurances
+  string total_remaining_insurance_commissions = 19 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];

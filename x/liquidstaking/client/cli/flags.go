@@ -10,6 +10,7 @@ const (
 	FlagValidatorAddress = "validator-address"
 	FlagProviderAddress  = "provider-address"
 	FlagDelegatorAddress = "delegator-address"
+	Queued               = "queued"
 )
 
 func flagSetChunks() *flag.FlagSet {
@@ -42,6 +43,7 @@ func flagSetUnstakingChunkInfoRequests() *flag.FlagSet {
 	fs := flag.NewFlagSet("", flag.ContinueOnError)
 
 	fs.String(FlagDelegatorAddress, "", "The bech-32 encoded address of the delegator")
+	fs.String(Queued, "", "Queued or in-progress")
 
 	return fs
 }

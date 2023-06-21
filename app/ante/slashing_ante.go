@@ -15,18 +15,22 @@ import (
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 )
 
+// SlashingParamChangeLimitDecorator checks that the slashing params change proposals.
+// The liquidstaking module works closely with the slashing params. (e.g. MinimumCollateral constant is calculated based on the slashing params)
+// To reduce unexpected risks, it is important to reduce the maximum slashing penalty that can theoretically occur.
 type SlashingParamChangeLimitDecorator struct {
-	cdc            codec.BinaryCodec
 	slashingKeeper *slashingkeeper.Keeper
+	cdc            codec.BinaryCodec
 }
 
+// NewSlashingParamChangeLimitDecorator creates a new slashing param change limit decorator.
 func NewSlashingParamChangeLimitDecorator(
-	cdc codec.BinaryCodec,
 	slashingKeeper *slashingkeeper.Keeper,
+	cdc codec.BinaryCodec,
 ) SlashingParamChangeLimitDecorator {
 	return SlashingParamChangeLimitDecorator{
-		cdc:            cdc,
 		slashingKeeper: slashingKeeper,
+		cdc:            cdc,
 	}
 }
 
@@ -36,10 +40,6 @@ func (s SlashingParamChangeLimitDecorator) AnteHandle(
 	simulate bool,
 	next sdk.AnteHandler,
 ) (newCtx sdk.Context, err error) {
-	if !ctx.IsCheckTx() || simulate {
-		return next(ctx, tx, simulate)
-	}
-
 	msgs := tx.GetMsgs()
 	if err = s.ValidateMsgs(ctx, msgs); err != nil {
 		return ctx, err
@@ -49,8 +49,8 @@ func (s SlashingParamChangeLimitDecorator) AnteHandle(
 }
 
 func (s SlashingParamChangeLimitDecorator) ValidateMsgs(ctx sdk.Context, msgs []sdk.Msg) error {
+	var params slashingtypes.Params
 	validMsg := func(m sdk.Msg) error {
-		params := s.slashingKeeper.GetParams(ctx)
 		if msg, ok := m.(*govtypes.MsgSubmitProposal); ok {
 			switch c := msg.GetContent().(type) {
 			case *proposal.ParameterChangeProposal:
@@ -58,14 +58,19 @@ func (s SlashingParamChangeLimitDecorator) ValidateMsgs(ctx sdk.Context, msgs []
 					if c.GetSubspace() != slashingtypes.ModuleName {
 						return nil
 					}
+					if params == (slashingtypes.Params{}) {
+						params = s.slashingKeeper.GetParams(ctx)
+					}
 					switch c.GetKey() {
+					// SignedBlocksWindow, MinSignedPerWindow, DowntimeJailDuration are not allowed to be decreased.
+					// If we decrease these params, the slashing penalty can be increased.
 					case string(slashingtypes.KeySignedBlocksWindow):
 						window, err := strconv.ParseInt(c.GetValue(), 10, 64)
 						if err != nil {
 							return err
 						}
 						if window < params.SignedBlocksWindow {
-							return sdkerrors.Wrapf(types.ErrInvalidSignedBlocksWindow, "given: %d, current: %d", window, params.SignedBlocksWindow)
+							return types.ErrInvalidSignedBlocksWindow
 						}
 					case string(slashingtypes.KeyMinSignedPerWindow):
 						minSignedPerWindow, err := sdk.NewDecFromStr(c.GetValue())
@@ -73,7 +78,7 @@ func (s SlashingParamChangeLimitDecorator) ValidateMsgs(ctx sdk.Context, msgs []
 							return err
 						}
 						if minSignedPerWindow.LT(params.MinSignedPerWindow) {
-							return sdkerrors.Wrapf(types.ErrInvalidMinSignedPerWindow, "given: %s, current: %s", minSignedPerWindow, params.MinSignedPerWindow)
+							return types.ErrInvalidMinSignedPerWindow
 						}
 					case string(slashingtypes.KeyDowntimeJailDuration):
 						downtimeJailDuration, err := strconv.ParseInt(c.GetValue(), 10, 64)
@@ -81,15 +86,17 @@ func (s SlashingParamChangeLimitDecorator) ValidateMsgs(ctx sdk.Context, msgs []
 							return err
 						}
 						if time.Duration(downtimeJailDuration) < params.DowntimeJailDuration {
-							return sdkerrors.Wrapf(types.ErrInvalidDowntimeJailDuration, "given: %d, current: %d", downtimeJailDuration, params.DowntimeJailDuration)
+							return types.ErrInvalidDowntimeJailDuration
 						}
+					// SlashFractionDoubleSign, SlashFractionDowntime are not allowed to be increased.
+					// If we increase these params, the slashing penalty can be increased.
 					case string(slashingtypes.KeySlashFractionDoubleSign):
 						slashFractionDoubleSign, err := sdk.NewDecFromStr(c.GetValue())
 						if err != nil {
 							return err
 						}
 						if slashFractionDoubleSign.GT(params.SlashFractionDoubleSign) {
-							return sdkerrors.Wrapf(types.ErrInvalidSlashFractionDoubleSign, "given: %s, current: %s", slashFractionDoubleSign, params.SlashFractionDoubleSign)
+							return types.ErrInvalidSlashFractionDoubleSign
 						}
 					case string(slashingtypes.KeySlashFractionDowntime):
 						slashFractionDowntime, err := sdk.NewDecFromStr(c.GetValue())
@@ -97,7 +104,7 @@ func (s SlashingParamChangeLimitDecorator) ValidateMsgs(ctx sdk.Context, msgs []
 							return err
 						}
 						if slashFractionDowntime.GT(params.SlashFractionDowntime) {
-							return sdkerrors.Wrapf(types.ErrInvalidSlashFractionDowntime, "given: %s, current: %s", slashFractionDowntime, params.SlashFractionDowntime)
+							return types.ErrInvalidSlashFractionDowntime
 						}
 					}
 				}

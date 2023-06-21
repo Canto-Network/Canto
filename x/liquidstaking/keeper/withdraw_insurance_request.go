@@ -41,8 +41,8 @@ func (k Keeper) IterateWithdrawInsuranceRequests(ctx sdk.Context, cb func(req ty
 	}
 }
 
-func (k Keeper) GetAllWithdrawInsuranceRequests(ctx sdk.Context) []types.WithdrawInsuranceRequest {
-	var reqs []types.WithdrawInsuranceRequest
+func (k Keeper) GetAllWithdrawInsuranceRequests(ctx sdk.Context) (reqs []types.WithdrawInsuranceRequest) {
+	reqs = []types.WithdrawInsuranceRequest{}
 
 	k.IterateWithdrawInsuranceRequests(ctx, func(req types.WithdrawInsuranceRequest) bool {
 		reqs = append(reqs, req)

@@ -34,6 +34,7 @@ type BankKeeper interface {
 	GetBalance(ctx sdk.Context, addr sdk.AccAddress, denom string) sdk.Coin
 	HasBalance(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coin) bool
 	GetSupply(ctx sdk.Context, denom string) sdk.Coin
+	SpendableCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
 }
 
 // BankKeeper defines the expected interface needed to retrieve delegation info.

@@ -1,6 +1,4 @@
-<!--
-order: 3
--->
+<!-- order: 3 -->
 
 # State Transition
 
@@ -37,17 +35,15 @@ State transitions in chunks and insurances occur at EndBlocker when Epoch is rea
 **Triggering Condition**
 
 - EndBlock & Epoch **AND**
-- `PendingLiquidUnstake` must exists
+- `UnpairingForUnstakingChunkInfo` must exists
 
 **Operations**
 
-- consume `PendingLiquidUnstake`
+- with `UnpairingForUnstakingChunkInfo` which created when delegator request liquid unstake
   - get a related `Chunk`
   - undelegate a `Chunk`
   - state transition of `Insurance` (`Paired → Unpairing`)
   - state transition of `Chunk` (`Paired → UnpairingForUnstaking`)
-  - delete `PendingLiquidUnstake`
-- set new `UnpairingForUnstakingChunkInfo`
 
 ### Paired → Unpairing
 
@@ -77,21 +73,23 @@ State transitions in chunks and insurances occur at EndBlocker when Epoch is rea
   - burn escrowed ls tokens
   - send chunk size tokens back to liquid unstaker
 - state transition of `Insurance` (`Unpairing → Unpaired`)
-- delete `Chunk` (`UnpairingForUnstake → nil`)
+- delete `UnpairingForUnstakingChunkInfo`
+- delete `Chunk` (`UnpairingForUnstaking → nil`)
 
 ### Unpairing → Pairing
 
 **Triggering Condition**
 
 - EndBlock & Epoch
-- When there are no candidate insurances to pair
+- When there are no candidate insurances to pair **AND**
+- Chunk is not damaged
 
 **Operations**
 
 - state transition of `Insurance` (`Unpairing | UnpairingForWithdrawal → Unpaired`)
 - state transition of `Chunk` (`Unpairing → Pairing`)
 
-### Unpairing →nil
+### Unpairing → nil
 
 **Triggering Condition**
 
@@ -169,11 +167,22 @@ State transitions in chunks and insurances occur at EndBlocker when Epoch is rea
 
 - state transition of `Insurance` (`Paired → UnpairingForWithdrawal`)
 
+### UnpairingForWithdrawal | Unpairing → nil
+
+**Triggering Condition**
+
+- EndBlock & Epoch **AND**
+- Unpairing chunk got damaged(meaning insurance already send all of its balance to chunk, but was not enough) and there are no balances of insurance fee pool
+
+**Operations**
+
+- state transition of `Insurance` (`UnpairingForWithdrawal | Unpairing → nil`)
+ 
 ### Unpaired → nil
 
 **Triggering Condition**
 
-- Upon receipt of a valid `MsgWithdrawInsurance` message for unpaired `Insurance`.
+- Upon receipt of a valid `MsgWithdrawInsurance` message for unpaired `Insurance`
 
 **Operations**
 

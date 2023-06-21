@@ -57,6 +57,15 @@ func (k Keeper) IterateAllChunks(ctx sdk.Context, cb func(chunk types.Chunk) (st
 	return nil
 }
 
+func (k Keeper) GetAllChunks(ctx sdk.Context) (chunks []types.Chunk) {
+	chunks = []types.Chunk{}
+	k.IterateAllChunks(ctx, func(chunk types.Chunk) (stop bool, err error) {
+		chunks = append(chunks, chunk)
+		return false, nil
+	})
+	return
+}
+
 func (k Keeper) SetLastChunkId(ctx sdk.Context, id uint64) {
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshal(&gogotypes.UInt64Value{Value: id})

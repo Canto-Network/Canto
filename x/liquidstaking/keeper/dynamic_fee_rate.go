@@ -23,7 +23,11 @@ func (k Keeper) CalcUtilizationRatio(ctx sdk.Context) sdk.Dec {
 	return types.ChunkSize.Mul(sdk.NewInt(numPairedChunks)).ToDec().Quo(totalSupply.Amount.ToDec())
 }
 
-func (k Keeper) CalcDynamicFeeRate(ctx sdk.Context) sdk.Dec {
+// CalcDynamicFeeRate returns a dynamic fee rate of a module
+// and utilization ratio when it used to calculate the fee rate.
+func (k Keeper) CalcDynamicFeeRate(ctx sdk.Context) (
+	feeRate, utilizationRatio sdk.Dec,
+) {
 	dynamicFeeParams := k.GetParams(ctx).DynamicFeeRate
 	// set every field of params as separate variable
 	r0, softCap, optimal, hardCap, slope1, slope2 := dynamicFeeParams.R0,
@@ -31,14 +35,17 @@ func (k Keeper) CalcDynamicFeeRate(ctx sdk.Context) sdk.Dec {
 		dynamicFeeParams.Slope1, dynamicFeeParams.Slope2
 
 	hardCap = sdk.MinDec(hardCap, types.SecurityCap)
-	u := k.CalcUtilizationRatio(ctx)
-	if u.LT(softCap) {
-		return r0
+	utilizationRatio = k.CalcUtilizationRatio(ctx)
+	if utilizationRatio.LT(softCap) {
+		feeRate = r0
+		return feeRate, utilizationRatio
 	}
-	if u.LTE(optimal) {
-		return k.CalcFormulaBetweenSoftCapAndOptimal(r0, softCap, optimal, slope1, u)
+	if utilizationRatio.LTE(optimal) {
+		feeRate = k.CalcFormulaBetweenSoftCapAndOptimal(r0, softCap, optimal, slope1, utilizationRatio)
+		return feeRate, utilizationRatio
 	}
-	return k.CalcFormulaUpperOptimal(r0, optimal, hardCap, slope1, slope2, u)
+	feeRate = k.CalcFormulaUpperOptimal(r0, optimal, hardCap, slope1, slope2, utilizationRatio)
+	return feeRate, utilizationRatio
 }
 
 // CalcFormulaBetweenSoftCapAndOptimal returns a dynamic fee rate with formula between softcap and optimal.
