@@ -4,6 +4,32 @@
 
 The `liquidstaking` module emits the following events:
 
+## EndBlocker
+| Type                         | Attribute Key         | Attribute Value                 |
+|------------------------------|-----------------------|---------------------------------|
+| delegate                     | module                | liquidstaking                   |
+| delegate                     | chunk_id              | {chunk.Id}                      |
+| delegate                     | insurance_id          | {insurance.Id}                  |
+| delegate                     | delegator             | {chunk.DerivedAddress}          |
+| delegate                     | validator             | {validatorAddress}              |
+| delegate                     | amount                | {amount}                        |
+| delegate                     | new_shares            | {newShares}                     |
+| delegate                     | reason                | {reason}                        |
+| begin_liquid_unstake         | chunk_ids             | {commaSeparatedChunkIds}        |
+| begin_liquid_unstake         | completion_time       | {completionTime}                |
+| delete_queued_liquid_unstake | delegator             | {delegatorAddress}              |
+| begin_withdraw_insurance     | insurance_ids         | {commaSeparatedInsuranceIds}    |
+| begin_undelegate             | chunk_id              | {chunk.Id}                      |
+| begin_undelegate             | validator             | {validatorAddress}              |
+| begin_undelegate             | completion_time       | {completionTime}                |
+| begin_undelegate             | reason                | {reason}                        |
+| re_paired_with_new_insurance | chunk_id              | {chunk.Id}                      |
+| re_paired_with_new_insurance | new_insurance_id      | {newInsurance.Id}               |
+| begin_redelegate             | chunk_id              | {chunk.Id}                      |
+| begin_redelegate             | source_validator      | {outInsurance.ValidatorAddress} |
+| begin_redelegate             | destination_validator | {newInsurance.ValidatorAddress} |
+| begin_redelegate             | completion_time       | {outInsurance.Id}               |
+
 ## Handlers
 
 ### MsgLiquidStake
