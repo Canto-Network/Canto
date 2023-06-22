@@ -6,9 +6,9 @@ import (
 	"math/rand"
 	"time"
 
+	liquidstakingkeeper "github.com/Canto-Network/Canto/v6/x/liquidstaking"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 
-	liquidstakingkeeper "github.com/Canto-Network/Canto/v6/x/liquidstaking"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/x/staking"
@@ -2810,7 +2810,7 @@ func (suite *KeeperTestSuite) TestOnlyOnePairedChunkGotDamagedSoNoChunksAvailabl
 
 	downValAddr := valAddrs[0]
 	downValPubKey := pubKeys[0]
-	//toBeUnpairedChunk := pairedChunks[0]
+	// toBeUnpairedChunk := pairedChunks[0]
 
 	epoch := suite.app.LiquidStakingKeeper.GetEpoch(suite.ctx)
 	epochTime := suite.ctx.BlockTime().Add(epoch.Duration)

@@ -11,7 +11,7 @@ option go_package = "github.com/Canto-Network/Canto/v6/x/liquidstaking/types";
 option (gogoproto.goproto_getters_all) = false;
 
 message GenesisState {
-  string LiquidBondDenom = 1;
+  string liquid_bond_denom = 1;
   Params params = 2 [ (gogoproto.nullable) = false ];
   Epoch epoch = 3 [ (gogoproto.nullable) = false ];
   uint64 last_chunk_id = 4;
