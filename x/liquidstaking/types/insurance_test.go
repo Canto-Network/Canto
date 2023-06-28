@@ -5,11 +5,20 @@ import (
 	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
+	"github.com/tendermint/tendermint/crypto"
 	"testing"
 )
 
-func TestSortInsurances(t *testing.T) {
+type insuranceTestSuite struct {
+	suite.Suite
+}
+
+func TestInsuranceTestSuite(t *testing.T) {
+	suite.Run(t, new(insuranceTestSuite))
+}
+
+func (suite *insuranceTestSuite) TestSortInsurances() {
 	n := 3
 	var val1, val2, val3 stakingtypes.Validator
 	publicKeys := simapp.CreateTestPubKeys(n)
@@ -25,9 +34,10 @@ func TestSortInsurances(t *testing.T) {
 		publicKeys[0],
 		stakingtypes.Description{},
 	)
-	require.NoError(t, err)
+	suite.NoError(err)
 	fivePercent := sdk.NewDecWithPrec(5, 2)
 	val1, err = val1.SetInitialCommission(stakingtypes.NewCommission(fivePercent, fivePercent, fivePercent))
+	suite.NoError(err)
 	validatorMap[val1Addr.String()] = val1
 
 	val2, err = stakingtypes.NewValidator(
@@ -35,9 +45,10 @@ func TestSortInsurances(t *testing.T) {
 		publicKeys[1],
 		stakingtypes.Description{},
 	)
-	require.NoError(t, err)
+	suite.NoError(err)
 	sevenPercent := sdk.NewDecWithPrec(7, 2)
 	val2, err = val2.SetInitialCommission(stakingtypes.NewCommission(sevenPercent, sevenPercent, sevenPercent))
+	suite.NoError(err)
 	validatorMap[val2Addr.String()] = val2
 
 	val3, err = stakingtypes.NewValidator(
@@ -45,9 +56,10 @@ func TestSortInsurances(t *testing.T) {
 		publicKeys[2],
 		stakingtypes.Description{},
 	)
-	require.NoError(t, err)
+	suite.NoError(err)
 	threePercent := sdk.NewDecWithPrec(3, 2)
 	val3, err = val3.SetInitialCommission(stakingtypes.NewCommission(threePercent, threePercent, threePercent))
+	suite.NoError(err)
 	validatorMap[val3Addr.String()] = val3
 
 	sameValidatorSameInsuranceFeeLessId := func(validatorMap map[string]stakingtypes.Validator, a, b types.Insurance) bool {
@@ -143,14 +155,96 @@ func TestSortInsurances(t *testing.T) {
 
 	for _, tc := range cases {
 		tc := tc
-		t.Run(tc.desc, func(t *testing.T) {
+		suite.Run(tc.desc, func() {
 			insurances := []types.Insurance{tc.b, tc.a}
 			types.SortInsurances(validatorMap, insurances, tc.descend)
 			if tc.descend {
-				require.Equal(t, tc.expected, tc.fn(validatorMap, insurances[1], insurances[0]))
+				suite.Equal(
+					tc.expected,
+					tc.fn(validatorMap, insurances[1], insurances[0]),
+				)
 			} else {
-				require.Equal(t, tc.expected, tc.fn(validatorMap, insurances[0], insurances[1]))
+				suite.Equal(
+					tc.expected,
+					tc.fn(validatorMap, insurances[0], insurances[1]),
+				)
 			}
 		})
 	}
+}
+
+func (suite *insuranceTestSuite) TestDerivedAddress() {
+	i := types.NewInsurance(1, sdk.AccAddress("test").String(), sdk.ValAddress("testval").String(), sdk.NewDecWithPrec(5, 2))
+	suite.Equal(
+		sdk.AccAddress(crypto.AddressHash([]byte("liquidstakinginsurance1"))).String(),
+		i.DerivedAddress().String(),
+	)
+	suite.Equal(
+		"cosmos1p6qg4xu665ld3l8nr72z0vpsujf0s9ek9ln8gy",
+		i.DerivedAddress().String(),
+	)
+}
+
+func (suite *insuranceTestSuite) TestFeePoolAddress() {
+	i := types.NewInsurance(1, sdk.AccAddress("test").String(), sdk.ValAddress("testval").String(), sdk.NewDecWithPrec(5, 2))
+	suite.Equal(
+		sdk.AccAddress(crypto.AddressHash([]byte("liquidstakinginsurancefee1"))).String(),
+		i.FeePoolAddress().String(),
+	)
+	suite.Equal(
+		"cosmos1fy0mcah0tcedpyqyz423mefdxh7zqz4gcfahxp",
+		i.FeePoolAddress().String(),
+	)
+}
+
+func (suite *insuranceTestSuite) TestGetProvider() {
+	i := types.NewInsurance(1, sdk.AccAddress("test").String(), sdk.ValAddress("testval").String(), sdk.NewDecWithPrec(5, 2))
+	suite.Equal(
+		sdk.AccAddress("test").String(),
+		i.GetProvider().String(),
+	)
+}
+
+func (suite *insuranceTestSuite) TestGetValidator() {
+	i := types.NewInsurance(1, sdk.AccAddress("test").String(), sdk.ValAddress("testval").String(), sdk.NewDecWithPrec(5, 2))
+	suite.Equal(
+		sdk.ValAddress("testval").String(),
+		i.GetValidator().String(),
+	)
+}
+
+func (suite *insuranceTestSuite) TestEqual() {
+	i1 := types.NewInsurance(1, sdk.AccAddress("test").String(), sdk.ValAddress("testval").String(), sdk.NewDecWithPrec(5, 2))
+
+	i2 := i1
+	suite.True(i1.Equal(i2))
+	i2.Id = 2
+	suite.False(i1.Equal(i2))
+
+	i2 = i1
+	i2.ProviderAddress = sdk.AccAddress("test2").String()
+	suite.False(i1.Equal(i2))
+
+	i2 = i1
+	i2.ValidatorAddress = sdk.ValAddress("testval2").String()
+	suite.False(i1.Equal(i2))
+
+	i2 = i1
+	i2.FeeRate = sdk.NewDecWithPrec(6, 2)
+	suite.False(i1.Equal(i2))
+}
+
+func (suite *insuranceTestSuite) TestSetStatus() {
+	i := types.NewInsurance(1, sdk.AccAddress("test").String(), sdk.ValAddress("testval").String(), sdk.NewDecWithPrec(5, 2))
+	suite.Equal(types.INSURANCE_STATUS_PAIRING, i.Status)
+	i.SetStatus(types.INSURANCE_STATUS_UNPAIRING)
+	suite.Equal(types.INSURANCE_STATUS_UNPAIRING, i.Status)
+}
+
+func (suite *insuranceTestSuite) TestValidate() {
+	i := types.NewInsurance(3, sdk.AccAddress("test").String(), sdk.ValAddress("testval").String(), sdk.NewDecWithPrec(5, 2))
+	suite.NoError(i.Validate(3))
+	suite.Error(i.Validate(2))
+	i.SetStatus(types.INSURANCE_STATUS_UNSPECIFIED)
+	suite.Error(i.Validate(3))
 }

@@ -73,20 +73,22 @@ func (nas NetAmountState) IsZeroState() bool {
 func (nas NetAmountState) String() string {
 	// Print all fields with field name
 	return fmt.Sprintf(`NetAmountState:
-	MintRate: %s
-	LsTokensTotalSupply:   %s
-	NetAmount: %s	
-	TotalLiquidTokens:     %s	
+	MintRate:                   %s
+	LsTokensTotalSupply:        %s
+	NetAmount: 	                %s	
+	TotalLiquidTokens:          %s	
 	RewardModuleAccountBalance: %s
-	FeeRate:               %s
-	UtilizationRatio:      %s
-	RemainingChunkSlots:   %s
-	DiscountRate:          %s
-	TotalDelShares:        %s
-	TotalRemainingRewards: %s	
-	TotalChunksBalance:    %s	
-	TotalUnbondingBalance: %s
-	TotalInsuranceTokens:  %s
+	FeeRate:                    %s
+	UtilizationRatio:           %s
+	RemainingChunkSlots:        %s
+	DiscountRate:               %s
+	NumPairedChunks:            %s
+	ChunkSize:                  %s
+	TotalDelShares:             %s
+	TotalRemainingRewards:      %s	
+	TotalChunksBalance:         %s	
+	TotalUnbondingBalance:      %s
+	TotalInsuranceTokens:       %s
 	TotalPairedInsuranceTokens: %s
     TotalUnpairingInsuranceTokens: %s
     TotalRemainingInsuranceCommissions: %s
@@ -100,6 +102,8 @@ func (nas NetAmountState) String() string {
 		nas.UtilizationRatio,
 		nas.RemainingChunkSlots,
 		nas.DiscountRate,
+		nas.NumPairedChunks,
+		nas.ChunkSize,
 		nas.TotalDelShares,
 		nas.TotalRemainingRewards,
 		nas.TotalChunksBalance,

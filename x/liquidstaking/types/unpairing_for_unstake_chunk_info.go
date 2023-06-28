@@ -44,5 +44,4 @@ func (info *UnpairingForUnstakingChunkInfo) Equal(other UnpairingForUnstakingChu
 	return info.ChunkId == other.ChunkId &&
 		info.DelegatorAddress == other.DelegatorAddress &&
 		info.EscrowedLstokens.IsEqual(other.EscrowedLstokens)
-
 }

@@ -39,8 +39,11 @@ func (msg MsgLiquidStake) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.DelegatorAddress); err != nil {
 		return sdkerrors.Wrapf(err, "invalid delegator address %s", msg.DelegatorAddress)
 	}
-	if !msg.Amount.IsValid() {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid amount %s", msg.Amount)
+	if ok := msg.Amount.IsZero(); ok {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "staking amount must not be zero")
+	}
+	if err := msg.Amount.Validate(); err != nil {
+		return err
 	}
 	return nil
 }
@@ -69,8 +72,11 @@ func (msg MsgLiquidUnstake) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.DelegatorAddress); err != nil {
 		return sdkerrors.Wrapf(err, "invalid delegator address %s", msg.DelegatorAddress)
 	}
-	if !msg.Amount.IsValid() {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid amount %s", msg.Amount)
+	if ok := msg.Amount.IsZero(); ok {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "unstaking amount must not be zero")
+	}
+	if err := msg.Amount.Validate(); err != nil {
+		return err
 	}
 	return nil
 }
@@ -101,8 +107,14 @@ func (msg MsgProvideInsurance) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.ProviderAddress); err != nil {
 		return sdkerrors.Wrapf(err, "invalid provider address %s", msg.ProviderAddress)
 	}
-	if !msg.Amount.IsValid() {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid amount %s", msg.Amount)
+	if _, err := sdk.ValAddressFromBech32(msg.ValidatorAddress); err != nil {
+		return sdkerrors.Wrapf(err, "invalid validator address %s", msg.ValidatorAddress)
+	}
+	if ok := msg.Amount.IsZero(); ok {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "collateral amount must not be zero")
+	}
+	if err := msg.Amount.Validate(); err != nil {
+		return err
 	}
 	if msg.FeeRate.IsNil() {
 		return ErrInvalidFeeRate
@@ -139,6 +151,9 @@ func (msg MsgCancelProvideInsurance) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.ProviderAddress); err != nil {
 		return sdkerrors.Wrapf(err, "invalid provider address %s", msg.ProviderAddress)
 	}
+	if msg.Id < 1 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid insurance id: %d", msg.Id)
+	}
 	return nil
 }
 func (msg MsgCancelProvideInsurance) GetSignBytes() []byte {
@@ -148,7 +163,6 @@ func (msg MsgCancelProvideInsurance) GetSigners() []sdk.AccAddress {
 	provider := sdk.MustAccAddressFromBech32(msg.ProviderAddress)
 	return []sdk.AccAddress{provider}
 }
-
 func (msg MsgCancelProvideInsurance) GetProvider() sdk.AccAddress {
 	addr := sdk.MustAccAddressFromBech32(msg.ProviderAddress)
 	return addr
@@ -167,8 +181,14 @@ func (msg MsgDepositInsurance) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.ProviderAddress); err != nil {
 		return sdkerrors.Wrapf(err, "invalid provider address %s", msg.ProviderAddress)
 	}
-	if !msg.Amount.IsValid() {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid amount %s", msg.Amount)
+	if msg.Id < 1 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid insurance id: %d", msg.Id)
+	}
+	if ok := msg.Amount.IsZero(); ok {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "deposit amount must not be zero")
+	}
+	if err := msg.Amount.Validate(); err != nil {
+		return err
 	}
 	return nil
 }
@@ -197,6 +217,9 @@ func (msg MsgWithdrawInsurance) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.ProviderAddress); err != nil {
 		return sdkerrors.Wrapf(err, "invalid provider address %s", msg.ProviderAddress)
 	}
+	if msg.Id < 1 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid insurance id: %d", msg.Id)
+	}
 	return nil
 }
 func (msg MsgWithdrawInsurance) GetSignBytes() []byte {
@@ -223,6 +246,9 @@ func (msg MsgWithdrawInsuranceCommission) Type() string  { return TypeMsgWithdra
 func (msg MsgWithdrawInsuranceCommission) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.ProviderAddress); err != nil {
 		return sdkerrors.Wrapf(err, "invalid provider address %s", msg.ProviderAddress)
+	}
+	if msg.Id < 1 {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "invalid insurance id: %d", msg.Id)
 	}
 	return nil
 }
@@ -251,6 +277,18 @@ func (msg MsgClaimDiscountedReward) Type() string  { return TypeMsgClaimDiscount
 func (msg MsgClaimDiscountedReward) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.RequesterAddress); err != nil {
 		return sdkerrors.Wrapf(err, "invalid requester address %s", msg.RequesterAddress)
+	}
+	if ok := msg.Amount.IsZero(); ok {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "maximum allowed ls tokens to pay must not be zero")
+	}
+	if err := msg.Amount.Validate(); err != nil {
+		return err
+	}
+	if msg.MinimumDiscountRate.IsNil() {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "minimum discount rate must not be nil")
+	}
+	if msg.MinimumDiscountRate.IsNegative() {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "minimum discount rate must not be negative")
 	}
 	return nil
 }
