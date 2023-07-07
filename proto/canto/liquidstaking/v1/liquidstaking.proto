@@ -234,8 +234,7 @@ message NetAmountState {
     (gogoproto.nullable) = false
   ];
 
-
-  // --- Chunk related fields
+ // --- Chunk related fields
   // The number of paired chunks
   string num_paired_chunks = 10 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
@@ -246,8 +245,7 @@ message NetAmountState {
   string chunk_size = 11 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
     (gogoproto.nullable) = false
-  ]
-  ;
+  ];
   // Total shares of all paired chunks
   string total_del_shares = 12 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",

@@ -49,7 +49,7 @@ service Query {
   rpc WithdrawInsuranceRequests(QueryWithdrawInsuranceRequestsRequest)
       returns (QueryWithdrawInsuranceRequestsResponse) {
     option (google.api.http).get =
-        "/canto/liquidstaking/v1/insurances/withdraw_insurance_requests";
+        "/canto/liquidstaking/v1/withdraw_insurance_requests";
   }
 
   // WithdrawInsuranceRequest returns a withdraw insurance request by id.
@@ -65,7 +65,7 @@ service Query {
       QueryUnpairingForUnstakingChunkInfosRequest)
       returns (QueryUnpairingForUnstakingChunkInfosResponse) {
     option (google.api.http).get =
-        "/canto/liquidstaking/v1/chunks/unpairing_for_unstaking_chunk_infos";
+        "/canto/liquidstaking/v1/unpairing_for_unstaking_chunk_infos";
   }
 
   // UnpairingForUnstakingChunkInfo returns a unpairing for unstaking chunk info
@@ -143,7 +143,8 @@ message QueryInsurancesRequest {
 }
 
 message QueryInsurancesResponse {
-  repeated QueryInsuranceResponse insurances = 1 [ (gogoproto.nullable) = false ];
+  repeated QueryInsuranceResponse insurances = 1
+      [ (gogoproto.nullable) = false ];
 
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }

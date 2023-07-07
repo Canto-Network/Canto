@@ -1105,11 +1105,11 @@ var (
 
 	pattern_Query_Insurance_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"canto", "liquidstaking", "v1", "insurances", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_WithdrawInsuranceRequests_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"canto", "liquidstaking", "v1", "insurances", "withdraw_insurance_requests"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_WithdrawInsuranceRequests_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"canto", "liquidstaking", "v1", "withdraw_insurance_requests"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_WithdrawInsuranceRequest_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"canto", "liquidstaking", "v1", "insurances", "id", "withdraw_insurance_requests"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_UnpairingForUnstakingChunkInfos_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"canto", "liquidstaking", "v1", "chunks", "unpairing_for_unstaking_chunk_infos"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_UnpairingForUnstakingChunkInfos_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"canto", "liquidstaking", "v1", "unpairing_for_unstaking_chunk_infos"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_UnpairingForUnstakingChunkInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"canto", "liquidstaking", "v1", "chunks", "id", "unpairing_for_unstaking_chunk_infos"}, "", runtime.AssumeColonVerbOpt(true)))
 
