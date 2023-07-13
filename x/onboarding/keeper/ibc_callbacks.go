@@ -92,6 +92,7 @@ func (k Keeper) OnRecvPacket(
 	if standardCoinBalance.LT(autoSwapThreshold) {
 		swappedAmount, err = k.coinswapKeeper.TradeInputForExactOutput(ctx, coinswaptypes.Input{Coin: transferredCoin, Address: recipient.String()}, coinswaptypes.Output{Coin: swapCoins, Address: recipient.String()})
 		if err != nil {
+			swappedAmount = sdk.ZeroInt()
 			logger.Error("failed to swap coins", "error", err)
 		} else {
 			ctx.EventManager().EmitEvent(
