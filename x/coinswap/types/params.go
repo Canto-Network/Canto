@@ -31,7 +31,7 @@ var (
 	DefaultMaxSwapAmount          = sdk.NewCoins(
 		sdk.NewCoin(UsdcIBCDenom, sdk.NewIntWithDecimal(10, 6)),
 		sdk.NewCoin(UsdtIBCDenom, sdk.NewIntWithDecimal(10, 6)),
-		sdk.NewCoin(EthIBCDenom, sdk.NewIntWithDecimal(1, 17)),
+		sdk.NewCoin(EthIBCDenom, sdk.NewIntWithDecimal(1, 16)),
 	)
 )
 
