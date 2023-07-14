@@ -15,8 +15,6 @@ import (
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 
 	cosmosante "github.com/Canto-Network/Canto/v6/app/ante/cosmos"
-
-	// vestingtypes "github.com/Canto-Network/Canto/v6/x/vesting/types"
 	sdkvesting "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 )
 
