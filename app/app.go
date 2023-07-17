@@ -1077,6 +1077,12 @@ func (app *Canto) setupUpgradeHandlers() {
 		v5.CreateUpgradeHandler(app.mm, app.configurator),
 	)
 
+	// v6 upgrade handler
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v6.UpgradeName,
+		v6.CreateUpgradeHandler(app.mm, app.configurator),
+	)
+
 	// When a planned update height is reached, the old binary will panic
 	// writing on disk the height and name of the update that triggered it
 	// This will read that value, and execute the preparations for the upgrade.
