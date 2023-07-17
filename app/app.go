@@ -144,6 +144,7 @@ import (
 	v3 "github.com/Canto-Network/Canto/v6/app/upgrades/v3"
 	v4 "github.com/Canto-Network/Canto/v6/app/upgrades/v4"
 	v5 "github.com/Canto-Network/Canto/v6/app/upgrades/v5"
+	v6 "github.com/Canto-Network/Canto/v6/app/upgrades/v6"
 )
 
 func init() {
@@ -1104,6 +1105,8 @@ func (app *Canto) setupUpgradeHandlers() {
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Added: []string{csrtypes.StoreKey},
 		}
+	case v6.UpgradeName:
+		// no store upgrades in v6
 	}
 
 	if storeUpgrades != nil {
