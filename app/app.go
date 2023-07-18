@@ -138,6 +138,7 @@ import (
 	v3 "github.com/Canto-Network/Canto/v6/app/upgrades/v3"
 	v4 "github.com/Canto-Network/Canto/v6/app/upgrades/v4"
 	v5 "github.com/Canto-Network/Canto/v6/app/upgrades/v5"
+	v6 "github.com/Canto-Network/Canto/v6/app/upgrades/v6"
 )
 
 func init() {
@@ -1044,6 +1045,12 @@ func (app *Canto) setupUpgradeHandlers() {
 		v5.CreateUpgradeHandler(app.mm, app.configurator),
 	)
 
+	// v6 upgrade handler
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v6.UpgradeName,
+		v6.CreateUpgradeHandler(app.mm, app.configurator),
+	)
+
 	// When a planned update height is reached, the old binary will panic
 	// writing on disk the height and name of the update that triggered it
 	// This will read that value, and execute the preparations for the upgrade.
@@ -1072,6 +1079,8 @@ func (app *Canto) setupUpgradeHandlers() {
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Added: []string{csrtypes.StoreKey},
 		}
+	case v6.UpgradeName:
+		// no store upgrades in v6
 	}
 
 	if storeUpgrades != nil {
