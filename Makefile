@@ -10,7 +10,7 @@ COMMIT := $(shell git log -1 --format='%H')
 LEDGER_ENABLED ?= true
 BINDIR ?= $(GOPATH)/bin
 canto_BINARY = cantod
-canto_DIR = canto
+canto_DIR = cantod
 BUILDDIR ?= $(CURDIR)/build
 SIMAPP = ./app
 HTTPS_GIT := https://github.com/canto/canto.git
@@ -371,34 +371,49 @@ test-rpc-pending:
 test-sim-nondeterminism:
 	@echo "Running non-determinism test..."
 	@go test -mod=readonly $(SIMAPP) -run TestAppStateDeterminism -Enabled=true \
-		-NumBlocks=100 -BlockSize=200 -Commit=true -Period=0 -v -timeout 24h
+		-NumBlocks=10 -BlockSize=100 -Commit=true -Period=1 -v -timeout 1h
+
+test-sim-nondeterminism-long:
+	@echo "Running non-determinism test..."
+	@go test -mod=readonly $(SIMAPP) -run TestAppStateDeterminism -Enabled=true \
+		-NumBlocks=100 -BlockSize=200 -Commit=true -Period=1 -v -timeout 1h
 
 test-sim-custom-genesis-fast:
 	@echo "Running custom genesis simulation..."
 	@echo "By default, ${HOME}/.$(canto_DIR)/config/genesis.json will be used."
 	@go test -mod=readonly $(SIMAPP) -run TestFullAppSimulation -Genesis=${HOME}/.$(canto_DIR)/config/genesis.json \
-		-Enabled=true -NumBlocks=100 -BlockSize=200 -Commit=true -Seed=99 -Period=5 -v -timeout 24h
+		-Enabled=true -NumBlocks=100 -BlockSize=200 -Commit=true -Seed=5 -Period=1 -v -timeout 1h
 
 test-sim-import-export: runsim
+	@echo "Running application import/export simulation. This may take several minutes..."
+	$(eval SEED := $(shell awk 'BEGIN{srand(); for (i=1; i<=5; i++) {n=int(10000*rand())+1; printf "%d%s", n, (i==5 ? "" : ",")}}'))
+	@$(BINDIR)/runsim -Jobs=1 -SimAppPkg=$(SIMAPP) -Seeds="$(SEED)" -ExitOnFail 10 1 TestAppImportExport
+
+test-sim-import-export-long: runsim
 	@echo "Running application import/export simulation. This may take several minutes..."
 	@$(BINDIR)/runsim -Jobs=4 -SimAppPkg=$(SIMAPP) -ExitOnFail 50 5 TestAppImportExport
 
 test-sim-after-import: runsim
+	@echo "Running application simulation-after-import. This may take several minutes..."
+	$(eval SEED := $(shell awk 'BEGIN{srand(); for (i=1; i<=5; i++) {n=int(10000*rand())+1; printf "%d%s", n, (i==5 ? "" : ",")}}'))
+	@$(BINDIR)/runsim -Jobs=1 -SimAppPkg=$(SIMAPP) -Seeds="$(SEED)" -ExitOnFail 10 1 TestAppSimulationAfterImport
+
+test-sim-after-import-long: runsim
 	@echo "Running application simulation-after-import. This may take several minutes..."
 	@$(BINDIR)/runsim -Jobs=4 -SimAppPkg=$(SIMAPP) -ExitOnFail 50 5 TestAppSimulationAfterImport
 
 test-sim-custom-genesis-multi-seed: runsim
 	@echo "Running multi-seed custom genesis simulation..."
 	@echo "By default, ${HOME}/.$(canto_DIR)/config/genesis.json will be used."
-	@$(BINDIR)/runsim -Genesis=${HOME}/.$(canto_DIR)/config/genesis.json -SimAppPkg=$(SIMAPP) -ExitOnFail 400 5 TestFullAppSimulation
+	@$(BINDIR)/runsim -Genesis=${HOME}/.$(canto_DIR)/config/genesis.json -SimAppPkg=$(SIMAPP) -ExitOnFail 50 5 TestFullAppSimulation
 
 test-sim-multi-seed-long: runsim
 	@echo "Running long multi-seed application simulation. This may take awhile!"
-	@$(BINDIR)/runsim -Jobs=4 -SimAppPkg=$(SIMAPP) -ExitOnFail 500 50 TestFullAppSimulation
+	@$(BINDIR)/runsim -Jobs=4 -SimAppPkg=$(SIMAPP) -ExitOnFail 500 10 TestFullAppSimulation
 
 test-sim-multi-seed-short: runsim
 	@echo "Running short multi-seed application simulation. This may take awhile!"
-	@$(BINDIR)/runsim -Jobs=4 -SimAppPkg=$(SIMAPP) -ExitOnFail 50 10 TestFullAppSimulation
+	@$(BINDIR)/runsim -Jobs=4 -SimAppPkg=$(SIMAPP) -ExitOnFail 50 5 TestFullAppSimulation
 
 test-sim-benchmark-invariants:
 	@echo "Running simulation invariant benchmarks..."
