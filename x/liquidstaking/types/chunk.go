@@ -52,3 +52,15 @@ func (c *Chunk) Validate(lastChunkId uint64) error {
 func (c *Chunk) HasPairedInsurance() bool {
 	return c.PairedInsuranceId != Empty
 }
+
+func (c *Chunk) HasUnpairingInsurance() bool {
+	return c.UnpairingInsuranceId != Empty
+}
+
+func (c *Chunk) EmptyPairedInsurance() {
+	c.PairedInsuranceId = Empty
+}
+
+func (c *Chunk) EmptyUnpairingInsurance() {
+	c.UnpairingInsuranceId = Empty
+}

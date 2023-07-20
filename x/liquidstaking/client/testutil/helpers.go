@@ -39,6 +39,34 @@ func ExecMsgCancelProvideInsurance(clientCtx client.Context, from string, insura
 	return clitestutil.ExecTestCLICmd(clientCtx, cli.NewCancelProvideInsuranceCmd(), args)
 }
 
+func ExecMsgWithdrawInsurance(clientCtx client.Context, from string, insuranceId uint64, extraArgs ...string) (testutil.BufferWriter, error) {
+	args := append(append([]string{
+		fmt.Sprintf("%d", insuranceId),
+		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
+	}, commonArgs...), extraArgs...)
+
+	return clitestutil.ExecTestCLICmd(clientCtx, cli.NewWithdrawInsuranceCmd(), args)
+}
+
+func ExecMsgWithdrawInsuranceCommission(clientCtx client.Context, from string, insuranceId uint64, extraArgs ...string) (testutil.BufferWriter, error) {
+	args := append(append([]string{
+		fmt.Sprintf("%d", insuranceId),
+		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
+	}, commonArgs...), extraArgs...)
+
+	return clitestutil.ExecTestCLICmd(clientCtx, cli.NewWithdrawInsuranceCommissionCmd(), args)
+}
+
+func ExecMsgDepositInsurance(clientCtx client.Context, from string, insuranceId uint64, amount sdk.Coin, extraArgs ...string) (testutil.BufferWriter, error) {
+	args := append(append([]string{
+		fmt.Sprintf("%d", insuranceId),
+		amount.String(),
+		fmt.Sprintf("--%s=%s", flags.FlagFrom, from),
+	}, commonArgs...), extraArgs...)
+
+	return clitestutil.ExecTestCLICmd(clientCtx, cli.NewDepositInsuranceCmd(), args)
+}
+
 func ExecMsgLiquidStake(clientCtx client.Context, from string, amount sdk.Coin, extraArgs ...string) (testutil.BufferWriter, error) {
 	args := append(append([]string{
 		amount.String(),

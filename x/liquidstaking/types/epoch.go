@@ -10,6 +10,7 @@ func (e *Epoch) Validate() error {
 	if e.Duration != types.DefaultUnbondingTime {
 		return ErrInvalidEpochDuration
 	}
+	// Comment the following lines checking StartTime when enable advance epoch mode.
 	if !e.StartTime.Before(time.Now()) {
 		return ErrInvalidEpochStartTime
 	}

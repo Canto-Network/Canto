@@ -24,13 +24,13 @@ func (suite *utilsTestSuite) TestDeriveAddress() {
 func (suite *utilsTestSuite) TestRandomInt() {
 	r := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
 	v := types.RandomInt(r, sdk.ZeroInt(), sdk.NewInt(100))
-	suite.True(v.GT(sdk.ZeroInt()))
+	suite.True(v.GTE(sdk.ZeroInt()))
 	suite.True(v.LT(sdk.NewInt(100)))
 }
 
 func (suite *utilsTestSuite) TestRandomDec() {
 	r := math_rand.New(math_rand.NewSource(time.Now().UnixNano()))
 	v := types.RandomDec(r, sdk.ZeroDec(), sdk.NewDec(100))
-	suite.True(v.GT(sdk.ZeroDec()))
+	suite.True(v.GTE(sdk.ZeroDec()))
 	suite.True(v.LT(sdk.NewDec(100)))
 }

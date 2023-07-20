@@ -248,3 +248,22 @@ func (suite *insuranceTestSuite) TestValidate() {
 	i.SetStatus(types.INSURANCE_STATUS_UNSPECIFIED)
 	suite.Error(i.Validate(3))
 }
+
+func (suite *insuranceTestSuite) TestHasChunk() {
+	i := types.NewInsurance(3, sdk.AccAddress("test").String(), sdk.ValAddress("testval").String(), sdk.NewDecWithPrec(5, 2))
+	i.ChunkId = 1
+	suite.True(i.HasChunk())
+
+	i.EmptyChunk()
+	suite.False(i.HasChunk())
+}
+
+func (suite *insuranceTestSuite) TestEmptyChunk() {
+	i := types.NewInsurance(3, sdk.AccAddress("test").String(), sdk.ValAddress("testval").String(), sdk.NewDecWithPrec(5, 2))
+	i.ChunkId = 1
+	suite.True(i.HasChunk())
+
+	i.EmptyChunk()
+	suite.False(i.HasChunk())
+	suite.Equal(types.Empty, i.ChunkId)
+}

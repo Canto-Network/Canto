@@ -71,3 +71,26 @@ func (suite *chunkTestSuite) TestHasPairedInsurance() {
 	c.PairedInsuranceId = 1
 	suite.True(c.HasPairedInsurance())
 }
+
+func (suite *chunkTestSuite) TestHasUnpairingInsurance() {
+	c := types.NewChunk(1)
+	suite.False(c.HasUnpairingInsurance())
+	c.UnpairingInsuranceId = 1
+	suite.True(c.HasUnpairingInsurance())
+}
+
+func (suite *chunkTestSuite) TestEmptyPairedInsurance() {
+	c := types.NewChunk(1)
+	c.PairedInsuranceId = 1
+	suite.True(c.HasPairedInsurance())
+	c.EmptyPairedInsurance()
+	suite.False(c.HasPairedInsurance())
+}
+
+func (suite *chunkTestSuite) TestEmptyUnpairingInsurance() {
+	c := types.NewChunk(1)
+	c.UnpairingInsuranceId = 1
+	suite.True(c.HasUnpairingInsurance())
+	c.EmptyUnpairingInsurance()
+	suite.False(c.HasUnpairingInsurance())
+}

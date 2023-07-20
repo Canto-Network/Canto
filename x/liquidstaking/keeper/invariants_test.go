@@ -45,7 +45,7 @@ func (suite *KeeperTestSuite) TestNetAmountInvariant() {
 		UtilizationRatio:                   sdk.MustNewDecFromStr("0.001999951953154277"),
 		RemainingChunkSlots:                sdk.NewInt(49),
 		NumPairedChunks:                    sdk.NewInt(1),
-		DiscountRate:                       sdk.MustNewDecFromStr("0.009719883361399663"),
+		DiscountRate:                       sdk.MustNewDecFromStr("0.009719883361399662"),
 		TotalDelShares:                     types.ChunkSize.ToDec(),
 		TotalRemainingRewards:              sdk.ZeroDec(),
 		TotalChunksBalance:                 sdk.ZeroInt(),
@@ -133,7 +133,7 @@ func (suite *KeeperTestSuite) TestChunksInvariant() {
 	var origin, mutated types.Chunk = env.pairedChunks[0], env.pairedChunks[0]
 	// forcefully change status of chunk as invalid
 	{
-		mutated.PairedInsuranceId = types.Empty
+		mutated.EmptyPairedInsurance()
 		suite.app.LiquidStakingKeeper.SetChunk(suite.ctx, mutated)
 		_, broken = keeper.ChunksInvariant(suite.app.LiquidStakingKeeper)(suite.ctx)
 		suite.True(broken, "paired chunk must have valid paired insurance id")
@@ -315,7 +315,7 @@ func (suite *KeeperTestSuite) TestInsurancesInvariant() {
 	// forcefully change paired chunk id
 	{
 		mutated := origin
-		mutated.ChunkId = types.Empty
+		mutated.EmptyChunk()
 		suite.app.LiquidStakingKeeper.SetInsurance(suite.ctx, mutated)
 		_, broken := keeper.InsurancesInvariant(suite.app.LiquidStakingKeeper)(suite.ctx)
 		suite.True(broken, "paired insurance must have valid chunk id")
@@ -342,7 +342,8 @@ func (suite *KeeperTestSuite) TestInsurancesInvariant() {
 		suite.ctx, types.NewMsgLiquidUnstake(
 			env.delegators[0].String(),
 			sdk.NewCoin(suite.denom, types.ChunkSize),
-		))
+		),
+	)
 	suite.NoError(err)
 	suite.ctx = suite.advanceEpoch(suite.ctx)
 	suite.ctx = suite.advanceHeight(suite.ctx, 1, "unstaking chunk started")
@@ -353,7 +354,7 @@ func (suite *KeeperTestSuite) TestInsurancesInvariant() {
 	// forcefully empty chunk id
 	{
 		mutated := origin
-		mutated.ChunkId = types.Empty
+		mutated.EmptyChunk()
 		suite.app.LiquidStakingKeeper.SetInsurance(suite.ctx, mutated)
 		_, broken := keeper.InsurancesInvariant(suite.app.LiquidStakingKeeper)(suite.ctx)
 		suite.True(broken, "unpairing insurance must have valid chunk id")
@@ -372,12 +373,15 @@ func (suite *KeeperTestSuite) TestInsurancesInvariant() {
 		suite.mustPassInvariants()
 	}
 
-	// 4: UNPAIRED INSURANCE
+	// 4: PAIRING INSURANCE
 	suite.ctx = suite.advanceEpoch(suite.ctx)
 	suite.ctx = suite.advanceHeight(suite.ctx, 1, "unstaking chunk finished")
 
 	origin, _ = suite.app.LiquidStakingKeeper.GetInsurance(suite.ctx, originChunk.UnpairingInsuranceId)
-	suite.Equal(types.INSURANCE_STATUS_UNPAIRED, origin.Status)
+	suite.Equal(
+		types.INSURANCE_STATUS_PAIRING, origin.Status,
+		"insurance is still healthy and not for withdrawal, so it should be pairing status",
+	)
 
 	// forcefully change chunk id of unpaired insurance
 	{
@@ -410,7 +414,7 @@ func (suite *KeeperTestSuite) TestInsurancesInvariant() {
 	// forcefully empty chunk id
 	{
 		mutated := origin
-		mutated.ChunkId = types.Empty
+		mutated.EmptyChunk()
 		suite.app.LiquidStakingKeeper.SetInsurance(suite.ctx, mutated)
 		_, broken := keeper.InsurancesInvariant(suite.app.LiquidStakingKeeper)(suite.ctx)
 		suite.True(broken, "unpairing for withdrawal insurance must have valid chunk id")
@@ -589,7 +593,7 @@ func (suite *KeeperTestSuite) checkUnpairingAndUnpairingForUnstakingChunks(
 	// forcefully change status of chunk as invalid
 	{
 		mutated := origin
-		mutated.UnpairingInsuranceId = types.Empty
+		mutated.EmptyUnpairingInsurance()
 		suite.app.LiquidStakingKeeper.SetChunk(suite.ctx, mutated)
 		_, broken := keeper.ChunksInvariant(suite.app.LiquidStakingKeeper)(suite.ctx)
 		suite.True(broken, "unpairing chunk must have valid unpairing insurance id")
@@ -628,18 +632,6 @@ func (suite *KeeperTestSuite) checkUnpairingAndUnpairingForUnstakingChunks(
 		suite.True(broken, "chunk's unbonding delegation must have one entry")
 		// recover
 		ubd.Entries = ubd.Entries[:len(ubd.Entries)-1]
-		suite.app.StakingKeeper.SetUnbondingDelegation(ctx, ubd)
-		suite.mustPassInvariants()
-	}
-
-	// forcefully change initial balance of unbonding entry
-	{
-		ubd.Entries[0].InitialBalance = ubd.Entries[0].InitialBalance.Sub(sdk.OneInt())
-		suite.app.StakingKeeper.SetUnbondingDelegation(ctx, ubd)
-		_, broken := keeper.ChunksInvariant(suite.app.LiquidStakingKeeper)(ctx)
-		suite.True(broken, "chunk's unbonding delegation's entry must have valid initial balance")
-		// recover
-		ubd.Entries[0].InitialBalance = ubd.Entries[0].InitialBalance.Add(sdk.OneInt())
 		suite.app.StakingKeeper.SetUnbondingDelegation(ctx, ubd)
 		suite.mustPassInvariants()
 	}

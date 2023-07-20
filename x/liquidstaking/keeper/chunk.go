@@ -22,22 +22,30 @@ func (k Keeper) GetChunk(ctx sdk.Context, id uint64) (chunk types.Chunk, found b
 	return chunk, true
 }
 
+func (k Keeper) mustGetChunk(ctx sdk.Context, id uint64) types.Chunk {
+	chunk, found := k.GetChunk(ctx, id)
+	if !found {
+		panic("chunk not found")
+	}
+	return chunk
+}
+
 func (k Keeper) DeleteChunk(ctx sdk.Context, id uint64) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.GetChunkKey(id))
 }
 
-func (k Keeper) GetAllPairingChunks(ctx sdk.Context) (chunks []types.Chunk, err error) {
-	err = k.IterateAllChunks(ctx, func(chunk types.Chunk) (stop bool, err error) {
+func (k Keeper) GetAllPairingChunks(ctx sdk.Context) (chunks []types.Chunk) {
+	k.IterateAllChunks(ctx, func(chunk types.Chunk) (stop bool) {
 		if chunk.Status == types.CHUNK_STATUS_PAIRING {
 			chunks = append(chunks, chunk)
 		}
-		return false, nil
+		return false
 	})
 	return
 }
 
-func (k Keeper) IterateAllChunks(ctx sdk.Context, cb func(chunk types.Chunk) (stop bool, err error)) error {
+func (k Keeper) IterateAllChunks(ctx sdk.Context, cb func(chunk types.Chunk) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, types.KeyPrefixChunk)
 	defer iterator.Close()
@@ -46,22 +54,18 @@ func (k Keeper) IterateAllChunks(ctx sdk.Context, cb func(chunk types.Chunk) (st
 		var chunk types.Chunk
 		k.cdc.MustUnmarshal(iterator.Value(), &chunk)
 
-		stop, err := cb(chunk)
-		if err != nil {
-			return err
-		}
+		stop := cb(chunk)
 		if stop {
 			break
 		}
 	}
-	return nil
 }
 
 func (k Keeper) GetAllChunks(ctx sdk.Context) (chunks []types.Chunk) {
 	chunks = []types.Chunk{}
-	k.IterateAllChunks(ctx, func(chunk types.Chunk) (stop bool, err error) {
+	k.IterateAllChunks(ctx, func(chunk types.Chunk) (stop bool) {
 		chunks = append(chunks, chunk)
-		return false, nil
+		return false
 	})
 	return
 }

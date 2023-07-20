@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"context"
 	"fmt"
 	"strconv"
 	"strings"
@@ -56,19 +55,22 @@ func CmdQueryParams() *cobra.Command {
 		Short: fmt.Sprintf("Query the current parameters of %s module", types.ModuleName),
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
 
 			queryClient := types.NewQueryClient(clientCtx)
 
 			request := &types.QueryParamsRequest{}
 
 			// Query store
-			response, err := queryClient.Params(context.Background(), request)
+			response, err := queryClient.Params(cmd.Context(), request)
 			if err != nil {
 				return err
 			}
 
-			return clientCtx.PrintProto(&response.Params)
+			return clientCtx.PrintProto(response)
 		},
 	}
 
@@ -84,14 +86,17 @@ func CmdQueryEpoch() *cobra.Command {
 		Short: fmt.Sprintf("Query the epoch of %s module", types.ModuleName),
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
 
 			queryClient := types.NewQueryClient(clientCtx)
 
 			request := &types.QueryEpochRequest{}
 
 			// Query store
-			response, err := queryClient.Epoch(context.Background(), request)
+			response, err := queryClient.Epoch(cmd.Context(), request)
 			if err != nil {
 				return err
 			}
@@ -154,7 +159,7 @@ $ %s query %s chunks --status [CHUNK_STATUS_PAIRING | CHUNK_STATUS_PAIRED | CHUN
 			queryClient := types.NewQueryClient(clientCtx)
 
 			// Query store
-			response, err := queryClient.Chunks(context.Background(), request)
+			response, err := queryClient.Chunks(cmd.Context(), request)
 			if err != nil {
 				return err
 			}
@@ -189,7 +194,7 @@ func CmdQueryChunk() *cobra.Command {
 
 			request := &types.QueryChunkRequest{Id: chunkId}
 			// Query store
-			response, err := queryClient.Chunk(context.Background(), request)
+			response, err := queryClient.Chunk(cmd.Context(), request)
 			if err != nil {
 				return err
 			}
@@ -247,7 +252,7 @@ $ %s query %s insurances --validator-address cantovaloper1gxl6usug4cz60yhpsjj7vw
 			queryClient := types.NewQueryClient(clientCtx)
 
 			// Query store
-			response, err := queryClient.Insurances(context.Background(), request)
+			response, err := queryClient.Insurances(cmd.Context(), request)
 			if err != nil {
 				return err
 			}
@@ -283,7 +288,7 @@ func CmdQueryInsurance() *cobra.Command {
 
 			request := &types.QueryInsuranceRequest{Id: insuranceId}
 			// Query store
-			response, err := queryClient.Insurance(context.Background(), request)
+			response, err := queryClient.Insurance(cmd.Context(), request)
 			if err != nil {
 				return err
 			}
@@ -337,7 +342,7 @@ $ %s query %s withdraw-insurance-requests --provider-address canto1czxcryk6qw30e
 			queryClient := types.NewQueryClient(clientCtx)
 
 			// Query store
-			response, err := queryClient.WithdrawInsuranceRequests(context.Background(), request)
+			response, err := queryClient.WithdrawInsuranceRequests(cmd.Context(), request)
 			if err != nil {
 				return err
 			}
@@ -378,7 +383,7 @@ $ %s query %s withdraw-insurance-request 1
 
 			request := &types.QueryWithdrawInsuranceRequestRequest{Id: insuranceId}
 			// Query store
-			response, err := queryClient.WithdrawInsuranceRequest(context.Background(), request)
+			response, err := queryClient.WithdrawInsuranceRequest(cmd.Context(), request)
 			if err != nil {
 				return err
 			}
@@ -386,6 +391,7 @@ $ %s query %s withdraw-insurance-request 1
 			return clientCtx.PrintProto(response)
 		},
 	}
+	flags.AddQueryFlagsToCmd(cmd)
 	return cmd
 }
 
@@ -433,7 +439,7 @@ $ %s query %s unpairing-for-unstaking-chunk-infos
 			}
 			queryClient := types.NewQueryClient(clientCtx)
 			// Query store
-			response, err := queryClient.UnpairingForUnstakingChunkInfos(context.Background(), request)
+			response, err := queryClient.UnpairingForUnstakingChunkInfos(cmd.Context(), request)
 			if err != nil {
 				return err
 			}
@@ -472,7 +478,7 @@ $ %s query %s unpairing-for-unstaking-chunk-info 1
 			queryClient := types.NewQueryClient(clientCtx)
 			request := &types.QueryUnpairingForUnstakingChunkInfoRequest{Id: chunkId}
 			// Query store
-			response, err := queryClient.UnpairingForUnstakingChunkInfo(context.Background(), request)
+			response, err := queryClient.UnpairingForUnstakingChunkInfo(cmd.Context(), request)
 			if err != nil {
 				return err
 			}
@@ -511,7 +517,7 @@ $ %s query %s redelegation-infos
 			}
 			queryClient := types.NewQueryClient(clientCtx)
 			// Query store
-			response, err := queryClient.RedelegationInfos(context.Background(), request)
+			response, err := queryClient.RedelegationInfos(cmd.Context(), request)
 			if err != nil {
 				return err
 			}
@@ -549,7 +555,7 @@ $ %s query %s redelegation-info 1
 			queryClient := types.NewQueryClient(clientCtx)
 			request := &types.QueryRedelegationInfoRequest{Id: id}
 			// Query store
-			response, err := queryClient.RedelegationInfo(context.Background(), request)
+			response, err := queryClient.RedelegationInfo(cmd.Context(), request)
 			if err != nil {
 				return err
 			}
@@ -583,7 +589,7 @@ $ %s query %s chunk-size
 			queryClient := types.NewQueryClient(clientCtx)
 			request := &types.QueryChunkSizeRequest{}
 			// Query store
-			response, err := queryClient.ChunkSize(context.Background(), request)
+			response, err := queryClient.ChunkSize(cmd.Context(), request)
 			if err != nil {
 				return err
 			}
@@ -615,7 +621,7 @@ $ %s query %s minimum-collateral
 			queryClient := types.NewQueryClient(clientCtx)
 			request := &types.QueryMinimumCollateralRequest{}
 			// Query store
-			response, err := queryClient.MinimumCollateral(context.Background(), request)
+			response, err := queryClient.MinimumCollateral(cmd.Context(), request)
 			if err != nil {
 				return err
 			}
@@ -649,7 +655,7 @@ $ %s query %s states
 			queryClient := types.NewQueryClient(clientCtx)
 			request := &types.QueryStatesRequest{}
 			// Query store
-			response, err := queryClient.States(context.Background(), request)
+			response, err := queryClient.States(cmd.Context(), request)
 			if err != nil {
 				return err
 			}

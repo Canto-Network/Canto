@@ -324,4 +324,11 @@ message RedelegationInfo {
   uint64 chunk_id = 1;
   google.protobuf.Timestamp completion_time = 2
   [ (gogoproto.stdtime) = true, (gogoproto.nullable) = false ];
+  // Any penalty during re-delegation period
+  string penaltyAmt = 3 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+  // If true, this info is deletable
+  bool deletable = 4;
 }

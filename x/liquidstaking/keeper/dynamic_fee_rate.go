@@ -9,12 +9,12 @@ import (
 func (k Keeper) CalcUtilizationRatio(ctx sdk.Context) sdk.Dec {
 	totalSupply := k.bankKeeper.GetSupply(ctx, k.stakingKeeper.BondDenom(ctx))
 	var numPairedChunks int64 = 0
-	k.IterateAllChunks(ctx, func(chunk types.Chunk) (bool, error) {
+	k.IterateAllChunks(ctx, func(chunk types.Chunk) bool {
 		if chunk.Status != types.CHUNK_STATUS_PAIRED {
-			return false, nil
+			return false
 		}
 		numPairedChunks++
-		return false, nil
+		return false
 	})
 	if totalSupply.IsZero() || numPairedChunks == 0 {
 		return sdk.ZeroDec()
@@ -77,5 +77,5 @@ func (k Keeper) MaxPairedChunks(ctx sdk.Context) sdk.Int {
 	// 1. u = (chunkSize * numPairedChunks) / totalSupply
 	// 2. numPairedChunks = u * (totalSupply / chunkSize)
 	// 3. maxPairedChunks = hardCap * (totalSupply / chunkSize)
-	return hardCap.Mul(totalSupply.Amount.ToDec().Quo(types.ChunkSize.ToDec())).TruncateInt()
+	return hardCap.Mul(totalSupply.Amount.ToDec().QuoTruncate(types.ChunkSize.ToDec())).TruncateInt()
 }

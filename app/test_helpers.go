@@ -100,3 +100,9 @@ func SetupTestingApp() (ibctesting.TestingApp, map[string]json.RawMessage) {
 	app := NewCanto(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, cfg, simapp.EmptyAppOptions{})
 	return app, NewDefaultGenesisState()
 }
+
+type EmptyAppOptions struct{}
+
+func (ao EmptyAppOptions) Get(o string) interface{} {
+	return nil
+}

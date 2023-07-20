@@ -131,6 +131,14 @@ func (suite *KeeperTestSuite) TestGRPCChunk() {
 				suite.True(chunk.Equal(response.Chunk))
 			},
 		},
+		{
+			"query by non-existing id",
+			&types.QueryChunkRequest{
+				Id: types.Empty,
+			},
+			true,
+			nil,
+		},
 	} {
 		suite.Run(tc.name, func() {
 			resp, err := suite.app.LiquidStakingKeeper.Chunk(sdk.WrapSDKContext(suite.ctx), tc.req)
@@ -279,6 +287,14 @@ func (suite *KeeperTestSuite) TestGRPCInsurance() {
 				suite.True(env.insurances[0].Equal(response.Insurance))
 			},
 		},
+		{
+			"query by non-existing id",
+			&types.QueryInsuranceRequest{
+				Id: types.Empty,
+			},
+			true,
+			nil,
+		},
 	} {
 		suite.Run(tc.name, func() {
 			resp, err := suite.app.LiquidStakingKeeper.Insurance(sdk.WrapSDKContext(suite.ctx), tc.req)
@@ -412,7 +428,7 @@ func (suite *KeeperTestSuite) TestGRPCWithdrawInsuranceRequest() {
 			nil,
 		},
 		{
-			"query by id",
+			"query by insurance id",
 			&types.QueryWithdrawInsuranceRequestRequest{
 				Id: 1,
 			},
@@ -425,30 +441,12 @@ func (suite *KeeperTestSuite) TestGRPCWithdrawInsuranceRequest() {
 			},
 		},
 		{
-			"query by id",
+			"query by non-existing insurance id",
 			&types.QueryWithdrawInsuranceRequestRequest{
-				Id: 1,
-			},
-			false,
-			func(response *types.QueryWithdrawInsuranceRequestResponse) {
-				_, found := suite.app.LiquidStakingKeeper.GetWithdrawInsuranceRequest(
-					suite.ctx, response.WithdrawInsuranceRequest.InsuranceId,
-				)
-				suite.True(found)
-			},
-		},
-		{
-			"query by non existing id",
-			&types.QueryWithdrawInsuranceRequestRequest{
-				Id: 100,
+				Id: types.Empty,
 			},
 			true,
-			func(response *types.QueryWithdrawInsuranceRequestResponse) {
-				_, found := suite.app.LiquidStakingKeeper.GetWithdrawInsuranceRequest(
-					suite.ctx, response.WithdrawInsuranceRequest.InsuranceId,
-				)
-				suite.False(found)
-			},
+			nil,
 		},
 	} {
 		suite.Run(tc.name, func() {
@@ -548,7 +546,6 @@ func (suite *KeeperTestSuite) TestGRPCUnpairingForUnstakingChunkInfos() {
 			}
 		})
 	}
-
 }
 
 func (suite *KeeperTestSuite) TestGRPCUnpairingForUnstakingChunkInfo() {
@@ -608,16 +605,12 @@ func (suite *KeeperTestSuite) TestGRPCUnpairingForUnstakingChunkInfo() {
 			},
 		},
 		{
-			"query info by chunk id",
+			"query by non-existing chunk id",
 			&types.QueryUnpairingForUnstakingChunkInfoRequest{
-				Id: env.pairedChunks[0].Id,
+				Id: types.Empty,
 			},
-			false,
-			func(response *types.QueryUnpairingForUnstakingChunkInfoResponse) {
-				chunk, found := suite.app.LiquidStakingKeeper.GetChunk(suite.ctx, response.UnpairingForUnstakingChunkInfo.ChunkId)
-				suite.True(found)
-				suite.True(chunk.Equal(env.pairedChunks[0]))
-			},
+			true,
+			nil,
 		},
 	} {
 		suite.Run(tc.name, func() {
@@ -633,6 +626,148 @@ func (suite *KeeperTestSuite) TestGRPCUnpairingForUnstakingChunkInfo() {
 		})
 	}
 
+}
+
+func (suite *KeeperTestSuite) TestGRPCRedelegationInfos() {
+	env := suite.setupLiquidStakeTestingEnv(testingEnvOptions{
+		desc:                  "",
+		numVals:               3,
+		fixedValFeeRate:       TenPercentFeeRate,
+		valFeeRates:           nil,
+		fixedPower:            1,
+		powers:                nil,
+		numInsurances:         3,
+		fixedInsuranceFeeRate: TenPercentFeeRate,
+		insuranceFeeRates:     nil,
+		numPairedChunks:       3,
+		fundingAccountBalance: types.ChunkSize.MulRaw(1000),
+	})
+	onePercentFeeRate := sdk.MustNewDecFromStr("0.01")
+	newVals, _ := suite.CreateValidators(
+		[]int64{onePower, onePower, onePower},
+		onePercentFeeRate,
+		nil,
+	)
+	_, oneInsurnace := suite.app.LiquidStakingKeeper.GetMinimumRequirements(suite.ctx)
+	providers, bals := suite.AddTestAddrsWithFunding(fundingAccount, 3, oneInsurnace.Amount)
+	// newly provided 3 insurances are more cheaper than the existing ones.
+	suite.provideInsurances(suite.ctx, providers, newVals, bals, onePercentFeeRate, nil)
+
+	suite.ctx = suite.advanceEpoch(suite.ctx)
+	suite.ctx = suite.advanceHeight(suite.ctx, 1, "re-delegations is started")
+
+	for _, tc := range []struct {
+		name      string
+		req       *types.QueryRedelegationInfosRequest
+		expectErr bool
+		postRun   func(response *types.QueryRedelegationInfosResponse)
+	}{
+		{
+			"nil request",
+			nil,
+			true,
+			nil,
+		},
+		{
+			"query all",
+			&types.QueryRedelegationInfosRequest{},
+			false,
+			func(response *types.QueryRedelegationInfosResponse) {
+				suite.Len(response.RedelegationInfos, len(env.pairedChunks))
+			},
+		},
+	} {
+		suite.Run(tc.name, func() {
+			resp, err := suite.app.LiquidStakingKeeper.RedelegationInfos(sdk.WrapSDKContext(suite.ctx), tc.req)
+			if tc.expectErr {
+				suite.Error(err)
+				return
+			}
+			suite.NoError(err)
+			if tc.postRun != nil {
+				tc.postRun(resp)
+			}
+		})
+	}
+}
+
+func (suite *KeeperTestSuite) TestGRPCRedelegationInfo() {
+	env := suite.setupLiquidStakeTestingEnv(testingEnvOptions{
+		desc:                  "",
+		numVals:               3,
+		fixedValFeeRate:       TenPercentFeeRate,
+		valFeeRates:           nil,
+		fixedPower:            1,
+		powers:                nil,
+		numInsurances:         3,
+		fixedInsuranceFeeRate: TenPercentFeeRate,
+		insuranceFeeRates:     nil,
+		numPairedChunks:       3,
+		fundingAccountBalance: types.ChunkSize.MulRaw(1000),
+	})
+	onePercentFeeRate := sdk.MustNewDecFromStr("0.01")
+	newVals, _ := suite.CreateValidators(
+		[]int64{onePower, onePower, onePower},
+		onePercentFeeRate,
+		nil,
+	)
+	_, oneInsurnace := suite.app.LiquidStakingKeeper.GetMinimumRequirements(suite.ctx)
+	providers, bals := suite.AddTestAddrsWithFunding(fundingAccount, 3, oneInsurnace.Amount)
+	// newly provided 3 insurances are more cheaper than the existing ones.
+	suite.provideInsurances(suite.ctx, providers, newVals, bals, onePercentFeeRate, nil)
+
+	suite.ctx = suite.advanceEpoch(suite.ctx)
+	suite.ctx = suite.advanceHeight(suite.ctx, 1, "re-delegations is started")
+
+	for _, tc := range []struct {
+		name      string
+		req       *types.QueryRedelegationInfoRequest
+		expectErr bool
+		postRun   func(response *types.QueryRedelegationInfoResponse)
+	}{
+		{
+			"nil request",
+			nil,
+			true,
+			nil,
+		},
+		{
+			"invalid request",
+			&types.QueryRedelegationInfoRequest{},
+			true,
+			nil,
+		},
+		{
+			"query by chunk id",
+			&types.QueryRedelegationInfoRequest{
+				Id: env.pairedChunks[0].Id,
+			},
+			false,
+			func(response *types.QueryRedelegationInfoResponse) {
+				suite.Equal(response.RedelegationInfo.ChunkId, env.pairedChunks[0].Id)
+			},
+		},
+		{
+			"query by non-existing chunk id",
+			&types.QueryRedelegationInfoRequest{
+				Id: types.Empty,
+			},
+			true,
+			nil,
+		},
+	} {
+		suite.Run(tc.name, func() {
+			resp, err := suite.app.LiquidStakingKeeper.RedelegationInfo(sdk.WrapSDKContext(suite.ctx), tc.req)
+			if tc.expectErr {
+				suite.Error(err)
+				return
+			}
+			suite.NoError(err)
+			if tc.postRun != nil {
+				tc.postRun(resp)
+			}
+		})
+	}
 }
 
 func (suite *KeeperTestSuite) TestGRPCChunkSize() {

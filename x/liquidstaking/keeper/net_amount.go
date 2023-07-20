@@ -20,7 +20,7 @@ func (k Keeper) GetNetAmountState(ctx sdk.Context) (nas types.NetAmountState) {
 	totalUnbondingChunksBalance := sdk.ZeroDec()
 	numPairedChunks := sdk.ZeroInt()
 
-	err := k.IterateAllChunks(ctx, func(chunk types.Chunk) (stop bool, err error) {
+	k.IterateAllChunks(ctx, func(chunk types.Chunk) (stop bool) {
 		balance := k.bankKeeper.GetBalance(ctx, chunk.DerivedAddress(), k.stakingKeeper.BondDenom(ctx))
 		totalChunksBalance = totalChunksBalance.Add(balance.Amount.ToDec())
 
@@ -31,12 +31,12 @@ func (k Keeper) GetNetAmountState(ctx sdk.Context) (nas types.NetAmountState) {
 			pairedInsurance, _ := k.GetInsurance(ctx, chunk.PairedInsuranceId)
 			valAddr, err := sdk.ValAddressFromBech32(pairedInsurance.ValidatorAddress)
 			if err != nil {
-				return true, err
+				panic(err)
 			}
 			validator := k.stakingKeeper.Validator(ctx, valAddr)
 			delegation, found := k.stakingKeeper.GetDelegation(ctx, chunk.DerivedAddress(), valAddr)
 			if !found {
-				return false, nil
+				return false
 			}
 			totalDelShares = totalDelShares.Add(delegation.GetShares())
 			tokens := validator.TokensFromSharesTruncated(delegation.GetShares()).TruncateInt()
@@ -57,14 +57,11 @@ func (k Keeper) GetNetAmountState(ctx sdk.Context) (nas types.NetAmountState) {
 				return false
 			})
 		}
-		return false, nil
+		return false
 	})
-	if err != nil {
-		panic(err)
-	}
 
 	// Iterate all paired insurances to get total insurance tokens
-	err = k.IterateAllInsurances(ctx, func(insurance types.Insurance) (stop bool, err error) {
+	k.IterateAllInsurances(ctx, func(insurance types.Insurance) (stop bool) {
 		insuranceBalance := k.bankKeeper.GetBalance(ctx, insurance.DerivedAddress(), bondDenom)
 		commission := k.bankKeeper.GetBalance(ctx, insurance.FeePoolAddress(), bondDenom)
 		switch insurance.Status {
@@ -76,11 +73,8 @@ func (k Keeper) GetNetAmountState(ctx sdk.Context) (nas types.NetAmountState) {
 		}
 		totalInsuranceTokens = totalInsuranceTokens.Add(insuranceBalance.Amount)
 		totalRemainingInsuranceCommissions = totalRemainingInsuranceCommissions.Add(commission.Amount.ToDec())
-		return false, nil
+		return false
 	})
-	if err != nil {
-		panic(err)
-	}
 
 	nas = types.NetAmountState{
 		LsTokensTotalSupply:                k.bankKeeper.GetSupply(ctx, liquidBondDenom).Amount,

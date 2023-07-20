@@ -1,17 +1,19 @@
 package ante_test
 
 import (
+	"strconv"
+
 	"github.com/Canto-Network/Canto/v6/app/ante"
 	"github.com/Canto-Network/Canto/v6/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/cosmos/cosmos-sdk/x/params/types/proposal"
-	"strconv"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
 // TODO: Advanced test cases (e.g. nested param change proposals)
 // Authz and multi msg cases
-func (suite *AnteTestSuite) TestSlashingParamChangeProposal() {
+func (suite *AnteTestSuite) TestParamChangeProposal() {
 	suite.SetupTest(false)
 	params := suite.app.SlashingKeeper.GetParams(suite.ctx)
 	tests := []struct {
@@ -100,9 +102,26 @@ func (suite *AnteTestSuite) TestSlashingParamChangeProposal() {
 			},
 			types.ErrInvalidSlashFractionDowntime,
 		},
+		{
+			"Changing Unbonding Time is not allowed",
+			func() *proposal.ParameterChangeProposal {
+				smaller := strconv.FormatInt(int64(stakingtypes.DefaultUnbondingTime)-1, 10)
+				unbondingTime := proposal.NewParamChange("staking", "UnbondingTime", smaller)
+				return proposal.NewParameterChangeProposal("tc10", "tc10", []proposal.ParamChange{unbondingTime})
+			},
+			types.ErrChangingUnbondingPeriodForbidden,
+		},
+		{
+			"Changing BondDenom is not allowed",
+			func() *proposal.ParameterChangeProposal {
+				unbondingTime := proposal.NewParamChange("staking", "BondDenom", "adoge")
+				return proposal.NewParameterChangeProposal("tc11", "tc11", []proposal.ParamChange{unbondingTime})
+			},
+			types.ErrChangingBondDenomForbidden,
+		},
 	}
 
-	spcld := ante.NewSlashingParamChangeLimitDecorator(&suite.app.SlashingKeeper, suite.app.AppCodec())
+	spcld := ante.NewParamChangeLimitDecorator(&suite.app.SlashingKeeper, suite.app.AppCodec())
 	anteHandler := sdk.ChainAnteDecorators(spcld)
 	for _, tc := range tests {
 		suite.Run(tc.desc, func() {

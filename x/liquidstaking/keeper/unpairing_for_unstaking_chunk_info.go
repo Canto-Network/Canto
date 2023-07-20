@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"fmt"
 	"github.com/Canto-Network/Canto/v6/x/liquidstaking/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -21,12 +22,20 @@ func (k Keeper) GetUnpairingForUnstakingChunkInfo(ctx sdk.Context, id uint64) (i
 	return info, true
 }
 
+func (k Keeper) mustGetUnpairingForUnstakingChunkInfo(ctx sdk.Context, id uint64) types.UnpairingForUnstakingChunkInfo {
+	info, found := k.GetUnpairingForUnstakingChunkInfo(ctx, id)
+	if !found {
+		panic(fmt.Sprintf("unpairing for unstaking chunk info not found: %d", id))
+	}
+	return info
+}
+
 func (k Keeper) DeleteUnpairingForUnstakingChunkInfo(ctx sdk.Context, id uint64) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.GetUnpairingForUnstakingChunkInfoKey(id))
 }
 
-func (k Keeper) IterateAllUnpairingForUnstakingChunkInfos(ctx sdk.Context, cb func(info types.UnpairingForUnstakingChunkInfo) (stop bool, err error)) error {
+func (k Keeper) IterateAllUnpairingForUnstakingChunkInfos(ctx sdk.Context, cb func(info types.UnpairingForUnstakingChunkInfo) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, types.KeyPrefixUnpairingForUnstakingChunkInfo)
 	defer iterator.Close()
@@ -35,16 +44,11 @@ func (k Keeper) IterateAllUnpairingForUnstakingChunkInfos(ctx sdk.Context, cb fu
 		var info types.UnpairingForUnstakingChunkInfo
 		k.cdc.MustUnmarshal(iterator.Value(), &info)
 
-		stop, err := cb(info)
-		if err != nil {
-			return err
-		}
+		stop := cb(info)
 		if stop {
 			break
 		}
 	}
-
-	return nil
 }
 
 func (k Keeper) GetAllUnpairingForUnstakingChunkInfos(ctx sdk.Context) (infos []types.UnpairingForUnstakingChunkInfo) {

@@ -52,7 +52,7 @@ func (k Keeper) GetAllWithdrawInsuranceRequests(ctx sdk.Context) (reqs []types.W
 	return reqs
 }
 
-func (k Keeper) IterateAllWithdrawInsuranceRequests(ctx sdk.Context, cb func(req types.WithdrawInsuranceRequest) (stop bool, err error)) error {
+func (k Keeper) IterateAllWithdrawInsuranceRequests(ctx sdk.Context, cb func(req types.WithdrawInsuranceRequest) (stop bool)) {
 	store := ctx.KVStore(k.storeKey)
 	iterator := sdk.KVStorePrefixIterator(store, types.KeyPrefixWithdrawInsuranceRequest)
 	defer iterator.Close()
@@ -61,13 +61,9 @@ func (k Keeper) IterateAllWithdrawInsuranceRequests(ctx sdk.Context, cb func(req
 		var req types.WithdrawInsuranceRequest
 		k.cdc.MustUnmarshal(iterator.Value(), &req)
 
-		stop, err := cb(req)
-		if err != nil {
-			return err
-		}
+		stop := cb(req)
 		if stop {
 			break
 		}
 	}
-	return nil
 }

@@ -29,6 +29,7 @@ const (
 	depositInsuranceName            = "liquidstaking/MsgDepositInsurance"
 	withdrawInsuranceName           = "liquidstaking/MsgWithdrawInsurance"
 	withdrawInsuranceCommissionName = "liquidstaking/MsgWithdrawInsuranceCommission"
+	claimDiscountedRewardName       = "liquidstaking/MsgClaimDiscountedReward"
 )
 
 func init() {
@@ -47,6 +48,7 @@ func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 		&MsgDepositInsurance{},
 		&MsgWithdrawInsurance{},
 		&MsgWithdrawInsuranceCommission{},
+		&MsgClaimDiscountedReward{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
@@ -63,4 +65,5 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgDepositInsurance{}, depositInsuranceName, nil)
 	cdc.RegisterConcrete(&MsgWithdrawInsurance{}, withdrawInsuranceName, nil)
 	cdc.RegisterConcrete(&MsgWithdrawInsuranceCommission{}, withdrawInsuranceCommissionName, nil)
+	cdc.RegisterConcrete(&MsgClaimDiscountedReward{}, claimDiscountedRewardName, nil)
 }

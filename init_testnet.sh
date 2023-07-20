@@ -13,7 +13,7 @@ command -v jq > /dev/null 2>&1 || { echo >&2 "jq not installed. More info: https
 
 # Reinstall daemon
 rm -rf ~/.cantod*
-make install
+make install-testing
 
 # Set client config
 cantod config keyring-backend $KEYRING

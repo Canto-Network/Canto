@@ -36,4 +36,7 @@ var (
 	ErrMustOneRedelegation                           = sdkerrors.Register(ModuleName, 30037, "must have one redelegation")
 	ErrMustOneRedelegationEntry                      = sdkerrors.Register(ModuleName, 30038, "must have one redelegation entry")
 	ErrNotFoundRedelegationInfoChunkId               = sdkerrors.Register(ModuleName, 30039, "redelegation info corresponding chunk id must exists")
+	ErrMustHaveNoPairedInsurance                     = sdkerrors.Register(ModuleName, 30040, "must have no paired insurance")
+	ErrMustHaveNoUnbondingDelegation                 = sdkerrors.Register(ModuleName, 30041, "must have no unbonding delegation")
+	ErrInsCommissionsNotWithdrawable                 = sdkerrors.Register(ModuleName, 30042, "insurance fee pool is not withdrawable")
 )

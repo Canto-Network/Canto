@@ -1,6 +1,8 @@
 package types
 
 import (
+	"github.com/cosmos/cosmos-sdk/x/evidence/exported"
+	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -70,9 +72,6 @@ type StakingKeeper interface {
 	) stakingtypes.UnbondingDelegation
 	InsertUBDQueue(ctx sdk.Context, ubd stakingtypes.UnbondingDelegation,
 		completionTime time.Time)
-	ValidateUnbondAmount(
-		ctx sdk.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt sdk.Int,
-	) (shares sdk.Dec, err error)
 	GetAllUnbondingDelegations(ctx sdk.Context, delegator sdk.AccAddress) []stakingtypes.UnbondingDelegation
 	GetUnbondingDelegation(
 		ctx sdk.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress,
@@ -99,6 +98,12 @@ type DistributionKeeper interface {
 // SlashingKeeper expected slashing keeper (noalias)
 type SlashingKeeper interface {
 	IsTombstoned(ctx sdk.Context, consAddr sdk.ConsAddress) bool
+	GetParams(ctx sdk.Context) slashingtypes.Params
+}
+
+// EvidenceKeeper expected evidence keeper (noalias)
+type EvidenceKeeper interface {
+	IterateEvidence(ctx sdk.Context, cb func(exported.Evidence) bool)
 }
 
 // StakingHooks event hooks for staking validator object (noalias)

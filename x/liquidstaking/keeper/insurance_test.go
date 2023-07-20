@@ -70,6 +70,38 @@ func (suite *KeeperTestSuite) TestLastInsuranceIdSetGet() {
 	suite.Require().Equal(result, id)
 }
 
+func (suite *KeeperTestSuite) TestIterateAllInsurances() {
+	numberInsurances := 10
+	insurances := GenerateInsurances(numberInsurances, false)
+	for _, insurance := range insurances {
+		suite.app.LiquidStakingKeeper.SetInsurance(suite.ctx, insurance)
+	}
+
+	// Iterate all insurances
+	var insuranceList []types.Insurance
+	suite.app.LiquidStakingKeeper.IterateAllInsurances(suite.ctx, func(insurance types.Insurance) (stop bool) {
+		insuranceList = append(insuranceList, insurance)
+		return false
+	})
+
+	// Validation
+	suite.Require().Equal(len(insuranceList), numberInsurances)
+}
+
+func (suite *KeeperTestSuite) TestGetAllInsurances() {
+	numberInsurances := 10
+	insurances := GenerateInsurances(numberInsurances, false)
+	for _, insurance := range insurances {
+		suite.app.LiquidStakingKeeper.SetInsurance(suite.ctx, insurance)
+	}
+
+	// Get all insurances
+	insuranceList := suite.app.LiquidStakingKeeper.GetAllInsurances(suite.ctx)
+
+	// Validation
+	suite.Require().Equal(len(insuranceList), numberInsurances)
+}
+
 // Creates a bunch of insurances
 func GenerateInsurances(number int, sameAddress bool) []types.Insurance {
 	s := rand.NewSource(0)

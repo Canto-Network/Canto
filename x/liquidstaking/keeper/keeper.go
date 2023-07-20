@@ -21,6 +21,7 @@ type Keeper struct {
 	distributionKeeper types.DistributionKeeper
 	stakingKeeper      types.StakingKeeper
 	slashingKeeper     types.SlashingKeeper
+	evidenceKeeper     types.EvidenceKeeper
 }
 
 // NewKeeper creates a new mint Keeper instance
@@ -33,6 +34,7 @@ func NewKeeper(
 	distributionKeeper types.DistributionKeeper,
 	stakingKeeper types.StakingKeeper,
 	slashingKeeper types.SlashingKeeper,
+	evidenceKeeper types.EvidenceKeeper,
 ) Keeper {
 	// set KeyTable if it has not already been set
 	if !subspace.HasKeyTable() {
@@ -48,6 +50,7 @@ func NewKeeper(
 		distributionKeeper: distributionKeeper,
 		stakingKeeper:      stakingKeeper,
 		slashingKeeper:     slashingKeeper,
+		evidenceKeeper:     evidenceKeeper,
 	}
 }
 

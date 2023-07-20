@@ -1,10 +1,10 @@
-<!-- order: 5 -->
+<!-- order: 6 -->
 
 # EndBlock
 
 The end block logic is executed at the end of each epoch.
 
-## Reward Distribution
+## Distribute Reward
 
 - For all paired chunks
   - withdraw delegation reward
@@ -15,6 +15,7 @@ The end block logic is executed at the end of each epoch.
     - burn fee calculated by `fee rate x (balance of chunk - insurance commission)` (Please check the `CalcDynamicFeeRate` in `dynamic_fee_rate.go` for detail.)
     - send rest of chunk balance to reward pool
 
+
 ## Cover slashing and handle mature unbondings
 
 ### For all unpairing for unstake chunks
@@ -22,19 +23,28 @@ The end block logic is executed at the end of each epoch.
 - calc penalty
   - penalty: `(chunk size tokens) - (balance of chunk)`
 - if penalty > 0
-  - unpairing insurance send penalty to reward pool
-  - refund lstokens corresponding penalty from ls token escrow acc
-    - refund amount: `(penalty / (chunk size tokens)) x (ls tokens to burn)`
+  - if unpairing insurance can cover
+  - if unpairing insurance cannot cover
+    - unpairing insurance send penalty to reward pool
+    - refund lstokens corresponding penalty from ls token escrow acc
+      - refund amount: `(penalty / (chunk size tokens)) x (ls tokens to burn)`
 - complete unpairing insurance's duty because it already covered penalty
 - burn all escrowed LS tokens, except for those that have been refunded (if any)
+- send all of chunk's balances to un-delegator
 - delete tracking obj(=`UnpairingForUnstakingChunkInfo`) and chunk
 
 ### For all unpairing chunks
 
 - calc penalty
   - penalty: `(chunk size tokens) - (balance of chunk)`
-- if penalty > 0
-  - unpairing insurance send penalty to chunk
+  - if re-delegation info exists and info.penalty > 0
+    - penalty = penalty - info.penalty (calc only penalty which current unpairing chunk should cover)
+    - info.Deletable = true 
+- if penalty > 0 
+  - if unpairing insurance can cover
+    - unpairing insurance send penalty to chunk
+  - if unpairing insurance cannot cover
+    - unpairing insurance send penalty to reward pool
 - complete insurance duty because unpairing insurance already covered penalty
 - if chunk got damaged (unpairing insurance could not cover fully)
   - send all chunk balances to reward pool because chunk is not valid anymore.
@@ -45,19 +55,34 @@ The end block logic is executed at the end of each epoch.
 
 - calc penalty
 - if penalty > 0
-  - if penalty > balance of insurance (meaning the insurance cannot fully cover it)
-    - state transition of insurance (`Paired → Unpairing`)
-    - un-delegate chunk
+  - if re-delegation info exists for chunk and info.penalty > 0
+    - unpairing insurance send all of its balance to reward pool
+    - update penalty to penalty - info.penalty (we updated it because paired insurance doens't have to cover penalty from re-delegation.)
     - state transition of chunk (`Paired → Unpairing`)
+    - un-delegate chunk
+    - set undelegatedByRedelegationPenalty as true
+  - if penalty > balance of insurance (meaning the insurance cannot fully cover it)
+    - if undelegatedByRedelegationPenalty is false
+      - un-delegate chunk
+      - state transition of insurance (`Paired → Unpairing`)
+      - state transition of chunk (`Paired → Unpairing`)
   - if penalty ≤ balance of insurance (meaning the insurance can cover it)
-    - send penalty to chunk
-    - chunk delegate additional shares corresponding penalty
+    - if undelegatedByRedelegationPenalty is false
+      - send penalty to chunk
+      - chunk delegate additional shares corresponding penalty
 - if insurance is not sufficient after cover penalty
   - state transition of insurance (`Paired → Unpairing`)
   - state transition of chunk (`Paired → Unpairing`)
 - if tombstone happened or the validator it is paired is not valid
   - state transition of insurance (`Paired → Unpairing`)
-  - state transition of chunk (`Paired → Unpairing`
+  - state transition of chunk (`Paired → Unpairing`)
+- if there was an unpairing insurance came from previous epoch and it is already finished its duty
+  - empty unpairing insurance id from chunk
+
+## Remove Deletable Redelegation Infos
+
+- For all re-delegation infos
+  - if is is matured and deletable, then remove it.
 
 ## Handle Queued Liquid Unstakes
 
@@ -84,6 +109,7 @@ The end block logic is executed at the end of each epoch.
   - out insurances are
     - paired with `Unpairing` chunk which have no unbonding obj
       - The most common case for this is withdrawing an insurance.
+    - paired with `Paired` chunk but have invalid validator. (sanity check)
 
 - create candidate insurances
   - candidate insurance must be in `Pairing or Paired`

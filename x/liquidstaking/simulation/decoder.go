@@ -3,6 +3,7 @@ package simulation
 import (
 	"bytes"
 	"fmt"
+
 	"github.com/Canto-Network/Canto/v6/x/liquidstaking/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -43,6 +44,12 @@ func NewDecodeStore(cdc codec.Codec) func(kvA, kvB kv.Pair) string {
 			cdc.MustUnmarshal(kvA.Value, &unpairingForUnstakingChunkInfoA)
 			cdc.MustUnmarshal(kvB.Value, &unpairingForUnstakingChunkInfoB)
 			return fmt.Sprintf("%v\n%v", unpairingForUnstakingChunkInfoA, unpairingForUnstakingChunkInfoB)
+
+		case bytes.Equal(kvA.Key[:1], types.KeyPrefixRedelegationInfo):
+			var redelegationInfoA, redelegationInfoB types.RedelegationInfo
+			cdc.MustUnmarshal(kvA.Value, &redelegationInfoA)
+			cdc.MustUnmarshal(kvB.Value, &redelegationInfoB)
+			return fmt.Sprintf("%v\n%v", redelegationInfoA, redelegationInfoB)
 
 		case bytes.Equal(kvA.Key[:1], types.KeyPrefixEpoch):
 			var epochA, epochB types.Epoch

@@ -328,8 +328,12 @@ func (suite *KeeperTestSuite) advanceHeight(ctx sdk.Context, height int, msg str
 func (suite *KeeperTestSuite) advanceEpoch(ctx sdk.Context) sdk.Context {
 	// Set block header time as epochStartTime + duration + 1 second
 	epoch := suite.app.LiquidStakingKeeper.GetEpoch(ctx)
+	startTime := ctx.BlockTime()
+	if startTime.Before(epoch.StartTime) {
+		startTime = epoch.StartTime
+	}
 	// Lets pass epoch
-	ctx = ctx.WithBlockTime(epoch.StartTime.Add(epoch.Duration))
+	ctx = ctx.WithBlockTime(startTime.Add(epoch.Duration))
 	suite.lsEpochCount += 1
 
 	fmt.Println("===============================================================================")

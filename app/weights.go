@@ -10,4 +10,6 @@ const (
 	DefaultWeightMsgWithdrawInsurance           int = 20
 	DefaultWeightMsgWithdrawInsuranceCommission int = 10
 	DefaultWeightMsgClaimDiscountedReward       int = 10
+
+	DefaultWeightUpdateDynamicFeeRateProposal int = 2
 )

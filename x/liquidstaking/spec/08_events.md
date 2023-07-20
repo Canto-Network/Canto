@@ -1,8 +1,20 @@
-<!-- order: 7 -->
+<!-- order: 8 -->
 
 # Events
 
 The `liquidstaking` module emits the following events:
+
+## BeginBlocker
+| Type                         | Attribute Key         | Attribute Value                 |
+|------------------------------|-----------------------|---------------------------------|
+| delegate                     | module                | liquidstaking                   |
+| delegate                     | chunk_id              | {chunk.Id}                      |
+| delegate                     | insurance_id          | {insurance.Id}                  |
+| delegate                     | delegator             | {chunk.DerivedAddress}          |
+| delegate                     | validator             | {validatorAddress}              |
+| delegate                     | amount                | {amount}                        |
+| delegate                     | new_shares            | {newShares}                     |
+| delegate                     | reason                | {reason}                        |
 
 ## EndBlocker
 | Type                         | Attribute Key         | Attribute Value                 |

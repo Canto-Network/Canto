@@ -65,3 +65,16 @@ func (suite *keysTestSuite) TestGetUnpairingForUnstakingChunkInfoKey() {
 		"KeyPrefixUnpairingForUnstakingChunkInfo + 8-bytes represented id as big endian order",
 	)
 }
+
+func (suite *keysTestSuite) TestGetRedelegationInfoKey() {
+	suite.Equal(
+		[]byte{0x8, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1},
+		types.GetRedelegationInfoKey(1),
+		"KeyPrefixRedelegationInfo + 8-bytes represented id as big endian order",
+	)
+	suite.Equal(
+		[]byte{0x8, 0x0, 0x0, 0x0, 0x2, 0x54, 0xb, 0xe3, 0xff},
+		types.GetRedelegationInfoKey(9999999999),
+		"KeyPrefixRedelegationInfo + 8-bytes represented id as big endian order",
+	)
+}
