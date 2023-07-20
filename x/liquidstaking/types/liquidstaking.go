@@ -11,6 +11,9 @@ const Empty uint64 = 0
 var SecurityCap = sdk.MustNewDecFromStr("0.25")
 var MaximumDiscountRate = sdk.MustNewDecFromStr("0.03")
 
+// MaximumInsuranceFeeRate is a maximum cap of insurance + validator fee rate.
+var MaximumInsValFeeRate = sdk.MustNewDecFromStr("0.5")
+
 var DefaultLiquidBondDenom = "lscanto"
 var RewardPool = DeriveAddress(ModuleName, "RewardPool")
 var LsTokenEscrowAcc = DeriveAddress(ModuleName, "LsTokenEscrowAcc")

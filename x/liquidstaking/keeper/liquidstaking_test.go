@@ -164,6 +164,17 @@ func (suite *KeeperTestSuite) TestProvideInsurance() {
 			nil,
 			"amount must be greater than minimum collateral",
 		},
+		{
+			"fee rate >= maximum fee rate",
+			&types.MsgProvideInsurance{
+				ProviderAddress:  providers[0].String(),
+				ValidatorAddress: valAddrs[0].String(),
+				Amount:           oneInsurance,
+				FeeRate:          TenPercentFeeRate.MulInt(sdk.NewInt(4)), // vFee 10% + 40% = 50%
+			},
+			nil,
+			"fee rate(validator fee rate + insurance fee rate) must be less than 0.500000000000000000",
+		},
 	} {
 		suite.Run(tc.name, func() {
 			s.Require().NoError(tc.msg.ValidateBasic())

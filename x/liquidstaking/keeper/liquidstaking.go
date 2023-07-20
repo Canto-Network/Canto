@@ -816,6 +816,11 @@ func (k Keeper) DoProvideInsurance(ctx sdk.Context, msg *types.MsgProvideInsuran
 		return
 	}
 
+	if feeRate.Add(validator.GetCommission()).GTE(types.MaximumInsValFeeRate) {
+		err = sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "fee rate(validator fee rate + insurance fee rate) must be less than %s", types.MaximumInsValFeeRate.String())
+		return
+	}
+
 	// Create an insurnace
 	insId := k.getNextInsuranceIdWithUpdate(ctx)
 	ins = types.NewInsurance(insId, providerAddr.String(), valAddr.String(), feeRate)

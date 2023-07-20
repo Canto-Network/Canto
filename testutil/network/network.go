@@ -415,7 +415,7 @@ func New(l Logger, baseDir string, cfg Config) (*Network, error) {
 			CodeHash:    common.BytesToHash(evmtypes.EmptyCodeHash).Hex(),
 		})
 
-		commission, err := sdk.NewDecFromStr("0.5")
+		commission, err := sdk.NewDecFromStr("0.1")
 		if err != nil {
 			return nil, err
 		}
