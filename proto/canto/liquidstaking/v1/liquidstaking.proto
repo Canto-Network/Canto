@@ -318,3 +318,10 @@ message WithdrawInsuranceRequest {
   // The id of insurance
   uint64 insurance_id = 1;
 }
+
+message RedelegationInfo {
+  // The id of chunk
+  uint64 chunk_id = 1;
+  google.protobuf.Timestamp completion_time = 2
+  [ (gogoproto.stdtime) = true, (gogoproto.nullable) = false ];
+}

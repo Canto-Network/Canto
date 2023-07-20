@@ -29,6 +29,7 @@ func AllInvariants(k Keeper) sdk.Invariant {
 			InsurancesInvariant,
 			UnpairingForUnstakingChunkInfosInvariant,
 			WithdrawInsuranceRequestsInvariant,
+			RedelegationInfosInvariant,
 		} {
 			res, stop := inv(k)(ctx)
 			if stop {
@@ -285,6 +286,30 @@ func WithdrawInsuranceRequestsInvariant(k Keeper) sdk.Invariant {
 		if brokenCount > 0 {
 			return sdk.FormatInvariant(types.ModuleName, "withdraw insurance requests", fmt.Sprintf(
 				"found %d broken withdraw insurance requests:\n%s", brokenCount, msg)), true
+		} else {
+			return "", false
+		}
+	}
+}
+
+func RedelegationInfosInvariant(k Keeper) sdk.Invariant {
+	return func(ctx sdk.Context) (string, bool) {
+		msg := ""
+		brokenCount := 0
+
+		infos := k.GetAllRedelegationInfos(ctx)
+		for _, info := range infos {
+			// get insurance from insurance id
+			_, found := k.GetChunk(ctx, info.ChunkId)
+			if !found {
+				msg += fmt.Sprintf("not found chunk(id: %d) for redelegation info\n", info.ChunkId)
+				brokenCount++
+				continue
+			}
+		}
+		if brokenCount > 0 {
+			return sdk.FormatInvariant(types.ModuleName, "redelegation infos", fmt.Sprintf(
+				"found %d broken redelegation infos:\n%s", brokenCount, msg)), true
 		} else {
 			return "", false
 		}

@@ -15,6 +15,7 @@ func NewGenesisState(
 	insurances []Insurance,
 	infos []UnpairingForUnstakingChunkInfo,
 	reqs []WithdrawInsuranceRequest,
+	reDelInfos []RedelegationInfo,
 ) GenesisState {
 	return GenesisState{
 		LiquidBondDenom:                 DefaultLiquidBondDenom,
@@ -26,6 +27,7 @@ func NewGenesisState(
 		Insurances:                      insurances,
 		UnpairingForUnstakingChunkInfos: infos,
 		WithdrawInsuranceRequests:       reqs,
+		RedelegationInfos:               reDelInfos,
 	}
 }
 
@@ -45,6 +47,7 @@ func DefaultGenesisState() *GenesisState {
 		Insurances:                      []Insurance{},
 		UnpairingForUnstakingChunkInfos: []UnpairingForUnstakingChunkInfo{},
 		WithdrawInsuranceRequests:       []WithdrawInsuranceRequest{},
+		RedelegationInfos:               []RedelegationInfo{},
 	}
 }
 
@@ -77,6 +80,11 @@ func (gs GenesisState) Validate() error {
 	}
 	for _, req := range gs.WithdrawInsuranceRequests {
 		if err := req.Validate(insuranceMap); err != nil {
+			return err
+		}
+	}
+	for _, info := range gs.RedelegationInfos {
+		if err := info.Validate(chunkMap); err != nil {
 			return err
 		}
 	}

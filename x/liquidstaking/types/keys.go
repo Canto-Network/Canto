@@ -25,6 +25,7 @@ const (
 	prefixInsurance
 	prefixWithdrawInsuranceRequest
 	prefixUnpairingForUnstakingChunkInfo
+	prefixRedelegationInfo
 	prefixEpoch
 )
 
@@ -37,6 +38,7 @@ var (
 	KeyPrefixInsurance                      = []byte{prefixInsurance}
 	KeyPrefixWithdrawInsuranceRequest       = []byte{prefixWithdrawInsuranceRequest}
 	KeyPrefixUnpairingForUnstakingChunkInfo = []byte{prefixUnpairingForUnstakingChunkInfo}
+	KeyPrefixRedelegationInfo               = []byte{prefixRedelegationInfo}
 	KeyPrefixEpoch                          = []byte{prefixEpoch}
 )
 
@@ -54,4 +56,8 @@ func GetWithdrawInsuranceRequestKey(insuranceId uint64) []byte {
 
 func GetUnpairingForUnstakingChunkInfoKey(chunkId uint64) []byte {
 	return append(KeyPrefixUnpairingForUnstakingChunkInfo, sdk.Uint64ToBigEndian(chunkId)...)
+}
+
+func GetRedelegationInfoKey(chunkId uint64) []byte {
+	return append(KeyPrefixRedelegationInfo, sdk.Uint64ToBigEndian(chunkId)...)
 }

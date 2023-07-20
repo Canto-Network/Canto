@@ -530,6 +530,58 @@ func (suite *KeeperTestSuite) TestWithdrawInsuranceRequestsInvariant() {
 	}
 }
 
+func (suite *KeeperTestSuite) TestRedelegationInfosInvariant() {
+	env := suite.setupLiquidStakeTestingEnv(
+		testingEnvOptions{
+			"TestRedelegationInfosInvariant",
+			3,
+			TenPercentFeeRate,
+			nil,
+			onePower,
+			nil,
+			1,
+			TenPercentFeeRate,
+			nil,
+			1,
+			types.ChunkSize.MulRaw(500),
+		},
+	)
+	_, broken := keeper.ChunksInvariant(suite.app.LiquidStakingKeeper)(suite.ctx)
+	suite.False(broken, "completely normal")
+
+	pairedChunk := env.pairedChunks[0]
+	_, oneInsurance := suite.app.LiquidStakingKeeper.GetMinimumRequirements(suite.ctx)
+	providers, provBals := suite.AddTestAddrsWithFunding(fundingAccount, 1, oneInsurance.Amount)
+	// provide very attractive insurance with zero fee rate
+	suite.provideInsurances(
+		suite.ctx,
+		providers,
+		[]sdk.ValAddress{env.valAddrs[2]},
+		provBals,
+		sdk.ZeroDec(),
+		nil,
+	)
+
+	suite.ctx = suite.advanceEpoch(suite.ctx)
+	suite.ctx = suite.advanceHeight(suite.ctx, 1, "re-delegation started")
+
+	pairedChunk, _ = suite.app.LiquidStakingKeeper.GetChunk(suite.ctx, pairedChunk.Id)
+	reDelInfos := suite.app.LiquidStakingKeeper.GetAllRedelegationInfos(suite.ctx)
+	suite.Len(reDelInfos, 1)
+	suite.Equal(pairedChunk.Id, reDelInfos[0].ChunkId)
+	suite.Equal(types.CHUNK_STATUS_PAIRED, pairedChunk.Status)
+
+	// forcefully delete chunk
+	{
+		suite.app.LiquidStakingKeeper.DeleteChunk(suite.ctx, pairedChunk.Id)
+		_, broken := keeper.RedelegationInfosInvariant(suite.app.LiquidStakingKeeper)(suite.ctx)
+		suite.True(broken, "unstaking chunk must have chunk")
+		// recover
+		suite.app.LiquidStakingKeeper.SetChunk(suite.ctx, pairedChunk)
+		suite.mustPassInvariants()
+	}
+}
+
 func (suite *KeeperTestSuite) checkUnpairingAndUnpairingForUnstakingChunks(
 	ctx sdk.Context,
 	origin types.Chunk,

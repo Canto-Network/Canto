@@ -279,6 +279,7 @@ func (suite *KeeperTestSuite) advanceHeight(ctx sdk.Context, height int, msg str
 	feeCollector := suite.app.AccountKeeper.GetModuleAccount(ctx, authtypes.FeeCollectorName)
 	for i := 0; i < height; i++ {
 		ctx = ctx.WithBlockHeight(ctx.BlockHeight() + 1).WithBlockTime(ctx.BlockTime().Add(time.Second))
+		liquidstaking.BeginBlocker(ctx, suite.app.LiquidStakingKeeper)
 
 		// Mimic inflation module AfterEpochEnd Hook
 		// - Inflation happened in the end of epoch triggered by AfterEpochEnd hook of epochs module

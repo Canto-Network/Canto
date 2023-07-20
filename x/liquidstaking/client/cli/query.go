@@ -38,6 +38,8 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 		CmdQueryWithdrawInsuranceRequest(),
 		CmdQueryUnpairingForUnstakingChunkInfos(),
 		CmdQueryUnpairingForUnstakingChunkInfo(),
+		CmdQueryRedelegationInfos(),
+		CmdQueryRedelegationInfo(),
 		CmdQueryChunkSize(),
 		CmdQueryMinimumCollateral(),
 		CmdQueryStates(),
@@ -471,6 +473,83 @@ $ %s query %s unpairing-for-unstaking-chunk-info 1
 			request := &types.QueryUnpairingForUnstakingChunkInfoRequest{Id: chunkId}
 			// Query store
 			response, err := queryClient.UnpairingForUnstakingChunkInfo(context.Background(), request)
+			if err != nil {
+				return err
+			}
+			return clientCtx.PrintProto(response)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
+}
+
+// CmdQueryRedelegationInfos implements a command that will return redelegation infos requests in liquidstaking module.
+func CmdQueryRedelegationInfos() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "redelegation-infos",
+		Args:  cobra.ExactArgs(0),
+		Short: "Query all redelegation infos",
+		Long: strings.TrimSpace(
+			fmt.Sprintf(`Query details about all redelegation infos on a network.
+Example:
+$ %s query %s redelegation-infos
+`,
+				version.AppName, types.ModuleName,
+			),
+		),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+			pageRequest, err := client.ReadPageRequest(cmd.Flags())
+			if err != nil {
+				return err
+			}
+			request := &types.QueryRedelegationInfosRequest{
+				Pagination: pageRequest,
+			}
+			queryClient := types.NewQueryClient(clientCtx)
+			// Query store
+			response, err := queryClient.RedelegationInfos(context.Background(), request)
+			if err != nil {
+				return err
+			}
+			return clientCtx.PrintProto(response)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
+}
+
+// CmdQueryRedelegationInfo implements a command that will return redelegation info in liquidstaking module.
+func CmdQueryRedelegationInfo() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "redelegation-info [chunk-id]",
+		Args:  cobra.ExactArgs(1),
+		Short: "Query the redelegation info associated with a given chunk id",
+		Long: strings.TrimSpace(
+			fmt.Sprintf(`Query details about a redelegation info on a network.
+Example:
+$ %s query %s redelegation-info 1
+`,
+				version.AppName, types.ModuleName,
+			),
+		),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+			// arg must be converted to a uint
+			id, err := strconv.ParseUint(args[0], 10, 64)
+			if err != nil {
+				return err
+			}
+			queryClient := types.NewQueryClient(clientCtx)
+			request := &types.QueryRedelegationInfoRequest{Id: id}
+			// Query store
+			response, err := queryClient.RedelegationInfo(context.Background(), request)
 			if err != nil {
 				return err
 			}

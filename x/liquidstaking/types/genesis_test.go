@@ -91,6 +91,17 @@ func TestGenesisValidate(t *testing.T) {
 			},
 			types.ErrNotFoundWithdrawInsuranceRequestInsuranceId.Error(),
 		},
+		{
+			"fail: RedelegationInfo exist for non-existing chunk",
+			func(genState *types.GenesisState) {
+				genState.RedelegationInfos = []types.RedelegationInfo{
+					{
+						ChunkId: 1,
+					},
+				}
+			},
+			types.ErrNotFoundRedelegationInfoChunkId.Error(),
+		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			genState := types.DefaultGenesisState()

@@ -34,9 +34,10 @@ const (
 	AttributeKeyWithdrawInsuranceRequestQueued = "withdraw_insurance_request_queued"
 	AttributeKeyReason                         = "reason"
 
-	AttributeValueCategory                         = ModuleName
-	AttributeValueReasonNotEnoughInsuranceCoverage = "not_enough_insurance_coverage"
-	AttributeValueReasonInsuranceCoverPenalty      = "insurance_cover_penalty"
-	AttributeValueReasonPairingChunkPaired         = "pairing_chunk_paired"
-	AttributeValueReasonNoCandidateInsurance       = "no_candidate_insurance"
+	AttributeValueCategory                             = ModuleName
+	AttributeValueReasonNotEnoughInsuranceCoverage     = "not_enough_insurance_coverage"
+	AttributeValueReasonPairedInsuranceCoverPenalty    = "paired_insurance_cover_penalty"
+	AttributeValueReasonUnpairingInsuranceCoverPenalty = "unpairing_insurance_cover_penalty"
+	AttributeValueReasonPairingChunkPaired             = "pairing_chunk_paired"
+	AttributeValueReasonNoCandidateInsurance           = "no_candidate_insurance"
 )

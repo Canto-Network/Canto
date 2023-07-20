@@ -244,6 +244,50 @@ func (k Keeper) UnpairingForUnstakingChunkInfo(c context.Context, req *types.Que
 	}, nil
 }
 
+func (k Keeper) RedelegationInfos(c context.Context, req *types.QueryRedelegationInfosRequest) (*types.QueryRedelegationInfosResponse, error) {
+	if req == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "empty request")
+	}
+	ctx := sdk.UnwrapSDKContext(c)
+
+	var infos []types.RedelegationInfo
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixRedelegationInfo)
+
+	pageRes, err := query.FilteredPaginate(store, req.Pagination, func(key []byte, value []byte, accumulate bool) (bool, error) {
+		var info types.RedelegationInfo
+		if err := k.cdc.Unmarshal(value, &info); err != nil {
+			return false, err
+		}
+		if accumulate {
+			infos = append(infos, info)
+		}
+
+		return true, nil
+	})
+
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &types.QueryRedelegationInfosResponse{infos, pageRes}, nil
+}
+
+func (k Keeper) RedelegationInfo(c context.Context, req *types.QueryRedelegationInfoRequest) (*types.QueryRedelegationInfoResponse, error) {
+	if req == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "empty request")
+	}
+	ctx := sdk.UnwrapSDKContext(c)
+
+	info, found := k.GetRedelegationInfo(ctx, req.Id)
+	if !found {
+		return nil, fmt.Errorf("no redelegation info is associated with Id %d", req.Id)
+	}
+
+	return &types.QueryRedelegationInfoResponse{
+		info,
+	}, nil
+}
+
 func (k Keeper) ChunkSize(c context.Context, req *types.QueryChunkSizeRequest) (*types.QueryChunkSizeResponse, error) {
 	if req == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "empty request")

@@ -150,7 +150,8 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 }
 
 // BeginBlock executes all ABCI BeginBlock logic respective to the liquidstaking module.
-func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {
+func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
+	BeginBlocker(ctx, am.keeper)
 }
 
 // EndBlock executes all ABCI EndBlock logic respective to the liquidstaking module. It
