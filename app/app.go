@@ -116,9 +116,6 @@ import (
 	erc20client "github.com/Canto-Network/Canto/v6/x/erc20/client"
 	erc20keeper "github.com/Canto-Network/Canto/v6/x/erc20/keeper"
 	erc20types "github.com/Canto-Network/Canto/v6/x/erc20/types"
-	"github.com/Canto-Network/Canto/v6/x/fees"
-	feeskeeper "github.com/Canto-Network/Canto/v6/x/fees/keeper"
-	feestypes "github.com/Canto-Network/Canto/v6/x/fees/types"
 
 	"github.com/Canto-Network/Canto/v6/x/inflation"
 	inflationkeeper "github.com/Canto-Network/Canto/v6/x/inflation/keeper"
@@ -126,9 +123,6 @@ import (
 	"github.com/Canto-Network/Canto/v6/x/recovery"
 	recoverykeeper "github.com/Canto-Network/Canto/v6/x/recovery/keeper"
 	recoverytypes "github.com/Canto-Network/Canto/v6/x/recovery/types"
-	"github.com/Canto-Network/Canto/v6/x/vesting"
-	vestingkeeper "github.com/Canto-Network/Canto/v6/x/vesting/keeper"
-	vestingtypes "github.com/Canto-Network/Canto/v6/x/vesting/types"
 
 	//govshuttle imports
 	"github.com/Canto-Network/Canto/v6/x/govshuttle"
@@ -196,7 +190,6 @@ var (
 		upgrade.AppModuleBasic{},
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
-		vesting.AppModuleBasic{},
 		evm.AppModuleBasic{},
 		feemarket.AppModuleBasic{},
 		inflation.AppModuleBasic{},
@@ -205,7 +198,6 @@ var (
 		csr.AppModuleBasic{},
 		epochs.AppModuleBasic{},
 		recovery.AppModuleBasic{},
-		fees.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -282,9 +274,7 @@ type Canto struct {
 	InflationKeeper  inflationkeeper.Keeper
 	Erc20Keeper      erc20keeper.Keeper
 	EpochsKeeper     epochskeeper.Keeper
-	VestingKeeper    vestingkeeper.Keeper
 	RecoveryKeeper   *recoverykeeper.Keeper
-	FeesKeeper       feeskeeper.Keeper
 	GovshuttleKeeper govshuttlekeeper.Keeper
 	CSRKeeper        csrkeeper.Keeper
 
@@ -342,8 +332,7 @@ func NewCanto(
 		evmtypes.StoreKey, feemarkettypes.StoreKey,
 		// Canto keys
 		inflationtypes.StoreKey, erc20types.StoreKey,
-		epochstypes.StoreKey, vestingtypes.StoreKey, recoverytypes.StoreKey, //recoverytypes.StoreKe
-		feestypes.StoreKey,
+		epochstypes.StoreKey, recoverytypes.StoreKey, //recoverytypes.StoreKe
 		csrtypes.StoreKey,
 		govshuttletypes.StoreKey,
 	)
@@ -453,11 +442,6 @@ func NewCanto(
 		),
 	)
 
-	app.VestingKeeper = vestingkeeper.NewKeeper(
-		keys[vestingtypes.StoreKey], appCodec,
-		app.AccountKeeper, app.BankKeeper, app.StakingKeeper,
-	)
-
 	app.Erc20Keeper = erc20keeper.NewKeeper(
 		keys[erc20types.StoreKey], appCodec, app.GetSubspace(erc20types.ModuleName),
 		app.AccountKeeper, app.BankKeeper, app.EvmKeeper,
@@ -466,12 +450,6 @@ func NewCanto(
 	app.GovshuttleKeeper = govshuttlekeeper.NewKeeper(
 		keys[govshuttletypes.StoreKey], appCodec, app.GetSubspace(govshuttletypes.ModuleName),
 		app.AccountKeeper, app.Erc20Keeper, govKeeper,
-	)
-
-	app.FeesKeeper = feeskeeper.NewKeeper(
-		keys[feestypes.StoreKey], appCodec, app.GetSubspace(feestypes.ModuleName),
-		app.BankKeeper, app.EvmKeeper,
-		authtypes.FeeCollectorName,
 	)
 
 	app.CSRKeeper = csrkeeper.NewKeeper(
@@ -498,7 +476,6 @@ func NewCanto(
 	app.EvmKeeper = app.EvmKeeper.SetHooks(
 		evmkeeper.NewMultiEvmHooks(
 			app.Erc20Keeper.Hooks(),
-			app.FeesKeeper.Hooks(),
 			app.CSRKeeper.Hooks(),
 		),
 	)
@@ -617,9 +594,7 @@ func NewCanto(
 		inflation.NewAppModule(app.InflationKeeper, app.AccountKeeper, app.StakingKeeper),
 		erc20.NewAppModule(app.Erc20Keeper, app.AccountKeeper),
 		epochs.NewAppModule(appCodec, app.EpochsKeeper),
-		vesting.NewAppModule(app.VestingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		recovery.NewAppModule(*app.RecoveryKeeper),
-		fees.NewAppModule(app.FeesKeeper, app.AccountKeeper),
 		govshuttle.NewAppModule(app.GovshuttleKeeper, app.AccountKeeper),
 		csr.NewAppModule(app.CSRKeeper, app.AccountKeeper),
 	)
@@ -652,11 +627,9 @@ func NewCanto(
 		authz.ModuleName,
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
-		vestingtypes.ModuleName,
 		inflationtypes.ModuleName,
 		erc20types.ModuleName,
 		recoverytypes.ModuleName,
-		feestypes.ModuleName,
 		govshuttletypes.ModuleName,
 		csrtypes.ModuleName,
 	)
@@ -686,13 +659,11 @@ func NewCanto(
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
 		// Canto modules
-		vestingtypes.ModuleName,
 		inflationtypes.ModuleName,
 		erc20types.ModuleName,
 		govshuttletypes.ModuleName,
 		csrtypes.ModuleName,
 		// recoverytypes.ModuleName,
-		feestypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -725,12 +696,10 @@ func NewCanto(
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
 		// Canto modules
-		vestingtypes.ModuleName,
 		inflationtypes.ModuleName,
 		erc20types.ModuleName,
 		epochstypes.ModuleName,
 		recoverytypes.ModuleName,
-		feestypes.ModuleName,
 		govshuttletypes.ModuleName,
 		csrtypes.ModuleName,
 		// NOTE: crisis module must go at the end to check for invariants on each module
@@ -782,10 +751,10 @@ func NewCanto(
 
 	maxGasWanted := cast.ToUint64(appOpts.Get(srvflags.EVMMaxTxGasWanted))
 	options := ante.HandlerOptions{
-		AccountKeeper:   app.AccountKeeper,
-		BankKeeper:      app.BankKeeper,
-		EvmKeeper:       app.EvmKeeper,
-		StakingKeeper:   app.StakingKeeper,
+		AccountKeeper: app.AccountKeeper,
+		BankKeeper:    app.BankKeeper,
+		EvmKeeper:     app.EvmKeeper,
+		// StakingKeeper:   app.StakingKeeper,
 		FeegrantKeeper:  app.FeeGrantKeeper,
 		IBCKeeper:       app.IBCKeeper,
 		FeeMarketKeeper: app.FeeMarketKeeper,
@@ -1048,7 +1017,6 @@ func initParamsKeeper(
 	paramsKeeper.Subspace(inflationtypes.ModuleName)
 	paramsKeeper.Subspace(erc20types.ModuleName)
 	paramsKeeper.Subspace(recoverytypes.ModuleName)
-	paramsKeeper.Subspace(feestypes.ModuleName)
 	paramsKeeper.Subspace(govshuttletypes.ModuleName)
 	paramsKeeper.Subspace(csrtypes.ModuleName)
 	return paramsKeeper
