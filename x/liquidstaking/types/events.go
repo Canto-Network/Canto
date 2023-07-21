@@ -35,10 +35,10 @@ const (
 	AttributeKeyReason                         = "reason"
 
 	AttributeValueCategory                                  = ModuleName
-	AttributeValueReasonNotEnoughUnpairingInsuranceCoverage = "not_enough_unpairing_insurance_coverage"
-	AttributeValueReasonNotEnoughPairedInsuranceCoverage    = "not_enough_paired_insurance_coverage"
-	AttributeValueReasonPairedInsuranceCoverPenalty         = "paired_insurance_cover_penalty"
-	AttributeValueReasonUnpairingInsuranceCoverPenalty      = "unpairing_insurance_cover_penalty"
+	AttributeValueReasonNotEnoughPairedInsCoverage          = "not_enough_paired_insurance_coverage"
+	AttributeValueReasonPairedInsBalUnderDoubleSignSlashing = "paired_insurance_coverage_is_under_double_sign_slashing"
+	AttributeValueReasonPairedInsCoverPenalty               = "paired_insurance_cover_penalty"
+	AttributeValueReasonUnpairingInsCoverPenalty            = "unpairing_insurance_cover_penalty"
 	AttributeValueReasonPairingChunkPaired                  = "pairing_chunk_paired"
-	AttributeValueReasonNoCandidateInsurance                = "no_candidate_insurance"
+	AttributeValueReasonNoCandidateIns                      = "no_candidate_insurance"
 )

@@ -18,9 +18,13 @@ type Chunk struct {
 A **chunk** has the following status:
 
 1. `Pairing`: This status indicates that the chunk is ready to be paired with an insurance.
-2. `Paired`: A chunk is paired with an insurance that has the lowest fee rate. The fee rate is determined by the sum of the insurance fee rate set by the insurance provider and the commission fee rate set by the validator designated by the insurance provider.
-3. `Unpairing`: A paired chunk enters this status when paired insurance is started to be withdrawn or is insufficient (meaning the insurance balance is below the minimum requirement to be considered valid insurance) or the validator of the insurance becomes tombstoned.
-4. `UnpairingForUnstaking`: When a delegator (also known as a liquid staker) sends a `MsgLiquidUnstake`, it is queued as a `UnpairingForUnstakingChunkInfo`. At the end of the epoch, the actual undelegation is triggered and the chunk enters this state. Once the unbonding period is over in next epoch, the staked tokens are returned to the delegator's account and the associated chunk object is removed.
+2. `Paired`: A chunk is paired with an insurance that has the lowest fee rate. 
+The fee rate is determined by the sum of the insurance fee rate set by the insurance provider and the commission fee rate set by the validator designated by the insurance provider.
+3. `Unpairing`: A paired chunk enters this status when paired insurance is started to be withdrawn or 
+paired insurance's balance <= 5.75%(double_sign_fraction + down_time_fraction) or the validator becoms invalid(e.g. tombstoned).
+4. `UnpairingForUnstaking`: When a delegator (also known as a liquid staker) sends a `MsgLiquidUnstake`, it is queued as a `UnpairingForUnstakingChunkInfo`. 
+At the end of the epoch, the actual undelegation is triggered and the chunk enters this state. 
+Once the unbonding period is over in next epoch, the staked tokens are returned to the delegator's account and the associated chunk object is removed.
 
 ## Insurance
 
@@ -41,17 +45,23 @@ type Insurance struct {
 
 An **insurance** has the following status:
 
-1. `Pairing`: This is the default status of an insurance when an insurance provider sends a `MsgInsuranceProvide`. This status indicates that the insurance is ready to be paired with a chunk. When an empty slot is available and either `msgLiquidStake` is received or `pairing` chunks have been created in the recent epoch, the insurance with the lowest fee will be paired with the chunk. Only pairing insurances can be canceled using `MsgCancelInsuranceProvide`.
-2. `Paired`: An insurance is paired with a chunk. While the insurance is in this status, it serves as a form of protection for the chunk by insuring it against unexpected loss that may occur due to validator slashing. This ensures that the chunk remains same size and maximize its staking rewards.
-3. `Unpairing`: A paired insurance enters this status when it has no longer has enough balance to cover slashing penalties, when the validator is tombstoned, or when the paired chunk is started to be undelegated. At the next epoch, unpairing will be unpaired.
-4. `UnpairingForWithdrawal`: A paired insurance enters this status when there are queued `WithdrawInsuranceRequest`s created by **`MsgWithdrawInsurance`** at the epoch.
+1. `Pairing`: This is the default status of an insurance when an insurance provider sends a `MsgInsuranceProvide`. 
+This status indicates that the insurance is ready to be paired with a chunk. When an empty slot is available and either `msgLiquidStake` is received or 
+`pairing` chunks have been created in the recent epoch, the insurance with the lowest fee will be paired with the chunk. 
+Only pairing insurances can be canceled using `MsgCancelInsuranceProvide`.
+2. `Paired`: An insurance is paired with a chunk. While the insurance is in this status, it serves as a form of protection for the chunk 
+by insuring it against unexpected loss that may occur due to validator slashing. 
+This ensures that the chunk remains same size and maximize its staking rewards.
+3. `Unpairing`: A paired insurance enters this status when it has no longer has enough balance(5.75% of chunk size tokens) to cover slashing penalties, when the validator is tombstoned, 
+or when the paired chunk is started to be undelegated by `MsgLiquidUnstake`. At the next epoch, unpairing will be unpaired or pairing if it is still valid.
+4. `UnpairingForWithdrawal`: A paired insurance enters this status when there are queued `WithdrawInsuranceRequest`s created by `MsgWithdrawInsurance` at the epoch.
 5. `Unpaired`: `Unpairing` insurances from previous epoch enters this status. `Unpaired` insurance can be withdrawn immediately by `MsgWithdrawInsurance`.
 
 ## UnpairingForUnstakingChunkInfo
 
-It is created when msgServer receives `MsgLiquidUnstake` for paired chunk. The actual unbonding is started at **[Handle Queued Liquid Unstakes](https://github.com/Canto-Network/Canto/blob/main/x/liquidstaking/spec/05_end_block.md#handle-queued-liquid-unstakes).**
+It is created when msgServer receives `MsgLiquidUnstake` for paired chunk. The actual unbonding is started at **[Handle Queued Liquid Unstakes](06_end_block.md#handle-queued-liquid-unstakes).**
 
-It is removed **[Cover slashing and handle mature unbondings](https://github.com/Canto-Network/Canto/blob/main/x/liquidstaking/spec/05_end_block.md#cover-slashing-and-handle-mature-unbondings)* when chunk unbonding is finished.
+It is removed **[Cover slashing and handle mature unbondings](06_end_block.md#cover-slashing-and-handle-mature-unbondings)* when chunk unbonding is finished.
 
 ```go
 type UnpairingForUnstakingChunkInfo struct {

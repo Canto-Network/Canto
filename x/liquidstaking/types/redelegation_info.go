@@ -3,7 +3,6 @@ package types
 import (
 	"time"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
@@ -11,8 +10,6 @@ func NewRedelegationInfo(id uint64, completionTime time.Time) RedelegationInfo {
 	return RedelegationInfo{
 		ChunkId:        id,
 		CompletionTime: completionTime,
-		PenaltyAmt:     sdk.ZeroInt(),
-		Deletable:      false,
 	}
 }
 

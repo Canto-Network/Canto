@@ -24,6 +24,8 @@ The end block logic is executed at the end of each epoch.
   - penalty: `(chunk size tokens) - (balance of chunk)`
 - if penalty > 0
   - if unpairing insurance can cover
+    - unpairing insurance send penalty to chunk
+    - chunk delegate additional tokens 
   - if unpairing insurance cannot cover
     - unpairing insurance send penalty to reward pool
     - refund lstokens corresponding penalty from ls token escrow acc
@@ -37,9 +39,6 @@ The end block logic is executed at the end of each epoch.
 
 - calc penalty
   - penalty: `(chunk size tokens) - (balance of chunk)`
-  - if re-delegation info exists and info.penalty > 0
-    - penalty = penalty - info.penalty (calc only penalty which current unpairing chunk should cover)
-    - info.Deletable = true 
 - if penalty > 0 
   - if unpairing insurance can cover
     - unpairing insurance send penalty to chunk
@@ -55,34 +54,35 @@ The end block logic is executed at the end of each epoch.
 
 - calc penalty
 - if penalty > 0
-  - if re-delegation info exists for chunk and info.penalty > 0
-    - unpairing insurance send all of its balance to reward pool
-    - update penalty to penalty - info.penalty (we updated it because paired insurance doens't have to cover penalty from re-delegation.)
-    - state transition of chunk (`Paired → Unpairing`)
+  - check if there are any penalty during re-pairing period (previous epoch ~ current epoch) 
+  - if penalty > 0
+    - unpairing insurance send penalty to chunk
+    - chunk delegate additional tokens
+  - if penalty > balance of paired insurance (cannot fully cover it)
     - un-delegate chunk
-    - set undelegatedByRedelegationPenalty as true
-  - if penalty > balance of insurance (meaning the insurance cannot fully cover it)
-    - if undelegatedByRedelegationPenalty is false
-      - un-delegate chunk
-      - state transition of insurance (`Paired → Unpairing`)
-      - state transition of chunk (`Paired → Unpairing`)
-  - if penalty ≤ balance of insurance (meaning the insurance can cover it)
-    - if undelegatedByRedelegationPenalty is false
-      - send penalty to chunk
-      - chunk delegate additional shares corresponding penalty
-- if insurance is not sufficient after cover penalty
+    - state transition of paired insurance (`Paired → Unpairing`)
+    - state transition of chunk (`Paired → Unpairing`)
+  - if penalty ≤ balance of paired insurance (can cover it)
+    - send penalty to chunk
+    - chunk delegate additional shares corresponding penalty
+- if paired insurance balance < 5.75% after cover penalty and if undelegate not started
+  - undelegate chunk
   - state transition of insurance (`Paired → Unpairing`)
   - state transition of chunk (`Paired → Unpairing`)
-- if tombstone happened or the validator it is paired is not valid
+- if validator is not valid
   - state transition of insurance (`Paired → Unpairing`)
   - state transition of chunk (`Paired → Unpairing`)
 - if there was an unpairing insurance came from previous epoch and it is already finished its duty
   - empty unpairing insurance id from chunk
+  - if insurance is still valid (balance and validator are all fine), then 
+    - state transition of insurance (`Unpairing → Pairing`)
+  - if insurance is not valid anymore
+    - state transition of insurance (`Unpairing → Unpaired`)
 
 ## Remove Deletable Redelegation Infos
 
 - For all re-delegation infos
-  - if is is matured and deletable, then remove it.
+  - if is is matured, then remove it.
 
 ## Handle Queued Liquid Unstakes
 

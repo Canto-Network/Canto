@@ -1371,6 +1371,11 @@ func (suite *KeeperTestSuite) TestPairedChunkTombstonedAndRedelegated() {
 	toBeTombstonedValidator := env.valAddrs[0]
 	toBeTombstonedValidatorPubKey := env.pubKeys[0]
 	toBeTombstonedChunk := env.pairedChunks[0]
+	ins, _ := suite.app.LiquidStakingKeeper.GetInsurance(suite.ctx, toBeTombstonedChunk.PairedInsuranceId)
+	// 7% + 3.75% = 10.75%
+	// After tombstone, it still pass the line (5.75%) which means
+	// The chunk will not be unpairing because of IsEnoughToCoverSlash check
+	suite.fundAccount(suite.ctx, ins.DerivedAddress(), types.ChunkSize.ToDec().Mul(sdk.NewDecWithPrec(375, 2)).Ceil().TruncateInt())
 	selfDelegationToken := suite.app.StakingKeeper.TokensFromConsensusPower(suite.ctx, onePower)
 	// handle a signature to set signing info
 	suite.app.SlashingKeeper.HandleValidatorSignature(
@@ -1498,7 +1503,7 @@ func (suite *KeeperTestSuite) TestPairedChunkTombstonedAndRedelegated() {
 			newInsurance.GetValidator(),
 		)
 		afterCovered := dstVal.TokensFromShares(del.GetShares())
-		suite.Equal(types.ChunkSize.ToDec().String(), afterCovered.String())
+		suite.True(afterCovered.GTE(types.ChunkSize.ToDec()))
 	}
 	suite.ctx = suite.advanceHeight(suite.ctx, 1, "delegation rewards are accumulated")
 	fmt.Println(suite.app.LiquidStakingKeeper.GetNetAmountState(suite.ctx))
@@ -2096,6 +2101,10 @@ func (suite *KeeperTestSuite) TestPairedChunkTombstonedAndUnpaired() {
 			"in re-pairing process insurance 3 will never be ranked in because it also points to tombstoned validator",
 		)
 	}
+	// 7% + 3.75% = 10.75%
+	// After tombstone, it still pass the line (5.75%) which means
+	// The chunk will not be unpairing because of IsEnoughToCoverSlash check
+	suite.fundAccount(suite.ctx, pairedInsurance.DerivedAddress(), types.ChunkSize.ToDec().Mul(sdk.NewDecWithPrec(375, 2)).Ceil().TruncateInt())
 
 	selfDelegationToken := suite.app.StakingKeeper.TokensFromConsensusPower(suite.ctx, onePower)
 	// handle a signature to set signing info
@@ -2173,9 +2182,8 @@ func (suite *KeeperTestSuite) TestPairedChunkTombstonedAndUnpaired() {
 			1,
 			"there were no candidate insurance to pair, so unbonding of chunk started",
 		)
-		suite.Equal(
-			unbondingDelegation.Entries[0].InitialBalance.String(),
-			types.ChunkSize.String(),
+		suite.True(
+			unbondingDelegation.Entries[0].InitialBalance.GTE(types.ChunkSize),
 			"there were no candidate insurance to pair, so unbonding of chunk started",
 		)
 	}
@@ -2189,10 +2197,9 @@ func (suite *KeeperTestSuite) TestPairedChunkTombstonedAndUnpaired() {
 	{
 		tombstonedChunkAfterUnpairing, _ := suite.app.LiquidStakingKeeper.GetChunk(suite.ctx, toBeTombstonedChunk.Id)
 		suite.Equal(types.CHUNK_STATUS_PAIRING, tombstonedChunkAfterUnpairing.Status)
-		suite.Equal(
-			suite.app.BankKeeper.GetBalance(suite.ctx, tombstonedChunk.DerivedAddress(), env.bondDenom).Amount.String(),
-			types.ChunkSize.String(),
-			"chunk's balance must be equal to chunk size",
+		suite.True(
+			suite.app.BankKeeper.GetBalance(suite.ctx, tombstonedChunk.DerivedAddress(), env.bondDenom).Amount.GTE(types.ChunkSize),
+			"chunk's balance must be gte chunk size",
 		)
 		suite.Equal(
 			types.Empty,
@@ -2222,8 +2229,6 @@ func (suite *KeeperTestSuite) TestMultiplePairedChunksTombstonedAndRedelegated()
 			types.ChunkSize.MulRaw(500),
 		},
 	)
-	_, oneInsurnace := suite.app.LiquidStakingKeeper.GetMinimumRequirements(suite.ctx)
-
 	suite.ctx = suite.advanceHeight(suite.ctx, 1, "liquid staking started")
 	fmt.Println(suite.app.LiquidStakingKeeper.GetNetAmountState(suite.ctx))
 
@@ -2234,15 +2239,20 @@ func (suite *KeeperTestSuite) TestMultiplePairedChunksTombstonedAndRedelegated()
 	toBeNewlyRankedInsurances := []types.Insurance{env.insurances[10], env.insurances[11], env.insurances[13]}
 	{
 		// 0, 3, 6 are paired currently but will be unpaired because it points to toBeTombstonedValidator
+		// 0, 3, 6 must have 5.75% chunkSize as balance after tombstoned to be re-delegated, please check IsEnoughToCoverSlash.
 		for i := 0; i < len(pairedInsurances); i++ {
 			suite.Equal(pairedInsurances[i].Id, toBeTombstonedChunks[i].PairedInsuranceId)
 			suite.Equal(toBeTombstonedValidator, pairedInsurances[i].GetValidator())
+			// 7% + 3.75% = 10.75%
+			// After 5% slashing => 5.75%
+			suite.fundAccount(suite.ctx, pairedInsurances[i].DerivedAddress(), types.ChunkSize.ToDec().Mul(sdk.NewDecWithPrec(375, 2)).Ceil().TruncateInt())
 		}
 		// 10, 11, 13 are not paired currently but will be paired because it points to valid validator
 		for i := 0; i < len(toBeNewlyRankedInsurances); i++ {
 			suite.NotEqual(toBeTombstonedValidator, toBeNewlyRankedInsurances[i].GetValidator())
 		}
 	}
+	targetInsurancesBalance := suite.app.BankKeeper.GetBalance(suite.ctx, pairedInsurances[0].DerivedAddress(), env.bondDenom).Amount
 
 	// Tombstone validator
 	{
@@ -2291,12 +2301,8 @@ func (suite *KeeperTestSuite) TestMultiplePairedChunksTombstonedAndRedelegated()
 				chunk.DerivedAddress(),
 				newInsurance.GetValidator(),
 			)
-			suite.Equal(types.ChunkSize.ToDec().String(), del.GetShares().String())
 			dstVal := suite.app.StakingKeeper.Validator(suite.ctx, newInsurance.GetValidator())
-			suite.Equal(
-				types.ChunkSize.ToDec().String(),
-				dstVal.TokensFromShares(del.GetShares()).String(),
-			)
+			suite.True(dstVal.TokensFromShares(del.GetShares()).GTE(types.ChunkSize.ToDec()))
 		}
 	}
 
@@ -2314,7 +2320,7 @@ func (suite *KeeperTestSuite) TestMultiplePairedChunksTombstonedAndRedelegated()
 					suite.ctx,
 					unpairedInsurance.DerivedAddress(),
 					env.bondDenom,
-				).IsLT(oneInsurnace),
+				).Amount.LT(targetInsurancesBalance),
 				"it covered penalty at epoch",
 			)
 			chunk, _ := suite.app.LiquidStakingKeeper.GetChunk(suite.ctx, unpairedInsurance.ChunkId)
@@ -2349,6 +2355,11 @@ func (suite *KeeperTestSuite) TestMultiplePairedChunksTombstonedAndUnpaired() {
 		for i := 0; i < len(pairedInsurances); i++ {
 			suite.Equal(pairedInsurances[i].Id, toBeTombstonedChunks[i].PairedInsuranceId)
 			suite.Equal(toBeTombstonedValidator, pairedInsurances[i].GetValidator())
+			// 7% + 3.75% = 10.75%
+			// After tombstone, it still pass the line (5.75%) which means
+			// The chunk will not be unpairing because of IsEnoughToCoverSlash check
+			suite.fundAccount(suite.ctx, pairedInsurances[i].DerivedAddress(), types.ChunkSize.ToDec().Mul(sdk.NewDecWithPrec(375, 2)).Ceil().TruncateInt())
+
 		}
 	}
 
@@ -2369,7 +2380,7 @@ func (suite *KeeperTestSuite) TestMultiplePairedChunksTombstonedAndUnpaired() {
 	}
 	val := suite.app.StakingKeeper.Validator(suite.ctx, toBeTombstonedValidator)
 	suite.tombstone(suite.ctx, toBeTombstonedValidator, toBeTombstonedValidatorPubKey, suite.ctx.BlockHeight()-1)
-	suite.ctx = suite.advanceHeight(suite.ctx, 1, "one block passed afetr validator is tombstoned because of double signing")
+	suite.ctx = suite.advanceHeight(suite.ctx, 1, "one block passed after validator is tombstoned because of double signing")
 	fmt.Println(suite.app.LiquidStakingKeeper.GetNetAmountState(suite.ctx))
 
 	suite.ctx = suite.advanceEpoch(suite.ctx)
@@ -2411,9 +2422,8 @@ func (suite *KeeperTestSuite) TestMultiplePairedChunksTombstonedAndUnpaired() {
 				unbondingDelegation.Entries,
 				1,
 			)
-			suite.Equal(
-				unbondingDelegation.Entries[0].InitialBalance.String(),
-				types.ChunkSize.String(),
+			suite.True(
+				unbondingDelegation.Entries[0].InitialBalance.GTE(types.ChunkSize),
 			)
 		}
 	}
@@ -2428,10 +2438,9 @@ func (suite *KeeperTestSuite) TestMultiplePairedChunksTombstonedAndUnpaired() {
 		for i, toBeTombstonedChunk := range toBeTombstonedChunks {
 			tombstonedChunkAfterUnpairing, _ := suite.app.LiquidStakingKeeper.GetChunk(suite.ctx, toBeTombstonedChunk.Id)
 			suite.Equal(types.CHUNK_STATUS_PAIRING, tombstonedChunkAfterUnpairing.Status)
-			suite.Equal(
-				suite.app.BankKeeper.GetBalance(suite.ctx, tombstonedChunks[i].DerivedAddress(), env.bondDenom).Amount.String(),
-				types.ChunkSize.String(),
-				"chunk's balance must be equal to chunk size",
+			suite.True(
+				suite.app.BankKeeper.GetBalance(suite.ctx, tombstonedChunks[i].DerivedAddress(), env.bondDenom).Amount.GTE(types.ChunkSize),
+				"chunk's balance must be GTE chunk size",
 			)
 			suite.Equal(
 				types.Empty,
@@ -2445,8 +2454,6 @@ func (suite *KeeperTestSuite) TestMultiplePairedChunksTombstonedAndUnpaired() {
 
 }
 
-// TODO: 2. TestMultiplePairedChunksTombstonedAndRepaired
-// Some chunks can be re-paired but others can't which means there are some standards and we need to test it
 func (suite *KeeperTestSuite) TestUnpairingForUnstakingChunkTombstoned() {
 	env := suite.setupLiquidStakeTestingEnv(
 		testingEnvOptions{
@@ -3468,6 +3475,64 @@ func (suite *KeeperTestSuite) TestGetAllRePairableChunksAndOutInsurances() {
 	for _, ins := range outInsurances {
 		suite.True(expectedOutInsurances[ins.Id])
 	}
+}
+
+func (suite *KeeperTestSuite) TestCalcCeiledPenalty() {
+	env := suite.setupLiquidStakeTestingEnv(
+		testingEnvOptions{
+			"TestTargetChunkGotBothUnstakeAndWithdrawInsuranceReqs",
+			1,
+			TenPercentFeeRate,
+			nil,
+			onePower,
+			nil,
+			2,
+			sdk.ZeroDec(),
+			[]sdk.Dec{TenPercentFeeRate, FivePercentFeeRate},
+			2,
+			types.ChunkSize.MulRaw(500),
+		},
+	)
+	toBeTombstonedValidator := env.valAddrs[0]
+	toBeTombstonedValidatorPubKey := env.pubKeys[0]
+
+	// Make tombstoned validator
+	{
+		selfDelegationToken := suite.app.StakingKeeper.TokensFromConsensusPower(suite.ctx, onePower)
+		// handle a signature to set signing info
+		suite.app.SlashingKeeper.HandleValidatorSignature(
+			suite.ctx,
+			toBeTombstonedValidatorPubKey.Address(),
+			selfDelegationToken.Int64(),
+			true,
+		)
+		suite.tombstone(suite.ctx, toBeTombstonedValidator, toBeTombstonedValidatorPubKey, suite.ctx.BlockHeight()-1)
+	}
+
+	validator, _ := suite.app.StakingKeeper.GetValidator(suite.ctx, toBeTombstonedValidator)
+	del, _ := suite.app.StakingKeeper.GetDelegation(suite.ctx, env.pairedChunks[0].DerivedAddress(), validator.GetOperator())
+
+	tokens := validator.TokensFromShares(del.GetShares()).Ceil().TruncateInt()
+	penaltyAmt := types.ChunkSize.Sub(tokens)
+	suite.Equal("12500000000000000000000", penaltyAmt.String())
+	// penalty value was exactly 5% of chunk size tokens, but what if we delegate additionally with this token?
+
+	// Mimic CalcCeiledPenalty to see what happens if we delegate with penaltyAmt
+	penaltyShares, _ := validator.SharesFromTokens(penaltyAmt)
+	suite.Equal("13157894736842105263157.894736842105263157", penaltyShares.String())
+	sharesToToken := validator.TokensFromShares(penaltyShares)
+	suite.Equal(
+		"12499999999999999999999.999999999999999999", sharesToToken.String(),
+		"if we delegate with penaltyAmt additionally, then the actual token value of added can be less than penaltyAmt",
+	)
+
+	// Now let's use CalcCeiledPenalty
+	result := suite.app.LiquidStakingKeeper.CalcCeiledPenalty(validator, penaltyAmt)
+	suite.Equal("12500000000000000000001", result.String())
+	suite.True(
+		result.GT(penaltyAmt),
+		"to cover penalty fully by delegate more to chunk, must be greater than penaltyAmt",
+	)
 }
 
 func (suite *KeeperTestSuite) downTimeSlashing(

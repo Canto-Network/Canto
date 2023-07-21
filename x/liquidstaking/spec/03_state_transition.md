@@ -52,8 +52,8 @@ State transitions in chunks and insurances occur at EndBlocker when Epoch is rea
 - EndBlock & Epoch **AND**
 - **(**
   - When paired `Insurance` start to be withdrawn **OR**
-  - When paired Insurance have inSufficient (balance of insurance < minimum coverage defined in module) **OR**
-  - When validator of paired insurance become tombstoned
+  - When paired Insurance have inSufficient (balance of insurance < 5.75% of chunkSize tokens) **OR**
+  - When validator of paired insurance is invalid(e.g. tombstoned)
 - **)**
 
 **Operations**
@@ -148,8 +148,8 @@ State transitions in chunks and insurances occur at EndBlocker when Epoch is rea
 - EndBlock & Epoch **AND**
 - **(**
   - paired `Chunk` is started to undelegate **OR**
-  - When paired Insurance have inSufficient (balance of insurance < minimum coverage defined in module) **OR**
-  - When validator of paired insurance become tombstoned
+  - When paired Insurance have inSufficient (balance of insurance < 5.75% of chunkSize tokens) **OR**
+  - When validator of paired insurance is invalid(e.g. tombstoned)
 - **)**
 
 **Operations**
