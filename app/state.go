@@ -3,6 +3,11 @@ package app
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"math/rand"
+	"os"
+	"time"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
@@ -14,10 +19,8 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmtypes "github.com/tendermint/tendermint/types"
-	"io"
-	"math/rand"
-	"os"
-	"time"
+
+	"github.com/evmos/ethermint/crypto/ethsecp256k1"
 )
 
 var FlagGenesisTimeValue = int64(1640995200)
@@ -219,7 +222,10 @@ func AppStateFromGenesisFileFn(r io.Reader, cdc codec.JSONCodec, genesisFile str
 		if _, err := r.Read(privkeySeed); err != nil {
 			panic(err)
 		}
-		privKey := ed25519.GenPrivKeyFromSecret(privkeySeed)
+		privKey, err := ethsecp256k1.GenerateKey()
+		if err != nil {
+			panic(err)
+		}
 
 		a, ok := acc.GetCachedValue().(authtypes.AccountI)
 		if !ok {
@@ -230,6 +236,7 @@ func AppStateFromGenesisFileFn(r io.Reader, cdc codec.JSONCodec, genesisFile str
 			PrivKey: privKey,
 			PubKey:  privKey.PubKey(),
 			Address: a.GetAddress(),
+			ConsKey: ed25519.GenPrivKeyFromSecret(privkeySeed),
 		}
 		newAccs[i] = simAcc
 	}

@@ -339,6 +339,7 @@ func NewCanto(
 	skipUpgradeHeights map[int64]bool,
 	homePath string,
 	invCheckPeriod uint,
+	simulation bool,
 	encodingConfig simappparams.EncodingConfig,
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
@@ -730,7 +731,6 @@ func NewCanto(
 		erc20types.ModuleName,
 		govshuttletypes.ModuleName,
 		csrtypes.ModuleName,
-		// recoverytypes.ModuleName,
 		feestypes.ModuleName,
 	)
 
@@ -794,7 +794,7 @@ func NewCanto(
 		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper),
 		capability.NewAppModule(appCodec, *app.CapabilityKeeper),
 		gov.NewAppModule(appCodec, app.GovKeeper, app.AccountKeeper, app.BankKeeper),
-		// staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
+		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		params.NewAppModule(app.ParamsKeeper),
@@ -835,6 +835,7 @@ func NewCanto(
 		SigGasConsumer:  SigVerificationGasConsumer,
 		Cdc:             appCodec,
 		MaxTxGasWanted:  maxGasWanted,
+		Simulation:      simulation,
 	}
 
 	if err := options.Validate(); err != nil {
