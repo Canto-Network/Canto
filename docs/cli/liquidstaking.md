@@ -7,8 +7,8 @@ Description: A high-level overview of how the command-line interfaces (CLI) work
 
 ## Synopsis
 
-This document provides a high-level overview of how the command line (CLI) interface works for the `liquidstaking` module. 
-To set up a local testing environment, you should run [init_testnet.sh](https://github.com/b-harvest/Canto/blob/liquidstaking-module/init_testnet.sh) 
+This document provides a high-level overview of how the command line (CLI) interface works for the `liquidstaking` module.
+To set up a local testing environment, you should run [init_testnet.sh](https://github.com/b-harvest/Canto/blob/liquidstaking-module/init_testnet.sh)
 
 Note that [jq](https://stedolan.github.io/jq/) is recommended to be installed as it is used to process JSON throughout the document.
 
@@ -187,7 +187,7 @@ cantod q bank balances <address> -o json | jq
 cantod q liquidstaking unpairing-for-unstaking-chunk-infos --queued="true" -o json | jq
 ```
 
-## DepositInsuranceCmd
+## DepositInsurance
 
 Deposit more coins to insurance
 
@@ -221,7 +221,7 @@ cantod tx liquidstaking deposit-insurance 1 22500000000000000000000acanto \
 cantod q bank balances <derived_address> -o json | jq
 ```
 
-## WithdrawInsuranceCmd
+## WithdrawInsurance
 
 Withdraw insurance
 
@@ -263,7 +263,7 @@ cantod q liquidstaking insurances
 cantod q bank balances <provider_address> -o json | jq
 ```
 
-## WithdrawInsuranceCommissionCmd
+## WithdrawInsuranceCommission
 
 Withdraw insurance commission
 
@@ -297,7 +297,7 @@ cantod q bank balances <fee_pool_address> -o json | jq
 cantod q bank balances <provider_address> -o json | jq
 ```
 
-## ClaimDiscountedRewardCmd
+## ClaimDiscountedReward
 
 Claim discounted reward
 
@@ -367,23 +367,223 @@ Example
 
 ```bash
 cantod query liquidstaking epoch -o json | jq
+```
 
+## Chunks
 
-## LiquidValidators
-
-Query all liquid validators.
+Query chunks.
 
 Usage
 
 ```bash
-liquid-validators
+chunks
 ```
 
 Example
 
 ```bash
-cantod query liquidstaking liquid-validators -o json | jq
+# Query all chunks
+cantod query liquidstaking chunks -o json | jq
+# Query only paired chunks.
+cantod query liquidstaking chunks --status CHUNK_STATUS_PAIRED -o json | jq
 ```
+
+## Chunk
+
+Query a chunk by id.
+
+Usage
+
+```bash
+chunks [chunk-id]
+```
+
+Example
+
+```bash
+cantod query liquidstaking chunk 1 -o json | jq
+```
+
+## Insurances
+
+Query insurances.
+
+Usage
+
+```bash
+insurances
+```
+
+Example
+
+```bash
+# Query all insurances
+cantod query liquidstaking insurances -o json | jq
+# Query only paired insurances.
+cantod query liquidstaking insurances --status INSURANCE_STATUS_PAIRED -o json | jq
+# Query insurances by provider address.
+cantod query liquidstaking insurances --provider-address canto1xjlslz2vl7v6gu807fmfw8ae7726q9pf9t3x34 -o json | jq
+# Query paired insurances by provider address and status.
+cantod query liquidstaking insurances --provider-address canto1xjlslz2vl7v6gu807fmfw8ae7726q9pf9t3x34 --status INSURANCE_STATUS_PAIRED -o json | jq
+```
+
+
+## Insurance
+
+Query an Insurance by id.
+
+Usage
+
+```bash
+insurance [insurance-id] 
+```
+
+Example
+
+```bash
+cantod query liquidstaking insurance 1 -o json | jq
+```
+
+## WithdrawInsuranceRequests
+
+Query WithdrawInsuranceRequests.
+
+Usage
+
+```bash
+withdraw-insurance-requests
+```
+
+Example
+
+```bash
+# Query all withdraw-insurance-requests
+cantod query liquidstaking withdraw-insurance-requests -o json | jq
+# Query all withdraw-insurance-requests by provider address
+cantod query liquidstaking withdraw-insurance-requests --provider-address canto1xjlslz2vl7v6gu807fmfw8ae7726q9pf9t3x34 -o json | jq
+```
+
+## WithdrawInsuranceRequest
+
+Query a WithdrawInsuranceRequest by insurance id.
+
+Usage
+
+```bash
+withdraw-insurance-request [insurance-id] 
+```
+
+Example
+
+```bash
+# Query a withdraw-insurance-request by insurance id
+cantod query liquidstaking withdraw-insurance-request 3 -o json | jq
+```
+
+## UnpairingForUnstakingChunkInfos
+
+Query UnpairingForUnstakingChunkInfos.
+
+Usage
+
+```bash
+unpairing-for-unstaking-chunk-infos 
+```
+
+Example
+
+```bash
+# Query all unpairing-for-unstaking-chunk-infos
+cantod query liquidstaking unpairing-for-unstaking-chunk-infos -o json | jq
+# Query all queued unpairing-for-unstaking-chunk-infos
+cantod query liquidstaking unpairing-for-unstaking-chunk-infos --queued=true -o json | jq
+```
+
+## UnpairingForUnstakingChunkInfo
+
+Query an UnpairingForUnstakingChunkInfo by chunk id.
+
+Usage
+
+```bash
+unpairing-for-unstaking-chunk-info [chunk-id]
+```
+
+Example
+
+```bash
+# Query all unpairing-for-unstaking-chunk-info by chunk id
+cantod query liquidstaking unpairing-for-unstaking-chunk-info 1 -o json | jq
+```
+
+## RedelegationInfos
+
+Query RedelegationInfos.
+
+Usage
+
+```bash
+redelegation-infos
+```
+
+Example
+
+```bash
+# Query redelegation-infos
+cantod query liquidstaking redelegation-infos -o json | jq
+```
+
+## RedelegationInfo
+
+Query RedelegationInfo by chunk id.
+
+Usage
+
+```bash
+redelegation-info [chunk-id]
+```
+
+Example
+
+```bash
+# Query redelegation-info by chunk id
+cantod query liquidstaking redelegation-info 1 -o json | jq
+```
+
+## ChunkSize
+
+Query ChunkSize.
+
+Usage
+
+```bash
+chunk-size
+```
+
+Example
+
+```bash
+# Query chunk size
+cantod query liquidstaking chunk-size -o json | jq
+```
+
+## MinimumCollateral
+
+Query MinimumCollateral.
+
+Usage
+
+```bash
+minimum-collateral
+```
+
+Example
+
+```bash
+# Query minimum collateral  
+cantod query liquidstaking minimum-collateral -o json | jq
+```
+
 ## States
 
 Query net amount state.
@@ -398,24 +598,4 @@ Example
 
 ```bash
 cantod query liquidstaking states -o json | jq
-```
-
-## VotingPower
-
-Query the voter’s staking and liquid staking voting power.
-
-Usage
-
-```bash
-voting-power [voter]
-```
-
-| **Argument** |  **Description**      |
-| :----------- | :-------------------- |
-| voter        | voter account address |
-
-Example
-
-```bash
-cantod query liquidstaking voting-power cre1mzgucqnfr2l8cj5apvdpllhzt4zeuh2c5l33n3 -o json | jq
 ```

@@ -22,5 +22,6 @@ message GenesisState {
       9 [ (gogoproto.nullable) = false ];
   repeated WithdrawInsuranceRequest withdraw_insurance_requests = 10
       [ (gogoproto.nullable) = false ];
-  repeated RedelegationInfo redelegation_infos = 11 [ (gogoproto.nullable) = false ];
+  repeated RedelegationInfo redelegation_infos = 11
+      [ (gogoproto.nullable) = false ];
 }

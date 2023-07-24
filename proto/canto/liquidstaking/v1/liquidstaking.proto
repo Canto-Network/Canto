@@ -234,7 +234,7 @@ message NetAmountState {
     (gogoproto.nullable) = false
   ];
 
- // --- Chunk related fields
+  // --- Chunk related fields
   // The number of paired chunks
   string num_paired_chunks = 10 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
@@ -323,5 +323,5 @@ message RedelegationInfo {
   // The id of chunk
   uint64 chunk_id = 1;
   google.protobuf.Timestamp completion_time = 2
-  [ (gogoproto.stdtime) = true, (gogoproto.nullable) = false ];
+      [ (gogoproto.stdtime) = true, (gogoproto.nullable) = false ];
 }

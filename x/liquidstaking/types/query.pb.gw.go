@@ -1289,7 +1289,7 @@ var (
 
 	pattern_Query_UnpairingForUnstakingChunkInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"canto", "liquidstaking", "v1", "chunks", "id", "unpairing_for_unstaking_chunk_infos"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_RedelegationInfos_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"canto", "liquidstaking", "v1", "chunks", "redelegation_infos"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_RedelegationInfos_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"canto", "liquidstaking", "v1", "redelegation_infos"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_RedelegationInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"canto", "liquidstaking", "v1", "chunks", "id", "redelegation_infos"}, "", runtime.AssumeColonVerbOpt(true)))
 

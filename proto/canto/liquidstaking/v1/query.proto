@@ -78,14 +78,14 @@ service Query {
 
   rpc RedelegationInfos(QueryRedelegationInfosRequest)
       returns (QueryRedelegationInfosResponse) {
-    option (google.api.http).get = "/canto/liquidstaking/v1/chunks/redelegation_infos";
+    option (google.api.http).get = "/canto/liquidstaking/v1/redelegation_infos";
   }
 
   rpc RedelegationInfo(QueryRedelegationInfoRequest)
       returns (QueryRedelegationInfoResponse) {
-    option (google.api.http).get = "/canto/liquidstaking/v1/chunks/{id}/redelegation_infos";
+    option (google.api.http).get =
+        "/canto/liquidstaking/v1/chunks/{id}/redelegation_infos";
   }
-
 
   // ChunkSize returns the chunk size of the module.
   rpc ChunkSize(QueryChunkSizeRequest) returns (QueryChunkSizeResponse) {
@@ -213,18 +213,16 @@ message QueryRedelegationInfosRequest {
 }
 
 message QueryRedelegationInfosResponse {
-  repeated RedelegationInfo redelegation_infos = 1 [ (gogoproto.nullable) = false ];
+  repeated RedelegationInfo redelegation_infos = 1
+      [ (gogoproto.nullable) = false ];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
-message QueryRedelegationInfoRequest {
-  uint64 id = 1;
-}
+message QueryRedelegationInfoRequest { uint64 id = 1; }
 
 message QueryRedelegationInfoResponse {
   RedelegationInfo redelegation_info = 1 [ (gogoproto.nullable) = false ];
 }
-
 
 message QueryChunkSizeRequest {}
 message QueryChunkSizeResponse {
