@@ -15,8 +15,6 @@ import (
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 
 	cosmosante "github.com/Canto-Network/Canto/v6/app/ante/cosmos"
-
-	vestingtypes "github.com/Canto-Network/Canto/v6/x/vesting/types"
 	sdkvesting "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 )
 
@@ -27,7 +25,6 @@ type HandlerOptions struct {
 	BankKeeper      evmtypes.BankKeeper
 	IBCKeeper       *ibckeeper.Keeper
 	FeeMarketKeeper evmtypes.FeeMarketKeeper
-	StakingKeeper   vestingtypes.StakingKeeper
 	EvmKeeper       ethante.EVMKeeper
 	FeegrantKeeper  ante.FeegrantKeeper
 	SignModeHandler authsigning.SignModeHandler
@@ -43,9 +40,6 @@ func (options HandlerOptions) Validate() error {
 	}
 	if options.BankKeeper == nil {
 		return sdkerrors.Wrap(sdkerrors.ErrLogic, "bank keeper is required for AnteHandler")
-	}
-	if options.StakingKeeper == nil {
-		return sdkerrors.Wrap(sdkerrors.ErrLogic, "staking keeper is required for AnteHandler")
 	}
 	if options.SignModeHandler == nil {
 		return sdkerrors.Wrap(sdkerrors.ErrLogic, "sign mode handler is required for ante builder")
@@ -69,7 +63,6 @@ func newEthAnteHandler(options HandlerOptions) sdk.AnteHandler {
 		ethante.NewEthSigVerificationDecorator(options.EvmKeeper),
 		ethante.NewEthAccountVerificationDecorator(options.AccountKeeper, options.EvmKeeper),
 		ethante.NewCanTransferDecorator(options.EvmKeeper),
-		NewEthVestingTransactionDecorator(options.AccountKeeper),
 		ethante.NewEthGasConsumeDecorator(options.EvmKeeper, options.MaxTxGasWanted),
 		ethante.NewEthIncrementSenderSequenceDecorator(options.AccountKeeper),
 		ethante.NewGasWantedDecorator(options.EvmKeeper, options.FeeMarketKeeper),
@@ -94,7 +87,6 @@ func newCosmosAnteHandler(options HandlerOptions) sdk.AnteHandler {
 		ante.NewValidateMemoDecorator(options.AccountKeeper),
 		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
 		ante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper),
-		NewVestingDelegationDecorator(options.AccountKeeper, options.StakingKeeper, options.Cdc),
 		NewValidatorCommissionDecorator(options.Cdc),
 		// SetPubKeyDecorator must be called before all signature verification decorators
 		ante.NewSetPubKeyDecorator(options.AccountKeeper),
@@ -123,7 +115,6 @@ func newCosmosAnteHandlerEip712(options HandlerOptions) sdk.AnteHandler {
 		ante.NewValidateMemoDecorator(options.AccountKeeper),
 		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
 		ante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper),
-		NewVestingDelegationDecorator(options.AccountKeeper, options.StakingKeeper, options.Cdc),
 		NewValidatorCommissionDecorator(options.Cdc),
 		// SetPubKeyDecorator must be called before all signature verification decorators
 		ante.NewSetPubKeyDecorator(options.AccountKeeper),
