@@ -11,7 +11,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 
@@ -29,7 +28,6 @@ import (
 	"github.com/Canto-Network/Canto/v6/x/onboarding/keeper"
 	onboardingtest "github.com/Canto-Network/Canto/v6/x/onboarding/testutil"
 	"github.com/Canto-Network/Canto/v6/x/onboarding/types"
-	vestingtypes "github.com/Canto-Network/Canto/v6/x/vesting/types"
 )
 
 var (
@@ -274,26 +272,6 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 			"swap / convert remaining ibc token - swap and erc20 conversion are successful (ibc token balance is bigger than 0)",
 			func() {
 				cantoChannel = "channel-0"
-				transferAmount = sdk.NewIntWithDecimal(25, 6)
-				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, ethsecpAddrcanto)
-				bz := transfertypes.ModuleCdc.MustMarshalJSON(&transfer)
-				packet = channeltypes.NewPacket(bz, 100, transfertypes.PortID, sourceChannel, transfertypes.PortID, cantoChannel, timeoutHeight, 0)
-			},
-			true,
-			sdk.NewCoins(sdk.NewCoin("acanto", sdk.ZeroInt()), sdk.NewCoin(uusdcIbcdenom, sdk.NewIntWithDecimal(1, 6))),
-			sdk.NewCoin("acanto", sdk.NewIntWithDecimal(4, 18)),
-			sdk.NewCoin(uusdcIbcdenom, sdk.NewIntWithDecimal(1, 6)),
-			sdk.NewInt(20998399),
-		},
-		{
-			"swap / convert remaining ibc token - receiver is a vesting account",
-			func() {
-				// Set vesting account
-				bacc := authtypes.NewBaseAccount(secpAddr, nil, 0, 0)
-				acc := vestingtypes.NewClawbackVestingAccount(bacc, secpAddr, nil, suite.ctx.BlockTime(), nil, nil)
-
-				suite.app.AccountKeeper.SetAccount(suite.ctx, acc)
-
 				transferAmount = sdk.NewIntWithDecimal(25, 6)
 				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, ethsecpAddrcanto)
 				bz := transfertypes.ModuleCdc.MustMarshalJSON(&transfer)

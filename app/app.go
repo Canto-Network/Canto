@@ -146,6 +146,7 @@ import (
 	v4 "github.com/Canto-Network/Canto/v6/app/upgrades/v4"
 	v5 "github.com/Canto-Network/Canto/v6/app/upgrades/v5"
 	v6 "github.com/Canto-Network/Canto/v6/app/upgrades/v6"
+	v7 "github.com/Canto-Network/Canto/v6/app/upgrades/v7"
 )
 
 func init() {
@@ -783,9 +784,9 @@ func NewCanto(
 
 	maxGasWanted := cast.ToUint64(appOpts.Get(srvflags.EVMMaxTxGasWanted))
 	options := ante.HandlerOptions{
-		AccountKeeper: app.AccountKeeper,
-		BankKeeper:    app.BankKeeper,
-		EvmKeeper:     app.EvmKeeper,
+		AccountKeeper:   app.AccountKeeper,
+		BankKeeper:      app.BankKeeper,
+		EvmKeeper:       app.EvmKeeper,
 		FeegrantKeeper:  app.FeeGrantKeeper,
 		IBCKeeper:       app.IBCKeeper,
 		FeeMarketKeeper: app.FeeMarketKeeper,
