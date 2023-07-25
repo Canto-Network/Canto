@@ -1,4 +1,4 @@
-package v6_test
+package v7_test
 
 import (
 	"testing"
@@ -18,7 +18,7 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	chain "github.com/Canto-Network/Canto/v6/app"
-	v6 "github.com/Canto-Network/Canto/v6/app/upgrades/v6"
+	v7 "github.com/Canto-Network/Canto/v6/app/upgrades/v7"
 	coinswaptypes "github.com/Canto-Network/Canto/v6/x/coinswap/types"
 	onboardingtypes "github.com/Canto-Network/Canto/v6/x/onboarding/types"
 )
@@ -63,7 +63,7 @@ func TestKeeperTestSuite(t *testing.T) {
 
 const testUpgradeHeight = 10
 
-func (s *UpgradeTestSuite) TestUpgradeV6() {
+func (s *UpgradeTestSuite) TestUpgradeV7() {
 	testCases := []struct {
 		title   string
 		before  func()
@@ -71,7 +71,7 @@ func (s *UpgradeTestSuite) TestUpgradeV6() {
 		expPass bool
 	}{
 		{
-			"v6 upgrade onboarding & coinswap",
+			"v7 upgrade onboarding & coinswap",
 			func() {},
 			func() {
 				coinswapParams := s.app.CoinswapKeeper.GetParams(s.ctx)
@@ -103,7 +103,7 @@ func (s *UpgradeTestSuite) TestUpgradeV6() {
 			tc.before()
 
 			s.ctx = s.ctx.WithBlockHeight(testUpgradeHeight - 1)
-			plan := upgradetypes.Plan{Name: v6.UpgradeName, Height: testUpgradeHeight}
+			plan := upgradetypes.Plan{Name: v7.UpgradeName, Height: testUpgradeHeight}
 			err := s.app.UpgradeKeeper.ScheduleUpgrade(s.ctx, plan)
 			s.Require().NoError(err)
 			_, exists := s.app.UpgradeKeeper.GetUpgradePlan(s.ctx)

@@ -19,7 +19,6 @@ import (
 
 	"github.com/Canto-Network/Canto/v6/x/recovery/keeper"
 	"github.com/Canto-Network/Canto/v6/x/recovery/types"
-	vestingtypes "github.com/Canto-Network/Canto/v6/x/vesting/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 )
 
@@ -161,23 +160,6 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 				otherSecpAddrcanto := sdk.AccAddress(pk1.PubKey().Address()).String()
 
 				transfer := transfertypes.NewFungibleTokenPacketData(denom, "100", secpAddrCosmos, otherSecpAddrcanto)
-				bz := transfertypes.ModuleCdc.MustMarshalJSON(&transfer)
-				packet = channeltypes.NewPacket(bz, 100, transfertypes.PortID, sourceChannel, transfertypes.PortID, cantoChannel, timeoutHeight, 0)
-			},
-			true,
-			false,
-			coins,
-		},
-		{
-			"continue - receiver is a vesting account",
-			func() {
-				// Set vesting account
-				bacc := authtypes.NewBaseAccount(ethsecpAddr, nil, 0, 0)
-				acc := vestingtypes.NewClawbackVestingAccount(bacc, ethsecpAddr, nil, suite.ctx.BlockTime(), nil, nil)
-
-				suite.app.AccountKeeper.SetAccount(suite.ctx, acc)
-
-				transfer := transfertypes.NewFungibleTokenPacketData(denom, "100", ethsecpAddrCosmos, ethsecpAddrcanto)
 				bz := transfertypes.ModuleCdc.MustMarshalJSON(&transfer)
 				packet = channeltypes.NewPacket(bz, 100, transfertypes.PortID, sourceChannel, transfertypes.PortID, cantoChannel, timeoutHeight, 0)
 			},
