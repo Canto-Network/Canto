@@ -2,3 +2,7 @@
 .testnets
 .bencher
 DS_Store
+node_modules
+.idea
+coverage.txt
+build
