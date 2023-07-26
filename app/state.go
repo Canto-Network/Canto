@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
@@ -235,6 +236,7 @@ func AppStateFromGenesisFileFn(r io.Reader, cdc codec.JSONCodec, genesisFile str
 			PrivKey: privKey,
 			PubKey:  privKey.PubKey(),
 			Address: a.GetAddress(),
+			ConsKey: ed25519.GenPrivKeyFromSecret(privkeySeed),
 		}
 		newAccs[i] = simAcc
 	}

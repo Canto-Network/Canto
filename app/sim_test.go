@@ -7,9 +7,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/evmos/ethermint/encoding"
-	abci "github.com/tendermint/tendermint/abci/types"
-
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/store"
@@ -25,6 +22,7 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	ibctransfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
 	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
+	"github.com/evmos/ethermint/encoding"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/libs/log"
@@ -185,7 +183,7 @@ func TestAppImportExport(t *testing.T) {
 	require.NoError(t, err)
 
 	ctxA := app.NewContext(true, tmproto.Header{Height: app.LastBlockHeight()})
-	ctxB := newApp.NewContext(true, tmproto.Header{Height: app.LastBlockHeight()})
+	ctxB := newApp.NewContext(true, tmproto.Header{ChainID: config.ChainID, Height: app.LastBlockHeight()})
 	newApp.mm.InitGenesis(ctxB, app.AppCodec(), genesisState)
 	newApp.StoreConsensusParams(ctxB, exported.ConsensusParams)
 
@@ -394,9 +392,13 @@ func TestAppSimulationAfterImport(t *testing.T) {
 	)
 	require.Equal(t, cantoconfig.AppName, newApp.Name())
 
-	newApp.InitChain(abci.RequestInitChain{
-		AppStateBytes: exported.AppState,
-	})
+	var genesisState GenesisState
+	err = json.Unmarshal(exported.AppState, &genesisState)
+	require.NoError(t, err)
+
+	ctx := newApp.NewContext(true, tmproto.Header{ChainID: config.ChainID, Height: app.LastBlockHeight()})
+	newApp.mm.InitGenesis(ctx, app.AppCodec(), genesisState)
+	newApp.StoreConsensusParams(ctx, exported.ConsensusParams)
 
 	_, _, err = simulation.SimulateFromSeed(
 		t,
