@@ -1,5 +1,22 @@
 #!/usr/bin/make -f
 
+###
+# Find OS and Go environment
+# GO contains the Go binary
+# FS contains the OS file separator
+###
+ifeq ($(OS),Windows_NT)
+  GO := $(shell where go.exe 2> NUL)
+  FS := \\
+else
+  GO := $(shell command -v go 2> /dev/null)
+  FS := /
+endif
+
+ifeq ($(GO),)
+  $(error could not find go. Is it in PATH? $(GO))
+endif
+
 PACKAGES_NOSIMULATION=$(shell go list ./... | grep -v '/simulation')
 PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
 DIFF_TAG=$(shell git rev-list --tags="v*" --max-count=1 --not $(shell git rev-list --tags="v*" "HEAD..origin"))
@@ -8,6 +25,7 @@ VERSION ?= $(shell echo $(shell git describe --tags $(or $(DIFF_TAG), $(DEFAULT_
 TMVERSION := $(shell go list -m github.com/tendermint/tendermint | sed 's:.* ::')
 COMMIT := $(shell git log -1 --format='%H')
 LEDGER_ENABLED ?= true
+GOPATH ?= $(shell $(GO) env GOPATH)
 BINDIR ?= $(GOPATH)/bin
 canto_BINARY = cantod
 canto_DIR = cantod
@@ -188,7 +206,7 @@ RUNSIM         = $(TOOLS_DESTDIR)/runsim
 runsim: $(RUNSIM)
 $(RUNSIM):
 	@echo "Installing runsim..."
-	@(cd /tmp && ${GO_MOD} go get github.com/cosmos/tools/cmd/runsim@master)
+	@(cd /tmp && go install github.com/cosmos/tools/cmd/runsim@v1.0.0)
 
 statik: $(STATIK)
 $(STATIK):
@@ -362,7 +380,12 @@ test-rpc-pending:
 test-sim-nondeterminism:
 	@echo "Running non-determinism test..."
 	@go test -mod=readonly $(SIMAPP) -run TestAppStateDeterminism -Enabled=true \
-		-NumBlocks=100 -BlockSize=200 -Commit=true -Period=1 -v -timeout 1h
+		-NumBlocks=20 -BlockSize=100 -Commit=true -Period=1 -v -timeout 10m
+
+test-sim-nondeterminism-long:
+	@echo "Running non-determinism-long test..."
+	@go test -mod=readonly $(SIMAPP) -run TestAppStateDeterminism -Enabled=true \
+		-NumBlocks=100 -BlockSize=200 -Commit=true -Period=1 -v -timeout 10h
 
 test-sim-custom-genesis-fast:
 	@echo "Running custom genesis simulation..."
@@ -372,11 +395,21 @@ test-sim-custom-genesis-fast:
 
 test-sim-import-export: runsim
 	@echo "Running application import/export simulation. This may take several minutes..."
-	@$(BINDIR)/runsim -Jobs=4 -SimAppPkg=$(SIMAPP) -ExitOnFail 50 5 TestAppImportExport
+	@$(BINDIR)/runsim -Jobs=4 -SimAppPkg=$(SIMAPP) -Seeds=1,10,100,1000 -ExitOnFail 50 5 TestAppImportExport
+
+test-sim-import-export-long: runsim
+	@echo "Running application simulation-import-export-long. This may take several minutes..."
+	$(eval SEED := $(shell awk 'BEGIN{srand(); for (i=1; i<=50; i++) {n=int(10000*rand())+1; printf "%d%s", n, (i==50 ? "" : ",")}}'))
+	@$(BINDIR)/runsim -Jobs=4 -SimAppPkg=$(SIMAPP) -Seeds="$(SEED)" -ExitOnFail 500 5 TestAppImportExport
 
 test-sim-after-import: runsim
 	@echo "Running application simulation-after-import. This may take several minutes..."
-	@$(BINDIR)/runsim -Jobs=4 -SimAppPkg=$(SIMAPP) -ExitOnFail 50 5 TestAppSimulationAfterImport
+	@$(BINDIR)/runsim -Jobs=4 -SimAppPkg=$(SIMAPP) -Seeds=1,10,100,1000 -ExitOnFail 50 5 TestAppSimulationAfterImport
+
+test-sim-after-import-long: runsim
+	@echo "Running application simulation-after-import-long. This may take several minutes..."
+	$(eval SEED := $(shell awk 'BEGIN{srand(); for (i=1; i<=50; i++) {n=int(10000*rand())+1; printf "%d%s", n, (i==50 ? "" : ",")}}'))
+	@$(BINDIR)/runsim -Jobs=4 -SimAppPkg=$(SIMAPP) -Seeds="$(SEED)" -ExitOnFail 500 5 TestAppSimulationAfterImport
 
 test-sim-custom-genesis-multi-seed: runsim
 	@echo "Running multi-seed custom genesis simulation..."
