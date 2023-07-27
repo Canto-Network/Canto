@@ -93,12 +93,6 @@ func Setup(
 	return app
 }
 
-type EmptyAppOptions struct{}
-
-func (ao EmptyAppOptions) Get(o string) interface{} {
-	return nil
-}
-
 // SetupTestingApp initializes the IBC-go testing application
 func SetupTestingApp() (ibctesting.TestingApp, map[string]json.RawMessage) {
 	db := dbm.NewMemDB()

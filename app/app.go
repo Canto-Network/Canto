@@ -720,6 +720,7 @@ func NewCanto(
 	// NOTE: this is not required apps that don't use the simulator for fuzz testing
 	// transactions
 	app.sm = module.NewSimulationManager(
+		// basic sdk modules
 		auth.NewAppModule(appCodec, app.AccountKeeper, ethermintapp.RandomGenesisAccounts),
 		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper),
 		capability.NewAppModule(appCodec, *app.CapabilityKeeper),
@@ -729,14 +730,20 @@ func NewCanto(
 		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
-		// feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
+		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
+		ibc.NewAppModule(app.IBCKeeper),
+		transferModule,
+		// TODO: Temporary exclusion authz due to issues with implementation of authz simulation
 		// authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
-		// ibc.NewAppModule(app.IBCKeeper),
-		// transferModule,
-		// evm.NewAppModule(app.EvmKeeper, app.AccountKeeper),
+
+		// canto, ethermint modules
+		evm.NewAppModule(app.EvmKeeper, app.AccountKeeper),
 		epochs.NewAppModule(appCodec, app.EpochsKeeper),
 		inflation.NewAppModule(app.InflationKeeper, app.AccountKeeper, app.StakingKeeper),
-		// feemarket.NewAppModule(app.FeeMarketKeeper),
+		feemarket.NewAppModule(app.FeeMarketKeeper),
+
+		// TODO: Modules that have not yet been implemented for simulation
+		// govshuttle, csr, recovery, erc20
 	)
 
 	app.sm.RegisterStoreDecoders()
