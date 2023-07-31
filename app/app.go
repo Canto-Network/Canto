@@ -120,9 +120,6 @@ import (
 	"github.com/Canto-Network/Canto/v6/x/inflation"
 	inflationkeeper "github.com/Canto-Network/Canto/v6/x/inflation/keeper"
 	inflationtypes "github.com/Canto-Network/Canto/v6/x/inflation/types"
-	"github.com/Canto-Network/Canto/v6/x/recovery"
-	recoverykeeper "github.com/Canto-Network/Canto/v6/x/recovery/keeper"
-	recoverytypes "github.com/Canto-Network/Canto/v6/x/recovery/types"
 
 	//govshuttle imports
 	"github.com/Canto-Network/Canto/v6/x/govshuttle"
@@ -197,7 +194,6 @@ var (
 		govshuttle.AppModuleBasic{},
 		csr.AppModuleBasic{},
 		epochs.AppModuleBasic{},
-		recovery.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -274,7 +270,6 @@ type Canto struct {
 	InflationKeeper  inflationkeeper.Keeper
 	Erc20Keeper      erc20keeper.Keeper
 	EpochsKeeper     epochskeeper.Keeper
-	RecoveryKeeper   *recoverykeeper.Keeper
 	GovshuttleKeeper govshuttlekeeper.Keeper
 	CSRKeeper        csrkeeper.Keeper
 
@@ -333,7 +328,7 @@ func NewCanto(
 		evmtypes.StoreKey, feemarkettypes.StoreKey,
 		// Canto keys
 		inflationtypes.StoreKey, erc20types.StoreKey,
-		epochstypes.StoreKey, recoverytypes.StoreKey, //recoverytypes.StoreKe
+		epochstypes.StoreKey,
 		csrtypes.StoreKey,
 		govshuttletypes.StoreKey,
 	)
@@ -489,49 +484,16 @@ func NewCanto(
 	// RecvPacket, message that originates from core IBC and goes down to app, the flow is the otherway
 	// channel.RecvPacket -> recovery.OnRecvPacket -> claim.OnRecvPacket -> transfer.OnRecvPacket
 
-	// app.TransferKeeper = ibctransferkeeper.NewKeeper(
-	// 	appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName), app.RecoveryKeeper,
-	// 	//nil, // ICS4 Wrapper: claims IBC middleware
-	// 	app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
-	// 	app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
-	// )
-
-	// set Recovery Module as the ICS4Wrapper
-
-	app.RecoveryKeeper = recoverykeeper.NewKeeper(
-		app.GetSubspace(recoverytypes.ModuleName),
-		app.AccountKeeper,
-		app.BankKeeper,
-		app.IBCKeeper.ChannelKeeper,
-		app.TransferKeeper,
-	)
-
 	app.TransferKeeper = ibctransferkeeper.NewKeeper(
-		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName), app.RecoveryKeeper,
+		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName), app.IBCKeeper.ChannelKeeper,
 		//nil, // ICS4 Wrapper: claims IBC middleware
 		app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
 		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
 	)
 
-	app.RecoveryKeeper.SetTransferKeeper(app.TransferKeeper)
-
-	// app.TransferKeeper = ibctransferkeeper.NewKeeper(
-	// 	appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName),
-	// 	app.RecoveryKeeper,
-	// 	app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
-	// 	app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
-	// )
-	// Set the ICS4 wrappers for claims and recovery middlewares
-	app.RecoveryKeeper.SetICS4Wrapper(app.IBCKeeper.ChannelKeeper)
+	// Set the ICS4 wrappers for onboarding middleware
+	// SET ONBOARDING MIDDLEWARE ICS4 WRAPPER
 	// NOTE: ICS4 wrapper for Transfer Keeper already set
-
-	// set Recovery Module as the ICS4Wrapper
-	// app.TransferKeeper = ibctransferkeeper.NewKeeper(
-	// 	appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName),
-	// 	app.RecoveryKeeper,
-	// 	app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
-	// 	app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
-	// )
 
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
 
@@ -543,7 +505,7 @@ func NewCanto(
 	var transferStack porttypes.IBCModule
 
 	transferStack = transfer.NewIBCModule(app.TransferKeeper)
-	transferStack = recovery.NewIBCMiddleware(*app.RecoveryKeeper, transferStack)
+	// ADD ONBOARDING MIDDLEWARE TO TRANSFER STACK
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
@@ -595,7 +557,6 @@ func NewCanto(
 		inflation.NewAppModule(app.InflationKeeper, app.AccountKeeper, app.StakingKeeper),
 		erc20.NewAppModule(app.Erc20Keeper, app.AccountKeeper),
 		epochs.NewAppModule(appCodec, app.EpochsKeeper),
-		recovery.NewAppModule(*app.RecoveryKeeper),
 		govshuttle.NewAppModule(app.GovshuttleKeeper, app.AccountKeeper),
 		csr.NewAppModule(app.CSRKeeper, app.AccountKeeper),
 	)
@@ -630,7 +591,6 @@ func NewCanto(
 		paramstypes.ModuleName,
 		inflationtypes.ModuleName,
 		erc20types.ModuleName,
-		recoverytypes.ModuleName,
 		govshuttletypes.ModuleName,
 		csrtypes.ModuleName,
 	)
@@ -644,7 +604,6 @@ func NewCanto(
 		feemarkettypes.ModuleName,
 		// Note: epochs' endblock should be "real" end of epochs, we keep epochs endblock at the end
 		epochstypes.ModuleName,
-		recoverytypes.ModuleName,
 		// no-op modules
 		ibchost.ModuleName,
 		ibctransfertypes.ModuleName,
@@ -700,7 +659,6 @@ func NewCanto(
 		inflationtypes.ModuleName,
 		erc20types.ModuleName,
 		epochstypes.ModuleName,
-		recoverytypes.ModuleName,
 		govshuttletypes.ModuleName,
 		csrtypes.ModuleName,
 		// NOTE: crisis module must go at the end to check for invariants on each module
@@ -1025,7 +983,6 @@ func initParamsKeeper(
 	// Canto subspaces
 	paramsKeeper.Subspace(inflationtypes.ModuleName)
 	paramsKeeper.Subspace(erc20types.ModuleName)
-	paramsKeeper.Subspace(recoverytypes.ModuleName)
 	paramsKeeper.Subspace(govshuttletypes.ModuleName)
 	paramsKeeper.Subspace(csrtypes.ModuleName)
 	return paramsKeeper
