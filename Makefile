@@ -380,12 +380,12 @@ test-rpc-pending:
 test-sim-nondeterminism:
 	@echo "Running non-determinism test..."
 	@go test -mod=readonly $(SIMAPP) -run TestAppStateDeterminism -Enabled=true \
-		-NumBlocks=20 -BlockSize=100 -Commit=true -Period=1 -v -timeout 10m
+		-NumBlocks=20 -BlockSize=100 -Commit=true -Seed=42 -Period=1 -v -timeout 10m
 
 test-sim-nondeterminism-long:
 	@echo "Running non-determinism-long test..."
 	@go test -mod=readonly $(SIMAPP) -run TestAppStateDeterminism -Enabled=true \
-		-NumBlocks=100 -BlockSize=200 -Commit=true -Period=1 -v -timeout 10h
+		-NumBlocks=100 -BlockSize=200 -Commit=true -Seed=42 -Period=1 -v -timeout 10h
 
 test-sim-custom-genesis-fast:
 	@echo "Running custom genesis simulation..."
