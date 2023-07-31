@@ -1022,7 +1022,7 @@ paths:
                         id:
                           type: string
                           format: uint64
-                          title: Id of the chunk
+                          title: Unique id increased by 1
                         paired_insurance_id:
                           type: string
                           format: uint64
@@ -1030,8 +1030,8 @@ paths:
                         unpairing_insurance_id:
                           type: string
                           format: uint64
+                          title: Id of Unpairing insurance, 0 means no insurance
                         status:
-                          title: Status of the chunk
                           type: string
                           enum:
                             - CHUNK_STATUS_UNSPECIFIED
@@ -1054,27 +1054,27 @@ paths:
 
                             designated by the insurance provider.
                              - CHUNK_STATUS_UNPAIRING: A paired chunk enters this status when paired insurance is started to be
-                            withdrawn or is insufficient (meaning the insurance
-                            balance is below the
+                            withdrawn or it's balance <=
+                            5.75%(double_sign_fraction +
 
-                            minimum requirement to be considered valid
-                            insurance) or the validator of
+                            down_time_fraction) of chunk size tokens or the
+                            validator becomes
 
-                            the insurance becomes tombstoned.
+                            tombstoned.
                              - CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING: When a delegator (also known as a liquid staker) sends a MsgLiquidUnstake,
-                            it is queued as a PendingLiquidUnstake. At the end
-                            of the epoch,
+                            it is queued as a UnpairingForUnstakingChunkInfo. At
+                            the end of the epoch,
 
                             the actual undelegation is triggered and the chunk
                             enters this state.
 
                             Once the unbonding period is over in next epoch, the
-                            staked tokens are
+                            tokens corresponding
 
-                            returned to the delegator's account and the
-                            associated chunk object is
+                            chunk size are returned to the delegator's account
+                            and the associated chunk
 
-                            removed.
+                            object is removed.
                       description: Chunk defines the chunk of the module.
                     derived_address:
                       type: string
@@ -1143,26 +1143,25 @@ paths:
 
             designated by the insurance provider.
              - CHUNK_STATUS_UNPAIRING: A paired chunk enters this status when paired insurance is started to be
-            withdrawn or is insufficient (meaning the insurance balance is below
-            the
+            withdrawn or it's balance <= 5.75%(double_sign_fraction +
 
-            minimum requirement to be considered valid insurance) or the
-            validator of
+            down_time_fraction) of chunk size tokens or the validator becomes
 
-            the insurance becomes tombstoned.
+            tombstoned.
              - CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING: When a delegator (also known as a liquid staker) sends a MsgLiquidUnstake,
-            it is queued as a PendingLiquidUnstake. At the end of the epoch,
+            it is queued as a UnpairingForUnstakingChunkInfo. At the end of the
+            epoch,
 
             the actual undelegation is triggered and the chunk enters this
             state.
 
-            Once the unbonding period is over in next epoch, the staked tokens
-            are
+            Once the unbonding period is over in next epoch, the tokens
+            corresponding
 
-            returned to the delegator's account and the associated chunk object
-            is
+            chunk size are returned to the delegator's account and the
+            associated chunk
 
-            removed.
+            object is removed.
           in: query
           required: false
           type: string
@@ -1249,7 +1248,7 @@ paths:
                   id:
                     type: string
                     format: uint64
-                    title: Id of the chunk
+                    title: Unique id increased by 1
                   paired_insurance_id:
                     type: string
                     format: uint64
@@ -1257,8 +1256,8 @@ paths:
                   unpairing_insurance_id:
                     type: string
                     format: uint64
+                    title: Id of Unpairing insurance, 0 means no insurance
                   status:
-                    title: Status of the chunk
                     type: string
                     enum:
                       - CHUNK_STATUS_UNSPECIFIED
@@ -1281,30 +1280,77 @@ paths:
 
                       designated by the insurance provider.
                        - CHUNK_STATUS_UNPAIRING: A paired chunk enters this status when paired insurance is started to be
-                      withdrawn or is insufficient (meaning the insurance
-                      balance is below the
+                      withdrawn or it's balance <= 5.75%(double_sign_fraction +
 
-                      minimum requirement to be considered valid insurance) or
-                      the validator of
+                      down_time_fraction) of chunk size tokens or the validator
+                      becomes
 
-                      the insurance becomes tombstoned.
+                      tombstoned.
                        - CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING: When a delegator (also known as a liquid staker) sends a MsgLiquidUnstake,
-                      it is queued as a PendingLiquidUnstake. At the end of the
-                      epoch,
+                      it is queued as a UnpairingForUnstakingChunkInfo. At the
+                      end of the epoch,
 
                       the actual undelegation is triggered and the chunk enters
                       this state.
 
                       Once the unbonding period is over in next epoch, the
-                      staked tokens are
+                      tokens corresponding
 
-                      returned to the delegator's account and the associated
-                      chunk object is
+                      chunk size are returned to the delegator's account and the
+                      associated chunk
 
-                      removed.
+                      object is removed.
                 description: Chunk defines the chunk of the module.
               derived_address:
                 type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
+  /canto/liquidstaking/v1/chunks/{id}/redelegation_infos:
+    get:
+      operationId: RedelegationInfo
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              redelegation_info:
+                type: object
+                properties:
+                  chunk_id:
+                    type: string
+                    format: uint64
+                  completion_time:
+                    type: string
+                    format: date-time
         default:
           description: An unexpected error response.
           schema:
@@ -1355,13 +1401,13 @@ paths:
                   chunk_id:
                     type: string
                     format: uint64
-                    title: The id of chunk
+                    title: Which chunk is unpairing for unstaking
                   delegator_address:
                     type: string
                     title: Address of delegator (=liquid unstaker)
                   escrowed_lstokens:
                     type: string
-                    title: Amount of ls tokens to burn
+                    title: How much lstokens will be burned when unbonding finished
         default:
           description: An unexpected error response.
           schema:
@@ -1461,7 +1507,7 @@ paths:
                         id:
                           type: string
                           format: uint64
-                          title: Id of the insurance
+                          title: Unique id increased by 1
                         validator_address:
                           type: string
                           title: Address of the validator
@@ -1470,7 +1516,6 @@ paths:
                           title: Address of the insurance provider
                         fee_rate:
                           type: string
-                          title: Fee rate of the insurance
                         chunk_id:
                           type: string
                           format: uint64
@@ -1516,18 +1561,22 @@ paths:
                             the chunk remains same size and maximize its staking
                             rewards.
                              - INSURANCE_STATUS_UNPAIRING: A paired insurance enters this status when it no longer has enough balance
-                            to cover slashing penalties, when the validator is
-                            tombstoned, or
+                            (=5.75% of chunk size tokens) to cover slashing
+                            penalties, when the
 
-                            when the paired chunk is started to be undelegated.
+                            validator is tombstoned, or when the paired chunk is
+                            started to be
 
-                            At the next epoch, unpairing will be unpaired.
-                             - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL: A paired insurance enters this status when there are
-                            queued withdrawal insurance requests created by
+                            undelegated by MsgLiquidUnstake. At the next epoch,
+                            unpairing will be
+
+                            unpaired or pairing if it still valid.
+                             - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL: A paired insurance enters this status when there was a
+                            queued WithdrawalInsuranceRequest created by
                             MsgWithdrawInsurance at the
 
                             epoch.
-                             - INSURANCE_STATUS_UNPAIRED: Unpairing insurances from previous epoch enters this status.
+                             - INSURANCE_STATUS_UNPAIRED: Unpairing insurances from previous epoch can enter this status.
                             Unpaired insurance can be withdrawn immediately by
                             MsgWithdrawInsurance.
                       description: Insurance defines the insurance of the module.
@@ -1613,17 +1662,20 @@ paths:
 
             the chunk remains same size and maximize its staking rewards.
              - INSURANCE_STATUS_UNPAIRING: A paired insurance enters this status when it no longer has enough balance
-            to cover slashing penalties, when the validator is tombstoned, or
+            (=5.75% of chunk size tokens) to cover slashing penalties, when the
 
-            when the paired chunk is started to be undelegated.
+            validator is tombstoned, or when the paired chunk is started to be
 
-            At the next epoch, unpairing will be unpaired.
-             - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL: A paired insurance enters this status when there are
-            queued withdrawal insurance requests created by MsgWithdrawInsurance
-            at the
+            undelegated by MsgLiquidUnstake. At the next epoch, unpairing will
+            be
+
+            unpaired or pairing if it still valid.
+             - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL: A paired insurance enters this status when there was a
+            queued WithdrawalInsuranceRequest created by MsgWithdrawInsurance at
+            the
 
             epoch.
-             - INSURANCE_STATUS_UNPAIRED: Unpairing insurances from previous epoch enters this status.
+             - INSURANCE_STATUS_UNPAIRED: Unpairing insurances from previous epoch can enter this status.
             Unpaired insurance can be withdrawn immediately by
             MsgWithdrawInsurance.
           in: query
@@ -1723,7 +1775,7 @@ paths:
                   id:
                     type: string
                     format: uint64
-                    title: Id of the insurance
+                    title: Unique id increased by 1
                   validator_address:
                     type: string
                     title: Address of the validator
@@ -1732,7 +1784,6 @@ paths:
                     title: Address of the insurance provider
                   fee_rate:
                     type: string
-                    title: Fee rate of the insurance
                   chunk_id:
                     type: string
                     format: uint64
@@ -1778,18 +1829,22 @@ paths:
                       the chunk remains same size and maximize its staking
                       rewards.
                        - INSURANCE_STATUS_UNPAIRING: A paired insurance enters this status when it no longer has enough balance
-                      to cover slashing penalties, when the validator is
-                      tombstoned, or
+                      (=5.75% of chunk size tokens) to cover slashing penalties,
+                      when the
 
-                      when the paired chunk is started to be undelegated.
+                      validator is tombstoned, or when the paired chunk is
+                      started to be
 
-                      At the next epoch, unpairing will be unpaired.
-                       - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL: A paired insurance enters this status when there are
-                      queued withdrawal insurance requests created by
+                      undelegated by MsgLiquidUnstake. At the next epoch,
+                      unpairing will be
+
+                      unpaired or pairing if it still valid.
+                       - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL: A paired insurance enters this status when there was a
+                      queued WithdrawalInsuranceRequest created by
                       MsgWithdrawInsurance at the
 
                       epoch.
-                       - INSURANCE_STATUS_UNPAIRED: Unpairing insurances from previous epoch enters this status.
+                       - INSURANCE_STATUS_UNPAIRED: Unpairing insurances from previous epoch can enter this status.
                       Unpaired insurance can be withdrawn immediately by
                       MsgWithdrawInsurance.
                 description: Insurance defines the insurance of the module.
@@ -1843,7 +1898,7 @@ paths:
                   insurance_id:
                     type: string
                     format: uint64
-                    title: The id of insurance
+                    title: Which insurance is requested for withdrawal
         default:
           description: An unexpected error response.
           schema:
@@ -1984,6 +2039,8 @@ paths:
                     description: >-
                       DynamicFeeRate defines parameters realated with dynamic
                       fee rate mechanism.
+                  maximum_discount_rate:
+                    type: string
             description: >-
               QueryParamsResponse is the response type for the Query/Params RPC
               method.
@@ -2009,6 +2066,136 @@ paths:
                     value:
                       type: string
                       format: byte
+      tags:
+        - Query
+  /canto/liquidstaking/v1/redelegation_infos:
+    get:
+      operationId: RedelegationInfos
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              redelegation_infos:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    chunk_id:
+                      type: string
+                      format: uint64
+                    completion_time:
+                      type: string
+                      format: date-time
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending
+
+            order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   /canto/liquidstaking/v1/states:
@@ -2040,10 +2227,13 @@ paths:
                     type: string
                     title: >-
                       Calculated by reward module account's native token balance
-                      + all paired
+                      + all
 
-                      chunk's native token balance + all delegation tokens of
-                      paired chunks
+                      all chunk's native token balance + sum of token values of
+                      all chunk's
+
+                      delegation shares + sum of all remaining rewards of paired
+                      chunks since
 
                       last Epoch + all unbonding delegation tokens of unpairing
                       chunks
@@ -2079,7 +2269,7 @@ paths:
                     title: Current chunk size tokens
                   total_del_shares:
                     type: string
-                    title: Total shares of all paired chunks
+                    title: Total delegation shares of all paired chunks
                   total_remaining_rewards:
                     type: string
                     title: >-
@@ -2100,10 +2290,8 @@ paths:
                       period is finished.
                   total_unbonding_chunks_balance:
                     type: string
-                    title: >-
-                      The sum of unbonding balance of all chunks in Unpairing
-                      and
-
+                    title: |-
+                      The sum of unbonding balance of all chunks in Unpairing or
                       UnpairingForUnstaking
                   total_insurance_tokens:
                     type: string
@@ -2179,13 +2367,13 @@ paths:
                     chunk_id:
                       type: string
                       format: uint64
-                      title: The id of chunk
+                      title: Which chunk is unpairing for unstaking
                     delegator_address:
                       type: string
                       title: Address of delegator (=liquid unstaker)
                     escrowed_lstokens:
                       type: string
-                      title: Amount of ls tokens to burn
+                      title: How much lstokens will be burned when unbonding finished
               pagination:
                 type: object
                 properties:
@@ -2327,7 +2515,7 @@ paths:
                     insurance_id:
                       type: string
                       format: uint64
-                      title: The id of insurance
+                      title: Which insurance is requested for withdrawal
               pagination:
                 type: object
                 properties:
@@ -35300,7 +35488,7 @@ definitions:
       id:
         type: string
         format: uint64
-        title: Id of the chunk
+        title: Unique id increased by 1
       paired_insurance_id:
         type: string
         format: uint64
@@ -35308,8 +35496,8 @@ definitions:
       unpairing_insurance_id:
         type: string
         format: uint64
+        title: Id of Unpairing insurance, 0 means no insurance
       status:
-        title: Status of the chunk
         type: string
         enum:
           - CHUNK_STATUS_UNSPECIFIED
@@ -35331,23 +35519,24 @@ definitions:
 
           designated by the insurance provider.
            - CHUNK_STATUS_UNPAIRING: A paired chunk enters this status when paired insurance is started to be
-          withdrawn or is insufficient (meaning the insurance balance is below
-          the
+          withdrawn or it's balance <= 5.75%(double_sign_fraction +
 
-          minimum requirement to be considered valid insurance) or the validator
-          of
+          down_time_fraction) of chunk size tokens or the validator becomes
 
-          the insurance becomes tombstoned.
+          tombstoned.
            - CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING: When a delegator (also known as a liquid staker) sends a MsgLiquidUnstake,
-          it is queued as a PendingLiquidUnstake. At the end of the epoch,
+          it is queued as a UnpairingForUnstakingChunkInfo. At the end of the
+          epoch,
 
           the actual undelegation is triggered and the chunk enters this state.
 
-          Once the unbonding period is over in next epoch, the staked tokens are
+          Once the unbonding period is over in next epoch, the tokens
+          corresponding
 
-          returned to the delegator's account and the associated chunk object is
+          chunk size are returned to the delegator's account and the associated
+          chunk
 
-          removed.
+          object is removed.
     description: Chunk defines the chunk of the module.
   canto.liquidstaking.v1.ChunkStatus:
     type: string
@@ -35358,25 +35547,34 @@ definitions:
       - CHUNK_STATUS_UNPAIRING
       - CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING
     default: CHUNK_STATUS_UNSPECIFIED
-    description: |-
+    description: >-
       ChunkStatus defines the status of the chunk.
 
        - CHUNK_STATUS_PAIRING: This status indicates that the chunk is ready to be paired with an
       insurance.
        - CHUNK_STATUS_PAIRED: A chunk is paired with an insurance that has the lowest fee rate.
       The fee rate is determined by the sum of the insurance fee rate set by
+
       the insurance provider and the commission fee rate set by the validator
+
       designated by the insurance provider.
        - CHUNK_STATUS_UNPAIRING: A paired chunk enters this status when paired insurance is started to be
-      withdrawn or is insufficient (meaning the insurance balance is below the
-      minimum requirement to be considered valid insurance) or the validator of
-      the insurance becomes tombstoned.
+      withdrawn or it's balance <= 5.75%(double_sign_fraction +
+
+      down_time_fraction) of chunk size tokens or the validator becomes
+
+      tombstoned.
        - CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING: When a delegator (also known as a liquid staker) sends a MsgLiquidUnstake,
-      it is queued as a PendingLiquidUnstake. At the end of the epoch,
+      it is queued as a UnpairingForUnstakingChunkInfo. At the end of the epoch,
+
       the actual undelegation is triggered and the chunk enters this state.
-      Once the unbonding period is over in next epoch, the staked tokens are
-      returned to the delegator's account and the associated chunk object is
-      removed.
+
+      Once the unbonding period is over in next epoch, the tokens corresponding
+
+      chunk size are returned to the delegator's account and the associated
+      chunk
+
+      object is removed.
   canto.liquidstaking.v1.DynamicFeeRate:
     type: object
     properties:
@@ -35439,7 +35637,7 @@ definitions:
       id:
         type: string
         format: uint64
-        title: Id of the insurance
+        title: Unique id increased by 1
       validator_address:
         type: string
         title: Address of the validator
@@ -35448,7 +35646,6 @@ definitions:
         title: Address of the insurance provider
       fee_rate:
         type: string
-        title: Fee rate of the insurance
       chunk_id:
         type: string
         format: uint64
@@ -35489,17 +35686,19 @@ definitions:
 
           the chunk remains same size and maximize its staking rewards.
            - INSURANCE_STATUS_UNPAIRING: A paired insurance enters this status when it no longer has enough balance
-          to cover slashing penalties, when the validator is tombstoned, or
+          (=5.75% of chunk size tokens) to cover slashing penalties, when the
 
-          when the paired chunk is started to be undelegated.
+          validator is tombstoned, or when the paired chunk is started to be
 
-          At the next epoch, unpairing will be unpaired.
-           - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL: A paired insurance enters this status when there are
-          queued withdrawal insurance requests created by MsgWithdrawInsurance
-          at the
+          undelegated by MsgLiquidUnstake. At the next epoch, unpairing will be
+
+          unpaired or pairing if it still valid.
+           - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL: A paired insurance enters this status when there was a
+          queued WithdrawalInsuranceRequest created by MsgWithdrawInsurance at
+          the
 
           epoch.
-           - INSURANCE_STATUS_UNPAIRED: Unpairing insurances from previous epoch enters this status.
+           - INSURANCE_STATUS_UNPAIRED: Unpairing insurances from previous epoch can enter this status.
           Unpaired insurance can be withdrawn immediately by
           MsgWithdrawInsurance.
     description: Insurance defines the insurance of the module.
@@ -35537,17 +35736,18 @@ definitions:
 
       the chunk remains same size and maximize its staking rewards.
        - INSURANCE_STATUS_UNPAIRING: A paired insurance enters this status when it no longer has enough balance
-      to cover slashing penalties, when the validator is tombstoned, or
+      (=5.75% of chunk size tokens) to cover slashing penalties, when the
 
-      when the paired chunk is started to be undelegated.
+      validator is tombstoned, or when the paired chunk is started to be
 
-      At the next epoch, unpairing will be unpaired.
-       - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL: A paired insurance enters this status when there are
-      queued withdrawal insurance requests created by MsgWithdrawInsurance at
-      the
+      undelegated by MsgLiquidUnstake. At the next epoch, unpairing will be
+
+      unpaired or pairing if it still valid.
+       - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL: A paired insurance enters this status when there was a
+      queued WithdrawalInsuranceRequest created by MsgWithdrawInsurance at the
 
       epoch.
-       - INSURANCE_STATUS_UNPAIRED: Unpairing insurances from previous epoch enters this status.
+       - INSURANCE_STATUS_UNPAIRED: Unpairing insurances from previous epoch can enter this status.
       Unpaired insurance can be withdrawn immediately by MsgWithdrawInsurance.
   canto.liquidstaking.v1.NetAmountState:
     type: object
@@ -35568,9 +35768,11 @@ definitions:
         type: string
         title: >-
           Calculated by reward module account's native token balance + all
-          paired
 
-          chunk's native token balance + all delegation tokens of paired chunks
+          all chunk's native token balance + sum of token values of all chunk's
+
+          delegation shares + sum of all remaining rewards of paired chunks
+          since
 
           last Epoch + all unbonding delegation tokens of unpairing chunks
       total_liquid_tokens:
@@ -35603,7 +35805,7 @@ definitions:
         title: Current chunk size tokens
       total_del_shares:
         type: string
-        title: Total shares of all paired chunks
+        title: Total delegation shares of all paired chunks
       total_remaining_rewards:
         type: string
         title: >-
@@ -35625,7 +35827,7 @@ definitions:
       total_unbonding_chunks_balance:
         type: string
         title: |-
-          The sum of unbonding balance of all chunks in Unpairing and
+          The sum of unbonding balance of all chunks in Unpairing or
           UnpairingForUnstaking
       total_insurance_tokens:
         type: string
@@ -35701,6 +35903,8 @@ definitions:
         description: >-
           DynamicFeeRate defines parameters realated with dynamic fee rate
           mechanism.
+      maximum_discount_rate:
+        type: string
     description: Params defines the parameters for the module.
   canto.liquidstaking.v1.QueryChunkResponse:
     type: object
@@ -35711,7 +35915,7 @@ definitions:
           id:
             type: string
             format: uint64
-            title: Id of the chunk
+            title: Unique id increased by 1
           paired_insurance_id:
             type: string
             format: uint64
@@ -35719,8 +35923,8 @@ definitions:
           unpairing_insurance_id:
             type: string
             format: uint64
+            title: Id of Unpairing insurance, 0 means no insurance
           status:
-            title: Status of the chunk
             type: string
             enum:
               - CHUNK_STATUS_UNSPECIFIED
@@ -35743,26 +35947,25 @@ definitions:
 
               designated by the insurance provider.
                - CHUNK_STATUS_UNPAIRING: A paired chunk enters this status when paired insurance is started to be
-              withdrawn or is insufficient (meaning the insurance balance is
-              below the
+              withdrawn or it's balance <= 5.75%(double_sign_fraction +
 
-              minimum requirement to be considered valid insurance) or the
-              validator of
+              down_time_fraction) of chunk size tokens or the validator becomes
 
-              the insurance becomes tombstoned.
+              tombstoned.
                - CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING: When a delegator (also known as a liquid staker) sends a MsgLiquidUnstake,
-              it is queued as a PendingLiquidUnstake. At the end of the epoch,
+              it is queued as a UnpairingForUnstakingChunkInfo. At the end of
+              the epoch,
 
               the actual undelegation is triggered and the chunk enters this
               state.
 
-              Once the unbonding period is over in next epoch, the staked tokens
-              are
+              Once the unbonding period is over in next epoch, the tokens
+              corresponding
 
-              returned to the delegator's account and the associated chunk
-              object is
+              chunk size are returned to the delegator's account and the
+              associated chunk
 
-              removed.
+              object is removed.
         description: Chunk defines the chunk of the module.
       derived_address:
         type: string
@@ -35795,7 +35998,7 @@ definitions:
                 id:
                   type: string
                   format: uint64
-                  title: Id of the chunk
+                  title: Unique id increased by 1
                 paired_insurance_id:
                   type: string
                   format: uint64
@@ -35803,8 +36006,8 @@ definitions:
                 unpairing_insurance_id:
                   type: string
                   format: uint64
+                  title: Id of Unpairing insurance, 0 means no insurance
                 status:
-                  title: Status of the chunk
                   type: string
                   enum:
                     - CHUNK_STATUS_UNSPECIFIED
@@ -35827,27 +36030,26 @@ definitions:
 
                     designated by the insurance provider.
                      - CHUNK_STATUS_UNPAIRING: A paired chunk enters this status when paired insurance is started to be
-                    withdrawn or is insufficient (meaning the insurance balance
-                    is below the
+                    withdrawn or it's balance <= 5.75%(double_sign_fraction +
 
-                    minimum requirement to be considered valid insurance) or the
-                    validator of
+                    down_time_fraction) of chunk size tokens or the validator
+                    becomes
 
-                    the insurance becomes tombstoned.
+                    tombstoned.
                      - CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING: When a delegator (also known as a liquid staker) sends a MsgLiquidUnstake,
-                    it is queued as a PendingLiquidUnstake. At the end of the
-                    epoch,
+                    it is queued as a UnpairingForUnstakingChunkInfo. At the end
+                    of the epoch,
 
                     the actual undelegation is triggered and the chunk enters
                     this state.
 
-                    Once the unbonding period is over in next epoch, the staked
-                    tokens are
+                    Once the unbonding period is over in next epoch, the tokens
+                    corresponding
 
-                    returned to the delegator's account and the associated chunk
-                    object is
+                    chunk size are returned to the delegator's account and the
+                    associated chunk
 
-                    removed.
+                    object is removed.
               description: Chunk defines the chunk of the module.
             derived_address:
               type: string
@@ -35903,7 +36105,7 @@ definitions:
           id:
             type: string
             format: uint64
-            title: Id of the insurance
+            title: Unique id increased by 1
           validator_address:
             type: string
             title: Address of the validator
@@ -35912,7 +36114,6 @@ definitions:
             title: Address of the insurance provider
           fee_rate:
             type: string
-            title: Fee rate of the insurance
           chunk_id:
             type: string
             format: uint64
@@ -35955,17 +36156,21 @@ definitions:
 
               the chunk remains same size and maximize its staking rewards.
                - INSURANCE_STATUS_UNPAIRING: A paired insurance enters this status when it no longer has enough balance
-              to cover slashing penalties, when the validator is tombstoned, or
+              (=5.75% of chunk size tokens) to cover slashing penalties, when
+              the
 
-              when the paired chunk is started to be undelegated.
+              validator is tombstoned, or when the paired chunk is started to be
 
-              At the next epoch, unpairing will be unpaired.
-               - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL: A paired insurance enters this status when there are
-              queued withdrawal insurance requests created by
-              MsgWithdrawInsurance at the
+              undelegated by MsgLiquidUnstake. At the next epoch, unpairing will
+              be
+
+              unpaired or pairing if it still valid.
+               - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL: A paired insurance enters this status when there was a
+              queued WithdrawalInsuranceRequest created by MsgWithdrawInsurance
+              at the
 
               epoch.
-               - INSURANCE_STATUS_UNPAIRED: Unpairing insurances from previous epoch enters this status.
+               - INSURANCE_STATUS_UNPAIRED: Unpairing insurances from previous epoch can enter this status.
               Unpaired insurance can be withdrawn immediately by
               MsgWithdrawInsurance.
         description: Insurance defines the insurance of the module.
@@ -35987,7 +36192,7 @@ definitions:
                 id:
                   type: string
                   format: uint64
-                  title: Id of the insurance
+                  title: Unique id increased by 1
                 validator_address:
                   type: string
                   title: Address of the validator
@@ -35996,7 +36201,6 @@ definitions:
                   title: Address of the insurance provider
                 fee_rate:
                   type: string
-                  title: Fee rate of the insurance
                 chunk_id:
                   type: string
                   format: uint64
@@ -36042,18 +36246,22 @@ definitions:
                     the chunk remains same size and maximize its staking
                     rewards.
                      - INSURANCE_STATUS_UNPAIRING: A paired insurance enters this status when it no longer has enough balance
-                    to cover slashing penalties, when the validator is
-                    tombstoned, or
+                    (=5.75% of chunk size tokens) to cover slashing penalties,
+                    when the
 
-                    when the paired chunk is started to be undelegated.
+                    validator is tombstoned, or when the paired chunk is started
+                    to be
 
-                    At the next epoch, unpairing will be unpaired.
-                     - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL: A paired insurance enters this status when there are
-                    queued withdrawal insurance requests created by
+                    undelegated by MsgLiquidUnstake. At the next epoch,
+                    unpairing will be
+
+                    unpaired or pairing if it still valid.
+                     - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL: A paired insurance enters this status when there was a
+                    queued WithdrawalInsuranceRequest created by
                     MsgWithdrawInsurance at the
 
                     epoch.
-                     - INSURANCE_STATUS_UNPAIRED: Unpairing insurances from previous epoch enters this status.
+                     - INSURANCE_STATUS_UNPAIRED: Unpairing insurances from previous epoch can enter this status.
                     Unpaired insurance can be withdrawn immediately by
                     MsgWithdrawInsurance.
               description: Insurance defines the insurance of the module.
@@ -36151,7 +36359,60 @@ definitions:
             description: >-
               DynamicFeeRate defines parameters realated with dynamic fee rate
               mechanism.
+          maximum_discount_rate:
+            type: string
     description: QueryParamsResponse is the response type for the Query/Params RPC method.
+  canto.liquidstaking.v1.QueryRedelegationInfoResponse:
+    type: object
+    properties:
+      redelegation_info:
+        type: object
+        properties:
+          chunk_id:
+            type: string
+            format: uint64
+          completion_time:
+            type: string
+            format: date-time
+  canto.liquidstaking.v1.QueryRedelegationInfosResponse:
+    type: object
+    properties:
+      redelegation_infos:
+        type: array
+        items:
+          type: object
+          properties:
+            chunk_id:
+              type: string
+              format: uint64
+            completion_time:
+              type: string
+              format: date-time
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
   canto.liquidstaking.v1.QueryStatesResponse:
     type: object
     properties:
@@ -36174,10 +36435,12 @@ definitions:
             type: string
             title: >-
               Calculated by reward module account's native token balance + all
-              paired
 
-              chunk's native token balance + all delegation tokens of paired
-              chunks
+              all chunk's native token balance + sum of token values of all
+              chunk's
+
+              delegation shares + sum of all remaining rewards of paired chunks
+              since
 
               last Epoch + all unbonding delegation tokens of unpairing chunks
           total_liquid_tokens:
@@ -36212,7 +36475,7 @@ definitions:
             title: Current chunk size tokens
           total_del_shares:
             type: string
-            title: Total shares of all paired chunks
+            title: Total delegation shares of all paired chunks
           total_remaining_rewards:
             type: string
             title: >-
@@ -36234,7 +36497,7 @@ definitions:
           total_unbonding_chunks_balance:
             type: string
             title: |-
-              The sum of unbonding balance of all chunks in Unpairing and
+              The sum of unbonding balance of all chunks in Unpairing or
               UnpairingForUnstaking
           total_insurance_tokens:
             type: string
@@ -36273,13 +36536,13 @@ definitions:
           chunk_id:
             type: string
             format: uint64
-            title: The id of chunk
+            title: Which chunk is unpairing for unstaking
           delegator_address:
             type: string
             title: Address of delegator (=liquid unstaker)
           escrowed_lstokens:
             type: string
-            title: Amount of ls tokens to burn
+            title: How much lstokens will be burned when unbonding finished
   canto.liquidstaking.v1.QueryUnpairingForUnstakingChunkInfosResponse:
     type: object
     properties:
@@ -36291,13 +36554,13 @@ definitions:
             chunk_id:
               type: string
               format: uint64
-              title: The id of chunk
+              title: Which chunk is unpairing for unstaking
             delegator_address:
               type: string
               title: Address of delegator (=liquid unstaker)
             escrowed_lstokens:
               type: string
-              title: Amount of ls tokens to burn
+              title: How much lstokens will be burned when unbonding finished
       pagination:
         type: object
         properties:
@@ -36332,7 +36595,7 @@ definitions:
           insurance_id:
             type: string
             format: uint64
-            title: The id of insurance
+            title: Which insurance is requested for withdrawal
   canto.liquidstaking.v1.QueryWithdrawInsuranceRequestsResponse:
     type: object
     properties:
@@ -36344,7 +36607,7 @@ definitions:
             insurance_id:
               type: string
               format: uint64
-              title: The id of insurance
+              title: Which insurance is requested for withdrawal
       pagination:
         type: object
         properties:
@@ -36370,26 +36633,35 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
+  canto.liquidstaking.v1.RedelegationInfo:
+    type: object
+    properties:
+      chunk_id:
+        type: string
+        format: uint64
+      completion_time:
+        type: string
+        format: date-time
   canto.liquidstaking.v1.UnpairingForUnstakingChunkInfo:
     type: object
     properties:
       chunk_id:
         type: string
         format: uint64
-        title: The id of chunk
+        title: Which chunk is unpairing for unstaking
       delegator_address:
         type: string
         title: Address of delegator (=liquid unstaker)
       escrowed_lstokens:
         type: string
-        title: Amount of ls tokens to burn
+        title: How much lstokens will be burned when unbonding finished
   canto.liquidstaking.v1.WithdrawInsuranceRequest:
     type: object
     properties:
       insurance_id:
         type: string
         format: uint64
-        title: The id of insurance
+        title: Which insurance is requested for withdrawal
   ethermint.evm.v1.ChainConfig:
     type: object
     properties:

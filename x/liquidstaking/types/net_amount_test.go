@@ -22,10 +22,11 @@ func (suite *netAmountTestSuite) TestCalcNetAmount() {
 		TotalLiquidTokens:           sdk.MustNewDecFromStr("250000000000000000000000").TruncateInt(),
 		TotalUnbondingChunksBalance: sdk.MustNewDecFromStr("250000000000000000000000").TruncateInt(),
 		TotalRemainingRewards:       sdk.MustNewDecFromStr("160000000000000000000"),
+		RewardModuleAccBalance:      sdk.MustNewDecFromStr("160000000000000000000").TruncateInt(),
 	}
 	suite.Equal(
 		"500320000000000000000000.000000000000000000",
-		nas.CalcNetAmount(sdk.MustNewDecFromStr("160000000000000000000").TruncateInt()).String(),
+		nas.CalcNetAmount().String(),
 	)
 }
 

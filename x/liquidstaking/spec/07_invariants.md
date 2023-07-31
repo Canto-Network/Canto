@@ -20,14 +20,13 @@ all of check logics are treated as **OR** conditions, not **AND** condition
   - there is no paired insurance
   - cannot find paired insurance obj
   - cannot find delegation obj
-  - value of delegation shares ≤ ChunkSize tokens
+  - delegation shares < ChunkSize tokens
 - for any Unpairing and UnpairingForUnstaking chunk
   - there is no unpairing insurance
   - cannot find unpairing insurance obj
   - **if it is epoch then**
     - cannot find unbonding delegation obj
     - unbonding entries ≠ 1
-    - unbonding entries[0].InitialBalance < ChunkSize tokens
 - for any chunk status == Unspecified
 
 **Insurances invariant check broken when**
@@ -51,10 +50,13 @@ all of check logics are treated as **OR** conditions, not **AND** condition
 
 - for any info
   - cannot find related chunk obj
-  - related chunk’s (status ≠ Paried) and (status ≠ UnpairingForUnstaking)
 
 **WithdrawInsuranceRequests Invariant check broken when**
 
 - for any req
   - cannot find related insurance obj
-  - related insurance’s status ≠ Paired
+
+**RedelgationInfos Invariant check broken when**
+
+- for any info
+  - cannot find related chunk obj

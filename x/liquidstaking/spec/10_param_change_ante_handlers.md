@@ -15,6 +15,13 @@ Currently, the only way to change a parameter is through a param change proposal
 ## Param Change Limit Decorator 
 
 ### Slashing module
+Currently, when handle paired chunks, the liquidstaking module checks paired insurance's balance >= 5.75% of chunk size tokens. 
+If not, the paired chunk start to be unbonded. 5.75% is calculated based on the current slashing params.
+* 5%: SlashFractionDoubleSign
+* 0.75%: SlashFractionDowntime
+
+5.75% is very important to ensure the security of the liquidstaking module. So we need to impose restrictions on the slashing param changes.
+
 * SignedBlocksWindow, MinSignedPerWindow, DowntimeJailDuration are not allowed to be decreased.
   * If we decrease these params, the slashing penalty can be increased.
 

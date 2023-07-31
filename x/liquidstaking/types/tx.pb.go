@@ -34,7 +34,7 @@ type MsgLiquidStake struct {
 	// delegator_address is the address of the user who requests the liquid
 	// staking.
 	DelegatorAddress string `protobuf:"bytes,1,opt,name=delegator_address,json=delegatorAddress,proto3" json:"delegator_address,omitempty"`
-	// amount is the amount of native token to be liquid staked.
+	// (How many chunks to liquid stake?) x ChunkSize
 	Amount github_com_cosmos_cosmos_sdk_types.Coin `protobuf:"bytes,2,opt,name=amount,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Coin" json:"amount"`
 }
 
@@ -117,8 +117,7 @@ var xxx_messageInfo_MsgLiquidStakeResponse proto.InternalMessageInfo
 type MsgLiquidUnstake struct {
 	// delegator_address is the address of the user who want to liquid unstaking.
 	DelegatorAddress string `protobuf:"bytes,1,opt,name=delegator_address,json=delegatorAddress,proto3" json:"delegator_address,omitempty"`
-	// amount is the number calculated by (number of chunks want to unstake) *
-	// chunk.size. The delegator must have corresponding ls tokens to unstake.
+	// (How many chunks to be unstaked?) x ChunkSize
 	Amount github_com_cosmos_cosmos_sdk_types.Coin `protobuf:"bytes,2,opt,name=amount,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Coin" json:"amount"`
 }
 

@@ -2,7 +2,7 @@
 
 # BeginBlock
 
-The end block logic is executed at the end of each epoch.
+The begin block logic is executed at the end of each epoch.
 
 ## Cover Redelegation Penalty
 
@@ -11,5 +11,5 @@ The end block logic is executed at the end of each epoch.
   - calc diff between entry.SharesDst and dstDel.Shares
   - if calc is positive (meaning there is a penalty during the redelegation period)
     - calc penalty amt which is the token value of shares lost due to slashing 
-    - send penalty amt of tokens to chunk (if unpairing insurance balance is below penalty amt, send all insurance's balance to chunk)
+    - send penalty amt of tokens to chunk 
     - chunk delegate additional shares corresponding penalty amt

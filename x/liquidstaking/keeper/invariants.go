@@ -19,6 +19,8 @@ func RegisterInvariants(ir sdk.InvariantRegistry, k Keeper) {
 		UnpairingForUnstakingChunkInfosInvariant(k))
 	ir.RegisterRoute(types.ModuleName, "withdraw-insurance-requests",
 		WithdrawInsuranceRequestsInvariant(k))
+	ir.RegisterRoute(types.ModuleName, "redelegation-infos",
+		RedelegationInfosInvariant(k))
 }
 
 func AllInvariants(k Keeper) sdk.Invariant {
@@ -65,9 +67,9 @@ func ChunksInvariant(k Keeper) sdk.Invariant {
 		k.IterateAllChunks(ctx, func(chunk types.Chunk) bool {
 			switch chunk.Status {
 			case types.CHUNK_STATUS_PAIRING:
-				// must have empty paired insurance
+				// must have empty paired pairedIns
 				if chunk.HasPairedInsurance() {
-					msg += fmt.Sprintf("pairing chunk(id: %d) have non-empty paired insurance\n", chunk.Id)
+					msg += fmt.Sprintf("pairing chunk(id: %d) have non-empty paired pairedIns\n", chunk.Id)
 					brokenCount++
 					return false
 				}
@@ -86,19 +88,19 @@ func ChunksInvariant(k Keeper) sdk.Invariant {
 					brokenCount++
 					return false
 				}
-				insurance, found := k.GetInsurance(ctx, chunk.PairedInsuranceId)
+				pairedIns, found := k.GetInsurance(ctx, chunk.PairedInsuranceId)
 				if !found {
 					msg += fmt.Sprintf("not found paired insurance for paired chunk(id: %d)\n", chunk.Id)
 					brokenCount++
 					return false
 				}
-				if insurance.Status != types.INSURANCE_STATUS_PAIRED {
-					msg += fmt.Sprintf("paired chunk(id: %d) have paired insurance with invalid status: %s\n", chunk.Id, insurance.Status)
+				if pairedIns.Status != types.INSURANCE_STATUS_PAIRED {
+					msg += fmt.Sprintf("paired chunk(id: %d) have paired insurance with invalid status: %s\n", chunk.Id, pairedIns.Status)
 					brokenCount++
 					return false
 				}
 				// must have valid Delegation object
-				delegation, found := k.stakingKeeper.GetDelegation(ctx, chunk.DerivedAddress(), insurance.GetValidator())
+				delegation, found := k.stakingKeeper.GetDelegation(ctx, chunk.DerivedAddress(), pairedIns.GetValidator())
 				if !found {
 					msg += fmt.Sprintf("not found delegation for paired chunk(id: %d)\n", chunk.Id)
 					brokenCount++
@@ -106,7 +108,7 @@ func ChunksInvariant(k Keeper) sdk.Invariant {
 				}
 				delShares := delegation.GetShares()
 				if delShares.LT(types.ChunkSize.ToDec()) {
-					msg += fmt.Sprintf("delegation tokens of paired chunk(id: %d) is less than chunk size tokens: %s\n", chunk.Id, delShares.String())
+					msg += fmt.Sprintf("paired chunk's delegation sharesis less than chunk size tokens: %s(chunkId: %d)\n", delShares.String(), chunk.Id)
 					brokenCount++
 					return false
 				}
@@ -117,7 +119,7 @@ func ChunksInvariant(k Keeper) sdk.Invariant {
 					brokenCount++
 					return false
 				}
-				insurance, found := k.GetInsurance(ctx, chunk.UnpairingInsuranceId)
+				unpairingIns, found := k.GetInsurance(ctx, chunk.UnpairingInsuranceId)
 				if !found {
 					msg += fmt.Sprintf("not found unpairing insurance for unpairing chunk(id: %d)\n", chunk.Id)
 					brokenCount++
@@ -130,7 +132,7 @@ func ChunksInvariant(k Keeper) sdk.Invariant {
 					return false
 				}
 				// must have unbonding delegation
-				ubd, found := k.stakingKeeper.GetUnbondingDelegation(ctx, chunk.DerivedAddress(), insurance.GetValidator())
+				ubd, found := k.stakingKeeper.GetUnbondingDelegation(ctx, chunk.DerivedAddress(), unpairingIns.GetValidator())
 				if !found {
 					msg += fmt.Sprintf("not found unbonding delegation for unpairing chunk(id: %d)\n", chunk.Id)
 					brokenCount++
@@ -162,69 +164,69 @@ func InsurancesInvariant(k Keeper) sdk.Invariant {
 	return func(ctx sdk.Context) (string, bool) {
 		msg := ""
 		brokenCount := 0
-		k.IterateAllInsurances(ctx, func(insurance types.Insurance) bool {
-			switch insurance.Status {
+		k.IterateAllInsurances(ctx, func(ins types.Insurance) bool {
+			switch ins.Status {
 			case types.INSURANCE_STATUS_PAIRING:
 				// must have empty chunk
-				if insurance.HasChunk() {
-					msg += fmt.Sprintf("pairing insurance(id: %d) have non-empty paired chunk\n", insurance.Id)
+				if ins.HasChunk() {
+					msg += fmt.Sprintf("pairing insurance(id: %d) have non-empty paired chunk\n", ins.Id)
 					brokenCount++
 					return false
 				}
 			case types.INSURANCE_STATUS_PAIRED:
 				// must have paired chunk
-				if !insurance.HasChunk() {
-					msg += fmt.Sprintf("paired insurance(id: %d) have empty paired chunk\n", insurance.Id)
+				if !ins.HasChunk() {
+					msg += fmt.Sprintf("paired insurance(id: %d) have empty paired chunk\n", ins.Id)
 					brokenCount++
 					return false
 				}
-				chunk, found := k.GetChunk(ctx, insurance.ChunkId)
+				chunk, found := k.GetChunk(ctx, ins.ChunkId)
 				if !found {
-					msg += fmt.Sprintf("not found paired chunk for paired insurance(id: %d)\n", insurance.Id)
+					msg += fmt.Sprintf("not found paired chunk for paired insurance(id: %d)\n", ins.Id)
 					brokenCount++
 					return false
 				}
 				if chunk.Status != types.CHUNK_STATUS_PAIRED {
-					msg += fmt.Sprintf("paired insurance(id: %d) have invalid paired chunk status: %s\n", insurance.Id, chunk.Status)
+					msg += fmt.Sprintf("paired insurance(id: %d) have invalid paired chunk status: %s\n", ins.Id, chunk.Status)
 					brokenCount++
 					return false
 				}
 			case types.INSURANCE_STATUS_UNPAIRING:
 				// must have chunk to protect
-				if !insurance.HasChunk() {
-					msg += fmt.Sprintf("unpairing insurance(id: %d) have empty chunk to protect\n", insurance.Id)
+				if !ins.HasChunk() {
+					msg += fmt.Sprintf("unpairing insurance(id: %d) have empty chunk to protect\n", ins.Id)
 					brokenCount++
 					return false
 				}
-				_, found := k.GetChunk(ctx, insurance.ChunkId)
+				_, found := k.GetChunk(ctx, ins.ChunkId)
 				if !found {
-					msg += fmt.Sprintf("not found chunk to protect for unpairing insurance(id: %d)\n", insurance.Id)
+					msg += fmt.Sprintf("not found chunk to protect for unpairing insurance(id: %d)\n", ins.Id)
 					brokenCount++
 					return false
 				}
 
 			case types.INSURANCE_STATUS_UNPAIRED:
 				// must have empty chunk
-				if insurance.HasChunk() {
-					msg += fmt.Sprintf("unpaired insurance(id: %d) have non-empty paired chunk\n", insurance.Id)
+				if ins.HasChunk() {
+					msg += fmt.Sprintf("unpaired insurance(id: %d) have non-empty paired chunk\n", ins.Id)
 					brokenCount++
 					return false
 				}
 			case types.INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL:
 				// must have chunk to protect
-				if !insurance.HasChunk() {
-					msg += fmt.Sprintf("unpairing for withdrawal insurance(id: %d) have empty chunk to protect\n", insurance.Id)
+				if !ins.HasChunk() {
+					msg += fmt.Sprintf("unpairing for withdrawal insurance(id: %d) have empty chunk to protect\n", ins.Id)
 					brokenCount++
 					return false
 				}
-				_, found := k.GetChunk(ctx, insurance.ChunkId)
+				_, found := k.GetChunk(ctx, ins.ChunkId)
 				if !found {
-					msg += fmt.Sprintf("not found chunk to protect for unpairing for withdrawal insurance(id: %d)\n", insurance.Id)
+					msg += fmt.Sprintf("not found chunk to protect for unpairing for withdrawal insurance(id: %d)\n", ins.Id)
 					brokenCount++
 					return false
 				}
 			default:
-				msg += fmt.Sprintf("insurance(id: %d) have invalid status: %s\n", insurance.Id, insurance.Status)
+				msg += fmt.Sprintf("insurance(id: %d) have invalid status: %s\n", ins.Id, ins.Status)
 				brokenCount++
 				return false
 			}

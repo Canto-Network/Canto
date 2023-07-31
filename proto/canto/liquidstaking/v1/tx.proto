@@ -53,7 +53,7 @@ message MsgLiquidStake {
   // delegator_address is the address of the user who requests the liquid
   // staking.
   string delegator_address = 1;
-  // amount is the amount of native token to be liquid staked.
+  // (How many chunks to liquid stake?) x ChunkSize
   string amount = 2 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
     (gogoproto.nullable) = false
@@ -65,8 +65,7 @@ message MsgLiquidStakeResponse {}
 message MsgLiquidUnstake {
   // delegator_address is the address of the user who want to liquid unstaking.
   string delegator_address = 1;
-  // amount is the number calculated by (number of chunks want to unstake) *
-  // chunk.size. The delegator must have corresponding ls tokens to unstake.
+  // (How many chunks to be unstaked?) x ChunkSize
   string amount = 2 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
     (gogoproto.nullable) = false

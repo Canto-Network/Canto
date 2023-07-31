@@ -386,7 +386,6 @@ func (suite *KeeperTestSuite) setupLiquidStakeTestingEnv(env testingEnvOptions) 
 
 	bondDenom := suite.app.StakingKeeper.BondDenom(suite.ctx)
 	liquidBondDenom := suite.app.LiquidStakingKeeper.GetLiquidBondDenom(suite.ctx)
-	u := suite.app.LiquidStakingKeeper.CalcUtilizationRatio(suite.ctx)
 	fmt.Printf(`
 ===============================================================================
 Initial state of %s 
@@ -416,7 +415,7 @@ Initial state of %s
 		liquidBondDenom,
 		env.fundingAccountBalance,
 		suite.app.BankKeeper.GetSupply(suite.ctx, suite.denom).String(),
-		u.String(),
+		nas.UtilizationRatio.String(),
 	)
 	return testingEnv{
 		delegators,

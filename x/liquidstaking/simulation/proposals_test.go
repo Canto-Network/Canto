@@ -35,14 +35,22 @@ func TestProposalContents(t *testing.T) {
 
 	// execute ProposalContents function
 	weightedProposalContent := simulation.ProposalContents(app.LiquidStakingKeeper)
-	require.Len(t, weightedProposalContent, 1)
+	require.Len(t, weightedProposalContent, 2)
 
 	w0 := weightedProposalContent[0]
+	w1 := weightedProposalContent[1]
 
 	// tests w0 interface:
 	require.Equal(t, simulation.OpWeightSimulateUpdateDynamicFeeRateProposal, w0.AppParamsKey())
 	require.Equal(t, cantoapp.DefaultWeightUpdateDynamicFeeRateProposal, w0.DefaultWeight())
 
+	// tests w1 interface:
+	require.Equal(t, simulation.OpWeightSimulateUpdateMaximumDiscountRate, w1.AppParamsKey())
+	require.Equal(t, cantoapp.DefaultWeightUpdateMaximumDiscountRate, w1.DefaultWeight())
+
 	content0 := w0.ContentSimulatorFn()(r, ctx, accounts)
 	require.Nil(t, content0)
+
+	content1 := w1.ContentSimulatorFn()(r, ctx, accounts)
+	require.Nil(t, content1)
 }

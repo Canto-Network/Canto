@@ -12,4 +12,5 @@ const (
 	DefaultWeightMsgClaimDiscountedReward       int = 10
 
 	DefaultWeightUpdateDynamicFeeRateProposal int = 2
+	DefaultWeightUpdateMaximumDiscountRate        = 2
 )

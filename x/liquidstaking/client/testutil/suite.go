@@ -66,7 +66,7 @@ func (suite *IntegrationTestSuite) TestCmdQueryParams() {
 		{
 			"json output",
 			[]string{fmt.Sprintf("--%s=json", tmcli.OutputFlag)},
-			`{"params":{"dynamic_fee_rate":{"r0":"0.000000000000000000","u_soft_cap":"0.050000000000000000","u_hard_cap":"0.100000000000000000","u_optimal":"0.090000000000000000","slope1":"0.100000000000000000","slope2":"0.400000000000000000","max_fee_rate":"0.500000000000000000"}}}`,
+			`{"params":{"dynamic_fee_rate":{"r0":"0.000000000000000000","u_soft_cap":"0.050000000000000000","u_hard_cap":"0.100000000000000000","u_optimal":"0.090000000000000000","slope1":"0.100000000000000000","slope2":"0.400000000000000000","max_fee_rate":"0.500000000000000000"},"maximum_discount_rate":"0.030000000000000000"}}`,
 		},
 		{
 			"text output",
@@ -80,6 +80,7 @@ func (suite *IntegrationTestSuite) TestCmdQueryParams() {
     u_hard_cap: "0.100000000000000000"
     u_optimal: "0.090000000000000000"
     u_soft_cap: "0.050000000000000000"
+  maximum_discount_rate: "0.030000000000000000"
 `,
 		},
 	}

@@ -37,6 +37,10 @@ func genDynamicFeeRate(r *rand.Rand) types.DynamicFeeRate {
 	}
 }
 
+func genMaximumDiscountRate(r *rand.Rand) sdk.Dec {
+	return types.RandomDec(r, sdk.ZeroDec(), sdk.MustNewDecFromStr("0.09"))
+}
+
 func RandomizedGenState(simState *module.SimulationState) {
 	genesis := types.DefaultGenesisState()
 

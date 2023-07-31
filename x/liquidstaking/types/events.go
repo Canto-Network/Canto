@@ -15,6 +15,7 @@ const (
 	EventTypeBeginUndelegate                = "begin_undelegate"
 	EventTypeRePairedWithNewInsurance       = "re_paired_with_new_insurance"
 	EventTypeBeginRedelegate                = "begin_redelegate"
+	EventTypeDelegate                       = "delegate"
 
 	AttributeKeyChunkId                        = "chunk_id"
 	AttributeKeyChunkIds                       = "chunk_ids"
@@ -33,6 +34,10 @@ const (
 	AttributeKeyDiscountedMintRate             = "discounted_mint_rate"
 	AttributeKeyWithdrawInsuranceRequestQueued = "withdraw_insurance_request_queued"
 	AttributeKeyReason                         = "reason"
+	AttributeKeyCompletionTime                 = "completion_time"
+	AttributeKeyValidator                      = "validator"
+	AttributeKeySrcValidator                   = "src_validator"
+	AttributeKeyDstValidator                   = "dst_validator"
 
 	AttributeValueCategory                                  = ModuleName
 	AttributeValueReasonNotEnoughPairedInsCoverage          = "not_enough_paired_insurance_coverage"

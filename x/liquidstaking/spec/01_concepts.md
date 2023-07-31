@@ -61,11 +61,12 @@ Delegation reward are distributed as follows:
 The fee is calculated as follows: `fee = (delegation reward - insurance commission) * feeRate`
 
 **Fee rate** is calculated based on **utilization ratio** and **fee rate parameters** set by the governance.
+* u (= utilization ratio) = `NetAmountBeforeModuleFee / total supply of native token` (for `NetAmountBeforeModuleFee`, please refer to [02_state.md](02_state.md#netamountstate-in-memory-only))
 * if u < softCap then, **fee rate =** `r0`
 * if softCap <= u <= optimal then, **fee rate =** `r0 + ((u - softcap) / (optimal - softcap) x slope1)`
 * if optimal < u <= hardCap then, **fee rate =** `r0 + slope1 + ((min(u, hardcap) - optimal) / (hardcap - optimal) x slope2)`
 
-An explanation of the parameters used in the above formula can be found in [](08_params.md). 
+An explanation of the parameters used in the above formula can be found in [09_params.md](09_params.md). 
 
 Fee rate is calculated at the beginning of the epoch and applied to every chunk delegation rewards.
 Calculated fee with fee rate is burned and the rest of the delegation reward goes to the reward pool.
@@ -74,6 +75,6 @@ Calculated fee with fee rate is burned and the rest of the delegation reward goe
 
 The rewards accumulated on the **reward module account** can be withdrawn by anyone who has lsToken, at a discounted price.
 
-The discount rate is calculated as follows: `discount rate = reward module account's balance / (num paired chunks * chunk size)`
+The discount rate is calculated as follows: `discount rate = reward module account's balance / NetAmount`
 
-The cap is 3% so the discount rate cannot exceed 3%.
+The cap is 3% so the discount rate cannot exceed 3%. This value is a parameter that can be changed by governance.

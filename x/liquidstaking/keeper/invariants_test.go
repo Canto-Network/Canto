@@ -42,10 +42,10 @@ func (suite *KeeperTestSuite) TestNetAmountInvariant() {
 		TotalLiquidTokens:                  types.ChunkSize,
 		RewardModuleAccBalance:             sdk.MustNewDecFromStr("2429970840349915725000").TruncateInt(),
 		FeeRate:                            sdk.ZeroDec(),
-		UtilizationRatio:                   sdk.MustNewDecFromStr("0.001999951953154277"),
-		RemainingChunkSlots:                sdk.NewInt(49),
+		UtilizationRatio:                   sdk.MustNewDecFromStr("0.002019391252867340"),
+		RemainingChunkSlots:                sdk.NewInt(48),
 		NumPairedChunks:                    sdk.NewInt(1),
-		DiscountRate:                       sdk.MustNewDecFromStr("0.009719883361399662"),
+		DiscountRate:                       sdk.MustNewDecFromStr("0.009626316686011733"),
 		TotalDelShares:                     types.ChunkSize.ToDec(),
 		TotalRemainingRewards:              sdk.ZeroDec(),
 		TotalChunksBalance:                 sdk.ZeroInt(),
@@ -73,6 +73,11 @@ func (suite *KeeperTestSuite) TestNetAmountInvariant() {
 			completionTime.Add(time.Hour),
 		)
 		staking.EndBlocker(cachedCtx, suite.app.StakingKeeper)
+
+		// forcefully change status of chunk as pairing
+		mutatedChunk := env.pairedChunks[0]
+		mutatedChunk.SetStatus(types.CHUNK_STATUS_PAIRING)
+		suite.app.LiquidStakingKeeper.SetChunk(cachedCtx, mutatedChunk)
 
 		oneChunkCoins := sdk.NewCoins(oneChunk)
 		reward := sdk.NewCoins(sdk.NewCoin(suite.denom, nas.RewardModuleAccBalance))

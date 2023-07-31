@@ -11,34 +11,37 @@ Liquid stake with an amount of native tokens. A liquid staker is expected to rec
 ```go
 type MsgLiquidStake struct {
 	DelegatorAddress    string
-	Amount              types.Coin
+	Amount              types.Coin // (How many chunks to liquid stake?) x ChunkSize
 }
 ```
 
 **msg is failed if:**
 
-- `msg.Amount` is not bond denom
+- `msg.Amount` is not a bond denom
 - `msg.Amount` is not multiple of ChunkSize tokens
-- If there are no empty slot
+- If there are no empty slot or pairing insurance
+- If chunks to liquid stake is bigger than empty slot or pairing insurance
 - The balance of msg sender(=Delegator) does not have enough amount of coins for `msg.Amount`
 
 ### MsgLiquidUnstake
 
-Liquid unstake with an amount of native tokens which is expected to sent to unstaker when unstaking is done. 
+Liquid unstake with an amount of native tokens which is expected to be sent to unstaker when unstaking is done. 
 The liquid unstake request will be queued until the upcoming Epoch and will initiate the unstaking process.
 
 ```go
 type MsgLiquidUnstake struct {
 	DelegatorAddress string
-	Amount sdk.Coin // (How many chunks to be unstaked?) x chunk.size
+	Amount sdk.Coin // (How many chunks to be unstaked?) x ChunkSize
 }
 ```
 
 **msg is failed if:**
 
-- `msg.Amount` is not bond denom
+- `msg.Amount` is not a bond denom
 - `msg.Amount` is not multiple of ChunkSize tokens
-- The balance of msg sender(=Delegator) does not have enough amount of ls tokens for corresponding value of `msg.Amount`
+- If there are no paired chunks
+- If chunks to liquid unstake is bigger than paired chunks
+- The balance of msg sender(=Delegator) does not have enough amount of ls tokens corresponding value of `msg.Amount`
 
 ## Insurance
 
@@ -46,7 +49,8 @@ type MsgLiquidUnstake struct {
 
 Provide insurance to cover slashing penalties for chunks and to receive commission. 
 * 9% of chunk size tokens is recommended for the `msg.Amount`.
-* 7% is minimum collateral for the chunk size tokens. If the collateral is less than 7%, the insurance will be unpaired and the provider will not receive commission.
+* 7% is minimum collateral for the chunk size tokens. If the collateral is less than 5.75% of chunk size tokens, 
+then the insurance will be unpaired and the provider will not receive commission.
 * The fee rate + Validator(msg.ValidatorAddress)'s fee rate must be less than 50%.
 
 ```go
@@ -60,10 +64,10 @@ type MsgProvideInsurance struct {
 
 **msg is failed if:**
 
-- `msg.Amount` is not bond denom
+- `msg.Amount` is not a bond denom
 - `msg.Amount` must be bigger than minimum collateral (7% of chunk size tokens)
 - `msg.ValidatorAddress` is not valid validator
-- `msg.FeeRate` + Validator(msg.ValidatorAddress).Commission.Rate >= 0.5 (50%)
+- `msg.FeeRate` + `Validator(msg.ValidatorAddress).Commission.Rate` >= 0.5 (50%)
 
 ### MsgCancelProvideInsurance
 
@@ -83,7 +87,7 @@ type MsgCancelInsuranceProvide struct {
 
 ### MsgWithdrawInsurance
 
-Create a pending insurance request for withdrawal or immediately withdraw all its commissions and collaterals when it is unpaired insurance. 
+Create a pending request for withdrawal or immediately withdraw all its commissions and collaterals when it is unpaired insurance. 
 If it is not unpaired, then withdrawal will be triggered during the upcoming Epoch.
 
 ```go
@@ -95,8 +99,8 @@ type MsgWithdrawInsurance struct {
 
 **msg is failed if:**
 
-- There are no paired, unpairing or unpaired insurance with given `msg.Id`
 - Provider of Insurance with given id is different with `msg.ProviderAddress`
+- There are no paired or unpaired insurance with given `msg.Id`
 
 ### MsgWithdrawInsuranceCommission
 
@@ -112,6 +116,7 @@ type MsgWithdrawInsuranceCommission struct {
 
 **msg is failed if:**
 
+- There are no insurance with given `msg.Id`
 - Provider of Insurance with given id is different with `msg.ProviderAddress`
 
 ### MsgDepositInsurance
@@ -142,11 +147,12 @@ How much to get rewards is calculated by `msg.Amount` and discounted mint rate. 
 type MsgClaimDiscountedReward struct {
 	RequesterAddress string
 	Amount sdk.Coin
-	minimumDiscountRate sdk.Dec
+	MinimumDiscountRate sdk.Dec
 }
 ```
 
 **msg is failed if:**
 
-- `msg.Amount` is not liquid bond denom
-- current discount rate is lower than `msg.MinimumDiscountRate`
+- `msg.Amount` is not a liquid bond denom
+- current discount rate is lower than `msg.MinimumDiscountRate` 
+- if `msg.RequesterAddress` doesn't have enough amount of ls tokens corresponding value of `msg.Amount`

@@ -12,7 +12,16 @@ func TestParams(t *testing.T) {
 	require.IsType(t, paramstypes.KeyTable{}, ParamKeyTable())
 
 	params := DefaultParams()
-	paramStr := `dynamic_fee_rate:<r0:"0" u_soft_cap:"50000000000000000" u_hard_cap:"100000000000000000" u_optimal:"90000000000000000" slope1:"100000000000000000" slope2:"400000000000000000" max_fee_rate:"500000000000000000" > `
+	paramStr := `dynamicfeerate:
+  r0: "0.000000000000000000"
+  usoftcap: "0.050000000000000000"
+  uhardcap: "0.100000000000000000"
+  uoptimal: "0.090000000000000000"
+  slope1: "0.100000000000000000"
+  slope2: "0.400000000000000000"
+  maxfeerate: "0.500000000000000000"
+maximumdiscountrate: "0.030000000000000000"
+`
 
 	require.Equal(t, paramStr, params.String())
 }

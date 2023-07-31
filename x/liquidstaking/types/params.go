@@ -2,13 +2,15 @@ package types
 
 import (
 	"fmt"
+	"gopkg.in/yaml.v2"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
 var (
-	KeyDynamicFeeRate = []byte("DynamicFeeRate")
+	KeyDynamicFeeRate      = []byte("DynamicFeeRate")
+	KeyMaximumDiscountRate = []byte("MaximumDiscountRate")
 
 	DefaultR0       = sdk.ZeroDec()
 	DefaultUSoftCap = sdk.MustNewDecFromStr("0.05")
@@ -17,6 +19,8 @@ var (
 	DefaultSlope1   = sdk.MustNewDecFromStr("0.1")
 	DefaultSlope2   = sdk.MustNewDecFromStr("0.4")
 	DefaultMaxFee   = sdk.MustNewDecFromStr("0.5")
+
+	DefaultMaximumDiscountRate = sdk.MustNewDecFromStr("0.03")
 )
 
 var _ paramtypes.ParamSet = &Params{}
@@ -30,9 +34,11 @@ func ParamKeyTable() paramtypes.KeyTable {
 func NewParams(
 	dynamicFeeRate DynamicFeeRate,
 	// r0, uSoftCap, uHardCap, uOptimal, slope1, slope2, maxFeeRate sdk.Dec,
+	maximumDiscountRate sdk.Dec,
 ) Params {
 	return Params{
 		dynamicFeeRate,
+		maximumDiscountRate,
 	}
 }
 
@@ -47,6 +53,7 @@ func DefaultParams() Params {
 			Slope2:     DefaultSlope2,
 			MaxFeeRate: DefaultMaxFee,
 		},
+		DefaultMaximumDiscountRate,
 	)
 }
 
@@ -54,10 +61,11 @@ func DefaultParams() Params {
 func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
 		paramtypes.NewParamSetPair(KeyDynamicFeeRate, &p.DynamicFeeRate, validateDynamicFeeRate),
+		paramtypes.NewParamSetPair(KeyMaximumDiscountRate, &p.MaximumDiscountRate, validateMaximumDiscountRate),
 	}
 }
 
-func (p Params) Validate() error {
+func (p *Params) Validate() error {
 	for _, v := range []struct {
 		value     interface{}
 		validator func(interface{}) error
@@ -65,12 +73,21 @@ func (p Params) Validate() error {
 		{
 			p.DynamicFeeRate, validateDynamicFeeRate,
 		},
+		{
+			p.MaximumDiscountRate, validateMaximumDiscountRate,
+		},
 	} {
 		if err := v.validator(v.value); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+// String returns a human-readable string representation of the parameters.
+func (p *Params) String() string {
+	out, _ := yaml.Marshal(p)
+	return string(out)
 }
 
 // TODO: Write test codes for it right now!!
@@ -251,5 +268,26 @@ func validateDynamicFeeRate(i interface{}) (err error) {
 	if !v.R0.Add(v.Slope1).Add(v.Slope2).LTE(v.MaxFeeRate) {
 		return fmt.Errorf("r0 + slope1 + slope2 should not exceeds maxFeeRate")
 	}
+	return nil
+}
+
+func validateMaximumDiscountRate(i interface{}) (err error) {
+	v, ok := i.(sdk.Dec)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	if v.IsNil() {
+		return fmt.Errorf("maximumDiscountRate should not be nil")
+	}
+
+	if v.IsNegative() {
+		return fmt.Errorf("maximumDiscountRate should not be negative")
+	}
+
+	if v.GT(sdk.OneDec()) {
+		return fmt.Errorf("maximumDiscountRate should not be greater than 1")
+	}
+
 	return nil
 }

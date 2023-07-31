@@ -10,57 +10,17 @@ func (k Keeper) GetNetAmountState(ctx sdk.Context) (nas types.NetAmountState) {
 	liquidBondDenom := k.GetLiquidBondDenom(ctx)
 	bondDenom := k.stakingKeeper.BondDenom(ctx)
 	totalDelShares := sdk.ZeroDec()
-	totalChunksBalance := sdk.NewDec(0)
+	totalChunksBalance := sdk.ZeroInt()
 	totalRemainingRewards := sdk.ZeroDec()
+	totalRemainingRewardsBeforeModuleFee := sdk.ZeroDec()
 	totalRemainingInsuranceCommissions := sdk.ZeroDec()
 	totalLiquidTokens := sdk.ZeroInt()
 	totalInsuranceTokens := sdk.ZeroInt()
 	totalPairedInsuranceTokens := sdk.ZeroInt()
 	totalUnpairingInsuranceTokens := sdk.ZeroInt()
-	totalUnbondingChunksBalance := sdk.ZeroDec()
+	totalUnbondingChunksBalance := sdk.ZeroInt()
 	numPairedChunks := sdk.ZeroInt()
 
-	k.IterateAllChunks(ctx, func(chunk types.Chunk) (stop bool) {
-		balance := k.bankKeeper.GetBalance(ctx, chunk.DerivedAddress(), k.stakingKeeper.BondDenom(ctx))
-		totalChunksBalance = totalChunksBalance.Add(balance.Amount.ToDec())
-
-		switch chunk.Status {
-		case types.CHUNK_STATUS_PAIRED:
-			numPairedChunks = numPairedChunks.Add(sdk.OneInt())
-			// chunk is paired which means have delegation
-			pairedInsurance, _ := k.GetInsurance(ctx, chunk.PairedInsuranceId)
-			valAddr, err := sdk.ValAddressFromBech32(pairedInsurance.ValidatorAddress)
-			if err != nil {
-				panic(err)
-			}
-			validator := k.stakingKeeper.Validator(ctx, valAddr)
-			delegation, found := k.stakingKeeper.GetDelegation(ctx, chunk.DerivedAddress(), valAddr)
-			if !found {
-				return false
-			}
-			totalDelShares = totalDelShares.Add(delegation.GetShares())
-			tokens := validator.TokensFromSharesTruncated(delegation.GetShares()).TruncateInt()
-			totalLiquidTokens = totalLiquidTokens.Add(tokens)
-			cachedCtx, _ := ctx.CacheContext()
-			endingPeriod := k.distributionKeeper.IncrementValidatorPeriod(cachedCtx, validator)
-			delRewards := k.distributionKeeper.CalculateDelegationRewards(cachedCtx, validator, delegation, endingPeriod)
-			delReward := delRewards.AmountOf(bondDenom)
-			insuranceCommission := delReward.Mul(pairedInsurance.FeeRate)
-			// insuranceCommission is not reward of module
-			pureReward := delReward.Sub(insuranceCommission)
-			totalRemainingRewards = totalRemainingRewards.Add(pureReward)
-		default:
-			k.stakingKeeper.IterateDelegatorUnbondingDelegations(ctx, chunk.DerivedAddress(), func(ubd stakingtypes.UnbondingDelegation) (stop bool) {
-				for _, entry := range ubd.Entries {
-					totalUnbondingChunksBalance = totalUnbondingChunksBalance.Add(entry.Balance.ToDec())
-				}
-				return false
-			})
-		}
-		return false
-	})
-
-	// Iterate all paired insurances to get total insurance tokens
 	k.IterateAllInsurances(ctx, func(insurance types.Insurance) (stop bool) {
 		insuranceBalance := k.bankKeeper.GetBalance(ctx, insurance.DerivedAddress(), bondDenom)
 		commission := k.bankKeeper.GetBalance(ctx, insurance.FeePoolAddress(), bondDenom)
@@ -75,26 +35,88 @@ func (k Keeper) GetNetAmountState(ctx sdk.Context) (nas types.NetAmountState) {
 		totalRemainingInsuranceCommissions = totalRemainingInsuranceCommissions.Add(commission.Amount.ToDec())
 		return false
 	})
+	k.IterateAllChunks(ctx, func(chunk types.Chunk) (stop bool) {
+		balance := k.bankKeeper.GetBalance(ctx, chunk.DerivedAddress(), k.stakingKeeper.BondDenom(ctx))
+		totalChunksBalance = totalChunksBalance.Add(balance.Amount)
 
+		switch chunk.Status {
+		case types.CHUNK_STATUS_PAIRED:
+			numPairedChunks = numPairedChunks.Add(sdk.OneInt())
+			pairedIns, validator, del := k.mustValidatePairedChunk(ctx, chunk)
+			totalDelShares = totalDelShares.Add(del.GetShares())
+			tokenValue := validator.TokensFromSharesTruncated(del.GetShares()).TruncateInt()
+			// TODO: Currently we don't consider unpairing insurance's balance for re-pairing or re-delegation scenarios.
+			tokenValue = k.calcTokenValueWithInsuranceCoverage(ctx, tokenValue, pairedIns)
+			totalLiquidTokens = totalLiquidTokens.Add(tokenValue)
+
+			cachedCtx, _ := ctx.CacheContext()
+			endingPeriod := k.distributionKeeper.IncrementValidatorPeriod(cachedCtx, validator)
+			delRewards := k.distributionKeeper.CalculateDelegationRewards(cachedCtx, validator, del, endingPeriod)
+			// chunk's remaining reward is calculated by
+			// 1. rest = del_reward - insurance_commission
+			// 2. remaining = rest x (1 - module_fee_rate)
+			delReward := delRewards.AmountOf(bondDenom)
+			insuranceCommission := delReward.Mul(pairedIns.FeeRate)
+			remainingReward := delReward.Sub(insuranceCommission)
+			totalRemainingRewardsBeforeModuleFee = totalRemainingRewardsBeforeModuleFee.Add(remainingReward)
+		default:
+			k.stakingKeeper.IterateDelegatorUnbondingDelegations(ctx, chunk.DerivedAddress(), func(ubd stakingtypes.UnbondingDelegation) (stop bool) {
+				for _, entry := range ubd.Entries {
+					unpairingIns := k.mustGetInsurance(ctx, chunk.UnpairingInsuranceId)
+					tokenValue := k.calcTokenValueWithInsuranceCoverage(ctx, entry.Balance, unpairingIns)
+					totalUnbondingChunksBalance = totalUnbondingChunksBalance.Add(tokenValue)
+				}
+				return false
+			})
+		}
+		return false
+	})
+	rewardPoolBalance := k.bankKeeper.GetBalance(ctx, types.RewardPool, bondDenom).Amount
+	netAmountBeforeModuleFee := rewardPoolBalance.Add(totalChunksBalance).
+		Add(totalLiquidTokens).
+		Add(totalUnbondingChunksBalance).ToDec().
+		Add(totalRemainingRewardsBeforeModuleFee)
+	totalSupplyAmt := k.bankKeeper.GetSupply(ctx, bondDenom).Amount
+	params := k.GetParams(ctx)
+	u := types.CalcUtilizationRatio(netAmountBeforeModuleFee, totalSupplyAmt)
+	moduleFeeRate := types.CalcDynamicFeeRate(u, params.DynamicFeeRate)
+	totalRemainingRewards = totalRemainingRewardsBeforeModuleFee.Mul(sdk.OneDec().Sub(moduleFeeRate))
 	nas = types.NetAmountState{
 		LsTokensTotalSupply:                k.bankKeeper.GetSupply(ctx, liquidBondDenom).Amount,
 		TotalLiquidTokens:                  totalLiquidTokens,
-		TotalChunksBalance:                 totalChunksBalance.TruncateInt(),
+		TotalChunksBalance:                 totalChunksBalance,
 		TotalDelShares:                     totalDelShares,
 		TotalRemainingRewards:              totalRemainingRewards,
-		TotalUnbondingChunksBalance:        totalUnbondingChunksBalance.TruncateInt(),
+		TotalUnbondingChunksBalance:        totalUnbondingChunksBalance,
 		NumPairedChunks:                    numPairedChunks,
 		ChunkSize:                          types.ChunkSize,
 		TotalRemainingInsuranceCommissions: totalRemainingInsuranceCommissions,
 		TotalInsuranceTokens:               totalInsuranceTokens,
 		TotalPairedInsuranceTokens:         totalPairedInsuranceTokens,
 		TotalUnpairingInsuranceTokens:      totalUnpairingInsuranceTokens,
+		FeeRate:                            moduleFeeRate,
+		UtilizationRatio:                   u,
+		RewardModuleAccBalance:             rewardPoolBalance,
+		RemainingChunkSlots:                types.GetAvailableChunkSlots(u, params.DynamicFeeRate.UHardCap, totalSupplyAmt),
 	}
-	nas.NetAmount = nas.CalcNetAmount(k.bankKeeper.GetBalance(ctx, types.RewardPool, bondDenom).Amount)
+	nas.NetAmount = nas.CalcNetAmount()
 	nas.MintRate = nas.CalcMintRate()
-	nas.RewardModuleAccBalance = k.bankKeeper.GetBalance(ctx, types.RewardPool, bondDenom).Amount
-	nas.FeeRate, nas.UtilizationRatio = k.CalcDynamicFeeRate(ctx)
-	nas.RemainingChunkSlots = k.GetAvailableChunkSlots(ctx)
-	nas.DiscountRate = k.CalcDiscountRate(ctx)
+	nas.DiscountRate = nas.CalcDiscountRate(params.MaximumDiscountRate)
 	return
+}
+
+func (k Keeper) calcTokenValueWithInsuranceCoverage(
+	ctx sdk.Context, tokenValue sdk.Int, ins types.Insurance) sdk.Int {
+	penaltyAmt := types.ChunkSize.Sub(tokenValue)
+	// If penaltyAmt > 0 and paired insurance can cover it, then token value is same with ChunkSize
+	if penaltyAmt.IsPositive() {
+		// Consider insurance coverage
+		insBal := k.bankKeeper.GetBalance(ctx, ins.DerivedAddress(), k.stakingKeeper.BondDenom(ctx))
+		penaltyAmt = penaltyAmt.Sub(insBal.Amount)
+		if penaltyAmt.IsPositive() {
+			// It means insurance can't cover penalty perfectly
+			tokenValue = tokenValue.Sub(penaltyAmt)
+		}
+	}
+	return tokenValue
 }

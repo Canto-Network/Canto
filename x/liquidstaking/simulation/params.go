@@ -19,5 +19,14 @@ func ParamChanges(r *rand.Rand) []simtypes.ParamChange {
 				return string(bz)
 			},
 		),
+		simulation.NewSimParamChange(types.ModuleName, string(types.KeyMaximumDiscountRate),
+			func(r *rand.Rand) string {
+				bz, err := json.Marshal(genMaximumDiscountRate(r))
+				if err != nil {
+					panic(err)
+				}
+				return string(bz)
+			},
+		),
 	}
 }

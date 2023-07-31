@@ -6,17 +6,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (nas NetAmountState) CalcNetAmount(rewardPoolBalance sdk.Int) sdk.Dec {
-	return rewardPoolBalance.Add(nas.TotalChunksBalance).
+func (nas NetAmountState) CalcNetAmount() sdk.Dec {
+	return nas.RewardModuleAccBalance.Add(nas.TotalChunksBalance).
 		Add(nas.TotalLiquidTokens).
-		Add(nas.TotalUnbondingChunksBalance).ToDec().
-		Add(nas.TotalRemainingRewards)
-}
-
-// TODO: Need to be reviewed
-func (nas NetAmountState) CalcConservativeNetAmount(rewardPoolBalance sdk.Int) sdk.Dec {
-	return rewardPoolBalance.Add(nas.TotalChunksBalance).
-		Add(nas.NumPairedChunks.Mul(ChunkSize)). // Use this value instead of total liquid tokens
 		Add(nas.TotalUnbondingChunksBalance).ToDec().
 		Add(nas.TotalRemainingRewards)
 }
@@ -26,6 +18,16 @@ func (nas NetAmountState) CalcMintRate() sdk.Dec {
 		return sdk.ZeroDec()
 	}
 	return nas.LsTokensTotalSupply.ToDec().QuoTruncate(nas.NetAmount)
+}
+
+// CalcDiscountRate calculates the current discount rate.
+// reward module account's balance / (num paired chunks * chunk size)
+func (nas NetAmountState) CalcDiscountRate(maximumDiscountRate sdk.Dec) sdk.Dec {
+	if nas.RewardModuleAccBalance.IsZero() || maximumDiscountRate.IsZero() {
+		return sdk.ZeroDec()
+	}
+	discountRate := nas.RewardModuleAccBalance.ToDec().QuoTruncate(nas.NetAmount)
+	return sdk.MinDec(discountRate, sdk.MinDec(MaximumDiscountRateCap, maximumDiscountRate))
 }
 
 func (nas NetAmountState) Equal(nas2 NetAmountState) bool {
