@@ -31,6 +31,7 @@ type HandlerOptions struct {
 	SigGasConsumer  func(meter sdk.GasMeter, sig signing.SignatureV2, params authtypes.Params) error
 	Cdc             codec.BinaryCodec
 	MaxTxGasWanted  uint64
+	Simulation      bool
 }
 
 // Validate checks if the keepers are defined
@@ -93,6 +94,35 @@ func newCosmosAnteHandler(options HandlerOptions) sdk.AnteHandler {
 		ante.NewValidateSigCountDecorator(options.AccountKeeper),
 		ante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),
 		ante.NewSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
+		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
+		ibcante.NewAnteDecorator(options.IBCKeeper),
+		ethante.NewGasWantedDecorator(options.EvmKeeper, options.FeeMarketKeeper),
+	)
+}
+
+// newCosmosSimulationAnteHandler creates the ante handler for simulation, skipped few decorators for simulation
+func newCosmosSimulationAnteHandler(options HandlerOptions) sdk.AnteHandler {
+	return sdk.ChainAnteDecorators(
+		ethante.RejectMessagesDecorator{}, // reject MsgEthereumTxs
+		cosmosante.NewAuthzLimiterDecorator(
+			sdk.MsgTypeURL(&evmtypes.MsgEthereumTx{}),
+			sdk.MsgTypeURL(&sdkvesting.MsgCreateVestingAccount{}),
+		),
+		ante.NewSetUpContextDecorator(),
+		ante.NewRejectExtensionOptionsDecorator(),
+		ante.NewValidateBasicDecorator(),
+		ante.NewMempoolFeeDecorator(),
+		ethante.NewMinGasPriceDecorator(options.FeeMarketKeeper, options.EvmKeeper),
+		ante.NewTxTimeoutHeightDecorator(),
+		ante.NewValidateMemoDecorator(options.AccountKeeper),
+		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
+		// NewParamChangeLimitDecorator(options.SlashingKeeper, options.Cdc),
+		ante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper),
+		// NewValidatorCommissionDecorator(options.Cdc),
+		//ante.NewSetPubKeyDecorator(options.AccountKeeper),
+		ante.NewValidateSigCountDecorator(options.AccountKeeper),
+		//ante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),
+		//ante.NewSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
 		ibcante.NewAnteDecorator(options.IBCKeeper),
 		ethante.NewGasWantedDecorator(options.EvmKeeper, options.FeeMarketKeeper),
