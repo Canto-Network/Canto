@@ -749,7 +749,9 @@ func NewCanto(
 		feemarket.NewAppModule(app.FeeMarketKeeper),
 
 		// TODO: Modules that have not yet been implemented for simulation
-		// govshuttle, csr, recovery, erc20
+		// govshuttle, csr, inflation, erc20
+
+		coinswap.NewAppModule(appCodec, app.CoinswapKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()
@@ -765,10 +767,9 @@ func NewCanto(
 
 	maxGasWanted := cast.ToUint64(appOpts.Get(srvflags.EVMMaxTxGasWanted))
 	options := ante.HandlerOptions{
-		AccountKeeper: app.AccountKeeper,
-		BankKeeper:    app.BankKeeper,
-		EvmKeeper:     app.EvmKeeper,
-		//StakingKeeper:   app.StakingKeeper,
+		AccountKeeper:   app.AccountKeeper,
+		BankKeeper:      app.BankKeeper,
+		EvmKeeper:       app.EvmKeeper,
 		FeegrantKeeper:  app.FeeGrantKeeper,
 		IBCKeeper:       app.IBCKeeper,
 		FeeMarketKeeper: app.FeeMarketKeeper,
