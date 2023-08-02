@@ -45,7 +45,11 @@ func NewAnteHandler(options HandlerOptions) sdk.AnteHandler {
 		// handle as totally normal Cosmos SDK tx
 		switch tx.(type) {
 		case sdk.Tx:
-			anteHandler = newCosmosAnteHandler(options)
+			if options.Simulation {
+				anteHandler = newCosmosSimulationAnteHandler(options)
+			} else {
+				anteHandler = newCosmosAnteHandler(options)
+			}
 		default:
 			return ctx, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "invalid transaction type: %T", tx)
 		}
