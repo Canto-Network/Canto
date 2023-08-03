@@ -747,11 +747,10 @@ func NewCanto(
 		epochs.NewAppModule(appCodec, app.EpochsKeeper),
 		inflation.NewAppModule(app.InflationKeeper, app.AccountKeeper, app.StakingKeeper),
 		feemarket.NewAppModule(app.FeeMarketKeeper),
+		coinswap.NewAppModule(appCodec, app.CoinswapKeeper, app.AccountKeeper, app.BankKeeper),
 
 		// TODO: Modules that have not yet been implemented for simulation
 		// govshuttle, csr, inflation, erc20
-
-		coinswap.NewAppModule(appCodec, app.CoinswapKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()
