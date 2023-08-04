@@ -113,7 +113,7 @@ f_install_protoc_gen_swagger() {
     fi
     
     pushd "${TEMPDIR}" >/dev/null
-    go get github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
+    go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@v${PROTOC_GRPC_GATEWAY_VERSION}
     npm install -g swagger-combine
     popd >/dev/null
     f_print_done
