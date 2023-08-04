@@ -123,9 +123,6 @@ import (
 	"github.com/Canto-Network/Canto/v6/x/onboarding"
 	onboardingkeeper "github.com/Canto-Network/Canto/v6/x/onboarding/keeper"
 	onboardingtypes "github.com/Canto-Network/Canto/v6/x/onboarding/types"
-	"github.com/Canto-Network/Canto/v6/x/recovery"
-	recoverykeeper "github.com/Canto-Network/Canto/v6/x/recovery/keeper"
-	recoverytypes "github.com/Canto-Network/Canto/v6/x/recovery/types"
 
 	//govshuttle imports
 	"github.com/Canto-Network/Canto/v6/x/govshuttle"
@@ -205,7 +202,6 @@ var (
 		govshuttle.AppModuleBasic{},
 		csr.AppModuleBasic{},
 		epochs.AppModuleBasic{},
-		recovery.AppModuleBasic{},
 		onboarding.AppModuleBasic{},
 		coinswap.AppModuleBasic{},
 	)
@@ -286,7 +282,6 @@ type Canto struct {
 	InflationKeeper  inflationkeeper.Keeper
 	Erc20Keeper      erc20keeper.Keeper
 	EpochsKeeper     epochskeeper.Keeper
-	RecoveryKeeper   *recoverykeeper.Keeper
 	OnboardingKeeper *onboardingkeeper.Keeper
 	GovshuttleKeeper govshuttlekeeper.Keeper
 	CSRKeeper        csrkeeper.Keeper
@@ -315,6 +310,7 @@ func NewCanto(
 	skipUpgradeHeights map[int64]bool,
 	homePath string,
 	invCheckPeriod uint,
+	simulation bool,
 	encodingConfig simappparams.EncodingConfig,
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
@@ -348,7 +344,7 @@ func NewCanto(
 		evmtypes.StoreKey, feemarkettypes.StoreKey,
 		// Canto keys
 		inflationtypes.StoreKey, erc20types.StoreKey,
-		epochstypes.StoreKey, recoverytypes.StoreKey,
+		epochstypes.StoreKey,
 		onboardingtypes.StoreKey,
 		csrtypes.StoreKey,
 		govshuttletypes.StoreKey,
@@ -512,18 +508,10 @@ func NewCanto(
 	// Create Transfer Stack
 
 	// SendPacket, since it is originating from the application to core IBC:
-	// transferKeeper.SendPacket -> recovery.SendPacket -> onboarding.SendPacket -> channel.SendPacket
+	// transferKeeper.SendPacket -> onboarding.SendPacket -> channel.SendPacket
 
 	// RecvPacket, message that originates from core IBC and goes down to app, the flow is the otherway
-	// channel.RecvPacket -> onboarding.OnRecvPacket -> recovery.OnRecvPacket -> transfer.OnRecvPacket
-
-	app.RecoveryKeeper = recoverykeeper.NewKeeper(
-		app.GetSubspace(recoverytypes.ModuleName),
-		app.AccountKeeper,
-		app.BankKeeper,
-		app.IBCKeeper.ChannelKeeper,
-		app.TransferKeeper,
-	)
+	// channel.RecvPacket -> onboarding.OnRecvPacket -> transfer.OnRecvPacket
 
 	app.OnboardingKeeper = onboardingkeeper.NewKeeper(
 		app.GetSubspace(onboardingtypes.ModuleName),
@@ -536,16 +524,14 @@ func NewCanto(
 	)
 
 	app.TransferKeeper = ibctransferkeeper.NewKeeper(
-		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName), app.RecoveryKeeper,
+		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName), app.OnboardingKeeper,
 		app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
 		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
 	)
 
 	app.OnboardingKeeper.SetTransferKeeper(app.TransferKeeper)
-	app.RecoveryKeeper.SetTransferKeeper(app.TransferKeeper)
 
-	// Set the ICS4 wrappers for onboarding and recovery middlewares
-	app.RecoveryKeeper.SetICS4Wrapper(app.OnboardingKeeper)
+	// Set the ICS4 wrappers for onboarding middlewares
 	app.OnboardingKeeper.SetICS4Wrapper(app.IBCKeeper.ChannelKeeper)
 	// NOTE: ICS4 wrapper for Transfer Keeper already set
 
@@ -554,14 +540,12 @@ func NewCanto(
 
 	// transfer stack contains (from top to bottom):
 	// - Onboarding Middleware
-	// - Recovery Middleware
 	// - Transfer
 
 	// create IBC module from bottom to top of stack
 	var transferStack porttypes.IBCModule
 
 	transferStack = transfer.NewIBCModule(app.TransferKeeper)
-	transferStack = recovery.NewIBCMiddleware(*app.RecoveryKeeper, transferStack)
 	transferStack = onboarding.NewIBCMiddleware(*app.OnboardingKeeper, transferStack)
 
 	// Create static IBC router, add transfer route, then set and seal it
@@ -614,11 +598,9 @@ func NewCanto(
 		inflation.NewAppModule(app.InflationKeeper, app.AccountKeeper, app.StakingKeeper),
 		erc20.NewAppModule(app.Erc20Keeper, app.AccountKeeper),
 		epochs.NewAppModule(appCodec, app.EpochsKeeper),
-		recovery.NewAppModule(*app.RecoveryKeeper),
 		onboarding.NewAppModule(*app.OnboardingKeeper),
 		govshuttle.NewAppModule(app.GovshuttleKeeper, app.AccountKeeper),
 		csr.NewAppModule(app.CSRKeeper, app.AccountKeeper),
-
 		coinswap.NewAppModule(appCodec, app.CoinswapKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
@@ -652,7 +634,6 @@ func NewCanto(
 		paramstypes.ModuleName,
 		inflationtypes.ModuleName,
 		erc20types.ModuleName,
-		recoverytypes.ModuleName,
 		onboardingtypes.ModuleName,
 		govshuttletypes.ModuleName,
 		csrtypes.ModuleName,
@@ -668,7 +649,6 @@ func NewCanto(
 		feemarkettypes.ModuleName,
 		// Note: epochs' endblock should be "real" end of epochs, we keep epochs endblock at the end
 		epochstypes.ModuleName,
-		recoverytypes.ModuleName,
 		onboardingtypes.ModuleName,
 		// no-op modules
 		ibchost.ModuleName,
@@ -684,15 +664,12 @@ func NewCanto(
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
-
 		// Canto modules
 		inflationtypes.ModuleName,
 		erc20types.ModuleName,
 		govshuttletypes.ModuleName,
 		csrtypes.ModuleName,
 		coinswaptypes.ModuleName,
-
-		// recoverytypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -728,12 +705,10 @@ func NewCanto(
 		inflationtypes.ModuleName,
 		erc20types.ModuleName,
 		epochstypes.ModuleName,
-		recoverytypes.ModuleName,
 		onboardingtypes.ModuleName,
 		govshuttletypes.ModuleName,
 		csrtypes.ModuleName,
 		coinswaptypes.ModuleName,
-
 		// NOTE: crisis module must go at the end to check for invariants on each module
 		crisistypes.ModuleName,
 	)
@@ -751,24 +726,31 @@ func NewCanto(
 	// NOTE: this is not required apps that don't use the simulator for fuzz testing
 	// transactions
 	app.sm = module.NewSimulationManager(
+		// basic sdk modules
 		auth.NewAppModule(appCodec, app.AccountKeeper, ethermintapp.RandomGenesisAccounts),
 		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper),
 		capability.NewAppModule(appCodec, *app.CapabilityKeeper),
 		gov.NewAppModule(appCodec, app.GovKeeper, app.AccountKeeper, app.BankKeeper),
-		// mint.NewAppModule(appCodec, app.MintKeeper, app.AccountKeeper),
 		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
-		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
+		// TODO: Temporary exclusion authz due to issues with implementation of authz simulation
+		// authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
+
+		// canto, ethermint modules
 		evm.NewAppModule(app.EvmKeeper, app.AccountKeeper),
 		epochs.NewAppModule(appCodec, app.EpochsKeeper),
+		inflation.NewAppModule(app.InflationKeeper, app.AccountKeeper, app.StakingKeeper),
 		feemarket.NewAppModule(app.FeeMarketKeeper),
 		coinswap.NewAppModule(appCodec, app.CoinswapKeeper, app.AccountKeeper, app.BankKeeper),
+
+		// TODO: Modules that have not yet been implemented for simulation
+		// govshuttle, csr, inflation, erc20
 	)
 
 	app.sm.RegisterStoreDecoders()
@@ -794,6 +776,7 @@ func NewCanto(
 		SigGasConsumer:  SigVerificationGasConsumer,
 		Cdc:             appCodec,
 		MaxTxGasWanted:  maxGasWanted,
+		Simulation:      simulation,
 	}
 
 	if err := options.Validate(); err != nil {
@@ -1060,13 +1043,10 @@ func initParamsKeeper(
 	// Canto subspaces
 	paramsKeeper.Subspace(inflationtypes.ModuleName)
 	paramsKeeper.Subspace(erc20types.ModuleName)
-	paramsKeeper.Subspace(recoverytypes.ModuleName)
 	paramsKeeper.Subspace(onboardingtypes.ModuleName)
 	paramsKeeper.Subspace(govshuttletypes.ModuleName)
 	paramsKeeper.Subspace(csrtypes.ModuleName)
-
 	paramsKeeper.Subspace(coinswaptypes.ModuleName)
-
 	return paramsKeeper
 }
 
