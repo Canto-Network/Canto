@@ -44,6 +44,22 @@
       }
     },
     {
+      "url": "./tmp-swagger-gen/canto/onboarding/v1/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "OnboardingParams"
+        }
+      }
+    },
+    {
+      "url": "./tmp-swagger-gen/canto/coinswap/v1/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "CoinswapParams"
+        }
+      }
+    },
+    {
       "url": "./tmp-swagger-gen/ibc/applications/transfer/v1/query.swagger.json",
       "operationIds": {
         "rename": {
