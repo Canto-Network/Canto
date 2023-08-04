@@ -7,14 +7,6 @@
   },
   "apis": [
     {
-      "url": "./tmp-swagger-gen/canto/claims/v1/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "ClaimsParams"
-        }
-      }
-    },
-    {
       "url": "./tmp-swagger-gen/canto/epochs/v1/query.swagger.json"
     },
     {
@@ -26,30 +18,11 @@
       }
     },
     {
-      "url": "./tmp-swagger-gen/canto/incentives/v1/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "IncentivesParams"
-        }
-      }
-    },
-    {
       "url": "./tmp-swagger-gen/canto/inflation/v1/query.swagger.json",
       "operationIds": {
         "rename": {
           "Params": "InflationParams",
           "TotalSupply": "InflationTotalSupply"
-        }
-      }
-    },
-    {
-      "url": "./tmp-swagger-gen/canto/vesting/v1/query.swagger.json"
-    },
-    {
-      "url": "./tmp-swagger-gen/canto/recovery/v1/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "RecoveryParams"
         }
       }
     },

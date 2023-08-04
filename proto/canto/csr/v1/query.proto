@@ -7,7 +7,6 @@ import "cosmos/base/query/v1beta1/pagination.proto";
 import "canto/csr/v1/params.proto";
 import "canto/csr/v1/csr.proto";
 
-
 option go_package = "github.com/Canto-Network/Canto/v6/x/csr/types";
 
 // Query defines the gRPC querier service.
@@ -18,16 +17,17 @@ service Query {
   }
   // query all registered CSRs
   rpc CSRs(QueryCSRsRequest) returns (QueryCSRsResponse) {
-    option (google.api.http).get = "/canto/v1/csr/csrs"; 
+    option (google.api.http).get = "/canto/v1/csr/csrs";
   }
-  // query a specific CSR by the nftId 
+  // query a specific CSR by the nftId
   rpc CSRByNFT(QueryCSRByNFTRequest) returns (QueryCSRByNFTResponse) {
     // query by address
     option (google.api.http).get = "/canto/v1/csr/nft/{nftId}";
   }
   // query a CSR by smart contract address
-  rpc CSRByContract(QueryCSRByContractRequest) returns (QueryCSRByContractResponse) { 
-    // query by deployer address 
+  rpc CSRByContract(QueryCSRByContractRequest)
+      returns (QueryCSRByContractResponse) {
+    // query by deployer address
     option (google.api.http).get = "/canto/v1/csr/contract/{address}";
   }
   // query the turnstile address
@@ -42,7 +42,7 @@ message QueryParamsRequest {}
 // QueryParamsResponse is the response type for the Query/Params RPC method.
 message QueryParamsResponse {
   // params holds all the parameters of this module.
-  Params params = 1 [(gogoproto.nullable) = false];
+  Params params = 1 [ (gogoproto.nullable) = false ];
 }
 
 // QueryCSRsRequest is the request type for the Query/CSRs RPC method.
@@ -59,32 +59,28 @@ message QueryCSRsResponse {
 }
 
 // QueryCSRByNFTRequest is the request type for the Query/CSRByNFT RPC method.
-message QueryCSRByNFTRequest { 
-  uint64 nftId = 1; 
-}
+message QueryCSRByNFTRequest { uint64 nftId = 1; }
 
 // QueryCSRByNFTResponse is the response type for the Query/CSRByNFT RPC method.
-message QueryCSRByNFTResponse { 
+message QueryCSRByNFTResponse {
   // csr object queried by nft id
-  CSR csr = 1 [ (gogoproto.nullable) = false];
+  CSR csr = 1 [ (gogoproto.nullable) = false ];
 }
 
-// QueryCSRByContractRequest is the request type for the Query/CSRByContract RPC method.
-message QueryCSRByContractRequest {
-  string address = 1; 
-}
+// QueryCSRByContractRequest is the request type for the Query/CSRByContract RPC
+// method.
+message QueryCSRByContractRequest { string address = 1; }
 
-// QueryCSRByContractResponse is the response type for the Query/CSRByContract RPC method.
-message QueryCSRByContractResponse { 
+// QueryCSRByContractResponse is the response type for the Query/CSRByContract
+// RPC method.
+message QueryCSRByContractResponse {
   // csr object queried by smart contract address
-  CSR csr = 1 [ (gogoproto.nullable) = false];
+  CSR csr = 1 [ (gogoproto.nullable) = false ];
 }
 
 // QueryTurnstileRequest is the request type for the Query/Turnstile RPC method.
-message QueryTurnstileRequest {
-}
+message QueryTurnstileRequest {}
 
-// QueryTurnstileResponse is the response type for the Query/Turnstile RPC method.
-message QueryTurnstileResponse {
-  string address = 1;
-}
+// QueryTurnstileResponse is the response type for the Query/Turnstile RPC
+// method.
+message QueryTurnstileResponse { string address = 1; }
