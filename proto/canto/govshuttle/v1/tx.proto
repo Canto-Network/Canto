@@ -7,7 +7,7 @@ option go_package = "github.com/Canto-Network/Canto/v6/x/govshuttle/types";
 
 // Msg defines the Msg service.
 service Msg {
-    // this line is used by starport scaffolding # proto/tx/rpc
+  // this line is used by starport scaffolding # proto/tx/rpc
 }
 
 // this line is used by starport scaffolding # proto/tx/message
