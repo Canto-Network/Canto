@@ -1,0 +1,25 @@
+syntax = "proto3";
+package canto.onboarding.v1;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/duration.proto";
+
+option go_package = "github.com/Canto-Network/Canto/v6/x/onboarding/types";
+
+// GenesisState defines the onboarding module's genesis state.
+message GenesisState {
+  // params defines all the paramaters of the module.
+  Params params = 1 [ (gogoproto.nullable) = false ];
+}
+
+// Params holds parameters for the onboarding module
+message Params {
+  // enable onboarding IBC middleware
+  bool enable_onboarding = 1;
+
+  string auto_swap_threshold = 3 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+  repeated string whitelisted_channels = 4;
+}
