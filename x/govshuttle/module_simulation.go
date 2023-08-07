@@ -4,8 +4,8 @@ import (
 	"math/rand"
 
 	//"github.com/Canto-Network/Canto/v2/testutil/sample"
-	govshuttlesimulation "github.com/Canto-Network/Canto/v6/x/govshuttle/simulation"
-	"github.com/Canto-Network/Canto/v6/x/govshuttle/types"
+	govshuttlesimulation "github.com/Canto-Network/Canto/v7/x/govshuttle/simulation"
+	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"

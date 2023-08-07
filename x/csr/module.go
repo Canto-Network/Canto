@@ -11,9 +11,9 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
-	"github.com/Canto-Network/Canto/v6/x/csr/client/cli"
-	"github.com/Canto-Network/Canto/v6/x/csr/keeper"
-	"github.com/Canto-Network/Canto/v6/x/csr/types"
+	"github.com/Canto-Network/Canto/v7/x/csr/client/cli"
+	"github.com/Canto-Network/Canto/v7/x/csr/keeper"
+	"github.com/Canto-Network/Canto/v7/x/csr/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"

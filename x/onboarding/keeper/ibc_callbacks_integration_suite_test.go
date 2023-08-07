@@ -17,13 +17,13 @@ import (
 	clienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
 	channeltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
 
-	"github.com/Canto-Network/Canto/v6/app"
-	ibcgotesting "github.com/Canto-Network/Canto/v6/ibc/testing"
-	coinswaptypes "github.com/Canto-Network/Canto/v6/x/coinswap/types"
-	erc20types "github.com/Canto-Network/Canto/v6/x/erc20/types"
-	inflationtypes "github.com/Canto-Network/Canto/v6/x/inflation/types"
-	onboardingtest "github.com/Canto-Network/Canto/v6/x/onboarding/testutil"
-	"github.com/Canto-Network/Canto/v6/x/onboarding/types"
+	"github.com/Canto-Network/Canto/v7/app"
+	ibcgotesting "github.com/Canto-Network/Canto/v7/ibc/testing"
+	coinswaptypes "github.com/Canto-Network/Canto/v7/x/coinswap/types"
+	erc20types "github.com/Canto-Network/Canto/v7/x/erc20/types"
+	inflationtypes "github.com/Canto-Network/Canto/v7/x/inflation/types"
+	onboardingtest "github.com/Canto-Network/Canto/v7/x/onboarding/testutil"
+	"github.com/Canto-Network/Canto/v7/x/onboarding/types"
 )
 
 type IBCTestingSuite struct {

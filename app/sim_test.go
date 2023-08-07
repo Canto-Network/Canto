@@ -30,11 +30,11 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	cantoconfig "github.com/Canto-Network/Canto/v6/cmd/config"
-	csrtypes "github.com/Canto-Network/Canto/v6/x/csr/types"
-	erc20types "github.com/Canto-Network/Canto/v6/x/erc20/types"
-	govshuttletypes "github.com/Canto-Network/Canto/v6/x/govshuttle/types"
-	inflationtypes "github.com/Canto-Network/Canto/v6/x/inflation/types"
+	cantoconfig "github.com/Canto-Network/Canto/v7/cmd/config"
+	csrtypes "github.com/Canto-Network/Canto/v7/x/csr/types"
+	erc20types "github.com/Canto-Network/Canto/v7/x/erc20/types"
+	govshuttletypes "github.com/Canto-Network/Canto/v7/x/govshuttle/types"
+	inflationtypes "github.com/Canto-Network/Canto/v7/x/inflation/types"
 )
 
 // Get flags every time the simulator is run

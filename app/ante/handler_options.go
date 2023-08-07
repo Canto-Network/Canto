@@ -14,7 +14,7 @@ import (
 	ethante "github.com/evmos/ethermint/app/ante"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 
-	cosmosante "github.com/Canto-Network/Canto/v6/app/ante/cosmos"
+	cosmosante "github.com/Canto-Network/Canto/v7/app/ante/cosmos"
 	sdkvesting "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 )
 
