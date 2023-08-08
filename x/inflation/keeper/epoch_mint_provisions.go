@@ -3,7 +3,7 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/Canto-Network/Canto/v6/x/inflation/types"
+	"github.com/Canto-Network/Canto/v7/x/inflation/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

@@ -31,7 +31,7 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	cantoapp "github.com/Canto-Network/Canto/v6/app"
+	cantoapp "github.com/Canto-Network/Canto/v7/app"
 )
 
 var DefaultTestingAppInit func() (TestingApp, map[string]json.RawMessage) = SetupTestingApp

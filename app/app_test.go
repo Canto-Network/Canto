@@ -15,7 +15,7 @@ import (
 
 	"github.com/evmos/ethermint/encoding"
 
-	"github.com/Canto-Network/Canto/v6/types"
+	"github.com/Canto-Network/Canto/v7/types"
 )
 
 func TestCantoExport(t *testing.T) {

@@ -13,7 +13,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
-	"github.com/Canto-Network/Canto/v6/x/coinswap/types"
+	"github.com/Canto-Network/Canto/v7/x/coinswap/types"
 )
 
 // Keeper of the coinswap store

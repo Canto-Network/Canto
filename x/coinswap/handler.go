@@ -4,8 +4,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/Canto-Network/Canto/v6/x/coinswap/keeper"
-	"github.com/Canto-Network/Canto/v6/x/coinswap/types"
+	"github.com/Canto-Network/Canto/v7/x/coinswap/keeper"
+	"github.com/Canto-Network/Canto/v7/x/coinswap/types"
 )
 
 // NewHandler returns a handler for all "coinswap" type messages.
