@@ -9,8 +9,8 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
-	"github.com/Canto-Network/Canto/v6/app/params"
-	"github.com/Canto-Network/Canto/v6/x/erc20/keeper"
+	"github.com/Canto-Network/Canto/v7/app/params"
+	"github.com/Canto-Network/Canto/v7/x/erc20/keeper"
 )
 
 // Simulation operation weights constants.

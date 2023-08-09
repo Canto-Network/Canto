@@ -7,7 +7,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/types/module"
 
-	"github.com/Canto-Network/Canto/v6/x/erc20/types"
+	"github.com/Canto-Network/Canto/v7/x/erc20/types"
 )
 
 // DONTCOVER

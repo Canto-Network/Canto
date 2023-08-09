@@ -9,7 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/Canto-Network/Canto/v6/x/inflation/types"
+	"github.com/Canto-Network/Canto/v7/x/inflation/types"
 )
 
 // DONTCOVER

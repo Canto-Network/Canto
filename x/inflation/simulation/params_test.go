@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/Canto-Network/Canto/v6/x/inflation/simulation"
+	"github.com/Canto-Network/Canto/v7/x/inflation/simulation"
 )
 
 func TestParamChanges(t *testing.T) {

@@ -14,8 +14,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/Canto-Network/Canto/v6/x/epochs/simulation"
-	"github.com/Canto-Network/Canto/v6/x/epochs/types"
+	"github.com/Canto-Network/Canto/v7/x/epochs/simulation"
+	"github.com/Canto-Network/Canto/v7/x/epochs/types"
 )
 
 func TestRandomizedGenState(t *testing.T) {

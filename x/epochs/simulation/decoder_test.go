@@ -10,8 +10,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/types/kv"
 
-	"github.com/Canto-Network/Canto/v6/x/epochs/simulation"
-	"github.com/Canto-Network/Canto/v6/x/epochs/types"
+	"github.com/Canto-Network/Canto/v7/x/epochs/simulation"
+	"github.com/Canto-Network/Canto/v7/x/epochs/types"
 )
 
 func TestEpochsStore(t *testing.T) {

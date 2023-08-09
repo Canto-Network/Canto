@@ -10,8 +10,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/types/kv"
 
-	"github.com/Canto-Network/Canto/v6/x/inflation/simulation"
-	"github.com/Canto-Network/Canto/v6/x/inflation/types"
+	"github.com/Canto-Network/Canto/v7/x/inflation/simulation"
+	"github.com/Canto-Network/Canto/v7/x/inflation/types"
 )
 
 func TestInflationStore(t *testing.T) {

@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/Canto-Network/Canto/v6/x/erc20/simulation"
+	"github.com/Canto-Network/Canto/v7/x/erc20/simulation"
 )
 
 func TestParamChanges(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
-	"github.com/Canto-Network/Canto/v6/x/csr/types"
+	"github.com/Canto-Network/Canto/v7/x/csr/types"
 )
 
 func ParamChanges(r *rand.Rand) []simtypes.ParamChange {

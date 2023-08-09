@@ -10,8 +10,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/types/kv"
 
-	"github.com/Canto-Network/Canto/v6/x/govshuttle/simulation"
-	"github.com/Canto-Network/Canto/v6/x/govshuttle/types"
+	"github.com/Canto-Network/Canto/v7/x/govshuttle/simulation"
+	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
 )
 
 func TestGovShuttleStore(t *testing.T) {
