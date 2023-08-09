@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/Canto-Network/Canto/v7/contracts"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/common"
@@ -16,6 +15,8 @@ import (
 	evmkeeper "github.com/evmos/ethermint/x/evm/keeper"
 	evm "github.com/evmos/ethermint/x/evm/types"
 	feemarketkeeper "github.com/evmos/ethermint/x/feemarket/keeper"
+
+	"github.com/Canto-Network/Canto/v7/contracts"
 )
 
 func DeployContract(ctx sdk.Context,

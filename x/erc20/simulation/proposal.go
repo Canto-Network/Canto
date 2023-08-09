@@ -6,49 +6,143 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/evmos/ethermint/crypto/ethsecp256k1"
+	"github.com/evmos/ethermint/tests"
+	evmkeeper "github.com/evmos/ethermint/x/evm/keeper"
+	feemarketkeeper "github.com/evmos/ethermint/x/feemarket/keeper"
 
 	"github.com/Canto-Network/Canto/v7/app/params"
+	"github.com/Canto-Network/Canto/v7/x/erc20"
 	"github.com/Canto-Network/Canto/v7/x/erc20/keeper"
+	"github.com/Canto-Network/Canto/v7/x/erc20/types"
 )
 
 // Simulation operation weights constants.
 const (
-	OpWeightSimulateRegisterCoinProposal  = "op_weight_register_coin_proposal"
-	OpWeightSimulateRegisterERC20Proposal = "op_weight_register_erc20_proposal"
+	OpWeightSimulateRegisterCoinProposal          = "op_weight_register_coin_proposal"
+	OpWeightSimulateRegisterERC20Proposal         = "op_weight_register_erc20_proposal"
+	OpWeightSimulateToggleTokenConversionProposal = "op_weight_toggle_token_conversion_proposal"
+
+	erc20Name     = "Coin Token"
+	erc20Symbol   = "CTKN"
+	erc20Decimals = uint8(18)
 )
 
 // ProposalContents defines the module weighted proposals' contents
-func ProposalContents(k keeper.Keeper) []simtypes.WeightedProposalContent {
+func ProposalContents(k keeper.Keeper, bk bankkeeper.Keeper, ek evmkeeper.Keeper, fk feemarketkeeper.Keeper) []simtypes.WeightedProposalContent {
 	return []simtypes.WeightedProposalContent{
 		simulation.NewWeightedProposalContent(
 			OpWeightSimulateRegisterCoinProposal,
 			params.DefaultWeightRegisterCoinProposal,
-			SimulateRegisterCoinProposal(k),
+			SimulateRegisterCoinProposal(k, bk),
 		),
 		simulation.NewWeightedProposalContent(
 			OpWeightSimulateRegisterERC20Proposal,
 			params.DefaultWeightRegisterERC20Proposal,
-			SimulateRegisterERC20Proposal(k),
+			SimulateRegisterERC20Proposal(k, ek, fk),
+		),
+		simulation.NewWeightedProposalContent(
+			OpWeightSimulateToggleTokenConversionProposal,
+			params.DefaultWeightToggleTokenConversionProposal,
+			SimulateToggleTokenConversionProposal(k, ek, fk),
 		),
 	}
 }
 
-func SimulateRegisterCoinProposal(k keeper.Keeper) simtypes.ContentSimulatorFn {
+func SimulateRegisterCoinProposal(k keeper.Keeper, bk bankkeeper.Keeper) simtypes.ContentSimulatorFn {
 	return func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) simtypes.Content {
 		coinMetadata := genRandomCoinMetadata(r)
+		bk.MintCoins(ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(coinMetadata.Base, sdk.NewInt(1))))
+
 		params := k.GetParams(ctx)
 		params.EnableErc20 = true
 		k.SetParams(ctx, params)
-		k.RegisterCoin(ctx, coinMetadata)
+
+		proposal := types.RegisterCoinProposal{
+			Title:       simtypes.RandStringOfLength(r, 10),
+			Description: simtypes.RandStringOfLength(r, 100),
+			Metadata:    coinMetadata,
+		}
+
+		if err := erc20.NewErc20ProposalHandler(&k)(ctx, &proposal); err != nil {
+			panic(err)
+		}
+
 		return nil
 	}
 }
 
-func SimulateRegisterERC20Proposal(k keeper.Keeper) simtypes.ContentSimulatorFn {
+func SimulateRegisterERC20Proposal(k keeper.Keeper, evmKeepr evmkeeper.Keeper, feemarketKeeper feemarketkeeper.Keeper) simtypes.ContentSimulatorFn {
 	return func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) simtypes.Content {
-		genRandomCoinMetadata(r)
+		params := k.GetParams(ctx)
+		params.EnableErc20 = true
+		k.SetParams(ctx, params)
+
+		// account key
+		priv, err := ethsecp256k1.GenerateKey()
+		if err != nil {
+			panic(err)
+		}
+		address := common.BytesToAddress(priv.PubKey().Address().Bytes())
+		signer := tests.NewSigner(priv)
+
+		contractAddr, err := erc20.DeployContract(ctx, evmKeepr, feemarketKeeper, address, signer, erc20Name, erc20Symbol, erc20Decimals)
+		if err != nil {
+			panic(err)
+		}
+
+		proposal := types.RegisterERC20Proposal{
+			Title:        simtypes.RandStringOfLength(r, 10),
+			Description:  simtypes.RandStringOfLength(r, 100),
+			Erc20Address: contractAddr.String(),
+		}
+
+		if err := erc20.NewErc20ProposalHandler(&k)(ctx, &proposal); err != nil {
+			panic(err)
+		}
+
+		return nil
+	}
+}
+
+func SimulateToggleTokenConversionProposal(k keeper.Keeper, evmKeeper evmkeeper.Keeper, feemarketKeeper feemarketkeeper.Keeper) simtypes.ContentSimulatorFn {
+	return func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) simtypes.Content {
+		params := k.GetParams(ctx)
+		params.EnableErc20 = true
+		k.SetParams(ctx, params)
+
+		// account key
+		priv, err := ethsecp256k1.GenerateKey()
+		if err != nil {
+			panic(err)
+		}
+		address := common.BytesToAddress(priv.PubKey().Address().Bytes())
+		signer := tests.NewSigner(priv)
+
+		contractAddr, err := erc20.DeployContract(ctx, evmKeeper, feemarketKeeper, address, signer, erc20Name, erc20Symbol, erc20Decimals)
+		if err != nil {
+			panic(err)
+		}
+
+		_, err = k.RegisterERC20(ctx, contractAddr)
+		if err != nil {
+			panic(err)
+		}
+
+		proposal := types.ToggleTokenConversionProposal{
+			Title:       simtypes.RandStringOfLength(r, 10),
+			Description: simtypes.RandStringOfLength(r, 100),
+			Token:       contractAddr.String(),
+		}
+
+		if err := erc20.NewErc20ProposalHandler(&k)(ctx, &proposal); err != nil {
+			panic(err)
+		}
+
 		return nil
 	}
 }
