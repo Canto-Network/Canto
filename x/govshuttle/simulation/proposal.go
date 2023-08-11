@@ -3,12 +3,14 @@ package simulation
 import (
 	"math/rand"
 
-	"github.com/Canto-Network/Canto/v7/app/params"
-	"github.com/Canto-Network/Canto/v7/x/govshuttle/keeper"
-	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
+
+	"github.com/Canto-Network/Canto/v7/app/params"
+	"github.com/Canto-Network/Canto/v7/x/govshuttle"
+	"github.com/Canto-Network/Canto/v7/x/govshuttle/keeper"
+	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
 )
 
 // Simulation operation weights constants.
@@ -17,33 +19,69 @@ const (
 	OpWeightSimulateTreasuryProposal      = "op_weight_treasury_proposal"
 )
 
-// ProposalContents defines the module weighted proposals' contents for mocking param changes, other actions with keeper
-func ProposalContents(ak types.AccountKeeper, bk types.BankKeeper, sk types.StakingKeeper, gk types.GovKeeper, k keeper.Keeper) []simtypes.WeightedProposalContent {
+// ProposalContents defines the module weighted proposals' contents
+func ProposalContents(k keeper.Keeper) []simtypes.WeightedProposalContent {
 	return []simtypes.WeightedProposalContent{
 		simulation.NewWeightedProposalContent(
 			OpWeightSimulateLendingMarketProposal,
-			params.DefaultWeightSimulateLendingMarketProposal,
-			SimulateLendingMarketProposal(sk, k),
+			params.DefaultWeightLendingMarketProposal,
+			SimulateLendingMarketProposal(k),
 		),
 		simulation.NewWeightedProposalContent(
 			OpWeightSimulateTreasuryProposal,
-			params.DefaultWeightSimulateTreasuryProposal,
-			SimulateTreasuryProposal(sk, k),
+			params.DefaultWeightRegisterERC20Proposal,
+			SimulateTreasuryProposal(k),
 		),
 	}
 }
 
-// SimulateAddWhitelistValidatorsProposal generates random add whitelisted validator param change proposal content.
-func SimulateLendingMarketProposal(sk types.StakingKeeper, k keeper.Keeper) simtypes.ContentSimulatorFn {
+func SimulateLendingMarketProposal(k keeper.Keeper) simtypes.ContentSimulatorFn {
 	return func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) simtypes.Content {
 
-		return types.NewLendingMarketProposal()
+		treasuryProposalMetadata := types.TreasuryProposalMetadata{
+			PropID:    1,
+			Recipient: accs[0].Address.String(),
+			Amount:    uint64(1000000000000000000),
+			Denom:     "canto",
+		}
+
+		treasuryProposal := types.TreasuryProposal{
+			Title:       simtypes.RandStringOfLength(r, 10),
+			Description: simtypes.RandStringOfLength(r, 100),
+			Metadata:    &treasuryProposalMetadata,
+		}
+
+		lendingMarketProposal := treasuryProposal.FromTreasuryToLendingMarket()
+		lendingMarketProposal.Metadata.Calldatas = []string{"callData1"}
+
+		if err := govshuttle.NewgovshuttleProposalHandler(&k)(ctx, lendingMarketProposal); err != nil {
+			panic(err)
+		}
+
+		return nil
 	}
 }
 
-// SimulateUpdateWhitelistValidatorsProposal generates random update whitelisted validator param change proposal content.
-func SimulateTreasuryProposal(sk types.StakingKeeper, k keeper.Keeper) simtypes.ContentSimulatorFn {
+func SimulateTreasuryProposal(k keeper.Keeper) simtypes.ContentSimulatorFn {
 	return func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) simtypes.Content {
-		return types.NewTreasuryProposal()
+
+		treasuryProposalMetadata := types.TreasuryProposalMetadata{
+			PropID:    1,
+			Recipient: accs[0].Address.String(),
+			Amount:    uint64(1000000000000000000),
+			Denom:     "canto",
+		}
+
+		proposal := types.TreasuryProposal{
+			Title:       simtypes.RandStringOfLength(r, 10),
+			Description: simtypes.RandStringOfLength(r, 100),
+			Metadata:    &treasuryProposalMetadata,
+		}
+
+		if err := govshuttle.NewgovshuttleProposalHandler(&k)(ctx, &proposal); err != nil {
+			panic(err)
+		}
+
+		return nil
 	}
 }

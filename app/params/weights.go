@@ -5,6 +5,6 @@ const (
 	DefaultWeightRegisterERC20Proposal         int = 5
 	DefaultWeightToggleTokenConversionProposal int = 5
 
-	DefaultWeightSimulateLendingMarketProposal int = 5
-	DefaultWeightSimulateTreasuryProposal      int = 5
+	DefaultWeightLendingMarketProposal int = 5
+	DefaultWeightTreasuryProposal      int = 5
 )
