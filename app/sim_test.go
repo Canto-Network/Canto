@@ -3,8 +3,6 @@ package app
 import (
 	"encoding/json"
 	"fmt"
-	inflationtypes "github.com/Canto-Network/Canto/v7/x/inflation/types"
-	"math/rand"
 	"os"
 	"testing"
 
