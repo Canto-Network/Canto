@@ -1,7 +1,7 @@
 package keeper_test
 
 import (
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking/types"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking/types"
 )
 
 func (suite *KeeperTestSuite) TestWithdrawInsuranceRequestSetGet() {

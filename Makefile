@@ -39,7 +39,7 @@ PROJECT := canto
 DOCKER_IMAGE := $(NAMESPACE)/$(PROJECT)
 COMMIT_HASH := $(shell git rev-parse --short=7 HEAD)
 DOCKER_TAG := $(COMMIT_HASH)
-REPO=github.com/Canto-Network/Canto/v6
+REPO=github.com/Canto-Network/Canto/v7
 
 export GO111MODULE = on
 
@@ -94,8 +94,8 @@ ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=canto \
           -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)" \
           -X github.com/tendermint/tendermint/version.TMCoreSemVer=$(TMVERSION)
 
-testing_ldflags = -X github.com/Canto-Network/Canto/v6/app.enableAdvanceEpoch=true \
-				  -X github.com/Canto-Network/Canto/v6/app.epochPerBlock=5
+testing_ldflags = -X github.com/Canto-Network/Canto/v7/app.enableAdvanceEpoch=true \
+				  -X github.com/Canto-Network/Canto/v7/app.epochPerBlock=5
 
 # DB backend selection
 ifeq (cleveldb,$(findstring cleveldb,$(COSMOS_BUILD_OPTIONS)))

@@ -19,7 +19,7 @@ import (
 
 	ibcgotesting "github.com/cosmos/ibc-go/v3/testing"
 
-	cantoapp "github.com/Canto-Network/Canto/v6/app"
+	cantoapp "github.com/Canto-Network/Canto/v7/app"
 	ethermint "github.com/evmos/ethermint/types"
 )
 

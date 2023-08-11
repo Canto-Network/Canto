@@ -1,6 +1,6 @@
 package keeper_test
 
-import "github.com/Canto-Network/Canto/v6/x/liquidstaking/types"
+import "github.com/Canto-Network/Canto/v7/x/liquidstaking/types"
 
 // Sets a bunch of chunks in the store and then get and ensure that each of them
 // match up with what is stored on stack vs keeper

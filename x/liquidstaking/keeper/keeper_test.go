@@ -6,10 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 
-	liquidstakingkeeper "github.com/Canto-Network/Canto/v6/x/liquidstaking/keeper"
+	liquidstakingkeeper "github.com/Canto-Network/Canto/v7/x/liquidstaking/keeper"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
@@ -21,8 +21,8 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/Canto-Network/Canto/v6/app"
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking/types"
+	"github.com/Canto-Network/Canto/v7/app"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"

@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Canto-Network/Canto/v6/types"
+	"github.com/Canto-Network/Canto/v7/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"

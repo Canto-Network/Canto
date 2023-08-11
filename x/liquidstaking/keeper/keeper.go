@@ -7,7 +7,7 @@ import (
 
 	"github.com/tendermint/tendermint/libs/log"
 
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking/types"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking/types"
 )
 
 // Keeper of the inflation store

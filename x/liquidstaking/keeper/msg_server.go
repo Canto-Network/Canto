@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking/types"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

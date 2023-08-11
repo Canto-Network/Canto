@@ -3,8 +3,8 @@ package simulation_test
 import (
 	"encoding/binary"
 	"fmt"
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking/simulation"
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking/types"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking/simulation"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/kv"

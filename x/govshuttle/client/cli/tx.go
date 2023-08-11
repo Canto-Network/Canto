@@ -15,7 +15,7 @@ import (
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/Canto-Network/Canto/v6/x/govshuttle/types"
+	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
 )
 
 var (
@@ -125,7 +125,7 @@ Where metadata.json contains (example):
 	return cmd
 }
 
-//Register TreasuryProposal submit cmd
+// Register TreasuryProposal submit cmd
 func NewTreasuryProposalCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "treasury-proposal [metadata]",

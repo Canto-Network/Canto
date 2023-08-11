@@ -3,7 +3,7 @@ package app
 import (
 	"encoding/json"
 	"fmt"
-	inflationtypes "github.com/Canto-Network/Canto/v6/x/inflation/types"
+	inflationtypes "github.com/Canto-Network/Canto/v7/x/inflation/types"
 	"math/rand"
 	"os"
 	"testing"
@@ -30,8 +30,8 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	cantoconfig "github.com/Canto-Network/Canto/v6/cmd/config"
-	liquidstakingtypes "github.com/Canto-Network/Canto/v6/x/liquidstaking/types"
+	cantoconfig "github.com/Canto-Network/Canto/v7/cmd/config"
+	liquidstakingtypes "github.com/Canto-Network/Canto/v7/x/liquidstaking/types"
 )
 
 // Get flags every time the simulator is run

@@ -10,9 +10,9 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	"github.com/Canto-Network/Canto/v6/testutil/network"
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking/client/cli"
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking/types"
+	"github.com/Canto-Network/Canto/v7/testutil/network"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking/client/cli"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 	sdk "github.com/cosmos/cosmos-sdk/types"

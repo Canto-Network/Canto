@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/Canto-Network/Canto/v6/app"
+	"github.com/Canto-Network/Canto/v7/app"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/common"
@@ -19,8 +19,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	//used for deploying contracts
-	"github.com/Canto-Network/Canto/v6/contracts"
-	"github.com/Canto-Network/Canto/v6/x/erc20/types"
+	"github.com/Canto-Network/Canto/v7/contracts"
+	"github.com/Canto-Network/Canto/v7/x/erc20/types"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 )
 
@@ -43,7 +43,7 @@ func TestKeeperTestSuite(t *testing.T) {
 	suite.Run(t, s)
 }
 
-//Test Helpers
+// Test Helpers
 func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 	checkTx := false
 

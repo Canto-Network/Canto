@@ -1,7 +1,7 @@
 package liquidstaking
 
 import (
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking/keeper"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

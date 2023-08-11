@@ -3,7 +3,7 @@ package testutil
 import (
 	"fmt"
 
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking/client/cli"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking/client/cli"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/testutil"

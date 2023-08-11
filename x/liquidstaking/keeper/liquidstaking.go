@@ -10,7 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/evidence/exported"
 	evidencetypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
 
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking/types"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"

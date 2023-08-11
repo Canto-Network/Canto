@@ -4,7 +4,7 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"math/rand"
 
-	"github.com/Canto-Network/Canto/v6/app/params"
+	"github.com/Canto-Network/Canto/v7/app/params"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -13,8 +13,8 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking/keeper"
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking/types"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking/keeper"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking/types"
 )
 
 // Simulation operation weights constants.

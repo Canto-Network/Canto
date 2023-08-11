@@ -17,8 +17,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/Canto-Network/Canto/v6/app"
-	"github.com/Canto-Network/Canto/v6/x/recovery/types"
+	"github.com/Canto-Network/Canto/v7/app"
+	"github.com/Canto-Network/Canto/v7/x/recovery/types"
 )
 
 var (

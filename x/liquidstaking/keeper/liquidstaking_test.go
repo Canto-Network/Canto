@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"time"
 
-	liquidstakingkeeper "github.com/Canto-Network/Canto/v6/x/liquidstaking"
+	liquidstakingkeeper "github.com/Canto-Network/Canto/v7/x/liquidstaking"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
@@ -14,7 +14,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/staking/teststaking"
 
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking/types"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/simulation"

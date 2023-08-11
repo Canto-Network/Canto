@@ -3,8 +3,8 @@ package keeper_test
 import (
 	"time"
 
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking"
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking/types"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	ethermint "github.com/evmos/ethermint/types"
 )

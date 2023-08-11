@@ -4,8 +4,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/common"
 
-	"github.com/Canto-Network/Canto/v6/x/fees/keeper"
-	"github.com/Canto-Network/Canto/v6/x/fees/types"
+	"github.com/Canto-Network/Canto/v7/x/fees/keeper"
+	"github.com/Canto-Network/Canto/v7/x/fees/types"
 )
 
 // InitGenesis import module genesis

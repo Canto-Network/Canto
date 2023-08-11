@@ -9,8 +9,8 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	sdkvesting "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 
-	"github.com/Canto-Network/Canto/v6/testutil"
-	"github.com/Canto-Network/Canto/v6/x/vesting/types"
+	"github.com/Canto-Network/Canto/v7/testutil"
+	"github.com/Canto-Network/Canto/v7/x/vesting/types"
 	"github.com/evmos/ethermint/tests"
 )
 

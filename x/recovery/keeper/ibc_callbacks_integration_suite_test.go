@@ -15,11 +15,11 @@ import (
 	channeltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
 	ibcgotesting "github.com/cosmos/ibc-go/v3/testing"
 
-	ibctesting "github.com/Canto-Network/Canto/v6/ibc/testing"
+	ibctesting "github.com/Canto-Network/Canto/v7/ibc/testing"
 
-	"github.com/Canto-Network/Canto/v6/app"
-	inflationtypes "github.com/Canto-Network/Canto/v6/x/inflation/types"
-	"github.com/Canto-Network/Canto/v6/x/recovery/types"
+	"github.com/Canto-Network/Canto/v7/app"
+	inflationtypes "github.com/Canto-Network/Canto/v7/x/inflation/types"
+	"github.com/Canto-Network/Canto/v7/x/recovery/types"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 )
 

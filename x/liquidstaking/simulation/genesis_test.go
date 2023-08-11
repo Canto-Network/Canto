@@ -6,8 +6,8 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking/simulation"
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking/types"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking/simulation"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/types/module"

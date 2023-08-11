@@ -8,8 +8,8 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 
-	"github.com/Canto-Network/Canto/v6/contracts"
-	"github.com/Canto-Network/Canto/v6/testutil"
+	"github.com/Canto-Network/Canto/v7/contracts"
+	"github.com/Canto-Network/Canto/v7/testutil"
 	"github.com/ethereum/go-ethereum/common"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/evmos/ethermint/crypto/ethsecp256k1"
@@ -19,7 +19,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-/// Load in all of the test contracts that will be used in the integration tests
+// / Load in all of the test contracts that will be used in the integration tests
+//
 //go:embed test_contracts/compiled_contracts/factoryContract.json
 var factoryContractJson []byte // nolint: golint
 var factoryContract evmtypes.CompiledContract

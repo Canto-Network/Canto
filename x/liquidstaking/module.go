@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	inflationtypes "github.com/Canto-Network/Canto/v6/x/inflation/types"
+	inflationtypes "github.com/Canto-Network/Canto/v7/x/inflation/types"
 	"github.com/armon/go-metrics"
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -14,8 +14,8 @@ import (
 	ethermint "github.com/evmos/ethermint/types"
 	"math/rand"
 
-	inflationkeeper "github.com/Canto-Network/Canto/v6/x/inflation/keeper"
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking/simulation"
+	inflationkeeper "github.com/Canto-Network/Canto/v7/x/inflation/keeper"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking/simulation"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -31,9 +31,9 @@ import (
 	"github.com/spf13/cobra"
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking/client/cli"
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking/keeper"
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking/types"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking/client/cli"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking/keeper"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking/types"
 )
 
 // type check to ensure the interface is properly implemented

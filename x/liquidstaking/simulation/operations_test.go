@@ -1,14 +1,14 @@
 package simulation_test
 
 import (
-	"github.com/Canto-Network/Canto/v6/app/params"
+	"github.com/Canto-Network/Canto/v7/app/params"
 	"math/rand"
 	"testing"
 	"time"
 
-	"github.com/Canto-Network/Canto/v6/app"
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking/simulation"
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking/types"
+	"github.com/Canto-Network/Canto/v7/app"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking/simulation"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/staking/teststaking"

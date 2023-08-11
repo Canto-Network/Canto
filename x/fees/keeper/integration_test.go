@@ -21,9 +21,9 @@ package keeper_test
 //	"github.com/evmos/ethermint/tests"
 //	evmtypes "github.com/evmos/ethermint/x/evm/types"
 //
-//	"github.com/Canto-Network/Canto/v6/app"
-//	"github.com/Canto-Network/Canto/v6/testutil"
-//	"github.com/Canto-Network/Canto/v6/x/fees/types"
+//	"github.com/Canto-Network/Canto/v7/app"
+//	"github.com/Canto-Network/Canto/v7/testutil"
+//	"github.com/Canto-Network/Canto/v7/x/fees/types"
 //
 //	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 //	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"

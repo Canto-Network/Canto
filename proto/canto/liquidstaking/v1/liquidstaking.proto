@@ -6,7 +6,7 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "cosmos_proto/cosmos.proto";
 
-option go_package = "github.com/Canto-Network/Canto/v6/x/liquidstaking/types";
+option go_package = "github.com/Canto-Network/Canto/v7/x/liquidstaking/types";
 
 // Epoch defines the epoch of the module.
 message Epoch {

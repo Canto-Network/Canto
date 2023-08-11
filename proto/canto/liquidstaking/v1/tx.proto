@@ -4,7 +4,7 @@ package canto.liquidstaking.v1;
 import "google/api/annotations.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/Canto-Network/Canto/v6/x/liquidstaking/types";
+option go_package = "github.com/Canto-Network/Canto/v7/x/liquidstaking/types";
 
 // Msg defines the liquidstaking Msg service.
 service Msg {

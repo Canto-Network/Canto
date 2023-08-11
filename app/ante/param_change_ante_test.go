@@ -3,8 +3,8 @@ package ante_test
 import (
 	"strconv"
 
-	"github.com/Canto-Network/Canto/v6/app/ante"
-	"github.com/Canto-Network/Canto/v6/types"
+	"github.com/Canto-Network/Canto/v7/app/ante"
+	"github.com/Canto-Network/Canto/v7/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/cosmos/cosmos-sdk/x/params/types/proposal"

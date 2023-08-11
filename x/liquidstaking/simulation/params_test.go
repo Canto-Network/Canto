@@ -1,7 +1,7 @@
 package simulation_test
 
 import (
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking/simulation"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking/simulation"
 	"github.com/stretchr/testify/require"
 	"math/rand"
 	"testing"
