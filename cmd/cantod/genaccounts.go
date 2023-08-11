@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/spf13/cobra"
@@ -15,7 +14,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	authvesting "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
+
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
@@ -24,13 +23,6 @@ import (
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 
 	cantokr "github.com/Canto-Network/Canto/v7/crypto/keyring"
-
-	vestingcli "github.com/Canto-Network/Canto/v7/x/vesting/client/cli"
-	vestingtypes "github.com/Canto-Network/Canto/v7/x/vesting/types"
-)
-
-const (
-	flagVestingStart = "vesting-start-time"
 )
 
 // AddGenesisAccountCmd returns add-genesis-account cobra Command.
@@ -87,121 +79,15 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 				return fmt.Errorf("failed to parse coins: %w", err)
 			}
 
-			vestingStart, err := cmd.Flags().GetInt64(flagVestingStart)
-			if err != nil {
-				return err
-			}
-
 			// create concrete account type based on input parameters
 			var genAccount authtypes.GenesisAccount
 
 			balances := banktypes.Balance{Address: addr.String(), Coins: coins.Sort()}
 			baseAccount := authtypes.NewBaseAccount(addr, nil, 0, 0)
 
-			clawback, _ := cmd.Flags().GetBool(vestingcli.FlagClawback)
-
-			// Create ClawbackvestingAccount, sdk.VestingAccount or EthAccount
-			switch {
-			case clawback:
-				// ClawbackvestingAccount requires clawback, lockup, vesting, and funder
-				// flags
-				var (
-					lockupStart                   int64
-					lockupPeriods, vestingPeriods authvesting.Periods
-				)
-
-				// Get funder addr which can perform clawback
-				funderStr, err := cmd.Flags().GetString(vestingcli.FlagFunder)
-				if err != nil {
-					return fmt.Errorf("must specify the clawback vesting account funder with the --funder flag")
-				}
-				funder, err := sdk.AccAddressFromBech32(funderStr)
-				if err != nil {
-					return err
-				}
-
-				// Read lockup and vesting schedules
-				lockupFile, _ := cmd.Flags().GetString(vestingcli.FlagLockup)
-				vestingFile, _ := cmd.Flags().GetString(vestingcli.FlagVesting)
-
-				if lockupFile == "" && vestingFile == "" {
-					return fmt.Errorf("must specify at least one of %s or %s", vestingcli.FlagLockup, vestingcli.FlagVesting)
-				}
-
-				if lockupFile != "" {
-					lockupStart, lockupPeriods, err = vestingcli.ReadScheduleFile(lockupFile)
-					if err != nil {
-						return err
-					}
-				}
-
-				if vestingFile != "" {
-					vestingStart, vestingPeriods, err = vestingcli.ReadScheduleFile(vestingFile)
-					if err != nil {
-						return err
-					}
-				}
-
-				// Align schedules in case lockup and vesting schedules have different
-				// start_time
-				commonStart, _ := vestingtypes.AlignSchedules(lockupStart, vestingStart, lockupPeriods, vestingPeriods)
-
-				// Get total lockup and vesting from schedules
-				vestingCoins := sdk.NewCoins()
-				for _, period := range vestingPeriods {
-					vestingCoins = vestingCoins.Add(period.Amount...)
-				}
-
-				lockupCoins := sdk.NewCoins()
-				for _, period := range lockupPeriods {
-					lockupCoins = lockupCoins.Add(period.Amount...)
-				}
-
-				// If lockup absent, default to an instant unlock schedule
-				if !vestingCoins.IsZero() && len(lockupPeriods) == 0 {
-					lockupPeriods = []authvesting.Period{
-						{Length: 0, Amount: vestingCoins},
-					}
-					lockupCoins = vestingCoins
-				}
-
-				// If vesting absent, default to an instant vesting schedule
-				if !lockupCoins.IsZero() && len(vestingPeriods) == 0 {
-					vestingPeriods = []authvesting.Period{
-						{Length: 0, Amount: lockupCoins},
-					}
-					vestingCoins = lockupCoins
-				}
-
-				// The vesting and lockup schedules must describe the same total amount.
-				// IsEqual can panic, so use (a == b) <=> (a <= b && b <= a).
-				if !(vestingCoins.IsAllLTE(lockupCoins) && lockupCoins.IsAllLTE(vestingCoins)) {
-					return fmt.Errorf("lockup (%s) and vesting (%s) amounts must be equal",
-						lockupCoins, vestingCoins,
-					)
-				}
-
-				// Check if account balance is aligned with vesting schedule
-				if !vestingCoins.IsEqual(coins) {
-					return fmt.Errorf("vestingCoins (%s) and coin balance (%s) amounts must be equal",
-						vestingCoins, coins,
-					)
-				}
-
-				genAccount = vestingtypes.NewClawbackVestingAccount(
-					baseAccount,
-					funder,
-					vestingCoins,
-					time.Unix(commonStart, 0),
-					lockupPeriods,
-					vestingPeriods,
-				)
-
-			default:
-				genAccount = &ethermint.EthAccount{
-					BaseAccount: baseAccount,
-					CodeHash:    common.BytesToHash(evmtypes.EmptyCodeHash).Hex(),
-				}
+			genAccount = &ethermint.EthAccount{
+				BaseAccount: baseAccount,
+				CodeHash:    common.BytesToHash(evmtypes.EmptyCodeHash).Hex(),
 			}
 
 			if err := genAccount.Validate(); err != nil {
@@ -267,11 +153,6 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 
 	cmd.Flags().String(flags.FlagHome, defaultNodeHome, "The application home directory")
 	cmd.Flags().String(flags.FlagKeyringBackend, flags.DefaultKeyringBackend, "Select keyring's backend (os|file|kwallet|pass|test)")
-	cmd.Flags().Int64(flagVestingStart, 0, "schedule start time (unix epoch) for vesting accounts")
-	cmd.Flags().Bool(vestingcli.FlagClawback, false, "create clawback account")
-	cmd.Flags().String(vestingcli.FlagFunder, "", "funder address for clawback")
-	cmd.Flags().String(vestingcli.FlagLockup, "", "path to file containing unlocking periods for a clawback vesting account")
-	cmd.Flags().String(vestingcli.FlagVesting, "", "path to file containing vesting periods for a clawback vesting account")
 	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd

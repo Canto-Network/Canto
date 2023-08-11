@@ -27,13 +27,10 @@
       }
     },
     {
-      "url": "./tmp-swagger-gen/canto/vesting/v1/query.swagger.json"
-    },
-    {
-      "url": "./tmp-swagger-gen/canto/recovery/v1/query.swagger.json",
+      "url": "./tmp-swagger-gen/ethermint/evm/v1/query.swagger.json",
       "operationIds": {
         "rename": {
-          "Params": "RecoveryParams"
+          "Params": "EvmParams"
         }
       }
     },
@@ -46,19 +43,27 @@
       }
     },
     {
-      "url": "./tmp-swagger-gen/ethermint/evm/v1/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "EvmParams"
-        }
-      }
-    },
-    {
       "url": "./tmp-swagger-gen/ethermint/feemarket/v1/query.swagger.json",
       "operationIds": {
         "rename": {
           "Params": "FeeMarketParams",
           "BaseFee": "FeeMarketBaseFee"
+        }
+      }
+    },
+    {
+      "url": "./tmp-swagger-gen/canto/onboarding/v1/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "OnboardingParams"
+        }
+      }
+    },
+    {
+      "url": "./tmp-swagger-gen/canto/coinswap/v1/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "CoinswapParams"
         }
       }
     },

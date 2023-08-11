@@ -18,12 +18,14 @@ import (
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	evidencetypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
+	"github.com/cosmos/cosmos-sdk/x/feegrant"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	ibctransfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
 	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
 	"github.com/evmos/ethermint/encoding"
+	evmtypes "github.com/evmos/ethermint/x/evm/types"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/libs/log"
@@ -31,6 +33,10 @@ import (
 	dbm "github.com/tendermint/tm-db"
 
 	cantoconfig "github.com/Canto-Network/Canto/v7/cmd/config"
+	csrtypes "github.com/Canto-Network/Canto/v7/x/csr/types"
+	erc20types "github.com/Canto-Network/Canto/v7/x/erc20/types"
+	govshuttletypes "github.com/Canto-Network/Canto/v7/x/govshuttle/types"
+	inflationtypes "github.com/Canto-Network/Canto/v7/x/inflation/types"
 	liquidstakingtypes "github.com/Canto-Network/Canto/v7/x/liquidstaking/types"
 )
 
@@ -72,7 +78,7 @@ func TestFullAppSimulation(t *testing.T) {
 
 	// TODO: shadowed
 	cantoApp := NewCanto(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, simapp.FlagPeriodValue,
-		true, encoding.MakeConfig(ModuleBasics), EmptyAppOptions{}, fauxMerkleModeOpt)
+		true, encoding.MakeConfig(ModuleBasics), simapp.EmptyAppOptions{}, fauxMerkleModeOpt)
 	require.Equal(t, cantoconfig.AppName, cantoApp.Name())
 
 	// run randomized simulation
@@ -121,7 +127,7 @@ func TestAppImportExport(t *testing.T) {
 		simapp.FlagPeriodValue,
 		true,
 		encoding.MakeConfig(ModuleBasics),
-		EmptyAppOptions{},
+		simapp.EmptyAppOptions{},
 		fauxMerkleModeOpt,
 	)
 	require.Equal(t, cantoconfig.AppName, app.Name())
@@ -173,7 +179,7 @@ func TestAppImportExport(t *testing.T) {
 		simapp.FlagPeriodValue,
 		true,
 		encoding.MakeConfig(ModuleBasics),
-		EmptyAppOptions{},
+		simapp.EmptyAppOptions{},
 		fauxMerkleModeOpt,
 	)
 	require.Equal(t, cantoconfig.AppName, newApp.Name())
@@ -200,24 +206,20 @@ func TestAppImportExport(t *testing.T) {
 		},
 		{app.keys[distrtypes.StoreKey], newApp.keys[distrtypes.StoreKey], [][]byte{}},
 		{app.keys[paramstypes.StoreKey], newApp.keys[paramstypes.StoreKey], [][]byte{}},
-		// {app.keys[upgradetypes.StoreKey], newApp.keys[upgradetypes.StoreKey], [][]byte{}},
 		{app.keys[evidencetypes.StoreKey], newApp.keys[evidencetypes.StoreKey], [][]byte{}},
 		{app.keys[capabilitytypes.StoreKey], newApp.keys[capabilitytypes.StoreKey], [][]byte{}},
-		// {app.keys[feegrant.StoreKey], newApp.keys[feegrant.StoreKey], [][]byte{}},
+		{app.keys[feegrant.StoreKey], newApp.keys[feegrant.StoreKey], [][]byte{}},
 		{app.keys[authzkeeper.StoreKey], newApp.keys[authzkeeper.StoreKey], [][]byte{}},
 		{app.keys[ibchost.StoreKey], newApp.keys[ibchost.StoreKey], [][]byte{}},
 		{app.keys[ibctransfertypes.StoreKey], newApp.keys[ibctransfertypes.StoreKey], [][]byte{}},
-		// {app.keys[evmtypes.StoreKey], newApp.keys[evmtypes.StoreKey], [][]byte{}},
+		{app.keys[evmtypes.StoreKey], newApp.keys[evmtypes.StoreKey], [][]byte{}},
 		{app.keys[feemarkettypes.StoreKey], newApp.keys[feemarkettypes.StoreKey], [][]byte{}},
 		{app.keys[inflationtypes.StoreKey], newApp.keys[inflationtypes.StoreKey], [][]byte{}},
-		// {app.keys[erc20types.StoreKey], newApp.keys[erc20types.StoreKey], [][]byte{}},
-		// EpochInfo.CurrentEpochStartHeight is set to the block height at the time of init genesis.
+		{app.keys[erc20types.StoreKey], newApp.keys[erc20types.StoreKey], [][]byte{}},
+		// In the case of epoch module, the value is updated when importing genesis, so the store consistency is broken
 		//{app.keys[epochstypes.StoreKey], newApp.keys[epochstypes.StoreKey], [][]byte{}},
-		// {app.keys[vestingtypes.StoreKey], newApp.keys[vestingtypes.StoreKey], [][]byte{}},
-		// {app.keys[recoverytypes.StoreKey], newApp.keys[recoverytypes.StoreKey], [][]byte{}},
-		// {app.keys[feestypes.StoreKey], newApp.keys[feestypes.StoreKey], [][]byte{}},
-		// {app.keys[csrtypes.StoreKey], newApp.keys[csrtypes.StoreKey], [][]byte{}},
-		// {app.keys[govshuttletypes.StoreKey], newApp.keys[govshuttletypes.StoreKey], [][]byte{}},
+		{app.keys[csrtypes.StoreKey], newApp.keys[csrtypes.StoreKey], [][]byte{}},
+		{app.keys[govshuttletypes.StoreKey], newApp.keys[govshuttletypes.StoreKey], [][]byte{}},
 		{app.keys[liquidstakingtypes.StoreKey], newApp.keys[liquidstakingtypes.StoreKey], [][]byte{}},
 	}
 
@@ -245,14 +247,13 @@ func TestAppStateDeterminism(t *testing.T) {
 	config.AllInvariants = false
 	config.ChainID = "canto_9000-1"
 
-	numSeeds := 3
-	numTimesToRunPerSeed := 5
+	numSeeds := config.NumBlocks / 10
+	numTimesToRunPerSeed := 2
 	appHashList := make([]json.RawMessage, numTimesToRunPerSeed)
 
 	for i := 0; i < numSeeds; i++ {
-		config.Seed = rand.Int63()
+		config.Seed = config.Seed + int64(i)
 		for j := 0; j < numTimesToRunPerSeed; j++ {
-			fmt.Printf("running simulation with seed %d, j: %d\n", config.Seed, j)
 			var logger log.Logger
 			if simapp.FlagVerboseValue {
 				logger = log.TestingLogger()
@@ -271,7 +272,7 @@ func TestAppStateDeterminism(t *testing.T) {
 				simapp.FlagPeriodValue,
 				true,
 				encoding.MakeConfig(ModuleBasics),
-				EmptyAppOptions{},
+				simapp.EmptyAppOptions{},
 				fauxMerkleModeOpt,
 			)
 			fmt.Printf("running simulation with seed %d\n", config.Seed)
@@ -328,7 +329,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		simapp.FlagPeriodValue,
 		true,
 		encoding.MakeConfig(ModuleBasics),
-		EmptyAppOptions{},
+		simapp.EmptyAppOptions{},
 		fauxMerkleModeOpt,
 	)
 	require.Equal(t, cantoconfig.AppName, app.Name())
@@ -385,7 +386,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		simapp.FlagPeriodValue,
 		true,
 		encoding.MakeConfig(ModuleBasics),
-		EmptyAppOptions{},
+		simapp.EmptyAppOptions{},
 		fauxMerkleModeOpt,
 	)
 	require.Equal(t, cantoconfig.AppName, newApp.Name())

@@ -1,0 +1,25 @@
+syntax = "proto3";
+package canto.onboarding.v1;
+
+import "google/api/annotations.proto";
+import "gogoproto/gogo.proto";
+import "canto/onboarding/v1/genesis.proto";
+
+option go_package = "github.com/Canto-Network/Canto/v7/x/onboarding/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Params retrieves the total set of onboarding parameters.
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/canto/onboarding/v1/params";
+  }
+}
+
+// QueryParamsRequest is the request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is the response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // params defines the parameters of the module.
+  Params params = 1 [ (gogoproto.nullable) = false ];
+}

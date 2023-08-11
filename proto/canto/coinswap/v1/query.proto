@@ -1,0 +1,77 @@
+syntax = "proto3";
+package canto.coinswap.v1;
+
+import "cosmos/base/v1beta1/coin.proto";
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "canto/coinswap/v1/coinswap.proto";
+
+option go_package = "github.com/Canto-Network/Canto/v7/x/coinswap/types";
+
+// Query creates service with coinswap as rpc
+service Query {
+  // Params returns parameters of the module.
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/canto/coinswap/params";
+  }
+
+  // LiquidityPool returns the liquidity pool for the provided
+  // lpt_denom
+  rpc LiquidityPool(QueryLiquidityPoolRequest)
+      returns (QueryLiquidityPoolResponse) {
+    option (google.api.http).get = "/canto/coinswap/pools/{lpt_denom}";
+  }
+
+  // LiquidityPools returns all the liquidity pools available
+  rpc LiquidityPools(QueryLiquidityPoolsRequest)
+      returns (QueryLiquidityPoolsResponse) {
+    option (google.api.http).get = "/canto/coinswap/pools";
+  }
+}
+
+// QueryParamsRequest is request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  Params params = 1 [ (gogoproto.nullable) = false ];
+}
+
+// QueryLiquidityPoolRequest is request type for the Query/LiquidityPool RPC
+// method
+message QueryLiquidityPoolRequest { string lpt_denom = 1; }
+
+// QueryLiquidityPoolResponse is response type for the Query/LiquidityPool RPC
+// method
+message QueryLiquidityPoolResponse {
+  PoolInfo pool = 1 [ (gogoproto.nullable) = false ];
+}
+
+// QueryLiquidityPoolsRequest is request type for the Query/LiquidityPools RPC
+// method
+message QueryLiquidityPoolsRequest {
+  // pagination defines an optional pagination for the request.
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryLiquidityPoolsResponse is response type for the Query/LiquidityPools RPC
+// method
+message QueryLiquidityPoolsResponse {
+  repeated PoolInfo pools = 1 [ (gogoproto.nullable) = false ];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message PoolInfo {
+  string id = 1;
+  // escrow account for deposit tokens
+  string escrow_address = 2;
+  // main token balance
+  cosmos.base.v1beta1.Coin standard = 3 [ (gogoproto.nullable) = false ];
+  // counterparty token balance
+  cosmos.base.v1beta1.Coin token = 4 [ (gogoproto.nullable) = false ];
+  // liquidity token balance
+  cosmos.base.v1beta1.Coin lpt = 5 [ (gogoproto.nullable) = false ];
+  // liquidity pool fee
+  string fee = 6;
+}
