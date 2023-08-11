@@ -863,7 +863,10 @@ func (suite *KeeperTestSuite) TestGRPCStates() {
 			&types.QueryStatesRequest{},
 			false,
 			func(response *types.QueryStatesResponse) {
-				response.NetAmountState.Equal(suite.app.LiquidStakingKeeper.GetNetAmountState(suite.ctx))
+				suite.Equal(
+					suite.app.LiquidStakingKeeper.GetNetAmountState(suite.ctx),
+					response.NetAmountState,
+				)
 			},
 		},
 	} {

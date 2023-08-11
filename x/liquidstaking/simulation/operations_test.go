@@ -1,6 +1,7 @@
 package simulation_test
 
 import (
+	"github.com/Canto-Network/Canto/v6/app/params"
 	"math/rand"
 	"testing"
 	"time"
@@ -54,14 +55,14 @@ func TestWeightedOperations(t *testing.T) {
 		opMsgRoute string
 		opMsgName  string
 	}{
-		{app.DefaultWeightMsgLiquidStake, types.ModuleName, types.TypeMsgLiquidStake},
-		{app.DefaultWeightMsgLiquidUnstake, types.ModuleName, types.TypeMsgLiquidUnstake},
-		{app.DefaultWeightMsgProvideInsurance, types.ModuleName, types.TypeMsgProvideInsurance},
-		{app.DefaultWeightMsgCancelProvideInsurance, types.ModuleName, types.TypeMsgCancelProvideInsurance},
-		{app.DefaultWeightMsgDepositInsurance, types.ModuleName, types.TypeMsgDepositInsurance},
-		{app.DefaultWeightMsgWithdrawInsurance, types.ModuleName, types.TypeMsgWithdrawInsurance},
-		{app.DefaultWeightMsgWithdrawInsuranceCommission, types.ModuleName, types.TypeMsgWithdrawInsuranceCommission},
-		{app.DefaultWeightMsgClaimDiscountedReward, types.ModuleName, types.TypeMsgClaimDiscountedReward},
+		{params.DefaultWeightMsgLiquidStake, types.ModuleName, types.TypeMsgLiquidStake},
+		{params.DefaultWeightMsgLiquidUnstake, types.ModuleName, types.TypeMsgLiquidUnstake},
+		{params.DefaultWeightMsgProvideInsurance, types.ModuleName, types.TypeMsgProvideInsurance},
+		{params.DefaultWeightMsgCancelProvideInsurance, types.ModuleName, types.TypeMsgCancelProvideInsurance},
+		{params.DefaultWeightMsgDepositInsurance, types.ModuleName, types.TypeMsgDepositInsurance},
+		{params.DefaultWeightMsgWithdrawInsurance, types.ModuleName, types.TypeMsgWithdrawInsurance},
+		{params.DefaultWeightMsgWithdrawInsuranceCommission, types.ModuleName, types.TypeMsgWithdrawInsuranceCommission},
+		{params.DefaultWeightMsgClaimDiscountedReward, types.ModuleName, types.TypeMsgClaimDiscountedReward},
 	}
 
 	for i, w := range weightedOps {

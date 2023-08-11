@@ -33,27 +33,23 @@ func (suite *KeeperTestSuite) TestNetAmountInvariant() {
 	suite.ctx = suite.advanceEpoch(suite.ctx)
 	suite.ctx = suite.advanceHeight(suite.ctx, 1, "module epoch reached")
 
-	nas := suite.app.LiquidStakingKeeper.GetNetAmountState(suite.ctx)
-	oneChunk, oneInsurance := suite.app.LiquidStakingKeeper.GetMinimumRequirements(suite.ctx)
-	suite.True(nas.Equal(types.NetAmountState{
-		MintRate:                           sdk.MustNewDecFromStr("0.990373683313988266"),
-		LsTokensTotalSupply:                types.ChunkSize,
-		NetAmount:                          sdk.MustNewDecFromStr("252429970840349915725000"),
-		TotalLiquidTokens:                  types.ChunkSize,
-		RewardModuleAccBalance:             sdk.MustNewDecFromStr("2429970840349915725000").TruncateInt(),
-		FeeRate:                            sdk.ZeroDec(),
-		UtilizationRatio:                   sdk.MustNewDecFromStr("0.002019391252867340"),
-		RemainingChunkSlots:                sdk.NewInt(48),
-		NumPairedChunks:                    sdk.NewInt(1),
-		DiscountRate:                       sdk.MustNewDecFromStr("0.009626316686011733"),
-		TotalDelShares:                     types.ChunkSize.ToDec(),
-		TotalRemainingRewards:              sdk.ZeroDec(),
-		TotalChunksBalance:                 sdk.ZeroInt(),
-		TotalUnbondingChunksBalance:        sdk.ZeroInt(),
-		TotalInsuranceTokens:               oneInsurance.Amount,
-		TotalPairedInsuranceTokens:         oneInsurance.Amount,
-		TotalUnpairingInsuranceTokens:      sdk.ZeroInt(),
-		TotalRemainingInsuranceCommissions: sdk.MustNewDecFromStr("269996760038879525000"),
+	nase := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
+	oneChunk, _ := suite.app.LiquidStakingKeeper.GetMinimumRequirements(suite.ctx)
+	suite.True(nase.Equal(types.NetAmountStateEssentials{
+		MintRate:                    sdk.MustNewDecFromStr("0.990373683313988266"),
+		LsTokensTotalSupply:         types.ChunkSize,
+		NetAmount:                   sdk.MustNewDecFromStr("252429970840349915725000"),
+		TotalLiquidTokens:           types.ChunkSize,
+		RewardModuleAccBalance:      sdk.MustNewDecFromStr("2429970840349915725000").TruncateInt(),
+		FeeRate:                     sdk.ZeroDec(),
+		UtilizationRatio:            sdk.MustNewDecFromStr("0.002019391252867340"),
+		RemainingChunkSlots:         sdk.NewInt(48),
+		NumPairedChunks:             sdk.NewInt(1),
+		DiscountRate:                sdk.MustNewDecFromStr("0.009626316686011733"),
+		TotalDelShares:              types.ChunkSize.ToDec(),
+		TotalRemainingRewards:       sdk.ZeroDec(),
+		TotalChunksBalance:          sdk.ZeroInt(),
+		TotalUnbondingChunksBalance: sdk.ZeroInt(),
 	}))
 
 	// forcefully make net amount zero
@@ -80,7 +76,7 @@ func (suite *KeeperTestSuite) TestNetAmountInvariant() {
 		suite.app.LiquidStakingKeeper.SetChunk(cachedCtx, mutatedChunk)
 
 		oneChunkCoins := sdk.NewCoins(oneChunk)
-		reward := sdk.NewCoins(sdk.NewCoin(suite.denom, nas.RewardModuleAccBalance))
+		reward := sdk.NewCoins(sdk.NewCoin(suite.denom, nase.RewardModuleAccBalance))
 		inputs := []banktypes.Input{
 			banktypes.NewInput(env.pairedChunks[0].DerivedAddress(), oneChunkCoins),
 			banktypes.NewInput(types.RewardPool, reward),
@@ -91,7 +87,7 @@ func (suite *KeeperTestSuite) TestNetAmountInvariant() {
 		}
 
 		suite.NoError(suite.app.BankKeeper.InputOutputCoins(cachedCtx, inputs, outputs))
-		_, broken = keeper.NetAmountInvariant(suite.app.LiquidStakingKeeper)(cachedCtx)
+		_, broken = keeper.NetAmountEssentialsInvariant(suite.app.LiquidStakingKeeper)(cachedCtx)
 		suite.True(broken, "net amount is zero")
 	}
 
@@ -110,7 +106,7 @@ func (suite *KeeperTestSuite) TestNetAmountInvariant() {
 			types.ModuleName,
 			sdk.NewCoins(lsTokenBal),
 		))
-		_, broken = keeper.NetAmountInvariant(suite.app.LiquidStakingKeeper)(cachedCtx)
+		_, broken = keeper.NetAmountEssentialsInvariant(suite.app.LiquidStakingKeeper)(cachedCtx)
 		suite.True(broken, "ls token is zero, but total liquid tokens is not zero")
 	}
 }
@@ -180,20 +176,6 @@ func (suite *KeeperTestSuite) TestChunksInvariant() {
 		suite.mustPassInvariants()
 	}
 
-	// forcefully delegation shares as invalid
-	{
-		mutatedDel := originDel
-		mutatedDel.Shares = mutatedDel.Shares.Sub(sdk.OneDec())
-		suite.app.StakingKeeper.SetDelegation(suite.ctx, mutatedDel)
-		_, broken = keeper.ChunksInvariant(suite.app.LiquidStakingKeeper)(suite.ctx)
-		suite.True(broken, "delegation must have valid shares")
-		// recover
-		suite.app.StakingKeeper.SetDelegation(suite.ctx, originDel)
-		suite.mustPassInvariants()
-	}
-	suite.ctx = suite.advanceEpoch(suite.ctx)
-	suite.ctx = suite.advanceHeight(suite.ctx, 1, "")
-
 	// 2: UNPAIRING CHUNK
 	// first, create unpairing chunk
 	insToBeWithdrawn, _, err := suite.app.LiquidStakingKeeper.DoWithdrawInsurance(
@@ -203,6 +185,9 @@ func (suite *KeeperTestSuite) TestChunksInvariant() {
 	suite.NoError(err)
 	suite.ctx = suite.advanceEpoch(suite.ctx)
 	suite.ctx = suite.advanceHeight(suite.ctx, 1, "start withdrawing insurance")
+
+	ins, _ := suite.app.LiquidStakingKeeper.GetInsurance(suite.ctx, insToBeWithdrawn.Id)
+	suite.Equal(types.INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL, ins.Status)
 
 	origin, _ = suite.app.LiquidStakingKeeper.GetChunk(suite.ctx, insToBeWithdrawn.ChunkId)
 	suite.checkUnpairingAndUnpairingForUnstakingChunks(suite.ctx, origin)

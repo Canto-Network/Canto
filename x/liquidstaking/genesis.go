@@ -29,6 +29,9 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	for _, request := range genState.WithdrawInsuranceRequests {
 		k.SetWithdrawInsuranceRequest(ctx, request)
 	}
+	for _, info := range genState.RedelegationInfos {
+		k.SetRedelegationInfo(ctx, info)
+	}
 }
 
 // ExportGenesis returns the capability module's exported genesis.
@@ -43,6 +46,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.Insurances = k.GetAllInsurances(ctx)
 	genesis.UnpairingForUnstakingChunkInfos = k.GetAllUnpairingForUnstakingChunkInfos(ctx)
 	genesis.WithdrawInsuranceRequests = k.GetAllWithdrawInsuranceRequests(ctx)
+	genesis.RedelegationInfos = k.GetAllRedelegationInfos(ctx)
 
 	return genesis
 }

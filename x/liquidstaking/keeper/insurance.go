@@ -38,7 +38,7 @@ func (k Keeper) DeleteInsurance(ctx sdk.Context, id uint64) {
 	store.Delete(types.GetInsuranceKey(ins.Id))
 }
 
-func (k Keeper) getPairingInsurances(ctx sdk.Context) (
+func (k Keeper) GetPairingInsurances(ctx sdk.Context) (
 	pairingInsurances []types.Insurance,
 	validatorMap map[string]stakingtypes.Validator,
 ) {

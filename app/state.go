@@ -143,13 +143,15 @@ func AppStateRandomizedFn(
 	numAccs := int64(len(accs))
 	genesisState := NewDefaultGenesisState()
 
-	var initalStake, numInitiallyBonded int64
+	var initialStake sdk.Int
+	var numInitiallyBonded int64
 	appParams.GetOrGenerate(
-		cdc,
-		simappparams.StakePerAccount,
-		&initalStake,
-		r,
-		func(r *rand.Rand) { initalStake = r.Int63n(1e12) },
+		cdc, simappparams.StakePerAccount, &initialStake, r,
+		func(r *rand.Rand) {
+			sdkReductionInt := sdk.NewInt(r.Int63n(1e12))
+			// ethermint reduction is 1e18 and cosmos is 1e6, so we need to multiply by 1e12(=1e18 - 1e6)
+			initialStake = sdkReductionInt.Mul(sdk.NewInt(1e12))
+		},
 	)
 	appParams.GetOrGenerate(
 		cdc,
@@ -169,7 +171,7 @@ func AppStateRandomizedFn(
   StakePerAccount: %d,
   InitiallyBondedValidators: %d,
 }
-`, initalStake, numInitiallyBonded)
+`, initialStake, numInitiallyBonded)
 
 	simState := &module.SimulationState{
 		AppParams:    appParams,
@@ -177,7 +179,7 @@ func AppStateRandomizedFn(
 		Rand:         r,
 		GenState:     genesisState,
 		Accounts:     accs,
-		InitialStake: initalStake,
+		InitialStake: initialStake,
 		NumBonded:    numInitiallyBonded,
 		GenTimestamp: genesisTimestamp,
 	}

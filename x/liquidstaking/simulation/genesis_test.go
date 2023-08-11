@@ -2,6 +2,7 @@ package simulation_test
 
 import (
 	"encoding/json"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"math/rand"
 	"testing"
 
@@ -9,7 +10,6 @@ import (
 	"github.com/Canto-Network/Canto/v6/x/liquidstaking/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/stretchr/testify/require"
@@ -28,7 +28,7 @@ func TestRandomizedGenState(t *testing.T) {
 		Rand:         r,
 		NumBonded:    3,
 		Accounts:     simtypes.RandomAccounts(r, 3),
-		InitialStake: 1000,
+		InitialStake: sdk.NewInt(1000),
 		GenState:     make(map[string]json.RawMessage),
 	}
 
@@ -38,13 +38,14 @@ func TestRandomizedGenState(t *testing.T) {
 	simState.Cdc.MustUnmarshalJSON(simState.GenState[types.ModuleName], &genState)
 
 	require.Equal(t, types.DefaultLiquidBondDenom, genState.LiquidBondDenom)
-	require.Equal(t, sdk.MustNewDecFromStr("0.008829090664211590"), genState.Params.DynamicFeeRate.R0)
-	require.Equal(t, sdk.MustNewDecFromStr("0.054728509433899850"), genState.Params.DynamicFeeRate.USoftCap)
-	require.Equal(t, sdk.MustNewDecFromStr("0.217123308450075589"), genState.Params.DynamicFeeRate.UHardCap)
-	require.Equal(t, sdk.MustNewDecFromStr("0.074253735354477023"), genState.Params.DynamicFeeRate.UOptimal)
-	require.Equal(t, sdk.MustNewDecFromStr("0.086603385603082241"), genState.Params.DynamicFeeRate.Slope1)
-	require.Equal(t, sdk.MustNewDecFromStr("0.323282234725096066"), genState.Params.DynamicFeeRate.Slope2)
-	require.Equal(t, sdk.MustNewDecFromStr("0.418714710992389897"), genState.Params.DynamicFeeRate.MaxFeeRate)
+	require.Equal(t, types.DefaultR0, genState.Params.DynamicFeeRate.R0)
+	require.Equal(t, types.DefaultUSoftCap, genState.Params.DynamicFeeRate.USoftCap)
+	require.Equal(t, types.DefaultUHardCap, genState.Params.DynamicFeeRate.UHardCap)
+	require.Equal(t, types.DefaultUOptimal, genState.Params.DynamicFeeRate.UOptimal)
+	require.Equal(t, types.DefaultSlope1, genState.Params.DynamicFeeRate.Slope1)
+	require.Equal(t, types.DefaultSlope2, genState.Params.DynamicFeeRate.Slope2)
+	require.Equal(t, types.DefaultMaximumDiscountRate, genState.Params.MaximumDiscountRate)
+	require.Equal(t, types.DefaultMaxFee, genState.Params.DynamicFeeRate.MaxFeeRate)
 }
 
 // TestInvalidGenesisState tests invalid genesis states.

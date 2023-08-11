@@ -100,7 +100,11 @@ type RedelegationInfo struct {
 
 This will be consumed at **Handle Queued Withdraw Insurance Requests** when Epoch is reached.
 
-## NetAmountState (in-memory only)
+## NetAmountStateEssentials (in-memory only)
+
+NetAmountStateEssentials contains items that are essential for executing the core logic of the liquid staking module (e.g. `MsgLiquidStake` and `MsgLiquidUnstake`).
+
+This state is in-memory only and is not persisted to the database. Every time module need it, it is calculated from the latest state.
 
 **NetAmount** is the sum of the following items
 
@@ -137,62 +141,79 @@ Depending on the equation, the value transformation between native tokens and ls
 - LsTokenToNativeToken: `lsTokenAmount * NetAmount / LsTokenTotalSupply` with truncations
 
 ```go
+// NetAmountStateEssentials is a subset of NetAmountState which is used for
+// core logics. Insurance related fields are excluded, because they are not used
+// in core logics(e.g. calculating mint rate).
+type NetAmountStateEssentials struct {
+  // Calculated by (total supply of ls tokens) / NetAmount
+  MintRate sdk.Dec 
+  // Total supply of ls tokens
+  // e.g. 100 ls tokens minted -> 10 ls tokens burned, then total supply is 90
+  // ls tokens
+  LsTokensTotalSupply sdk.Int 
+  // Calculated by reward module account's native token balance + all
+  // all chunk's native token balance + sum of token values of all chunk's
+  // delegation shares + sum of all remaining rewards of paired chunks since
+  // last Epoch + all unbonding delegation tokens of unpairing chunks
+  NetAmount sdk.Dec 
+  // The token amount worth of all delegation shares of all paired chunks
+  // (slashing applied amount)
+  TotalLiquidTokens sdk.Int 
+  // Balance of reward module account
+  RewardModuleAccBalance sdk.Int 
+  // Fee rate applied when deduct module fee at epoch
+  FeeRate sdk.Dec 
+  // Utilization ratio
+  UtilizationRatio sdk.Dec 
+  // How many chunks which can be created left?
+  RemainingChunkSlots sdk.Int 
+  // Discount rate applied when withdraw rewards
+  DiscountRate sdk.Dec 
+  // --- Chunk related fields
+  // The number of paired chunks
+  NumPairedChunks sdk.Int 
+  // Current chunk size tokens
+  ChunkSize sdk.Int 
+  // Total delegation shares of all paired chunks
+  TotalDelShares sdk.Dec 
+  // The cumulative reward of all chunks delegations from the last distribution
+  TotalRemainingRewards sdk.Dec 
+  // Sum of the balances of all chunks.
+  // Note: Paired chunks can be pairing status for various reasons (such as lack
+  // of insurance). In such cases, the delegated native tokens returns to the
+  // balance of DerivedAddress(Chunk.Id) after un-bonding period is finished.
+  TotalChunksBalance sdk.Int 
+  // The sum of unbonding balance of all chunks in Unpairing or
+  // UnpairingForUnstaking
+  TotalUnbondingChunksBalance sdk.Int 
+}
+```
+
+## NetAmountState (in-memory only)
+
+NetAmountState includes every field in NetAmountStateEssentials and additional fields related to Insurance 
+which is not used by core logics but provided for a query.
+
+The following code just shows the fields that are not included in NetAmountStateEssentials.
+
+```go
 // NetAmountState is type for net amount raw data and mint rate, This is a value
 // that depends on the several module state every time, so it is used only for
 // calculation and query and is not stored in kv.
 type NetAmountState struct {
-// Calculated by (total supply of ls tokens) / NetAmount
-MintRate github_com_cosmos_cosmos_sdk_types.Dec 
-// Total supply of ls tokens
-// e.g. 100 ls tokens minted -> 10 ls tokens burned, then total supply is 90
-// ls tokens
-LsTokensTotalSupply github_com_cosmos_cosmos_sdk_types.Int 
-// Calculated by reward module account's native token balance + all paired
-// chunk's native token balance + all delegation tokens of paired chunks
-// since last Epoch + all unbonding delegation tokens of unpairing chunks +
-// reward module account's balance
-NetAmount github_com_cosmos_cosmos_sdk_types.Dec 
-// The token amount worth of all delegation shares of all paired chunks
-// (slashing applied amount)
-TotalLiquidTokens github_com_cosmos_cosmos_sdk_types.Int 
-// Balance of reward module account
-RewardModuleAccBalance github_com_cosmos_cosmos_sdk_types.Int 
-// Fee rate applied when deduct module fee at epoch
-FeeRate github_com_cosmos_cosmos_sdk_types.Dec 
-// Utilization ratio
-UtilizationRatio github_com_cosmos_cosmos_sdk_types.Dec 
-// How many chunks which can be created left?
-RemainingChunkSlots github_com_cosmos_cosmos_sdk_types.Int 
-// Discount rate applied when withdraw rewards
-DiscountRate github_com_cosmos_cosmos_sdk_types.Dec 
-// --- Chunk related fields
-// The number of paired chunks
-NumPairedChunks github_com_cosmos_cosmos_sdk_types.Int 
-// Current chunk size tokens
-ChunkSize github_com_cosmos_cosmos_sdk_types.Int 
-// Total delegation shares of all paired chunks
-TotalDelShares github_com_cosmos_cosmos_sdk_types.Dec 
-// The cumulative reward of all chunks delegations from the last distribution
-TotalRemainingRewards github_com_cosmos_cosmos_sdk_types.Dec 
-// Sum of the balances of all chunks.
-// Note: Paired chunks can be pairing status for various reasons (such as lack
-// of insurance). In such cases, the delegated native tokens returns to the
-// balance of DerivedAddress(Chunk.Id) after un-bonding period is finished.
-TotalChunksBalance github_com_cosmos_cosmos_sdk_types.Int 
-// The sum of unbonding balance of all chunks in Unpairing or
-// UnpairingForUnstaking
-TotalUnbondingChunksBalance github_com_cosmos_cosmos_sdk_types.Int 
-// --- Insurance related fields
-// The sum of all insurances' amount (= DerivedAddress(Insurance.Id).Balance)
-TotalInsuranceTokens github_com_cosmos_cosmos_sdk_types.Int 
-// The sum of all paired insurances' amount (=
-// DerivedAddress(Insurance.Id).Balance)
-TotalPairedInsuranceTokens github_com_cosmos_cosmos_sdk_types.Int 
-// The sum of all unpairing insurances' amount (=
-// DerivedAddress(Insurance.Id).Balance)
-TotalUnpairingInsuranceTokens github_com_cosmos_cosmos_sdk_types.Int 
-// The cumulative commissions of all insurances
-TotalRemainingInsuranceCommissions github_com_cosmos_cosmos_sdk_types.Dec 
+  // (... all fields in NetAmountStateEssential)	
+  
+  // --- Insurance related fields
+  // The sum of all insurances' amount (= DerivedAddress(Insurance.Id).Balance)
+  TotalInsuranceTokens sdk.Int 
+  // The sum of all paired insurances' amount (= 
+  //DerivedAddress(Insurance.Id).Balance)
+  TotalPairedInsuranceTokens sdk.Int
+  // The sum of all unpairing insurances' amount (=
+  // DerivedAddress(Insurance.Id).Balance)
+  TotalUnpairingInsuranceTokens sdk.Int 
+  // The cumulative commissions of all insurances
+  TotalRemainingInsuranceCommissions sdk.Dec 	
 }
 ```
 

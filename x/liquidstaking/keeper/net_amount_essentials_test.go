@@ -21,7 +21,7 @@ func (suite *KeeperTestSuite) TestGetNetAmountState_TotalRemainingRewards() {
 	})
 
 	suite.ctx = suite.advanceHeight(suite.ctx, 100, "delegation rewards are accumulated")
-	nas := suite.app.LiquidStakingKeeper.GetNetAmountState(suite.ctx)
+	nase := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
 
 	cachedCtx, _ := suite.ctx.CacheContext()
 	suite.app.DistrKeeper.WithdrawDelegationRewards(cachedCtx, env.pairedChunks[0].DerivedAddress(), env.insurances[0].GetValidator())
@@ -31,12 +31,12 @@ func (suite *KeeperTestSuite) TestGetNetAmountState_TotalRemainingRewards() {
 
 	// Calc TotalRemainingRewards manually
 	rest := totalDelReward.ToDec().Mul(sdk.OneDec().Sub(TenPercentFeeRate))
-	remaining := rest.Mul(sdk.OneDec().Sub(nas.FeeRate))
-	result := remaining.Mul(sdk.OneDec().Sub(nas.DiscountRate))
+	remaining := rest.Mul(sdk.OneDec().Sub(nase.FeeRate))
+	result := remaining.Mul(sdk.OneDec().Sub(nase.DiscountRate))
 	suite.Equal("7578851328645878416158.763952739771150000", result.String())
-	suite.Equal(result.String(), nas.TotalRemainingRewards.String())
+	suite.Equal(result.String(), nase.TotalRemainingRewards.String())
 	suite.True(
-		totalDelReward.GT(nas.TotalRemainingRewards.TruncateInt()),
+		totalDelReward.GT(nase.TotalRemainingRewards.TruncateInt()),
 		"total del reward should be greater than total remaining rewards",
 	)
 }

@@ -90,7 +90,6 @@ func (p *Params) String() string {
 	return string(out)
 }
 
-// TODO: Write test codes for it right now!!
 func validateR0(i interface{}) error {
 	v, ok := i.(sdk.Dec)
 	if !ok {

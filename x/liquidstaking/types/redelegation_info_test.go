@@ -41,10 +41,32 @@ func (suite *redelegationInfoTestSuite) TestMatured() {
 	c := types.NewChunk(1)
 	blockTime := time.Now()
 	// sub one hour from blockTime
-	oneHourBeforeBlockTime := blockTime.Add(-time.Hour)
-	info := types.NewRedelegationInfo(c.Id, oneHourBeforeBlockTime)
-	suite.False(info.Matured(blockTime))
+	oneHourAfterBlockTime := blockTime.Add(time.Hour)
+	info := types.NewRedelegationInfo(c.Id, oneHourAfterBlockTime)
+	{
+		suite.True(
+			blockTime.Before(info.CompletionTime),
+			"blockTime < info.CompletionTime",
+		)
+		suite.False(info.Matured(blockTime), "info should not be matured")
+	}
 
-	info.CompletionTime = blockTime
-	suite.True(info.Matured(blockTime))
+	blockTime = blockTime.Add(time.Hour) // epoch reached exactly
+	{
+		suite.True(
+			blockTime.Equal(info.CompletionTime),
+			"blockTime == info.CompletionTime",
+		)
+		suite.True(info.Matured(blockTime))
+	}
+
+	blockTime = info.CompletionTime.Add(time.Second) // 1 sec after epoch
+	{
+		suite.True(
+			blockTime.After(info.CompletionTime),
+			"blockTime > info.CompletionTime",
+		)
+		suite.True(info.Matured(blockTime))
+	}
+
 }

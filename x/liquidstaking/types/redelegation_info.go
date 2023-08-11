@@ -13,8 +13,9 @@ func NewRedelegationInfo(id uint64, completionTime time.Time) RedelegationInfo {
 	}
 }
 
+// Matured returns true if currTime pass the completion time.
 func (rinfo *RedelegationInfo) Matured(currTime time.Time) bool {
-	return !rinfo.CompletionTime.Before(currTime)
+	return !currTime.Before(rinfo.CompletionTime)
 }
 
 func (rinfo *RedelegationInfo) Validate(chunkMap map[uint64]Chunk) error {

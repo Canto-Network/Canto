@@ -4,14 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/Canto-Network/Canto/v6/x/liquidstaking"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
 
-	"github.com/armon/go-metrics"
-	"github.com/cosmos/cosmos-sdk/telemetry"
 	"github.com/gorilla/mux"
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
@@ -143,7 +142,6 @@ import (
 	csrkeeper "github.com/Canto-Network/Canto/v6/x/csr/keeper"
 	csrtypes "github.com/Canto-Network/Canto/v6/x/csr/types"
 
-	"github.com/Canto-Network/Canto/v6/x/liquidstaking"
 	liquidstakingkeeper "github.com/Canto-Network/Canto/v6/x/liquidstaking/keeper"
 	liquidstakingtypes "github.com/Canto-Network/Canto/v6/x/liquidstaking/types"
 
@@ -659,7 +657,7 @@ func NewCanto(
 		fees.NewAppModule(app.FeesKeeper, app.AccountKeeper),
 		govshuttle.NewAppModule(app.GovshuttleKeeper, app.AccountKeeper),
 		csr.NewAppModule(app.CSRKeeper, app.AccountKeeper),
-		liquidstaking.NewAppModule(app.LiquidStakingKeeper, app.AccountKeeper),
+		liquidstaking.NewAppModule(appCodec, app.LiquidStakingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.DistrKeeper, app.InflationKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -807,7 +805,7 @@ func NewCanto(
 		epochs.NewAppModule(appCodec, app.EpochsKeeper),
 		inflation.NewAppModule(app.InflationKeeper, app.AccountKeeper, app.StakingKeeper),
 		// feemarket.NewAppModule(app.FeeMarketKeeper),
-		liquidstaking.NewAppModule(app.LiquidStakingKeeper, app.AccountKeeper),
+		liquidstaking.NewAppModule(appCodec, app.LiquidStakingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.DistrKeeper, app.InflationKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()
@@ -878,98 +876,13 @@ func (app *Canto) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci
 		// https://kodeit.dev/go-injecting-variable-values-during-building-binary-creating-build-script/
 		if EnableAdvanceEpoch {
 			if int(ctx.BlockHeight())%EpochPerBlock == 0 {
-				bondDenom := app.StakingKeeper.BondDenom(ctx)
-				lsmEpoch := app.LiquidStakingKeeper.GetEpoch(ctx)
-				ctx = ctx.WithBlockTime(lsmEpoch.StartTime.Add(lsmEpoch.Duration))
-				staking.BeginBlocker(ctx, app.StakingKeeper)
-
-				// mimic the begin block logic of epoch module
-				// currently epoch module use hooks when begin block and inflation module
-				// implemented that hook, so actual logic is in inflation module.
-				{
-					epochMintProvision, found := app.InflationKeeper.GetEpochMintProvision(ctx)
-					if !found {
-						panic("epoch mint provision not found")
-					}
-					inflationParams := app.InflationKeeper.GetParams(ctx)
-					// mintedCoin := sdk.NewCoin(inflationParams.MintDenom, epochMintProvision.TruncateInt())
-					mintedCoin := sdk.NewCoin(inflationParams.MintDenom, sdk.TokensFromConsensusPower(100, ethermint.PowerReduction))
-					staking, communityPool, err := app.InflationKeeper.MintAndAllocateInflation(ctx, mintedCoin)
-					app.Logger().Debug("minted and allocated inflation", "minted", mintedCoin, "staking", staking, "community_pool", communityPool)
-					if err != nil {
-						panic(err)
-					}
-					defer func() {
-						if mintedCoin.Amount.IsInt64() {
-							telemetry.IncrCounterWithLabels(
-								[]string{"inflation", "allocate", "total"},
-								float32(mintedCoin.Amount.Int64()),
-								[]metrics.Label{telemetry.NewLabel("denom", mintedCoin.Denom)},
-							)
-						}
-						if staking.AmountOf(mintedCoin.Denom).IsInt64() {
-							telemetry.IncrCounterWithLabels(
-								[]string{"inflation", "allocate", "staking", "total"},
-								float32(staking.AmountOf(mintedCoin.Denom).Int64()),
-								[]metrics.Label{telemetry.NewLabel("denom", mintedCoin.Denom)},
-							)
-						}
-						if communityPool.AmountOf(mintedCoin.Denom).IsInt64() {
-							telemetry.IncrCounterWithLabels(
-								[]string{"inflation", "allocate", "community_pool", "total"},
-								float32(communityPool.AmountOf(mintedCoin.Denom).Int64()),
-								[]metrics.Label{telemetry.NewLabel("denom", mintedCoin.Denom)},
-							)
-						}
-					}()
-
-					ctx.EventManager().EmitEvent(
-						sdk.NewEvent(
-							inflationtypes.EventTypeMint,
-							sdk.NewAttribute(inflationtypes.AttributeEpochNumber, fmt.Sprintf("%d", -1)),
-							sdk.NewAttribute(inflationtypes.AttributeKeyEpochProvisions, epochMintProvision.String()),
-							sdk.NewAttribute(sdk.AttributeKeyAmount, mintedCoin.Amount.String()),
-						),
-					)
+				am, ok := app.mm.Modules[liquidstakingtypes.ModuleName].(liquidstaking.AppModule)
+				if !ok {
+					panic("liquid staking module not found")
 				}
-
-				feeCollector := app.AccountKeeper.GetModuleAccount(ctx, authtypes.FeeCollectorName)
-				// mimic the begin block logic of distribution module
-				{
-					feeCollectorBalance := app.BankKeeper.GetAllBalances(ctx, feeCollector.GetAddress())
-					rewardsToBeDistributed := feeCollectorBalance.AmountOf(bondDenom)
-					app.Logger().Debug("rewards to be distributed", "amount", rewardsToBeDistributed)
-
-					// mimic distribution.BeginBlock (AllocateTokens, get rewards from feeCollector, AllocateTokensToValidator, add remaining to feePool)
-					err := app.BankKeeper.SendCoinsFromModuleToModule(ctx, authtypes.FeeCollectorName, distrtypes.ModuleName, feeCollectorBalance)
-					if err != nil {
-						panic(err)
-					}
-					totalRewards := sdk.ZeroDec()
-					totalPower := int64(0)
-					app.StakingKeeper.IterateBondedValidatorsByPower(ctx, func(index int64, validator stakingtypes.ValidatorI) (stop bool) {
-						consPower := validator.GetConsensusPower(app.StakingKeeper.PowerReduction(ctx))
-						totalPower = totalPower + consPower
-						return false
-					})
-					if totalPower != 0 {
-						app.StakingKeeper.IterateBondedValidatorsByPower(ctx, func(index int64, validator stakingtypes.ValidatorI) (stop bool) {
-							consPower := validator.GetConsensusPower(app.StakingKeeper.PowerReduction(ctx))
-							powerFraction := sdk.NewDec(consPower).QuoTruncate(sdk.NewDec(totalPower))
-							reward := rewardsToBeDistributed.ToDec().MulTruncate(powerFraction)
-							app.DistrKeeper.AllocateTokensToValidator(ctx, validator, sdk.DecCoins{{Denom: bondDenom, Amount: reward}})
-							totalRewards = totalRewards.Add(reward)
-							return false
-						})
-					}
-					remaining := rewardsToBeDistributed.ToDec().Sub(totalRewards)
-					feePool := app.DistrKeeper.GetFeePool(ctx)
-					feePool.CommunityPool = feePool.CommunityPool.Add(sdk.DecCoins{
-						{Denom: bondDenom, Amount: remaining}}...)
-					app.DistrKeeper.SetFeePool(ctx, feePool)
-				}
+				am.AdvanceEpochBeginBlock(ctx)
+				app.Logger().Debug("beginblocker executed in advance epoch ")
 			}
-			app.LiquidStakingKeeper.CoverRedelegationPenalty(ctx)
 		}
 	}()
 
@@ -983,24 +896,12 @@ func (app *Canto) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.Res
 		// https://kodeit.dev/go-injecting-variable-values-during-building-binary-creating-build-script/
 		if EnableAdvanceEpoch {
 			if int(ctx.BlockHeight())%EpochPerBlock == 0 {
-				lsmEpoch := app.LiquidStakingKeeper.GetEpoch(ctx)
-				ctx = ctx.WithBlockTime(lsmEpoch.StartTime.Add(lsmEpoch.Duration))
-
-				staking.EndBlocker(ctx, app.StakingKeeper)
-				app.Logger().Debug("staking endblocker executed")
-				// mimic liquidstaking endblocker except increasing epoch
-				{
-					app.LiquidStakingKeeper.DistributeReward(ctx)
-					app.LiquidStakingKeeper.CoverSlashingAndHandleMatureUnbondings(ctx)
-					app.LiquidStakingKeeper.RemoveDeletableRedelegationInfos(ctx)
-					app.LiquidStakingKeeper.HandleQueuedLiquidUnstakes(ctx)
-					app.LiquidStakingKeeper.HandleUnprocessedQueuedLiquidUnstakes(ctx)
-					app.LiquidStakingKeeper.HandleQueuedWithdrawInsuranceRequests(ctx)
-					newlyRankedInInsurances, rankOutInsurances := app.LiquidStakingKeeper.RankInsurances(ctx)
-					app.LiquidStakingKeeper.RePairRankedInsurances(ctx, newlyRankedInInsurances, rankOutInsurances)
-					app.LiquidStakingKeeper.IncrementEpoch(ctx)
+				am, ok := app.mm.Modules[liquidstakingtypes.ModuleName].(liquidstaking.AppModule)
+				if !ok {
+					panic("liquid staking module not found")
 				}
-				app.Logger().Debug("liquidstaking endblocker executed")
+				am.AdvanceEpochEndBlock(ctx)
+				app.Logger().Debug("endblocker executed in advance epoch ")
 			}
 		}
 	}()

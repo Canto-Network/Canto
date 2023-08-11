@@ -1,31 +1,28 @@
 package simulation
 
 import (
-	"github.com/Canto-Network/Canto/v6/app"
+	"math/rand"
+
 	"github.com/Canto-Network/Canto/v6/x/liquidstaking/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
-	"github.com/cosmos/cosmos-sdk/x/simulation"
-	"math/rand"
 )
 
 const (
 	OpWeightSimulateUpdateDynamicFeeRateProposal = "op_weight_simulate_update_dynamic_fee_rate_proposal"
 	OpWeightSimulateUpdateMaximumDiscountRate    = "op_weight_simulate_update_maximum_discount_rate"
+	OpWeightSimulateAdvanceEpoch                 = "op_weight_simulate_advance_epoch"
 )
 
-func ProposalContents(k keeper.Keeper) []simtypes.WeightedProposalContent {
+func ProposalContents(
+	k keeper.Keeper,
+) []simtypes.WeightedProposalContent {
 	return []simtypes.WeightedProposalContent{
-		simulation.NewWeightedProposalContent(
-			OpWeightSimulateUpdateDynamicFeeRateProposal,
-			app.DefaultWeightUpdateDynamicFeeRateProposal,
-			SimulateUpdateDynamicFeeRateProposal(k),
-		),
-		simulation.NewWeightedProposalContent(
-			OpWeightSimulateUpdateMaximumDiscountRate,
-			app.DefaultWeightUpdateMaximumDiscountRate,
-			SimulateUpdateMaximumDiscountRate(k),
-		),
+		//simulation.NewWeightedProposalContent(
+		//	OpWeightSimulateUpdateMaximumDiscountRate,
+		//	params.DefaultWeightUpdateMaximumDiscountRate,
+		//	SimulateUpdateMaximumDiscountRate(k),
+		//),
 	}
 }
 

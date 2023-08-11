@@ -46,6 +46,8 @@ type StakingKeeper interface {
 	GetValidator(ctx sdk.Context, addr sdk.ValAddress) (validator stakingtypes.Validator, found bool)
 
 	GetAllValidators(ctx sdk.Context) (validators []stakingtypes.Validator)
+	IterateBondedValidatorsByPower(sdk.Context,
+		func(index int64, validator stakingtypes.ValidatorI) (stop bool))
 	GetBondedValidatorsByPower(ctx sdk.Context) []stakingtypes.Validator
 
 	GetLastTotalPower(ctx sdk.Context) sdk.Int

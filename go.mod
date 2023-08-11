@@ -33,6 +33,8 @@ require (
 	github.com/evmos/ethermint v0.19.3
 )
 
+require github.com/ulule/deepcopier v0.0.0-20200430083143-45decc6639b6
+
 require (
 	cosmossdk.io/errors v1.0.0-beta.7
 	cosmossdk.io/math v1.0.0-beta.3 // indirect
@@ -167,6 +169,8 @@ require (
 
 replace (
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.1.7-0.20210622111912-ef00f8ac3d76
+	github.com/cosmos/cosmos-sdk => github.com/b-harvest/cosmos-sdk v0.45.9-2-canto-lsm-sim
+	github.com/cosmos/ibc-go/v3 v3.2.0 => github.com/b-harvest/ibc-go/v3 v3.2.0-1-canto-lsm-sim
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/tendermint/tendermint => github.com/informalsystems/tendermint v0.34.25
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2

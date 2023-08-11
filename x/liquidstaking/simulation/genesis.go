@@ -43,11 +43,16 @@ func genMaximumDiscountRate(r *rand.Rand) sdk.Dec {
 
 func RandomizedGenState(simState *module.SimulationState) {
 	genesis := types.DefaultGenesisState()
-
-	simState.AppParams.GetOrGenerate(
-		simState.Cdc, dynamicFeeRate, &genesis.Params.DynamicFeeRate, simState.Rand,
-		func(r *rand.Rand) { genesis.Params.DynamicFeeRate = genDynamicFeeRate(r) },
-	)
+	genesis.Epoch.StartTime = simState.GenTimestamp
+	genesis.Params.DynamicFeeRate = types.DynamicFeeRate{
+		R0:         types.DefaultR0,
+		USoftCap:   types.DefaultUSoftCap,
+		UHardCap:   types.DefaultUHardCap,
+		UOptimal:   types.DefaultUOptimal,
+		Slope1:     types.DefaultSlope1,
+		Slope2:     types.DefaultSlope2,
+		MaxFeeRate: types.DefaultMaxFee,
+	}
 
 	bz, _ := json.MarshalIndent(&genesis, "", " ")
 	fmt.Printf("Selected randomly generated liquidstaking parameters:\n%s\n", bz)

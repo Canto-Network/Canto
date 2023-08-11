@@ -3,6 +3,7 @@ package app
 import (
 	"encoding/json"
 	"fmt"
+	inflationtypes "github.com/Canto-Network/Canto/v6/x/inflation/types"
 	"math/rand"
 	"os"
 	"testing"
@@ -110,8 +111,6 @@ func TestAppImportExport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(dir))
 	}()
 
-	sdk.DefaultPowerReduction = sdk.NewIntFromUint64(1000000)
-
 	app := NewCanto(
 		logger,
 		db,
@@ -201,7 +200,7 @@ func TestAppImportExport(t *testing.T) {
 		},
 		{app.keys[distrtypes.StoreKey], newApp.keys[distrtypes.StoreKey], [][]byte{}},
 		{app.keys[paramstypes.StoreKey], newApp.keys[paramstypes.StoreKey], [][]byte{}},
-		//{app.keys[upgradetypes.StoreKey], newApp.keys[upgradetypes.StoreKey], [][]byte{}},
+		// {app.keys[upgradetypes.StoreKey], newApp.keys[upgradetypes.StoreKey], [][]byte{}},
 		{app.keys[evidencetypes.StoreKey], newApp.keys[evidencetypes.StoreKey], [][]byte{}},
 		{app.keys[capabilitytypes.StoreKey], newApp.keys[capabilitytypes.StoreKey], [][]byte{}},
 		// {app.keys[feegrant.StoreKey], newApp.keys[feegrant.StoreKey], [][]byte{}},
@@ -210,8 +209,9 @@ func TestAppImportExport(t *testing.T) {
 		{app.keys[ibctransfertypes.StoreKey], newApp.keys[ibctransfertypes.StoreKey], [][]byte{}},
 		// {app.keys[evmtypes.StoreKey], newApp.keys[evmtypes.StoreKey], [][]byte{}},
 		{app.keys[feemarkettypes.StoreKey], newApp.keys[feemarkettypes.StoreKey], [][]byte{}},
-		//{app.keys[inflationtypes.StoreKey], newApp.keys[inflationtypes.StoreKey], [][]byte{}},
+		{app.keys[inflationtypes.StoreKey], newApp.keys[inflationtypes.StoreKey], [][]byte{}},
 		// {app.keys[erc20types.StoreKey], newApp.keys[erc20types.StoreKey], [][]byte{}},
+		// EpochInfo.CurrentEpochStartHeight is set to the block height at the time of init genesis.
 		//{app.keys[epochstypes.StoreKey], newApp.keys[epochstypes.StoreKey], [][]byte{}},
 		// {app.keys[vestingtypes.StoreKey], newApp.keys[vestingtypes.StoreKey], [][]byte{}},
 		// {app.keys[recoverytypes.StoreKey], newApp.keys[recoverytypes.StoreKey], [][]byte{}},
@@ -249,12 +249,10 @@ func TestAppStateDeterminism(t *testing.T) {
 	numTimesToRunPerSeed := 5
 	appHashList := make([]json.RawMessage, numTimesToRunPerSeed)
 
-	sdk.DefaultPowerReduction = sdk.NewIntFromUint64(1000000)
-
 	for i := 0; i < numSeeds; i++ {
 		config.Seed = rand.Int63()
-
 		for j := 0; j < numTimesToRunPerSeed; j++ {
+			fmt.Printf("running simulation with seed %d, j: %d\n", config.Seed, j)
 			var logger log.Logger
 			if simapp.FlagVerboseValue {
 				logger = log.TestingLogger()
@@ -319,8 +317,6 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		db.Close()
 		require.NoError(t, os.RemoveAll(dir))
 	}()
-
-	sdk.DefaultPowerReduction = sdk.NewIntFromUint64(1000000)
 
 	app := NewCanto(
 		logger,

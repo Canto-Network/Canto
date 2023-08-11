@@ -375,8 +375,8 @@ func (suite *KeeperTestSuite) setupLiquidStakeTestingEnv(env testingEnvOptions) 
 
 	// create numPairedChunks delegators
 	delegators, delegatorBalances := suite.AddTestAddrsWithFunding(fundingAccount, env.numPairedChunks, oneChunk.Amount)
-	nas := suite.app.LiquidStakingKeeper.GetNetAmountState(suite.ctx)
-	suite.True(nas.IsZeroState(), "nothing happened yet so it must be zero state")
+	nase := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
+	suite.True(nase.IsZeroState(), "nothing happened yet so it must be zero state")
 	pairedChunks := suite.liquidStakes(suite.ctx, delegators, delegatorBalances)
 
 	// update insurance statuses because the status can be changed after liquid staking (pairing -> paired)
@@ -415,7 +415,7 @@ Initial state of %s
 		liquidBondDenom,
 		env.fundingAccountBalance,
 		suite.app.BankKeeper.GetSupply(suite.ctx, suite.denom).String(),
-		nas.UtilizationRatio.String(),
+		nase.UtilizationRatio.String(),
 	)
 	return testingEnv{
 		delegators,
