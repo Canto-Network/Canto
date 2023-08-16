@@ -331,6 +331,9 @@ func SimulateMsgProvideInsurance(ak types.AccountKeeper, bk types.BankKeeper, sk
 			spendable = bk.SpendableCoins(ctx, provider)
 		}
 
+		if feeRate.IsNegative() {
+			feeRate = sdk.ZeroDec()
+		}
 		msg := types.NewMsgProvideInsurance(provider.String(), validator.GetOperator().String(), collaterals[0], feeRate)
 		txCtx := simulation.OperationInput{
 			R:               r,

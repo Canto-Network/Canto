@@ -147,6 +147,11 @@ func (suite *msgTestSuite) TestMsgProvideInsurance() {
 			types.NewMsgProvideInsurance(provider.String(), validator.String(), stakingCoin, tenPercent),
 		},
 		{
+			"success: zero fee rate is allowed to provide",
+			"",
+			types.NewMsgProvideInsurance(provider.String(), validator.String(), stakingCoin, sdk.ZeroDec()),
+		},
+		{
 			"fail: empty provider address",
 			"invalid provider address : empty address string is not allowed",
 			types.NewMsgProvideInsurance("", validator.String(), stakingCoin, tenPercent),
@@ -171,8 +176,13 @@ func (suite *msgTestSuite) TestMsgProvideInsurance() {
 		},
 		{
 			"fail: empty rate",
-			"fee rate must not be nil",
+			"insurance fee rate must not be nil",
 			types.NewMsgProvideInsurance(provider.String(), validator.String(), stakingCoin, sdk.Dec{}),
+		},
+		{
+			"fail: minus rate",
+			"insurance fee rate must not be negative",
+			types.NewMsgProvideInsurance(provider.String(), validator.String(), stakingCoin, sdk.ZeroDec().Sub(sdk.OneDec())),
 		},
 	}
 
@@ -193,7 +203,7 @@ func (suite *msgTestSuite) TestMsgProvideInsurance() {
 				suite.Len(signers, 1)
 				suite.Equal(tc.msg.GetProvider(), signers[0])
 			} else {
-				suite.EqualError(err, tc.expectedErr)
+				suite.ErrorContains(err, tc.expectedErr)
 			}
 		})
 	}

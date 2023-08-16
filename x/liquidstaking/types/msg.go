@@ -117,7 +117,10 @@ func (msg MsgProvideInsurance) ValidateBasic() error {
 		return err
 	}
 	if msg.FeeRate.IsNil() {
-		return ErrInvalidFeeRate
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "insurance fee rate must not be nil")
+	}
+	if msg.FeeRate.IsNegative() {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "insurance fee rate must not be negative")
 	}
 	return nil
 }
