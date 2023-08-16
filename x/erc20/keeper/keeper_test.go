@@ -506,6 +506,11 @@ func (b *MockBankKeeper) SendCoinsFromAccountToModule(ctx sdk.Context, senderAdd
 	return args.Error(0)
 }
 
+func (b *MockBankKeeper) SpendableCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins {
+	args := b.Called(mock.Anything, mock.Anything)
+	return args.Get(0).(sdk.Coins)
+}
+
 func (b *MockBankKeeper) MintCoins(ctx sdk.Context, moduleName string, amt sdk.Coins) error {
 	args := b.Called(mock.Anything, mock.Anything, mock.Anything)
 	return args.Error(0)

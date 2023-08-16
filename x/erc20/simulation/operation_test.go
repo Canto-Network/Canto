@@ -5,18 +5,57 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Canto-Network/Canto/v7/x/erc20/types"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	"github.com/cosmos/cosmos-sdk/x/staking/teststaking"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/Canto-Network/Canto/v7/app/params"
 	"github.com/stretchr/testify/require"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	"github.com/cosmos/cosmos-sdk/x/staking/teststaking"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	"github.com/Canto-Network/Canto/v7/app"
+	"github.com/Canto-Network/Canto/v7/x/erc20/simulation"
+	"github.com/Canto-Network/Canto/v7/x/erc20/types"
 )
+
+func TestWeightedOperations(t *testing.T) {
+	canto, ctx := createTestApp(t, false)
+	cdc := types.ModuleCdc
+	appParams := make(simtypes.AppParams)
+
+	weightedOps := simulation.WeightedOperations(
+		appParams,
+		cdc,
+		canto.AccountKeeper,
+		canto.BankKeeper,
+		canto.Erc20Keeper,
+	)
+
+	s := rand.NewSource(2)
+	r := rand.New(s)
+	accs := getTestingAccounts(t, r, canto, ctx, 10)
+
+	expected := []struct {
+		weight     int
+		opMsgRoute string
+		opMsgName  string
+	}{
+		{params.DefaultWeightMsgConvertCoinNativeCoin, types.ModuleName, types.TypeMsgConvertCoin},
+		{params.DefaultWeightMsgConvertCoinNativeERC20, types.ModuleName, types.TypeMsgConvertCoin},
+		{params.DefaultWeightMsgConvertErc20NativeCoin, types.ModuleName, types.TypeMsgConvertERC20},
+		{params.DefaultWeightMsgConvertErc20NativeToken, types.ModuleName, types.TypeMsgConvertERC20},
+	}
+
+	for i, w := range weightedOps {
+		opMsg, _, _ := w.Op()(r, canto.BaseApp, ctx, accs, ctx.ChainID())
+		require.Equal(t, expected[i].weight, w.Weight())
+		require.Equal(t, expected[i].opMsgRoute, opMsg.Route)
+		require.Equal(t, expected[i].opMsgName, opMsg.Name)
+	}
+}
 
 func createTestApp(t *testing.T, isCheckTx bool) (*app.Canto, sdk.Context) {
 	app := app.Setup(isCheckTx, nil)
