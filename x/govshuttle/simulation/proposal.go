@@ -8,7 +8,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
 	"github.com/Canto-Network/Canto/v7/app/params"
-	"github.com/Canto-Network/Canto/v7/x/govshuttle"
 	"github.com/Canto-Network/Canto/v7/x/govshuttle/keeper"
 	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
 )
@@ -54,7 +53,7 @@ func SimulateLendingMarketProposal(k keeper.Keeper) simtypes.ContentSimulatorFn 
 		lendingMarketProposal := treasuryProposal.FromTreasuryToLendingMarket()
 		lendingMarketProposal.Metadata.Calldatas = []string{"callData1"}
 
-		if err := govshuttle.NewgovshuttleProposalHandler(&k)(ctx, lendingMarketProposal); err != nil {
+		if err := keeper.NewgovshuttleProposalHandler(&k)(ctx, lendingMarketProposal); err != nil {
 			panic(err)
 		}
 
@@ -78,7 +77,7 @@ func SimulateTreasuryProposal(k keeper.Keeper) simtypes.ContentSimulatorFn {
 			Metadata:    &treasuryProposalMetadata,
 		}
 
-		if err := govshuttle.NewgovshuttleProposalHandler(&k)(ctx, &proposal); err != nil {
+		if err := keeper.NewgovshuttleProposalHandler(&k)(ctx, &proposal); err != nil {
 			panic(err)
 		}
 

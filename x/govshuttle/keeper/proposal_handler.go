@@ -1,7 +1,6 @@
-package govshuttle
+package keeper
 
 import (
-	"github.com/Canto-Network/Canto/v7/x/govshuttle/keeper"
 	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -9,7 +8,7 @@ import (
 )
 
 // Return governance handler to process Compound Proposal
-func NewgovshuttleProposalHandler(k *keeper.Keeper) govtypes.Handler {
+func NewgovshuttleProposalHandler(k *Keeper) govtypes.Handler {
 	return func(ctx sdk.Context, content govtypes.Content) error {
 		switch c := content.(type) {
 		case *types.LendingMarketProposal:
@@ -23,7 +22,7 @@ func NewgovshuttleProposalHandler(k *keeper.Keeper) govtypes.Handler {
 	}
 }
 
-func handleLendingMarketProposal(ctx sdk.Context, k *keeper.Keeper, p *types.LendingMarketProposal) error {
+func handleLendingMarketProposal(ctx sdk.Context, k *Keeper, p *types.LendingMarketProposal) error {
 	err := p.ValidateBasic()
 	if err != nil {
 		return err
@@ -37,7 +36,7 @@ func handleLendingMarketProposal(ctx sdk.Context, k *keeper.Keeper, p *types.Len
 }
 
 // governance proposal handler
-func handleTreasuryProposal(ctx sdk.Context, k *keeper.Keeper, tp *types.TreasuryProposal) error {
+func handleTreasuryProposal(ctx sdk.Context, k *Keeper, tp *types.TreasuryProposal) error {
 	err := tp.ValidateBasic()
 	if err != nil {
 		return err

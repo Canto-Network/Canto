@@ -443,7 +443,7 @@ func NewCanto(
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
 		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper)).
 		AddRoute(erc20types.RouterKey, erc20.NewErc20ProposalHandler(&app.Erc20Keeper)).
-		AddRoute(govshuttletypes.RouterKey, govshuttle.NewgovshuttleProposalHandler(&app.GovshuttleKeeper))
+		AddRoute(govshuttletypes.RouterKey, govshuttlekeeper.NewgovshuttleProposalHandler(&app.GovshuttleKeeper))
 
 	govKeeper := govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName),
@@ -599,7 +599,7 @@ func NewCanto(
 		erc20.NewAppModule(app.Erc20Keeper, app.AccountKeeper),
 		epochs.NewAppModule(appCodec, app.EpochsKeeper),
 		onboarding.NewAppModule(*app.OnboardingKeeper),
-		govshuttle.NewAppModule(app.GovshuttleKeeper, app.AccountKeeper),
+		govshuttle.NewAppModule(appCodec, app.GovshuttleKeeper, app.AccountKeeper),
 		csr.NewAppModule(appCodec, app.CSRKeeper, app.AccountKeeper),
 		coinswap.NewAppModule(appCodec, app.CoinswapKeeper, app.AccountKeeper, app.BankKeeper),
 	)
@@ -749,6 +749,7 @@ func NewCanto(
 		feemarket.NewAppModule(app.FeeMarketKeeper),
 		coinswap.NewAppModule(appCodec, app.CoinswapKeeper, app.AccountKeeper, app.BankKeeper),
 		csr.NewAppModule(appCodec, app.CSRKeeper, app.AccountKeeper),
+		govshuttle.NewAppModule(appCodec, app.GovshuttleKeeper, app.AccountKeeper),
 		// TODO: Modules that have not yet been implemented for simulation
 		// govshuttle, csr, inflation, erc20
 	)
