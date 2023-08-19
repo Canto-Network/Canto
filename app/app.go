@@ -600,7 +600,7 @@ func NewCanto(
 		epochs.NewAppModule(appCodec, app.EpochsKeeper),
 		onboarding.NewAppModule(*app.OnboardingKeeper),
 		govshuttle.NewAppModule(app.GovshuttleKeeper, app.AccountKeeper),
-		csr.NewAppModule(app.CSRKeeper, app.AccountKeeper),
+		csr.NewAppModule(appCodec, app.CSRKeeper, app.AccountKeeper),
 		coinswap.NewAppModule(appCodec, app.CoinswapKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
@@ -748,7 +748,7 @@ func NewCanto(
 		inflation.NewAppModule(appCodec, app.InflationKeeper, app.AccountKeeper, app.StakingKeeper),
 		feemarket.NewAppModule(app.FeeMarketKeeper),
 		coinswap.NewAppModule(appCodec, app.CoinswapKeeper, app.AccountKeeper, app.BankKeeper),
-
+		csr.NewAppModule(appCodec, app.CSRKeeper, app.AccountKeeper),
 		// TODO: Modules that have not yet been implemented for simulation
 		// govshuttle, csr, inflation, erc20
 	)
