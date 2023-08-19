@@ -21,6 +21,7 @@ import (
 
 	"github.com/Canto-Network/Canto/v7/x/inflation/client/cli"
 	"github.com/Canto-Network/Canto/v7/x/inflation/keeper"
+	"github.com/Canto-Network/Canto/v7/x/inflation/simulation"
 	"github.com/Canto-Network/Canto/v7/x/inflation/types"
 )
 
@@ -32,7 +33,9 @@ var (
 )
 
 // app module Basics object
-type AppModuleBasic struct{}
+type AppModuleBasic struct {
+	cdc codec.Codec
+}
 
 // Name returns the inflation module's name.
 func (AppModuleBasic) Name() string {
@@ -100,12 +103,13 @@ type AppModule struct {
 
 // NewAppModule creates a new AppModule Object
 func NewAppModule(
+	cdc codec.Codec,
 	k keeper.Keeper,
 	ak authkeeper.AccountKeeper,
 	sk stakingkeeper.Keeper,
 ) AppModule {
 	return AppModule{
-		AppModuleBasic: AppModuleBasic{},
+		AppModuleBasic: AppModuleBasic{cdc: cdc},
 		keeper:         k,
 		ak:             ak,
 		sk:             sk,
@@ -185,6 +189,7 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 
 // GenerateGenesisState creates a randomized GenState of the inflation module.
 func (am AppModule) GenerateGenesisState(input *module.SimulationState) {
+	simulation.RandomizedGenState(input)
 }
 
 // ProposalContents doesn't return any content functions for governance proposals.
@@ -194,11 +199,12 @@ func (am AppModule) ProposalContents(simState module.SimulationState) []simtypes
 
 // RandomizedParams creates randomized inflation param changes for the simulator.
 func (am AppModule) RandomizedParams(r *rand.Rand) []simtypes.ParamChange {
-	return []simtypes.ParamChange{}
+	return simulation.ParamChanges(r)
 }
 
 // RegisterStoreDecoder registers a decoder for inflation module's types.
 func (am AppModule) RegisterStoreDecoder(decoderRegistry sdk.StoreDecoderRegistry) {
+	decoderRegistry[types.StoreKey] = simulation.NewDecodeStore(am.cdc)
 }
 
 // WeightedOperations doesn't return any inflation module operation.

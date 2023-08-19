@@ -39,15 +39,19 @@ func generateExponentialCalculation(r *rand.Rand) types.ExponentialCalculation {
 		A:             sdk.NewDec(int64(simtypes.RandIntBetween(r, 0, 10000000))),
 		R:             sdk.NewDecWithPrec(int64(simtypes.RandIntBetween(r, 0, 100)), 2),
 		C:             sdk.ZeroDec(),
-		BondingTarget: sdk.NewDecWithPrec(int64(simtypes.RandIntBetween(r, 0, 100)), 2),
+		BondingTarget: sdk.NewDecWithPrec(int64(simtypes.RandIntBetween(r, 1, 100)), 2),
 		MaxVariance:   sdk.ZeroDec(),
 	}
 }
 
 func generateInflationDistribution(r *rand.Rand) types.InflationDistribution {
+
+	stakingRewards := sdk.NewDecWithPrec(int64(simtypes.RandIntBetween(r, 0, 100)), 2)
+	communityPool := sdk.NewDec(1).Sub(stakingRewards)
+
 	return types.InflationDistribution{
-		StakingRewards: sdk.NewDec(int64(simtypes.RandIntBetween(r, 0, 10000000))),
-		CommunityPool:  sdk.NewDec(int64(simtypes.RandIntBetween(r, 0, 10000000))),
+		StakingRewards: stakingRewards,
+		CommunityPool:  communityPool,
 	}
 }
 

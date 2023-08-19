@@ -44,18 +44,18 @@ func TestRandomizedGenState(t *testing.T) {
 		A:             sdk.NewDec(2712964),
 		R:             sdk.NewDecWithPrec(11, 2),
 		C:             sdk.ZeroDec(),
-		BondingTarget: sdk.NewDecWithPrec(76, 2),
+		BondingTarget: sdk.NewDecWithPrec(94, 2),
 		MaxVariance:   sdk.ZeroDec(),
 	}, genState.Params.ExponentialCalculation)
 	require.Equal(t, types.InflationDistribution{
-		StakingRewards: sdk.NewDec(963310),
-		CommunityPool:  sdk.NewDec(1617859),
+		StakingRewards: sdk.NewDecWithPrec(1, 1),
+		CommunityPool:  sdk.NewDecWithPrec(9, 1),
 	}, genState.Params.InflationDistribution)
-	require.Equal(t, true, genState.Params.EnableInflation)
-	require.Equal(t, uint64(6634432), genState.Period)
+	require.Equal(t, false, genState.Params.EnableInflation)
+	require.Equal(t, uint64(1654145), genState.Period)
 	require.Equal(t, "day", genState.EpochIdentifier)
-	require.Equal(t, int64(5142676), genState.EpochsPerPeriod)
-	require.Equal(t, uint64(5100827), genState.SkippedEpochs)
+	require.Equal(t, int64(6634432), genState.EpochsPerPeriod)
+	require.Equal(t, uint64(5142676), genState.SkippedEpochs)
 
 }
 
