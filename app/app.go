@@ -307,12 +307,12 @@ type Canto struct {
 	FeeMarketKeeper feemarketkeeper.Keeper
 
 	// Canto keepers
-	InflationKeeper  inflationkeeper.Keeper
-	Erc20Keeper      erc20keeper.Keeper
-	EpochsKeeper     epochskeeper.Keeper
-	OnboardingKeeper *onboardingkeeper.Keeper
-	GovshuttleKeeper govshuttlekeeper.Keeper
-	CSRKeeper        csrkeeper.Keeper
+	InflationKeeper     inflationkeeper.Keeper
+	Erc20Keeper         erc20keeper.Keeper
+	EpochsKeeper        epochskeeper.Keeper
+	OnboardingKeeper    *onboardingkeeper.Keeper
+	GovshuttleKeeper    govshuttlekeeper.Keeper
+	CSRKeeper           csrkeeper.Keeper
 	LiquidStakingKeeper liquidstakingkeeper.Keeper
 
 	// Coinswap keeper
