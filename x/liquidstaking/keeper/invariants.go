@@ -43,7 +43,7 @@ func AllInvariants(k Keeper) sdk.Invariant {
 
 func NetAmountEssentialsInvariant(k Keeper) sdk.Invariant {
 	return func(ctx sdk.Context) (string, bool) {
-		nas := k.GetNetAmountStateEssentials(ctx)
+		nas, _, _, _ := k.GetNetAmountStateEssentials(ctx)
 		// if net amount is positive, it means that there are paired chunks.
 		if nas.LsTokensTotalSupply.IsPositive() && !nas.NetAmount.IsPositive() {
 			return "found positive lsToken supply with non-positive net amount", true

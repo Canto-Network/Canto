@@ -158,13 +158,18 @@ func AppStateRandomizedFn(
 		simappparams.InitiallyBondedValidators,
 		&numInitiallyBonded,
 		r,
-		func(r *rand.Rand) { numInitiallyBonded = int64(r.Intn(300)) },
+		func(r *rand.Rand) {
+			numInitiallyBonded = int64(r.Intn(300))
+			// at least 1 bonded validator
+			if numInitiallyBonded == 0 {
+				numInitiallyBonded = 1
+			}
+		},
 	)
 
 	if numInitiallyBonded > numAccs {
 		numInitiallyBonded = numAccs
 	}
-
 	fmt.Printf(
 		`Selected randomly generated parameters for simulated genesis:
 {

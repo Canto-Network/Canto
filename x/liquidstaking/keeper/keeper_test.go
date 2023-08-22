@@ -375,7 +375,7 @@ func (suite *KeeperTestSuite) setupLiquidStakeTestingEnv(env testingEnvOptions) 
 
 	// create numPairedChunks delegators
 	delegators, delegatorBalances := suite.AddTestAddrsWithFunding(fundingAccount, env.numPairedChunks, oneChunk.Amount)
-	nase := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
+	nase, _, _, _ := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
 	suite.True(nase.IsZeroState(), "nothing happened yet so it must be zero state")
 	pairedChunks := suite.liquidStakes(suite.ctx, delegators, delegatorBalances)
 

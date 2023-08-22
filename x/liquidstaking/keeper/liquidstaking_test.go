@@ -243,7 +243,7 @@ func (suite *KeeperTestSuite) TestLiquidStakeSuccess() {
 	suite.provideInsurances(suite.ctx, providers, valAddrs, balances, sdk.ZeroDec(), nil)
 
 	delegators, balances := suite.AddTestAddrsWithFunding(fundingAccount, 10, oneChunk.Amount)
-	nase := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
+	nase, _, _, _ := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
 
 	liquidBondDenom := suite.app.LiquidStakingKeeper.GetLiquidBondDenom(suite.ctx)
 	// First try
@@ -272,7 +272,7 @@ func (suite *KeeperTestSuite) TestLiquidStakeSuccess() {
 	}
 
 	// NetAmountStateEssentials should be updated correctly
-	afterNas := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
+	afterNas, _, _, _ := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
 	{
 		suite.True(afterNas.LsTokensTotalSupply.Equal(lsTokenMintAmount), "total ls token supply should be equal to minted amount")
 		suite.True(nase.TotalLiquidTokens.Add(amt1.Amount).Equal(afterNas.TotalLiquidTokens))
@@ -291,7 +291,7 @@ func (suite *KeeperTestSuite) TestLiquidStakeFail() {
 	)
 	oneChunk, oneInsurance := suite.app.LiquidStakingKeeper.GetMinimumRequirements(suite.ctx)
 	suite.fundAccount(suite.ctx, fundingAccount, oneChunk.Amount.MulRaw(100).Add(oneInsurance.Amount.MulRaw(10)))
-	nase := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
+	nase, _, _, _ := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
 	remainingChunkSlots := nase.RemainingChunkSlots
 	suite.Equal(
 		remainingChunkSlots, sdk.NewInt(10),
@@ -380,7 +380,7 @@ func (suite *KeeperTestSuite) TestLiquidStakeWithAdvanceBlocks() {
 	)
 
 	_, oneInsurance := suite.app.LiquidStakingKeeper.GetMinimumRequirements(suite.ctx)
-	nase := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
+	nase, _, _, _ := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
 	is := suite.getInsuranceState(suite.ctx)
 	pairedChunksInt := sdk.NewInt(int64(len(env.pairedChunks)))
 	// 1 chunk size * number of paired chunks (=3) tokens are liquidated
@@ -414,7 +414,7 @@ func (suite *KeeperTestSuite) TestLiquidStakeWithAdvanceBlocks() {
 
 	suite.ctx = suite.advanceHeight(suite.ctx, 1, "")
 	beforeNas := nase
-	nase = suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
+	nase, _, _, _ = suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
 	{
 		suite.Equal(
 			"80999676001295325000.000000000000000000",
@@ -427,7 +427,7 @@ func (suite *KeeperTestSuite) TestLiquidStakeWithAdvanceBlocks() {
 	beforeIs := is
 	suite.ctx = suite.advanceEpoch(suite.ctx)
 	suite.ctx = suite.advanceHeight(suite.ctx, 1, "delegation reward are distributed to insurance and reward module")
-	nase = suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
+	nase, _, _, _ = suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
 	is = suite.getInsuranceState(suite.ctx)
 	{
 		suite.Equal(
@@ -469,7 +469,7 @@ func (suite *KeeperTestSuite) TestLiquidUnstakeWithAdvanceBlocks() {
 	oneChunk, oneInsurance := suite.app.LiquidStakingKeeper.GetMinimumRequirements(suite.ctx)
 	pairedChunksInt := sdk.NewInt(int64(len(env.pairedChunks)))
 	mostExpensivePairedChunk := suite.getMostExpensivePairedChunk(env.pairedChunks)
-	nase := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
+	nase, _, _, _ := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
 	is := suite.getInsuranceState(suite.ctx)
 	// 1 chunk size * number of paired chunks (=3) tokens are liquidated
 	currentLiquidatedTokens := types.ChunkSize.Mul(pairedChunksInt)
@@ -502,7 +502,7 @@ func (suite *KeeperTestSuite) TestLiquidUnstakeWithAdvanceBlocks() {
 	suite.ctx = suite.advanceHeight(suite.ctx, 1, "")
 
 	beforeNas := nase
-	nase = suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
+	nase, _, _, _ = suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
 	{
 		suite.Equal(
 			"80999676001295325000.000000000000000000",
@@ -552,7 +552,7 @@ func (suite *KeeperTestSuite) TestLiquidUnstakeWithAdvanceBlocks() {
 	suite.ctx = suite.advanceHeight(suite.ctx, 1, "The actual unstaking started\nThe insurance commission and reward are claimed")
 	beforeNas = nase
 	beforeIs := is
-	nase = suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
+	nase, _, _, _ = suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
 	is = suite.getInsuranceState(suite.ctx)
 
 	// Check NetAmounState changed right
@@ -613,7 +613,7 @@ func (suite *KeeperTestSuite) TestLiquidUnstakeWithAdvanceBlocks() {
 	suite.ctx = suite.advanceHeight(suite.ctx, 1, "The insurance commission and reward are claimed\nThe unstaking is completed")
 
 	beforeNas = nase
-	nase = suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
+	nase, _, _, _ = suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
 	afterBondDenomBalance := suite.app.BankKeeper.GetBalance(suite.ctx, undelegator, env.bondDenom).Amount
 	// Get bondDeno balance of undelegator
 	{
@@ -1228,7 +1228,7 @@ func (suite *KeeperTestSuite) TestEndBlocker() {
 			toBeWithdrawnInsurance.GetValidator(),
 		)
 		suite.True(found)
-		suite.Equal(toBeWithdrawnInsurance.GetValidator().String(), unbondingDelegation.ValidatorAddress)
+		suite.Equal(toBeWithdrawnInsurance.ValidatorAddress, unbondingDelegation.ValidatorAddress)
 	}
 
 	suite.ctx = suite.advanceHeight(suite.ctx, 1, "")
@@ -2795,7 +2795,7 @@ func (suite *KeeperTestSuite) TestDynamicFee() {
 				},
 			)
 			{
-				nase := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
+				nase, _, _, _ := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
 				fmt.Println(nase)
 				// Check current state before reaching epoch
 				suite.Equal(
@@ -2807,10 +2807,10 @@ func (suite *KeeperTestSuite) TestDynamicFee() {
 					nase.FeeRate.String(),
 				)
 			}
-			beforeNas := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
+			beforeNas, _, _, _ := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
 			suite.ctx = suite.advanceEpoch(suite.ctx)
 			suite.ctx = suite.advanceHeight(suite.ctx, 1, "got rewards and dynamic fee is charged")
-			nase := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
+			nase, _, _, _ := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
 			suite.True(
 				nase.RewardModuleAccBalance.GT(beforeNas.RewardModuleAccBalance),
 				"reward module account's balance increased",
@@ -2859,7 +2859,7 @@ func (suite *KeeperTestSuite) TestCalcDiscountRate() {
 			cachedCtx = suite.advanceHeight(cachedCtx, tc.numRewardEpochs-1, fmt.Sprintf("let's pass %d reward epoch", tc.numRewardEpochs))
 			cachedCtx = suite.advanceEpoch(cachedCtx) // reward is accumulated to reward pool
 			cachedCtx = suite.advanceHeight(cachedCtx, 1, "liquid staking endblocker is triggered")
-			nase := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(cachedCtx)
+			nase, _, _, _ := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(cachedCtx)
 			suite.Equal(tc.expectedDiscountRate.String(), nase.DiscountRate.String())
 		})
 	}
@@ -3006,11 +3006,9 @@ func (suite *KeeperTestSuite) TestDoClaimDiscountedReward() {
 			cachedCtx = suite.advanceEpoch(cachedCtx) // reward is accumulated to reward pool
 			cachedCtx = suite.advanceHeight(cachedCtx, 1, "liquid staking endblocker is triggered")
 			requester := tc.msg.GetRequestser()
-			nase := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(cachedCtx)
+			nase, _, _, _ := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(cachedCtx)
 			suite.Equal(tc.expected.discountRate, nase.DiscountRate.String())
-			discountedMintRate := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(cachedCtx).MintRate.Mul(
-				sdk.OneDec().Sub(nase.DiscountRate),
-			)
+			discountedMintRate := nase.MintRate.Mul(sdk.OneDec().Sub(nase.DiscountRate))
 			claimableAmt := suite.app.BankKeeper.GetBalance(cachedCtx, types.RewardPool, suite.denom)
 			lsTokenToGetAll := claimableAmt.Amount.ToDec().Mul(discountedMintRate).Ceil().TruncateInt()
 			claimAmt := tc.msg.Amount.Amount.ToDec().Quo(discountedMintRate).TruncateInt()
@@ -3020,14 +3018,16 @@ func (suite *KeeperTestSuite) TestDoClaimDiscountedReward() {
 			suite.Equal(tc.expected.beforeTokenBal, suite.app.BankKeeper.GetBalance(cachedCtx, requester, suite.denom).Amount.String())
 			beforeLsTokenBal := suite.app.BankKeeper.GetBalance(cachedCtx, requester, liquidBondDenom).Amount
 			suite.Equal(tc.expected.beforeLsTokenBal, beforeLsTokenBal.String())
-			beforeMintRate := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(cachedCtx).MintRate
+			nase, _, _, _ = suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(cachedCtx)
+			beforeMintRate := nase.MintRate
 			suite.Equal(tc.expected.beforeMintRate, beforeMintRate.String())
 			_, _, err := suite.app.LiquidStakingKeeper.DoClaimDiscountedReward(cachedCtx, tc.msg)
 			suite.NoError(err)
 			suite.Equal(tc.afterTokenBal, suite.app.BankKeeper.GetBalance(cachedCtx, requester, suite.denom).Amount.String())
 			afterLsTokenBal := suite.app.BankKeeper.GetBalance(cachedCtx, requester, liquidBondDenom).Amount
 			suite.Equal(tc.expected.afterLsTokenBal, afterLsTokenBal.String())
-			afterMintRate := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(cachedCtx).MintRate
+			nase, _, _, _ = suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(cachedCtx)
+			afterMintRate := nase.MintRate
 			suite.Equal(tc.expected.afterMintRate, afterMintRate.String())
 			suite.Equal(tc.expected.increasedMintRate, afterMintRate.Sub(beforeMintRate).String())
 			suite.Equal(tc.expected.decreasedLsTokenBal, beforeLsTokenBal.Sub(afterLsTokenBal).String())
@@ -3131,7 +3131,7 @@ func (suite *KeeperTestSuite) TestChunkPositiveBalanceBeforeEpoch() {
 	suite.ctx = suite.advanceHeight(suite.ctx, 1, "liquid staking endblocker is triggered")
 
 	originReardModuleAccBalance, _ := sdk.NewIntFromString("161999352002591325000")
-	nase := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
+	nase, _, _, _ := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
 	{
 		additionalCommissions := coin.Amount.ToDec().Mul(TenPercentFeeRate).TruncateInt()
 		suite.Equal(

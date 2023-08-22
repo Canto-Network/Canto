@@ -122,7 +122,7 @@ func (k Keeper) CollectRewardAndFee(
 // DistributeReward withdraws delegation rewards from all paired chunks
 // Keeper.CollectRewardAndFee will be called during withdrawing process.
 func (k Keeper) DistributeReward(ctx sdk.Context) {
-	nas := k.GetNetAmountStateEssentials(ctx)
+	nase, _, _, _ := k.GetNetAmountStateEssentials(ctx)
 	k.IterateAllChunks(ctx, func(chunk types.Chunk) bool {
 		if chunk.Status != types.CHUNK_STATUS_PAIRED {
 			return false
@@ -133,7 +133,7 @@ func (k Keeper) DistributeReward(ctx sdk.Context) {
 			panic(err)
 		}
 
-		k.CollectRewardAndFee(ctx, nas.FeeRate, chunk, pairedIns)
+		k.CollectRewardAndFee(ctx, nase.FeeRate, chunk, pairedIns)
 		return false
 	})
 }
@@ -341,7 +341,7 @@ func (k Keeper) RankInsurances(ctx sdk.Context) (
 			ins.Status != types.INSURANCE_STATUS_PAIRING {
 			return false
 		}
-		if _, ok := candidatesValidatorMap[ins.GetValidator().String()]; !ok {
+		if _, ok := candidatesValidatorMap[ins.ValidatorAddress]; !ok {
 			// Only insurance which directs valid validator can be ranked in
 			validator, found := k.stakingKeeper.GetValidator(ctx, ins.GetValidator())
 			if !found {
@@ -411,7 +411,7 @@ func (k Keeper) RePairRankedInsurances(
 				continue
 			}
 			// Happy case. Same validator so we can skip re-delegation
-			if newRankInIns.GetValidator().Equals(outIns.GetValidator()) {
+			if newRankInIns.ValidatorAddress == outIns.ValidatorAddress {
 				// get chunk by outIns.ChunkId
 				chunk := k.mustGetChunk(ctx, outIns.ChunkId)
 				k.rePairChunkAndInsurance(ctx, chunk, newRankInIns, outIns)
@@ -522,8 +522,8 @@ func (k Keeper) RePairRankedInsurances(
 				types.EventTypeBeginRedelegate,
 				sdk.NewAttribute(sdk.AttributeKeyModule, types.ModuleName),
 				sdk.NewAttribute(types.AttributeKeyChunkId, fmt.Sprintf("%d", chunk.Id)),
-				sdk.NewAttribute(types.AttributeKeySrcValidator, outIns.GetValidator().String()),
-				sdk.NewAttribute(types.AttributeKeyDstValidator, newIns.GetValidator().String()),
+				sdk.NewAttribute(types.AttributeKeySrcValidator, outIns.ValidatorAddress),
+				sdk.NewAttribute(types.AttributeKeyDstValidator, newIns.ValidatorAddress),
 				sdk.NewAttribute(types.AttributeKeyCompletionTime, completionTime.Format(time.RFC3339)),
 			),
 		)
@@ -566,7 +566,7 @@ func (k Keeper) RePairRankedInsurances(
 				types.EventTypeBeginUndelegate,
 				sdk.NewAttribute(sdk.AttributeKeyModule, types.ModuleName),
 				sdk.NewAttribute(types.AttributeKeyChunkId, fmt.Sprintf("%d", chunk.Id)),
-				sdk.NewAttribute(types.AttributeKeyValidator, outIns.GetValidator().String()),
+				sdk.NewAttribute(types.AttributeKeyValidator, outIns.ValidatorAddress),
 				sdk.NewAttribute(types.AttributeKeyCompletionTime, completionTime.Format(time.RFC3339)),
 				sdk.NewAttribute(types.AttributeKeyReason, types.AttributeValueReasonNoCandidateIns),
 			),
@@ -590,18 +590,21 @@ func (k Keeper) DoLiquidStake(ctx sdk.Context, msg *types.MsgLiquidStake) (
 		return
 	}
 	chunksToCreate := amount.Amount.Quo(types.ChunkSize)
-	nas := k.GetNetAmountStateEssentials(ctx)
-	if nas.RemainingChunkSlots.LT(chunksToCreate) {
+
+	nase, _, _, _ := k.GetNetAmountStateEssentials(ctx)
+
+	if nase.RemainingChunkSlots.LT(chunksToCreate) {
 		err = sdkerrors.Wrapf(
 			types.ErrExceedAvailableChunks,
 			"requested chunks to create: %d, available chunks: %s",
 			chunksToCreate,
-			nas.RemainingChunkSlots.String(),
+			nase.RemainingChunkSlots.String(),
 		)
 		return
 	}
 
 	pairingInsurances, validatorMap := k.GetPairingInsurances(ctx)
+
 	numPairingInsurances := sdk.NewIntFromUint64(uint64(len(pairingInsurances)))
 	if chunksToCreate.GT(numPairingInsurances) {
 		err = types.ErrNoPairingInsurance
@@ -644,8 +647,8 @@ func (k Keeper) DoLiquidStake(ctx sdk.Context, msg *types.MsgLiquidStake) (
 
 		// Mint the liquid staking token
 		lsTokenMintAmount = types.ChunkSize
-		if nas.LsTokensTotalSupply.IsPositive() {
-			lsTokenMintAmount = nas.MintRate.MulTruncate(types.ChunkSize.ToDec()).TruncateInt()
+		if nase.LsTokensTotalSupply.IsPositive() {
+			lsTokenMintAmount = nase.MintRate.MulTruncate(types.ChunkSize.ToDec()).TruncateInt()
 		}
 		if !lsTokenMintAmount.IsPositive() {
 			err = sdkerrors.Wrapf(types.ErrInvalidAmount, "amount must be greater than or equal to %s", amount.String())
@@ -684,29 +687,22 @@ func (k Keeper) QueueLiquidUnstake(ctx sdk.Context, msg *types.MsgLiquidUnstake)
 
 	chunksToLiquidUnstake := amount.Amount.Quo(types.ChunkSize).Int64()
 
-	chunksWithInsId := make(map[uint64]types.Chunk)
-	var insurances []types.Insurance
-	validatorMap := make(map[string]stakingtypes.Validator)
-	k.IterateAllChunks(ctx, func(chunk types.Chunk) (stop bool) {
-		if chunk.Status != types.CHUNK_STATUS_PAIRED {
-			return false
-		}
+	nase, pairedChunksWithInsuranceId, pairedInsurances, validatorMap := k.GetNetAmountStateEssentials(ctx)
+
+	// purelyPairedInsurances contains paired insurances which serve chunk which is not in queue for unstaking.
+	var purelyPairedInsurances []types.Insurance
+	for _, pairedIns := range pairedInsurances {
+		chunk := pairedChunksWithInsuranceId[pairedIns.Id]
 		// check whether the chunk is already have unstaking requests in queue.
 		_, found := k.GetUnpairingForUnstakingChunkInfo(ctx, chunk.Id)
 		if found {
-			return false
+			delete(pairedChunksWithInsuranceId, pairedIns.Id)
+			continue
 		}
+		purelyPairedInsurances = append(purelyPairedInsurances, pairedIns)
+	}
 
-		pairedIns, validator, _ := k.mustValidatePairedChunk(ctx, chunk)
-		if _, ok := validatorMap[pairedIns.GetValidator().String()]; !ok {
-			validatorMap[pairedIns.ValidatorAddress] = validator
-		}
-		insurances = append(insurances, pairedIns)
-		chunksWithInsId[pairedIns.Id] = chunk
-		return false
-	})
-
-	pairedChunks := int64(len(chunksWithInsId))
+	pairedChunks := int64(len(pairedChunksWithInsuranceId))
 	if pairedChunks == 0 {
 		err = types.ErrNoPairedChunk
 		return
@@ -721,16 +717,16 @@ func (k Keeper) QueueLiquidUnstake(ctx sdk.Context, msg *types.MsgLiquidUnstake)
 		return
 	}
 	// Sort insurances by descend order
-	types.SortInsurances(validatorMap, insurances, true)
+	types.SortInsurances(validatorMap, purelyPairedInsurances, true)
 
 	// How much ls tokens must be burned
-	nas := k.GetNetAmountStateEssentials(ctx)
+
 	liquidBondDenom := k.GetLiquidBondDenom(ctx)
 	for i := int64(0); i < chunksToLiquidUnstake; i++ {
 		// Escrow ls tokens from the delegator
 		lsTokenBurnAmount := types.ChunkSize
-		if nas.LsTokensTotalSupply.IsPositive() {
-			lsTokenBurnAmount = lsTokenBurnAmount.ToDec().Mul(nas.MintRate).TruncateInt()
+		if nase.LsTokensTotalSupply.IsPositive() {
+			lsTokenBurnAmount = lsTokenBurnAmount.ToDec().Mul(nase.MintRate).TruncateInt()
 		}
 		lsTokensToBurn := sdk.NewCoin(liquidBondDenom, lsTokenBurnAmount)
 		if err = k.bankKeeper.SendCoins(
@@ -739,8 +735,8 @@ func (k Keeper) QueueLiquidUnstake(ctx sdk.Context, msg *types.MsgLiquidUnstake)
 			return
 		}
 
-		mostExpensiveInsurance := insurances[i]
-		chunkToBeUndelegated := chunksWithInsId[mostExpensiveInsurance.Id]
+		mostExpensiveInsurance := purelyPairedInsurances[i]
+		chunkToBeUndelegated := pairedChunksWithInsuranceId[mostExpensiveInsurance.Id]
 		_, found := k.GetUnpairingForUnstakingChunkInfo(ctx, chunkToBeUndelegated.Id)
 		if found {
 			err = sdkerrors.Wrapf(
@@ -757,7 +753,7 @@ func (k Keeper) QueueLiquidUnstake(ctx sdk.Context, msg *types.MsgLiquidUnstake)
 			msg.DelegatorAddress,
 			lsTokensToBurn,
 		)
-		toBeUnstakedChunks = append(toBeUnstakedChunks, chunksWithInsId[insurances[i].Id])
+		toBeUnstakedChunks = append(toBeUnstakedChunks, pairedChunksWithInsuranceId[mostExpensiveInsurance.Id])
 		infos = append(infos, info)
 		k.SetUnpairingForUnstakingChunkInfo(ctx, info)
 	}
@@ -906,6 +902,7 @@ func (k Keeper) DoDepositInsurance(ctx sdk.Context, msg *types.MsgDepositInsuran
 	if err = k.bankKeeper.SendCoins(ctx, providerAddr, ins.DerivedAddress(), sdk.NewCoins(amount)); err != nil {
 		return
 	}
+
 	return
 }
 
@@ -919,14 +916,14 @@ func (k Keeper) DoClaimDiscountedReward(ctx sdk.Context, msg *types.MsgClaimDisc
 		return
 	}
 
-	nas := k.GetNetAmountStateEssentials(ctx)
+	nase, _, _, _ := k.GetNetAmountStateEssentials(ctx)
 	// discount rate >= minimum discount rate
 	// if discount rate(e.g. 10%) is lower than minimum discount rate(e.g. 20%), then it is not profitable to claim reward.
-	if nas.DiscountRate.LT(msg.MinimumDiscountRate) {
-		err = sdkerrors.Wrapf(types.ErrDiscountRateTooLow, "current discount rate: %s", nas.DiscountRate)
+	if nase.DiscountRate.LT(msg.MinimumDiscountRate) {
+		err = sdkerrors.Wrapf(types.ErrDiscountRateTooLow, "current discount rate: %s", nase.DiscountRate)
 		return
 	}
-	discountedMintRate = nas.MintRate.Mul(sdk.OneDec().Sub(nas.DiscountRate))
+	discountedMintRate = nase.MintRate.Mul(sdk.OneDec().Sub(nase.DiscountRate))
 
 	var claimableCoin sdk.Coin
 	var burnAmt sdk.Coin
@@ -952,6 +949,7 @@ func (k Keeper) DoClaimDiscountedReward(ctx sdk.Context, msg *types.MsgClaimDisc
 	if err = k.bankKeeper.SendCoins(ctx, types.RewardPool, msg.GetRequestser(), claimCoins); err != nil {
 		return
 	}
+
 	return
 }
 
@@ -1608,7 +1606,7 @@ func (k Keeper) isRepairingChunk(ctx sdk.Context, chunk types.Chunk) bool {
 	if chunk.HasPairedInsurance() && chunk.HasUnpairingInsurance() {
 		pairedIns := k.mustGetInsurance(ctx, chunk.PairedInsuranceId)
 		unpairingIns := k.mustGetInsurance(ctx, chunk.UnpairingInsuranceId)
-		if pairedIns.GetValidator().Equals(unpairingIns.GetValidator()) {
+		if pairedIns.ValidatorAddress == unpairingIns.ValidatorAddress {
 			return true
 		}
 	}

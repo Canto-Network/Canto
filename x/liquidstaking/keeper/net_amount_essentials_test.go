@@ -21,7 +21,7 @@ func (suite *KeeperTestSuite) TestGetNetAmountState_TotalRemainingRewards() {
 	})
 
 	suite.ctx = suite.advanceHeight(suite.ctx, 100, "delegation rewards are accumulated")
-	nase := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
+	nase, _, _, _ := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
 
 	cachedCtx, _ := suite.ctx.CacheContext()
 	suite.app.DistrKeeper.WithdrawDelegationRewards(cachedCtx, env.pairedChunks[0].DerivedAddress(), env.insurances[0].GetValidator())

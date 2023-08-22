@@ -7,7 +7,10 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
-func (k Keeper) GetNetAmountStateEssentials(ctx sdk.Context) (nase types.NetAmountStateEssentials) {
+func (k Keeper) GetNetAmountStateEssentials(ctx sdk.Context) (
+	nase types.NetAmountStateEssentials, pairedChunkWithInsuranceId map[uint64]types.Chunk,
+	pairedInsurances []types.Insurance, validatorMap map[string]stakingtypes.Validator,
+) {
 	liquidBondDenom := k.GetLiquidBondDenom(ctx)
 	bondDenom := k.stakingKeeper.BondDenom(ctx)
 	totalDelShares := sdk.ZeroDec()
@@ -18,8 +21,9 @@ func (k Keeper) GetNetAmountStateEssentials(ctx sdk.Context) (nase types.NetAmou
 	totalUnbondingChunksBalance := sdk.ZeroInt()
 	numPairedChunks := sdk.ZeroInt()
 
+	pairedChunkWithInsuranceId = make(map[uint64]types.Chunk)
 	// To reduce gas consumption, store validator info in map
-	insValMap := make(map[string]stakingtypes.Validator)
+	validatorMap = make(map[string]stakingtypes.Validator)
 	k.IterateAllChunks(ctx, func(chunk types.Chunk) (stop bool) {
 		balance := k.bankKeeper.GetBalance(ctx, chunk.DerivedAddress(), k.stakingKeeper.BondDenom(ctx))
 		totalChunksBalance = totalChunksBalance.Add(balance.Amount)
@@ -28,16 +32,17 @@ func (k Keeper) GetNetAmountStateEssentials(ctx sdk.Context) (nase types.NetAmou
 		case types.CHUNK_STATUS_PAIRED:
 			numPairedChunks = numPairedChunks.Add(sdk.OneInt())
 			pairedIns := k.mustGetInsurance(ctx, chunk.PairedInsuranceId)
-			valAddr := pairedIns.GetValidator()
+			pairedChunkWithInsuranceId[chunk.PairedInsuranceId] = chunk
+			pairedInsurances = append(pairedInsurances, pairedIns)
 			// Use map to reduce gas consumption
-			if _, ok := insValMap[valAddr.String()]; !ok {
+			if _, ok := validatorMap[pairedIns.ValidatorAddress]; !ok {
 				validator, found := k.stakingKeeper.GetValidator(ctx, pairedIns.GetValidator())
 				if !found {
 					panic(fmt.Sprintf("validator of paired ins %s not found(insuranceId: %d)", pairedIns.GetValidator(), pairedIns.Id))
 				}
-				insValMap[valAddr.String()] = validator
+				validatorMap[pairedIns.ValidatorAddress] = validator
 			}
-			validator := insValMap[valAddr.String()]
+			validator := validatorMap[pairedIns.ValidatorAddress]
 
 			// Get delegation of chunk
 			del, found := k.stakingKeeper.GetDelegation(ctx, chunk.DerivedAddress(), validator.GetOperator())
@@ -51,9 +56,15 @@ func (k Keeper) GetNetAmountStateEssentials(ctx sdk.Context) (nase types.NetAmou
 			tokenValue = k.calcTokenValueWithInsuranceCoverage(ctx, tokenValue, pairedIns)
 			totalLiquidTokens = totalLiquidTokens.Add(tokenValue)
 
+			beforeCachedCtxConsumed := ctx.GasMeter().GasConsumed()
 			cachedCtx, _ := ctx.CacheContext()
 			endingPeriod := k.distributionKeeper.IncrementValidatorPeriod(cachedCtx, validator)
 			delRewards := k.distributionKeeper.CalculateDelegationRewards(cachedCtx, validator, del, endingPeriod)
+			afterCachedCtxConsumed := cachedCtx.GasMeter().GasConsumed()
+			cachedCtx.GasMeter().RefundGas(
+				afterCachedCtxConsumed-beforeCachedCtxConsumed,
+				"cachedCtx does not write state",
+			)
 			// chunk's remaining reward is calculated by
 			// 1. rest = del_reward - insurance_commission
 			// 2. remaining = rest x (1 - module_fee_rate)
@@ -61,6 +72,7 @@ func (k Keeper) GetNetAmountStateEssentials(ctx sdk.Context) (nase types.NetAmou
 			insuranceCommission := delReward.Mul(pairedIns.FeeRate)
 			remainingReward := delReward.Sub(insuranceCommission)
 			totalRemainingRewardsBeforeModuleFee = totalRemainingRewardsBeforeModuleFee.Add(remainingReward)
+
 		default:
 			k.stakingKeeper.IterateDelegatorUnbondingDelegations(ctx, chunk.DerivedAddress(), func(ubd stakingtypes.UnbondingDelegation) (stop bool) {
 				for _, entry := range ubd.Entries {
@@ -71,6 +83,7 @@ func (k Keeper) GetNetAmountStateEssentials(ctx sdk.Context) (nase types.NetAmou
 				return false
 			})
 		}
+
 		return false
 	})
 
@@ -101,6 +114,7 @@ func (k Keeper) GetNetAmountStateEssentials(ctx sdk.Context) (nase types.NetAmou
 	nase.NetAmount = nase.CalcNetAmount()
 	nase.MintRate = nase.CalcMintRate()
 	nase.DiscountRate = nase.CalcDiscountRate(params.MaximumDiscountRate)
+
 	return
 }
 

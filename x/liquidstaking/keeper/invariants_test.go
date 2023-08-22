@@ -33,7 +33,7 @@ func (suite *KeeperTestSuite) TestNetAmountInvariant() {
 	suite.ctx = suite.advanceEpoch(suite.ctx)
 	suite.ctx = suite.advanceHeight(suite.ctx, 1, "module epoch reached")
 
-	nase := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
+	nase, _, _, _ := suite.app.LiquidStakingKeeper.GetNetAmountStateEssentials(suite.ctx)
 	oneChunk, _ := suite.app.LiquidStakingKeeper.GetMinimumRequirements(suite.ctx)
 	suite.True(nase.Equal(types.NetAmountStateEssentials{
 		MintRate:                    sdk.MustNewDecFromStr("0.990373683313988266"),

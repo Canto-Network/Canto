@@ -7,7 +7,7 @@ import (
 )
 
 func (k Keeper) GetNetAmountState(ctx sdk.Context) types.NetAmountState {
-	nase := k.GetNetAmountStateEssentials(ctx)
+	nase, _, _, _ := k.GetNetAmountStateEssentials(ctx)
 	nas := &types.NetAmountState{}
 	deepcopier.Copy(&nase).To(nas)
 
