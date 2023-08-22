@@ -1,10 +1,10 @@
 package ante
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 
-	"github.com/Canto-Network/Canto/v7/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -14,6 +14,9 @@ import (
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
+	authzante "github.com/Canto-Network/Canto/v7/app/ante/cosmos"
+	"github.com/Canto-Network/Canto/v7/types"
 )
 
 // ParamChangeLimitDecorator checks that the params change proposals for slashing and staking modules.
@@ -51,8 +54,25 @@ func (s ParamChangeLimitDecorator) AnteHandle(
 
 func (s ParamChangeLimitDecorator) ValidateMsgs(ctx sdk.Context, msgs []sdk.Msg) error {
 	var slashingParams slashingtypes.Params
-	validMsg := func(m sdk.Msg) error {
-		if msg, ok := m.(*govtypes.MsgSubmitProposal); ok {
+	var validMsg func(m sdk.Msg, nestedCnt int) error
+	validMsg = func(m sdk.Msg, nestedCnt int) error {
+		if nestedCnt >= authzante.MaxNestedMsgs {
+			return fmt.Errorf("found more nested msgs than permited. Limit is : %d", authzante.MaxNestedMsgs)
+		}
+		switch msg := m.(type) {
+		case *authz.MsgExec:
+			for _, v := range msg.Msgs {
+				var innerMsg sdk.Msg
+				if err := s.cdc.UnpackAny(v, &innerMsg); err != nil {
+					return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "cannot unmarshal authz exec msgs")
+				}
+				nestedCnt++
+				if err := validMsg(innerMsg, nestedCnt); err != nil {
+					return err
+				}
+			}
+
+		case *govtypes.MsgSubmitProposal:
 			switch c := msg.GetContent().(type) {
 			case *proposal.ParameterChangeProposal:
 				for _, c := range c.Changes {
@@ -117,32 +137,14 @@ func (s ParamChangeLimitDecorator) ValidateMsgs(ctx sdk.Context, msgs []sdk.Msg)
 			default:
 				return nil
 			}
+		default:
+			return nil
 		}
 		return nil
 	}
-	validAuthz := func(execMsg *authz.MsgExec) error {
-		for _, v := range execMsg.Msgs {
-			var innerMsg sdk.Msg
-			if err := s.cdc.UnpackAny(v, &innerMsg); err != nil {
-				return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "cannot unmarshal authz exec msgs")
-			}
-			if err := validMsg(innerMsg); err != nil {
-				return err
-			}
-		}
 
-		return nil
-	}
 	for _, m := range msgs {
-		if msg, ok := m.(*authz.MsgExec); ok {
-			if err := validAuthz(msg); err != nil {
-				return err
-			}
-			continue
-		}
-
-		// validate normal msgs
-		if err := validMsg(m); err != nil {
+		if err := validMsg(m, 1); err != nil {
 			return err
 		}
 	}
