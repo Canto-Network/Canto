@@ -460,9 +460,27 @@ type MockEVMKeeper struct {
 	mock.Mock
 }
 
+func (m *MockEVMKeeper) ChainID() *big.Int {
+	args := m.Called()
+	return args.Get(0).(*big.Int)
+}
+
+func (m *MockEVMKeeper) GetNonce(ctx sdk.Context, addr common.Address) uint64 {
+	args := m.Called(mock.Anything, mock.Anything)
+	return args.Get(0).(uint64)
+}
+
+func (m *MockEVMKeeper) EthereumTx(goCtx context.Context, msg *evmtypes.MsgEthereumTx) (*evmtypes.MsgEthereumTxResponse, error) {
+	args := m.Called(mock.Anything, mock.Anything)
+	return args.Get(0).(*evmtypes.MsgEthereumTxResponse), args.Error(1)
+}
+
 func (m *MockEVMKeeper) GetParams(ctx sdk.Context) evmtypes.Params {
 	args := m.Called(mock.Anything)
 	return args.Get(0).(evmtypes.Params)
+}
+
+func (m *MockEVMKeeper) SetParams(ctx sdk.Context, params evmtypes.Params) {
 }
 
 func (m *MockEVMKeeper) GetAccountWithoutBalance(ctx sdk.Context, addr common.Address) *statedb.Account {
@@ -494,6 +512,11 @@ var _ types.BankKeeper = &MockBankKeeper{}
 
 type MockBankKeeper struct {
 	mock.Mock
+}
+
+func (b *MockBankKeeper) SendCoinsFromModuleToModule(ctx sdk.Context, senderModule, recipientModule string, amt sdk.Coins) error {
+	args := b.Called(mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+	return args.Error(0)
 }
 
 func (b *MockBankKeeper) SendCoinsFromModuleToAccount(ctx sdk.Context, senderModule string, recipientAddr sdk.AccAddress, amt sdk.Coins) error {

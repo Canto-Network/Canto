@@ -20,6 +20,7 @@ import (
 
 	"github.com/Canto-Network/Canto/v7/x/erc20/client/cli"
 	"github.com/Canto-Network/Canto/v7/x/erc20/keeper"
+	"github.com/Canto-Network/Canto/v7/x/erc20/simulation"
 	"github.com/Canto-Network/Canto/v7/x/erc20/types"
 )
 
@@ -91,19 +92,29 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 
 type AppModule struct {
 	AppModuleBasic
-	keeper keeper.Keeper
-	ak     authkeeper.AccountKeeper
+	keeper          keeper.Keeper
+	accountKeeper   authkeeper.AccountKeeper
+	bankKeeper      types.BankKeeper
+	evmKeeper       types.EVMKeeper
+	feemarketKeeper types.FeeMarketKeeper
 }
 
 // NewAppModule creates a new AppModule Object
 func NewAppModule(
+	cdc codec.Codec,
 	k keeper.Keeper,
-	ak authkeeper.AccountKeeper,
+	accountKeeper authkeeper.AccountKeeper,
+	bankKeeper types.BankKeeper,
+	evmKeeper types.EVMKeeper,
+	feemarketKeeper types.FeeMarketKeeper,
 ) AppModule {
 	return AppModule{
-		AppModuleBasic: AppModuleBasic{},
-		keeper:         k,
-		ak:             ak,
+		AppModuleBasic:  AppModuleBasic{cdc: cdc},
+		keeper:          k,
+		accountKeeper:   accountKeeper,
+		bankKeeper:      bankKeeper,
+		evmKeeper:       evmKeeper,
+		feemarketKeeper: feemarketKeeper,
 	}
 }
 
@@ -155,7 +166,7 @@ func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, data json.
 	var genesisState types.GenesisState
 
 	cdc.MustUnmarshalJSON(data, &genesisState)
-	InitGenesis(ctx, am.keeper, am.ak, genesisState)
+	InitGenesis(ctx, am.keeper, am.accountKeeper, genesisState)
 	return []abci.ValidatorUpdate{}
 }
 
@@ -164,11 +175,12 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 	return cdc.MustMarshalJSON(gs)
 }
 
-func (am AppModule) GenerateGenesisState(input *module.SimulationState) {
+func (am AppModule) GenerateGenesisState(simState *module.SimulationState) {
+	simulation.RandomizedGenState(simState)
 }
 
 func (am AppModule) ProposalContents(simState module.SimulationState) []simtypes.WeightedProposalContent {
-	return []simtypes.WeightedProposalContent{}
+	return simulation.ProposalContents(am.keeper, am.accountKeeper, am.bankKeeper, am.evmKeeper, am.feemarketKeeper)
 }
 
 func (am AppModule) RandomizedParams(r *rand.Rand) []simtypes.ParamChange {

@@ -2,10 +2,12 @@ package types
 
 import (
 	context "context"
+	"math/big"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core"
@@ -26,6 +28,7 @@ type AccountKeeper interface {
 type BankKeeper interface {
 	SendCoinsFromModuleToAccount(ctx sdk.Context, senderModule string, recipientAddr sdk.AccAddress, amt sdk.Coins) error
 	SendCoinsFromAccountToModule(ctx sdk.Context, senderAddr sdk.AccAddress, recipientModule string, amt sdk.Coins) error
+	SendCoinsFromModuleToModule(ctx sdk.Context, senderModule, recipientModule string, amt sdk.Coins) error
 	MintCoins(ctx sdk.Context, moduleName string, amt sdk.Coins) error
 	BurnCoins(ctx sdk.Context, moduleName string, amt sdk.Coins) error
 	IsSendEnabledCoin(ctx sdk.Context, coin sdk.Coin) bool
@@ -40,7 +43,17 @@ type BankKeeper interface {
 // EVMKeeper defines the expected EVM keeper interface used on erc20
 type EVMKeeper interface {
 	GetParams(ctx sdk.Context) evmtypes.Params
+	SetParams(ctx sdk.Context, params evmtypes.Params)
 	GetAccountWithoutBalance(ctx sdk.Context, addr common.Address) *statedb.Account
 	EstimateGas(c context.Context, req *evmtypes.EthCallRequest) (*evmtypes.EstimateGasResponse, error)
 	ApplyMessage(ctx sdk.Context, msg core.Message, tracer vm.EVMLogger, commit bool) (*evmtypes.MsgEthereumTxResponse, error)
+	ChainID() *big.Int
+	GetNonce(ctx sdk.Context, addr common.Address) uint64
+	EthereumTx(goCtx context.Context, msg *evmtypes.MsgEthereumTx) (*evmtypes.MsgEthereumTxResponse, error)
+}
+
+type FeeMarketKeeper interface {
+	GetBaseFee(ctx sdk.Context) *big.Int
+	GetParams(ctx sdk.Context) feemarkettypes.Params
+	SetParams(ctx sdk.Context, params feemarkettypes.Params)
 }

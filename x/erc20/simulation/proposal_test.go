@@ -18,7 +18,7 @@ func TestProposalContents(t *testing.T) {
 	accounts := getTestingAccounts(t, r, app, ctx, 10)
 
 	// execute ProposalContents function
-	weightedProposalContent := simulation.ProposalContents(app.Erc20Keeper, app.BankKeeper, *app.EvmKeeper, app.FeeMarketKeeper)
+	weightedProposalContent := simulation.ProposalContents(app.Erc20Keeper, app.AccountKeeper, app.BankKeeper, app.EvmKeeper, app.FeeMarketKeeper)
 	require.Len(t, weightedProposalContent, 3)
 
 	w0 := weightedProposalContent[0]
