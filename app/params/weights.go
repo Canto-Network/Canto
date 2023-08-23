@@ -6,9 +6,7 @@ const (
 	DefaultWeightToggleTokenConversionProposal int = 5
 	DefaultWeightLendingMarketProposal         int = 5
 	DefaultWeightTreasuryProposal              int = 5
-	DefaultWeightMsgConvertCoinNativeCoin      int = 20
-	DefaultWeightMsgConvertCoinNativeERC20     int = 20
 
-	DefaultWeightMsgConvertErc20NativeCoin  int = 20
-	DefaultWeightMsgConvertErc20NativeToken int = 20
+	DefaultWeightMsgConvertCoin  int = 20
+	DefaultWeightMsgConvertErc20 int = 20
 )

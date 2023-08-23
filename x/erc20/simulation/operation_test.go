@@ -43,10 +43,8 @@ func TestWeightedOperations(t *testing.T) {
 		opMsgRoute string
 		opMsgName  string
 	}{
-		{params.DefaultWeightMsgConvertCoinNativeCoin, types.ModuleName, types.TypeMsgConvertCoin},
-		{params.DefaultWeightMsgConvertCoinNativeERC20, types.ModuleName, types.TypeMsgConvertCoin},
-		{params.DefaultWeightMsgConvertErc20NativeCoin, types.ModuleName, types.TypeMsgConvertERC20},
-		{params.DefaultWeightMsgConvertErc20NativeToken, types.ModuleName, types.TypeMsgConvertERC20},
+		{params.DefaultWeightMsgConvertCoin, types.ModuleName, types.TypeMsgConvertCoin},
+		{params.DefaultWeightMsgConvertErc20, types.ModuleName, types.TypeMsgConvertERC20},
 	}
 
 	for i, w := range weightedOps {
