@@ -16,7 +16,7 @@ import (
 func NewDecodeStore(cdc codec.Codec) func(kvA, kvB kv.Pair) string {
 	return func(kvA, kvB kv.Pair) string {
 		switch {
-		case bytes.Equal(kvA.Key[:], types.PortKey):
+		case bytes.Equal(kvA.Key[:4], types.PortKey):
 			var paA, paB common.Address
 			paA = common.BytesToAddress(kvA.Value)
 			paB = common.BytesToAddress(kvB.Value)
