@@ -1,9 +1,10 @@
 package liquidstaking
 
 import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/Canto-Network/Canto/v7/x/liquidstaking/keeper"
 	"github.com/Canto-Network/Canto/v7/x/liquidstaking/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // InitGenesis initializes the capability module's state from a provided genesis
@@ -11,6 +12,10 @@ import (
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 	if err := genState.Validate(); err != nil {
 		panic(err)
+	}
+	stakingUnbondingTime := k.GetUnbondingTime(ctx)
+	if genState.Epoch.Duration != stakingUnbondingTime {
+		panic(types.ErrInvalidEpochDuration)
 	}
 	k.SetParams(ctx, genState.Params)
 	k.SetEpoch(ctx, genState.Epoch)
@@ -36,17 +41,15 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 
 // ExportGenesis returns the capability module's exported genesis.
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
-	genesis := types.DefaultGenesisState()
-	genesis.LiquidBondDenom = k.GetLiquidBondDenom(ctx)
-	genesis.Params = k.GetParams(ctx)
-	genesis.Epoch = k.GetEpoch(ctx)
-	genesis.LastChunkId = k.GetLastChunkId(ctx)
-	genesis.LastInsuranceId = k.GetLastInsuranceId(ctx)
-	genesis.Chunks = k.GetAllChunks(ctx)
-	genesis.Insurances = k.GetAllInsurances(ctx)
-	genesis.UnpairingForUnstakingChunkInfos = k.GetAllUnpairingForUnstakingChunkInfos(ctx)
-	genesis.WithdrawInsuranceRequests = k.GetAllWithdrawInsuranceRequests(ctx)
-	genesis.RedelegationInfos = k.GetAllRedelegationInfos(ctx)
-
-	return genesis
+	return types.NewGenesisState(
+		k.GetLiquidBondDenom(ctx),
+		k.GetParams(ctx),
+		k.GetEpoch(ctx),
+		k.GetLastChunkId(ctx),
+		k.GetLastInsuranceId(ctx),
+		k.GetAllChunks(ctx),
+		k.GetAllInsurances(ctx),
+		k.GetAllUnpairingForUnstakingChunkInfos(ctx),
+		k.GetAllWithdrawInsuranceRequests(ctx),
+		k.GetAllRedelegationInfos(ctx))
 }

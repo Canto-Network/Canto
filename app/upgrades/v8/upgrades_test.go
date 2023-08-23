@@ -4,9 +4,6 @@ import (
 	"testing"
 	"time"
 
-	chain "github.com/Canto-Network/Canto/v7/app"
-	v8 "github.com/Canto-Network/Canto/v7/app/upgrades/v8"
-	"github.com/Canto-Network/Canto/v7/x/liquidstaking/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -16,6 +13,10 @@ import (
 	"github.com/stretchr/testify/suite"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+
+	chain "github.com/Canto-Network/Canto/v7/app"
+	v8 "github.com/Canto-Network/Canto/v7/app/upgrades/v8"
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking/types"
 )
 
 type UpgradeTestSuite struct {
@@ -86,6 +87,19 @@ func (s *UpgradeTestSuite) TestUpgradeV8() {
 					params.DynamicFeeRate.MaxFeeRate, types.DefaultMaxFee)
 				s.Require().EqualValues(
 					params.MaximumDiscountRate, types.DefaultMaximumDiscountRate)
+
+				liquidBondDenom := s.app.LiquidStakingKeeper.GetLiquidBondDenom(s.ctx)
+				s.Require().EqualValues(
+					liquidBondDenom, types.DefaultLiquidBondDenom)
+
+				epoch := s.app.LiquidStakingKeeper.GetEpoch(s.ctx)
+				s.Require().EqualValues(
+					epoch, types.Epoch{
+						CurrentNumber: 0,
+						StartTime:     time.Time{},
+						Duration:      s.app.StakingKeeper.UnbondingTime(s.ctx),
+						StartHeight:   0,
+					})
 			},
 			true,
 		},

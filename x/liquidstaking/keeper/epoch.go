@@ -1,8 +1,11 @@
 package keeper
 
 import (
-	"github.com/Canto-Network/Canto/v7/x/liquidstaking/types"
+	"time"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking/types"
 )
 
 func (k Keeper) GetEpoch(ctx sdk.Context) types.Epoch {
@@ -30,4 +33,8 @@ func (k Keeper) IncrementEpoch(ctx sdk.Context) {
 func (k Keeper) IsEpochReached(ctx sdk.Context) bool {
 	epoch := k.GetEpoch(ctx)
 	return !ctx.BlockTime().Before(epoch.StartTime.Add(epoch.Duration))
+}
+
+func (k Keeper) GetUnbondingTime(ctx sdk.Context) time.Duration {
+	return k.stakingKeeper.UnbondingTime(ctx)
 }

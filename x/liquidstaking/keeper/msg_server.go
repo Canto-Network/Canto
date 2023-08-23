@@ -23,6 +23,7 @@ func (k Keeper) LiquidStake(goCtx context.Context, msg *types.MsgLiquidStake) (*
 	for _, chunk := range chunks {
 		chunkIds = append(chunkIds, strconv.FormatUint(chunk.Id, 10))
 	}
+	liquidBondDenom := k.GetLiquidBondDenom(ctx)
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
@@ -36,7 +37,7 @@ func (k Keeper) LiquidStake(goCtx context.Context, msg *types.MsgLiquidStake) (*
 			sdk.NewAttribute(types.AttributeKeyNewShares, totalNewShares.String()),
 			sdk.NewAttribute(
 				types.AttributeKeyLsTokenMintedAmount,
-				sdk.Coin{Denom: types.DefaultLiquidBondDenom, Amount: totalLsTokenMintAmount}.String(),
+				sdk.Coin{Denom: liquidBondDenom, Amount: totalLsTokenMintAmount}.String(),
 			),
 		),
 	})

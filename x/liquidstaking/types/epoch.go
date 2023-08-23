@@ -1,14 +1,13 @@
 package types
 
 import (
+	"fmt"
 	"time"
-
-	"github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
 func (e *Epoch) Validate() error {
-	if e.Duration != types.DefaultUnbondingTime {
-		return ErrInvalidEpochDuration
+	if e.Duration <= 0 {
+		return fmt.Errorf("duration must be positive: %d", e.Duration)
 	}
 	// Comment the following lines checking StartTime when enable advance epoch mode.
 	if !e.StartTime.Before(time.Now()) {

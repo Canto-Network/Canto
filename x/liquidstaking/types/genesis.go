@@ -8,6 +8,7 @@ import (
 
 // NewGenesisState creates a new GenesisState instance.
 func NewGenesisState(
+	liquidBondDenom string,
 	params Params,
 	epoch Epoch,
 	lastChunkId, lastInsuranceId uint64,
@@ -16,9 +17,9 @@ func NewGenesisState(
 	infos []UnpairingForUnstakingChunkInfo,
 	reqs []WithdrawInsuranceRequest,
 	reDelInfos []RedelegationInfo,
-) GenesisState {
-	return GenesisState{
-		LiquidBondDenom:                 DefaultLiquidBondDenom,
+) *GenesisState {
+	return &GenesisState{
+		LiquidBondDenom:                 liquidBondDenom,
 		Params:                          params,
 		Epoch:                           epoch,
 		LastChunkId:                     lastChunkId,
