@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Canto-Network/Canto/v7/app/params"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/simapp/helpers"
@@ -42,21 +43,21 @@ func WeightedOperations(
 	appParams.GetOrGenerate(
 		cdc, OpWeightMsgSwapOrder, &weightSwap, nil,
 		func(_ *rand.Rand) {
-			weightSwap = 50
+			weightSwap = params.DefaultWeightMsgSwapOrder
 		},
 	)
 
 	appParams.GetOrGenerate(
 		cdc, OpWeightMsgAddLiquidity, &weightAdd, nil,
 		func(_ *rand.Rand) {
-			weightAdd = 100
+			weightAdd = params.DefaultWeightMsgAddLiquidity
 		},
 	)
 
 	appParams.GetOrGenerate(
 		cdc, OpWeightMsgRemoveLiquidity, &weightRemove, nil,
 		func(_ *rand.Rand) {
-			weightRemove = 30
+			weightRemove = params.DefaultWeightMsgRemoveLiquidity
 		},
 	)
 
@@ -103,6 +104,11 @@ func SimulateMsgAddLiquidity(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 		maxToken = RandomSpendableToken(r, spendable)
 		if maxToken.Denom == standardDenom {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAddLiquidity, "tokenDenom should not be standardDenom"), nil, err
+		}
+
+		_, err = k.GetMaximumSwapAmount(ctx, maxToken.Denom)
+		if err != nil {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAddLiquidity, err.Error()), nil, nil
 		}
 
 		if strings.HasPrefix(maxToken.Denom, types.LptTokenPrefix) {
@@ -212,6 +218,11 @@ func SimulateMsgSwapOrder(k keeper.Keeper, ak types.AccountKeeper, bk types.Bank
 		// sold coin
 		inputCoin = RandomSpendableToken(r, spendable)
 
+		_, err = k.GetMaximumSwapAmount(ctx, inputCoin.Denom)
+		if err != nil {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgSwapOrder, err.Error()), nil, nil
+		}
+
 		if strings.HasPrefix(inputCoin.Denom, types.LptTokenPrefix) {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgSwapOrder, "inputCoin should not be liquidity token"), nil, err
 		}
@@ -240,6 +251,11 @@ func SimulateMsgSwapOrder(k keeper.Keeper, ak types.AccountKeeper, bk types.Bank
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgSwapOrder, "total supply is zero"), nil, err
 		}
 		outputCoin = RandomTotalToken(r, coins)
+		_, err = k.GetMaximumSwapAmount(ctx, inputCoin.Denom)
+		if err != nil {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgSwapOrder, err.Error()), nil, nil
+		}
+
 		if strings.HasPrefix(outputCoin.Denom, types.LptTokenPrefix) {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgSwapOrder, "outputCoin should not be liquidity token"), nil, err
 		}

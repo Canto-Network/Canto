@@ -9,4 +9,8 @@ const (
 
 	DefaultWeightMsgConvertCoin  int = 20
 	DefaultWeightMsgConvertErc20 int = 20
+
+	DefaultWeightMsgSwapOrder       int = 10
+	DefaultWeightMsgAddLiquidity    int = 20
+	DefaultWeightMsgRemoveLiquidity int = 10
 )
