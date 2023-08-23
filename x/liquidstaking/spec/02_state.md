@@ -24,7 +24,7 @@ the commission fee rate set by the validator designated by the insurance provide
 3. `Unpairing`: A paired chunk enters this status when paired insurance is started to be withdrawn or 
 it's balance <= 5.75%(double_sign_fraction + down_time_fraction) or the validator becomes invalid(e.g. tombstoned).
   * 5.75%(double_sign_fraction + down_time_fraction) is guaranteed when slashing param change is limited through antehandler. we already have this mechanism. 
-please check **[Param Change Ante Handlers](10_param_change_ante_handlers.md#param-change-ante-handlers).** for detail.
+please check **[Param Change Ante Handlers](10_ante_handlers.md#param-change-ante-handlers).** for detail.
 4. `UnpairingForUnstaking`: When a delegator (also known as a liquid staker) sends a `MsgLiquidUnstake`, it is queued as a `UnpairingForUnstakingChunkInfo`. 
 At the end of the epoch, the actual undelegation is triggered and the chunk enters this state. 
 Once the unbonding period is over in next epoch, the tokens corresponding chunk size are returned to the delegator's account and the associated chunk object is removed.

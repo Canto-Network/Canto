@@ -38,21 +38,21 @@ func NewParamChangeLimitDecorator(
 	}
 }
 
-func (s ParamChangeLimitDecorator) AnteHandle(
+func (pcld ParamChangeLimitDecorator) AnteHandle(
 	ctx sdk.Context,
 	tx sdk.Tx,
 	simulate bool,
 	next sdk.AnteHandler,
 ) (newCtx sdk.Context, err error) {
 	msgs := tx.GetMsgs()
-	if err = s.ValidateMsgs(ctx, msgs); err != nil {
+	if err = pcld.ValidateMsgs(ctx, msgs); err != nil {
 		return ctx, err
 	}
 
 	return next(ctx, tx, simulate)
 }
 
-func (s ParamChangeLimitDecorator) ValidateMsgs(ctx sdk.Context, msgs []sdk.Msg) error {
+func (pcld ParamChangeLimitDecorator) ValidateMsgs(ctx sdk.Context, msgs []sdk.Msg) error {
 	var slashingParams slashingtypes.Params
 	var validMsg func(m sdk.Msg, nestedCnt int) error
 	validMsg = func(m sdk.Msg, nestedCnt int) error {
@@ -63,7 +63,7 @@ func (s ParamChangeLimitDecorator) ValidateMsgs(ctx sdk.Context, msgs []sdk.Msg)
 		case *authz.MsgExec:
 			for _, v := range msg.Msgs {
 				var innerMsg sdk.Msg
-				if err := s.cdc.UnpackAny(v, &innerMsg); err != nil {
+				if err := pcld.cdc.UnpackAny(v, &innerMsg); err != nil {
 					return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "cannot unmarshal authz exec msgs")
 				}
 				nestedCnt++
@@ -78,7 +78,7 @@ func (s ParamChangeLimitDecorator) ValidateMsgs(ctx sdk.Context, msgs []sdk.Msg)
 				for _, c := range c.Changes {
 					switch c.GetSubspace() {
 					case slashingtypes.ModuleName:
-						slashingParams = s.slashingKeeper.GetParams(ctx)
+						slashingParams = pcld.slashingKeeper.GetParams(ctx)
 						switch c.GetKey() {
 						// SignedBlocksWindow, MinSignedPerWindow, DowntimeJailDuration are not allowed to be decreased.
 						// If we decrease these slashingParams, the slashing penalty can be increased.

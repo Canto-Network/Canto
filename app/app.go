@@ -806,18 +806,20 @@ func NewCanto(
 
 	maxGasWanted := cast.ToUint64(appOpts.Get(srvflags.EVMMaxTxGasWanted))
 	options := ante.HandlerOptions{
-		AccountKeeper:   app.AccountKeeper,
-		BankKeeper:      app.BankKeeper,
-		EvmKeeper:       app.EvmKeeper,
-		SlashingKeeper:  &app.SlashingKeeper,
-		FeegrantKeeper:  app.FeeGrantKeeper,
-		IBCKeeper:       app.IBCKeeper,
-		FeeMarketKeeper: app.FeeMarketKeeper,
-		SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
-		SigGasConsumer:  SigVerificationGasConsumer,
-		Cdc:             appCodec,
-		MaxTxGasWanted:  maxGasWanted,
-		Simulation:      simulation,
+		AccountKeeper:       app.AccountKeeper,
+		BankKeeper:          app.BankKeeper,
+		EvmKeeper:           app.EvmKeeper,
+		StakingKeeper:       &app.StakingKeeper,
+		SlashingKeeper:      &app.SlashingKeeper,
+		FeegrantKeeper:      app.FeeGrantKeeper,
+		IBCKeeper:           app.IBCKeeper,
+		FeeMarketKeeper:     app.FeeMarketKeeper,
+		LiquidStakingKeeper: &app.LiquidStakingKeeper,
+		SignModeHandler:     encodingConfig.TxConfig.SignModeHandler(),
+		SigGasConsumer:      SigVerificationGasConsumer,
+		Cdc:                 appCodec,
+		MaxTxGasWanted:      maxGasWanted,
+		Simulation:          simulation,
 	}
 
 	if err := options.Validate(); err != nil {

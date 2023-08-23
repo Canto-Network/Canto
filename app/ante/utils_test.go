@@ -2,8 +2,10 @@ package ante_test
 
 import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"math/big"
 	"testing"
 	"time"
@@ -80,6 +82,21 @@ func (suite *AnteTestSuite) SetupTest(isCheckTx bool) {
 	evmParams := suite.app.EvmKeeper.GetParams(suite.ctx)
 	evmParams.EvmDenom = suite.denom
 	suite.app.EvmKeeper.SetParams(suite.ctx, evmParams)
+
+	// Set validator
+	priv := ed25519.GenPrivKey()
+	valAddr := sdk.ValAddress(priv.PubKey().Address().Bytes())
+	validator, err := stakingtypes.NewValidator(valAddr, priv.PubKey(), stakingtypes.Description{})
+	suite.NoError(err)
+
+	validator, err = validator.SetInitialCommission(stakingtypes.NewCommission(
+		sdk.MustNewDecFromStr("0.05"), sdk.OneDec(), sdk.MustNewDecFromStr("0.2")),
+	)
+	if err != nil {
+		return
+	}
+	suite.app.StakingKeeper.SetValidator(suite.ctx, validator)
+	suite.NoError(suite.app.StakingKeeper.SetValidatorByConsAddr(suite.ctx, validator))
 }
 
 func TestAnteTestSuite(t *testing.T) {

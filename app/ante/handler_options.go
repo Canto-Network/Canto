@@ -1,6 +1,7 @@
 package ante
 
 import (
+	liquidstakingkeeper "github.com/Canto-Network/Canto/v7/x/liquidstaking/keeper"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -9,6 +10,7 @@ import (
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
+	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	ibcante "github.com/cosmos/ibc-go/v3/modules/core/ante"
 	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
 
@@ -22,18 +24,20 @@ import (
 // HandlerOptions defines the list of module keepers required to run the canto
 // AnteHandler decorators.
 type HandlerOptions struct {
-	AccountKeeper   evmtypes.AccountKeeper
-	BankKeeper      evmtypes.BankKeeper
-	IBCKeeper       *ibckeeper.Keeper
-	FeeMarketKeeper evmtypes.FeeMarketKeeper
-	SlashingKeeper  *slashingkeeper.Keeper
-	EvmKeeper       ethante.EVMKeeper
-	FeegrantKeeper  ante.FeegrantKeeper
-	SignModeHandler authsigning.SignModeHandler
-	SigGasConsumer  func(meter sdk.GasMeter, sig signing.SignatureV2, params authtypes.Params) error
-	Cdc             codec.BinaryCodec
-	MaxTxGasWanted  uint64
-	Simulation      bool
+	AccountKeeper       evmtypes.AccountKeeper
+	BankKeeper          evmtypes.BankKeeper
+	IBCKeeper           *ibckeeper.Keeper
+	FeeMarketKeeper     evmtypes.FeeMarketKeeper
+	StakingKeeper       *stakingkeeper.Keeper
+	SlashingKeeper      *slashingkeeper.Keeper
+	EvmKeeper           ethante.EVMKeeper
+	FeegrantKeeper      ante.FeegrantKeeper
+	LiquidStakingKeeper *liquidstakingkeeper.Keeper
+	SignModeHandler     authsigning.SignModeHandler
+	SigGasConsumer      func(meter sdk.GasMeter, sig signing.SignatureV2, params authtypes.Params) error
+	Cdc                 codec.BinaryCodec
+	MaxTxGasWanted      uint64
+	Simulation          bool
 }
 
 // Validate checks if the keepers are defined
@@ -92,6 +96,7 @@ func newCosmosAnteHandler(options HandlerOptions) sdk.AnteHandler {
 		ante.NewTxTimeoutHeightDecorator(),
 		ante.NewValidateMemoDecorator(options.AccountKeeper),
 		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
+		NewValCommissionChangeLimitDecorator(options.LiquidStakingKeeper, options.StakingKeeper, options.Cdc),
 		NewParamChangeLimitDecorator(options.SlashingKeeper, options.Cdc),
 		ante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper),
 		NewValidatorCommissionDecorator(options.Cdc),
@@ -122,6 +127,7 @@ func newCosmosSimulationAnteHandler(options HandlerOptions) sdk.AnteHandler {
 		ante.NewTxTimeoutHeightDecorator(),
 		ante.NewValidateMemoDecorator(options.AccountKeeper),
 		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
+		//NewValCommissionChangeLimitDecorator(options.LiquidStakingKeeper, options.StakingKeeper, options.Cdc),
 		// NewParamChangeLimitDecorator(options.SlashingKeeper, options.Cdc),
 		ante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper),
 		// NewValidatorCommissionDecorator(options.Cdc),
@@ -150,6 +156,7 @@ func newCosmosAnteHandlerEip712(options HandlerOptions) sdk.AnteHandler {
 		ante.NewTxTimeoutHeightDecorator(),
 		ante.NewValidateMemoDecorator(options.AccountKeeper),
 		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
+		NewValCommissionChangeLimitDecorator(options.LiquidStakingKeeper, options.StakingKeeper, options.Cdc),
 		NewParamChangeLimitDecorator(options.SlashingKeeper, options.Cdc),
 		ante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper),
 		NewValidatorCommissionDecorator(options.Cdc),

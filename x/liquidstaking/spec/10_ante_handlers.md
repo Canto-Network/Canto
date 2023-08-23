@@ -30,3 +30,15 @@ If not, the paired chunk start to be unbonded. 5.75% is calculated based on the 
 
 ### Staking module
 * UnbondingTime or BondDenom are not allowed to change.
+
+# Validation Commission Change Ante Handler
+
+The liquidstaking module has fee rate competition mechanism, so validator have incentive to lower their commission rate to get delegations from liquid staking module.
+At every epoch, the liquidstaking module will check the validator commission rate + insurance fee rate and sorts by ascending order(insurance with lower fee rate comes first).
+
+But validator can edit its commission rate at any time by using MsgEditValidator which can make the fee rate competition mechanism meaningless.
+To avoid this, we need to impose restrictions on validator commission changes.
+
+## ValCommissionChangeLimitDecorator
+It only accepts MsgEditValidator when current block time is within 23 hours and 50 minutes of the next epoch. 
+staking module have 24 hours limit for continuous MsgEditValidator, so validator can change only one time in that period.

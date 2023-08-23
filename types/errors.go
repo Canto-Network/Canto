@@ -17,6 +17,7 @@ const (
 	codeInvalidSlashFractionDowntime
 	codeChangingUnbondingPeriodForbidden
 	codeChangingBondDenomForbidden
+	codeChangingValCommissionForbidden
 )
 
 // errors
@@ -29,4 +30,5 @@ var (
 	ErrInvalidSlashFractionDowntime     = sdkerrors.Register(RootCodespace, codeInvalidSlashFractionDowntime, "cannot increase slash fraction downtime")
 	ErrChangingUnbondingPeriodForbidden = sdkerrors.Register(RootCodespace, codeChangingUnbondingPeriodForbidden, "changing unbonding period not allowed")
 	ErrChangingBondDenomForbidden       = sdkerrors.Register(RootCodespace, codeChangingBondDenomForbidden, "changing bond denom not allowed")
+	ErrChangingValCommissionForbidden   = sdkerrors.Register(RootCodespace, codeChangingValCommissionForbidden, "commission rate change is only allowed within 23 hours and 50 minutes of the epoch")
 )
