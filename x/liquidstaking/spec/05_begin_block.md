@@ -6,10 +6,10 @@ The begin block logic is executed at the end of each epoch.
 
 ## Cover Redelegation Penalty
 
-- For all redelegation infos
+- for all redelegation infos
   - get a redelegation entry of staking module 
-  - calc diff between entry.SharesDst and dstDel.Shares
-  - if calc is positive (meaning there is a penalty during the redelegation period)
-    - calc penalty amt which is the token value of shares lost due to slashing 
-    - send penalty amt of tokens to chunk 
-    - chunk delegate additional shares corresponding penalty amt
+  - calculate difference between `entry.SharesDst` and `dstDel.Shares`
+  - if calculated value is positive (meaning there is a penalty during the redelegation period)
+    - calculate penalty amount which is the token value of shares lost due to slashing 
+    - send penalty amount of tokens to chunk 
+    - chunk delegates additional shares corresponding penalty amount of tokens to validator

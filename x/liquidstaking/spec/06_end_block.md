@@ -6,140 +6,142 @@ The end block logic is executed at the end of each epoch.
 
 ## Distribute Reward
 
-- For all paired chunks
-  - withdraw delegation reward
-    - chunk balance increased
-  - distribute reward
+- for all paired chunks
+  - withdraw delegation rewards
+    - chunk balance increases
+  - distribute rewards
     - send insurance commission from chunk
       - insurance commission: `(balance of chunk) x insurance.FeeRate`
-    - burn fee calculated by `fee rate x (balance of chunk - insurance commission)` (Please check the `CalcDynamicFeeRate` in `dynamic_fee_rate.go` for detail.)
-    - send rest of chunk balance to reward pool
+    - burn fees calculated by `fee rate x (balance of chunk - insurance commission`) (For more details, please check the `CalcDynamicFeeRate` in `dynamic_fee_rate.go` )
+    - send rest of the chunk balance to the reward pool
 
 ## Cover slashing and handle mature unbondings
 
 ### For all unpairing for unstake chunks
 
-- calc penalty
+- calculate the penalty
   - penalty: `(chunk size tokens) - (balance of chunk)`
-- if penalty > 0
-  - if unpairing insurance can cover
-    - unpairing insurance send penalty to chunk
-  - if unpairing insurance cannot cover
-    - unpairing insurance send penalty to reward pool
-    - refund lstokens corresponding penalty from ls token escrow acc
+- if the penalty value is positive
+  - if the unpairing insurance can cover the penalty
+    - the unpairing insurance sends penalty to the chunk
+  - if the unpairing insurance cannot cover the penalty
+    - then unpairing insurance sends the penalty to the reward pool
+    - refund lsTokens equivalent to the penalty amount from the lsToken escrow account
       - refund amount: `(penalty / (chunk size tokens)) x (ls tokens to burn)`
-- complete unpairing insurance's duty because it already covered penalty
-- burn all escrowed LS tokens, except for those that have been refunded (if any)
-- send all of chunk's balances to un-delegator
-- delete tracking obj(=`UnpairingForUnstakingChunkInfo`) and chunk
+- complete the unpairing insurance's duty (the penalty is already covered)
+- burn all remaining escrowed lsTokens
+- send all of chunk's balances to the unstaker
+- delete the tracking object (`UnpairingForUnstakingChunkInfo`) and the chunk
 
 ### For all unpairing chunks
 
-- calc penalty
+- calculate the penalty
   - penalty: `(chunk size tokens) - (balance of chunk)`
-- if penalty > 0 
-  - if unpairing insurance can cover
-    - unpairing insurance send penalty to chunk
-  - if unpairing insurance cannot cover
-    - unpairing insurance send penalty to reward pool
-- complete insurance duty because unpairing insurance already covered penalty
-- if chunk got damaged (unpairing insurance could not cover fully)
-  - send all chunk balances to reward pool because chunk is not valid anymore.
-  - delete chunk
-  - if unpairing insurance's fee pool is empty, then delete unpairing insurance
-- else(= chunk is fine)
-  - chunk becomes `Pairing`
+- if the penalty value is positive
+  - if the unpairing insurance can cover the penalty
+    - the unpairing insurance sends the penalty to the chunk
+  - if the unpairing insurance cannot cover the penalty
+    - the unpairing insurance sends its remaining balance to the reward pool
+- complete the insurance's duty (the penalty is already covered)
+- if the chunk is damaged (the unpairing insurance could not fully cover the penalty)
+  - send all chunk balances to the reward pool (damaaged chunk is not valid anymore)
+  - delete the chunk
+  - if the unpairing insurance's fee pool is empty, delete the unpairing insurance
+- if the chunk is still valid
+  - set the chunk's status to `Pairing`
 
 ### For all paired chunks
 
-- calc penalty
+- calculate the penalty
   - penalty: `(chunk size tokens) - (token values of chunk del shares)`
-- if penalty > 0
-  - if chunk is re-paired at previous epoch
-    - if there was double sign slashing because of evidence created before previous epoch
-      - unpairing insurance send penalty to chunk
-      - chunk delegate additional tokens
-      - deduct covered amt from penalty
-  - if penalty > balance of paired insurance (cannot fully cover it)
-    - un-pair and un-delegate chunk (`Paired → Unpairing`)
-    - paired insurance becomes `Unpairing`
-  - if penalty ≤ balance of paired insurance (can cover it)
-    - send penalty to chunk
-    - chunk delegate additional shares corresponding penalty
-- if paired insurance balance < 5.75% after cover penalty and if undelegate not started
-  - un-pair and undelegate chunk (`Paired → Unpairing`)
-  - paired insurance becomes `Unpairing`
-- if validator is not valid
-  - un-pair chunk and insurance (both chunk and insurance `Paired → Unpairing`)
-- if there was an unpairing insurance came from previous epoch and it is already finished its duty
-  - empty unpairing insurance from chunk
-  - if the insurance is still valid (balance and validator are all fine), then it becomes `Pairing`
-  - if not, then it becomes `Unpaired`
+- if the penalty value is positive
+  - if the chunk is re-paired at the previous epoch
+    - if a double sign slashing evidence, created before the previous epoch, is found
+      - the unpairing insurance sends the penalty to the chunk
+      - the chunk delegates additional tokens
+      - deduct covered amount from penalty
+  - if penalty value is bigger than the balance of paired insurance (cannot fully cover the penalty)
+    - un-pair and un-delegate chunk (`Paired` → `Unpairing`)
+    - set the paired insurance's status to `Unpairing`
+  - if the penalty is less than or equal to the balance of the paired insurance (able to cover the penalty).
+    - send the penalty from the insurance to the chunk
+    - the chunk delegates additional shares corresponding to the covered penalty
+- if the paired insurance balance is less than 5.75% of the chunk size after covering the penalty and if undelegate is not started
+  - un-pair and undelegate the chunk (`Paired` → `Unpairing`)
+  - set the paired insurance's status to `Unpairing`
+- if the validator is not valid
+  - un-pair the chunk and the insurance (`Paired` → `Unpairing` for both the chunk and the insurance)
+- if the chunk has both `chunk.PairedInsuranceId` and `chunk.UnpairingInsuranceId` value (re-paring occured in the previous epoch)
+  - set the `chunk.PairedInsuranceId` to 0
+  - if the insurance is still valid, set the insurance status to `Pairing`
+  - otherwise, set the insurance's status to `Unpaired`
 
 ## Remove Deletable Redelegation Infos
 
-- For all re-delegation infos
-  - if it is matured, then delete it.
+- For all `RedelegationInfo`s
+  - if it is matured, delete the object.
 
 ## Handle Queued Liquid Unstakes
 
-- For all UnpairingForUnstakingChunkInfos (= info)
-  - got chunk from info.chunkId
-  - if the chunk is not `Paired`, then do nothing and return. 
-  - un-pair and un-delegate chunk 
-    - paired insurance becomes `Unpairing`
-    - chunk becomes `UnpairingForUnstaking`
+- For all `UnpairingForUnstakingChunkInfos`
+  - retrieve a chunk from  `info.chunkId`
+  - un-pair and un-delegate chunk if the chunk status is `Paired`
+    - set the paired insurance's status to `Unpairing`
+    - set the chunk's status to `UnpairingForUnstaking`
 
 ## Handle Unprocessed Queued Liquid Unstakes
 
-- For all UnpairingForUnstakingChunkInfos (= info)
-  - got chunk from info.chunkId
-  - if the chunk is not `UnpairingForUnstaking`, then delete info and refund info.EscrowedLsTokens to info.DelegatorAddress
+- For all `UnpairingForUnstakingChunkInfos` (= `info`)
+  - retrieve a chunk from `info.chunkId`
+  - if the chunk is not `UnpairingForUnstaking`
+    - delete `info` and refund `info.EscrowedLsTokens` to `info.DelegatorAddress`
 
 ## Handle Queued Withdraw Insurance Requests
 
-- For all WithdrawInsuranceRequests (= req)
-  - got insurance from req.InsuranceId
-  - insurance must be `Paired` or `Unpairing`
-  - got chunk from insurance.ChunkId
-  - if the chunk is `Paired`, unpair it 
-    - chunk becomes `Unpairing`
-    - empty paired insurance id from chunk
-    - chunk.UnpairingInsuranceId = insurance.Id
-  - insurance becomes `UnpairingForWithdrawal`
-  - delete request
+- For all `WithdrawInsuranceRequests` (= `req`)
+  - retrieve an insurance from `req.InsuranceId`
+  - retrieve a chunk from `insurance.ChunkId`
+  - if the chunk is `Paired`
+    - set the chunk's status to `Unpairing`
+    - set the paired insurance id from chunk to 0
+    - set `chunk.UnpairingInsuranceId` to `insurance.Id`
+  - set the insurance's status to `UnpairingForWithdrawal`
+  - delete the `req` object
 
 ## Rank Insurances
 
 - get all **re-pairable chunks**, **out insurances**, and **pairedInsuranceMap**
-  - condition of re-pairable chunk (re-pairable means can be paired with new insurance)
-    - must be one of `Pairing`, `Paired`, or `Unpairing (without unbonding obj)`
-  - out insurances are
-    - paired with `Unpairing` chunk which have no unbonding obj
+  - re-pairable chunks (re-pairable means can be paired with new insurance):
+    - chunks that have one of following status
+      - `Pairing` 
+      - `Paired`
+      - `Unpairing` (without unbonding obj)
+  - out insurances:
+    - insurances that paired with `Unpairing` chunk which have no unbonding object
       - The most common case for this is withdrawing an insurance.
-    - paired with `Paired` chunk but have invalid validator. 
+    - insurances that paired with `Paired` chunk but have invalid validator. 
 - create candidate insurances
-  - candidate insurance must be in `Pairing` or `Paired` statuses
+  - candidate insurance must be in `Pairing` or `Paired` status
   - candidate insurance must have valid validator 
-- sort candidate insurances in ascending order, with the cheapest insurance listed first
-- create rank in insurances and rank out insurances
-  - if re-pairable chunks are more than candidate insurances, then all candidates can be rank in.
-    - rank in insurances: `candidates`
-    - rank out insurances: `out insurances`
-  - rank in insurances: `candidates[:len(rePairableChunks)]`
-  - rank out insurances: paired insurances in `candidates[len(rePairableChunks):]`
-- append out insurances to rank out insurances
-- create **newly ranked in insurances**
-  - for insurances in **rank in insurances** which not exists in **pairedInsuranceMap**
-- return **newly ranked in insurances** and **rank out insurances**
+- sort candidate insurances in ascending order, placing the insurance with the lowest fee at the top
+- select rank-in insurances and rank-out insurances
+  - if re-pairable chunks are more than candidate insurances, all candidate insurances can be ranked in.
+    - rank-in insurances: `candidates`
+    - rank-out insurances: `out insurances`
+  - rank-in insurances: `candidates[:len(rePairableChunks)]`
+  - rank-out insurances: paired insurances in `candidates[len(rePairableChunks):]`
+- append **out insurances** to rank-out insurance list
+- create **newly ranked-in insurances**
+  - for insurances in **rank-in insurances** which not exists in **pairedInsuranceMap**
+- return **newly ranked-in insurances** and **rank-out insurances**
 
 ## RePair Ranked Insurances
 
-- create rank out insurance chunk map
+- create rank-out insurance chunk map
   - key: insurance id which in **ranked out insurances**
   - value: `Chunk`
-- for insurance in **newly ranked in insurances**
-  - if there is a rank out insurance which have same validator
+- for every insurances in **newly ranked in insurances**
+  - if there is a rank-out insurance which has the same validator
     - replace insurance id of chunk with new one because it directs same validator, we don’t have to re-delegate it
       - Rank out insurance becomes `Unpairing` insurance of chunk (`Paired → Unpairing`)
         - if rank out insurance is withdrawing insurance, just keep it as it is 

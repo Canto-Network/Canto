@@ -6,7 +6,8 @@
 
 ### MsgLiquidStake
 
-Liquid stake with an amount of native tokens. A liquid staker is expected to receive ls tokens at the current mint rate.
+Depositing native tokens that are multiples of the chunk size for liquid staking. 
+The liquid staker is anticipated to receive lsTokens at the prevailing mint rate.
 
 ```go
 type MsgLiquidStake struct {
@@ -15,18 +16,18 @@ type MsgLiquidStake struct {
 }
 ```
 
-**msg is failed if:**
+Message **fails** if:
 
 - `msg.Amount` is not a bond denom
 - `msg.Amount` is not multiple of ChunkSize tokens
-- If there are no empty slot or pairing insurance
-- If chunks to liquid stake is bigger than empty slot or pairing insurance
-- The balance of msg sender(=Delegator) does not have enough amount of coins for `msg.Amount`
+- no empty slot or pairing insurance available
+- number of chunks to liquid stake is bigger than empty slot or pairing insurance
+- balance of msg sender(=delegator) does not have enough amount of native coins for `msg.Amount`
 
 ### MsgLiquidUnstake
 
-Liquid unstake with an amount of native tokens which is expected to be sent to unstaker when unstaking is done. 
-The liquid unstake request will be queued until the upcoming Epoch and will initiate the unstaking process.
+Submitting an amount of native tokens (multiples of the chunk size) that is projected to be transferred to the unstaker upon the completion of the unstaking process. 
+The liquid unstake request will be held in a queue until the next epoch, at which point it will initiate the unstaking procedure.
 
 ```go
 type MsgLiquidUnstake struct {
@@ -35,23 +36,22 @@ type MsgLiquidUnstake struct {
 }
 ```
 
-**msg is failed if:**
+Message fails if:
 
 - `msg.Amount` is not a bond denom
 - `msg.Amount` is not multiple of ChunkSize tokens
-- If there are no paired chunks
-- If chunks to liquid unstake is bigger than paired chunks
-- The balance of msg sender(=Delegator) does not have enough amount of ls tokens corresponding value of `msg.Amount`
+- no paired chunks available
+- number of chunks to liquid unstake is bigger than the number of paired chunks
+- balance of msg sender(=delegator) does not have enough amount of lsTokens corresponding value of `msg.Amount`
 
 ## Insurance
 
 ### MsgProvideInsurance
 
 Provide insurance to cover slashing penalties for chunks and to receive commission. 
-* 9% of chunk size tokens is recommended for the `msg.Amount`.
-* 7% is minimum collateral for the chunk size tokens. If the collateral is less than 5.75% of chunk size tokens, 
-then the insurance will be unpaired and the provider will not receive commission.
-* The fee rate + Validator(msg.ValidatorAddress)'s fee rate must be less than 50%.
+* **recommended** to use 9% of the chunk size tokens for the `msg.Amount`.
+* **minimum** collateral is 7% of a chunk size.
+* Sum of insurance fee rate and corresponding validator's commission rate must be less than 50%.
 
 ```go
 type MsgProvideInsurance struct {
@@ -62,17 +62,16 @@ type MsgProvideInsurance struct {
 }
 ```
 
-**msg is failed if:**
+Message fails if:
 
 - `msg.Amount` is not a bond denom
-- `msg.Amount` must be bigger than minimum collateral (7% of chunk size tokens)
-- `msg.ValidatorAddress` is not valid validator
+- `msg.Amount` is less than the minimum collateral (7% of chunk size)
+- `msg.ValidatorAddress` is not valid validator (e.g., unbonded or tombstoned)
 - `msg.FeeRate` + `Validator(msg.ValidatorAddress).Commission.Rate` >= 0.5 (50%)
 
 ### MsgCancelProvideInsurance
 
-Cancel insurance provision. Only pairing insurance can be canceled.
-
+This message is a request to cancel an insurance provision. It's only possible to cancel pairing insurances.
 ```go
 type MsgCancelInsuranceProvide struct {
 	ProviderAddress string
@@ -80,15 +79,14 @@ type MsgCancelInsuranceProvide struct {
 }
 ```
 
-**msg is failed if:**
+Message fails if:
 
-- There are no pairing insurance with given `msg.Id`
-- Provider of Insurance with given id is different with `msg.ProviderAddress`
+- no pairing insurance with given `msg.Id` exists
+- insurance provider with the provided ID is not the same as `msg.ProviderAddress`.
 
 ### MsgWithdrawInsurance
 
-Create a pending request for withdrawal or immediately withdraw all its commissions and collaterals when it is unpaired insurance. 
-If it is not unpaired, then withdrawal will be triggered during the upcoming Epoch.
+This message is a request to withdraw the collaterals and commissions that have been accumulated. If the insurance status is `Unpaired`, the withdrawal will happen right away. For other statuses, the withdrawal will be initiated in the next epoch.
 
 ```go
 type MsgWithdrawInsurance struct {
@@ -97,15 +95,16 @@ type MsgWithdrawInsurance struct {
 }
 ```
 
-**msg is failed if:**
+Message fails if:
 
-- Provider of Insurance with given id is different with `msg.ProviderAddress`
-- There are no paired or unpaired insurance with given `msg.Id`
+- no `Paired` or `Unpaired` insurance with the given `msg.Id`
+- insurance provider with the provided ID is not the same as `msg.ProviderAddress`.
+
+
 
 ### MsgWithdrawInsuranceCommission
 
-Provider can withdraw accumulated commission from the insurance fee pool at any time. 
-Providers can also withdraw their commission by using `MsgWithdrawInsurance` for unpaired insurance.
+This message is a request to withdraw the accumulated commission from the insurance fee pool. The message is processed as soon as the request is received.
 
 ```go
 type MsgWithdrawInsuranceCommission struct {
@@ -114,45 +113,49 @@ type MsgWithdrawInsuranceCommission struct {
 }
 ```
 
-**msg is failed if:**
+Message fails if:
 
-- There are no insurance with given `msg.Id`
-- Provider of Insurance with given id is different with `msg.ProviderAddress`
+- no insurance with the given `msg.Id`
+- insurance provider with the provided ID is not the same as `msg.ProviderAddress`.
 
 ### MsgDepositInsurance
 
-Provider can deposit native tokens into insurance at any time. 
-Providers who are concerned that the insurance may not be sufficient, causing it to become unpaired and unable to earn commissions, can use this message.
+Depositing more native tokens as collaterals into a existing insurance. The message is processed as soon as the request is received.
+This message can be employed when the insurance's balance is not sufficient, leading to an unpaired status and blocking commission earnings. 
+It serves to avert such circumstances, maintaining the insurance status as either `Paired` or `Pairing`.
 
 ```go
 type MsgDepositInsurance struct {
-	ProviderAddress string
-	Id uint64 
-	Amount sdk.Coin
+    ProviderAddress string
+    Id              uint64
+    Amount          sdk.Coin
 }
 ```
 
-**msg is failed if:**
+Message fails if:
 
-- There are no insurance with given `msg.Id`
-- Provider of Insurance with given id is different with `msg.ProviderAddress`
+- no insurance with the given `msg.Id`
+- insurance provider with the provided ID is not the same as `msg.ProviderAddress`.
 - `msg.Amount` is not bond denom
 
 ### MsgClaimDiscountedReward
 
-Requester can withdraw accumulated reward from the reward pool at any time with discounted price.
-How much to get rewards is calculated by `msg.Amount` and discounted mint rate. (maximum discount rate is 3%)
-
+This message requests the exchange of lsTokens for native tokens from the reward pool at a reduced rate.
+The exchange rate is calcuated by current `MintRate` * `DiscountRate` where `discount rate = reward module account's balance / NetAmount`.
 ```go
 type MsgClaimDiscountedReward struct {
-	RequesterAddress string
-	Amount sdk.Coin
-	MinimumDiscountRate sdk.Dec
+    RequesterAddress    string
+    Amount              sdk.Coin
+    MinimumDiscountRate sdk.Dec
 }
 ```
 
-**msg is failed if:**
+Message fails if:
 
 - `msg.Amount` is not a liquid bond denom
 - current discount rate is lower than `msg.MinimumDiscountRate` 
-- if `msg.RequesterAddress` doesn't have enough amount of ls tokens corresponding value of `msg.Amount`
+- `msg.RequesterAddress` doesn't have enough amount of lsTokens corresponding to the value of `msg.Amount`.
+
+
+
+
