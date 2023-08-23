@@ -14,7 +14,7 @@ var _ types.MsgServer = &Keeper{}
 func (k Keeper) LiquidStake(goCtx context.Context, msg *types.MsgLiquidStake) (*types.MsgLiquidStakeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	chunks, newShares, lsTokenMintAmount, err := k.DoLiquidStake(ctx, msg)
+	chunks, totalNewShares, totalLsTokenMintAmount, err := k.DoLiquidStake(ctx, msg)
 	if err != nil {
 		return nil, err
 	}
@@ -33,10 +33,10 @@ func (k Keeper) LiquidStake(goCtx context.Context, msg *types.MsgLiquidStake) (*
 			sdk.NewAttribute(types.AttributeKeyChunkIds, strings.Join(chunkIds, ", ")),
 			sdk.NewAttribute(types.AttributeKeyDelegator, msg.DelegatorAddress),
 			sdk.NewAttribute(sdk.AttributeKeyAmount, msg.Amount.String()),
-			sdk.NewAttribute(types.AttributeKeyNewShares, newShares.String()),
+			sdk.NewAttribute(types.AttributeKeyNewShares, totalNewShares.String()),
 			sdk.NewAttribute(
 				types.AttributeKeyLsTokenMintedAmount,
-				sdk.Coin{Denom: types.DefaultLiquidBondDenom, Amount: lsTokenMintAmount}.String(),
+				sdk.Coin{Denom: types.DefaultLiquidBondDenom, Amount: totalLsTokenMintAmount}.String(),
 			),
 		),
 	})

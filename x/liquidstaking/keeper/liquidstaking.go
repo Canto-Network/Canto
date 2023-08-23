@@ -575,9 +575,8 @@ func (k Keeper) RePairRankedInsurances(
 	}
 }
 
-// TODO: Test with very large number of chunks
 func (k Keeper) DoLiquidStake(ctx sdk.Context, msg *types.MsgLiquidStake) (
-	chunks []types.Chunk, newShares sdk.Dec, lsTokenMintAmount sdk.Int, err error,
+	chunks []types.Chunk, totalNewShares sdk.Dec, totalLsTokenMintAmount sdk.Int, err error,
 ) {
 	delAddr := msg.GetDelegator()
 	amount := msg.Amount
@@ -612,12 +611,12 @@ func (k Keeper) DoLiquidStake(ctx sdk.Context, msg *types.MsgLiquidStake) (
 	}
 
 	types.SortInsurances(validatorMap, pairingInsurances, false)
-	totalNewShares := sdk.ZeroDec()
-	totalLsTokenMintAmount := sdk.ZeroInt()
+	totalNewShares, newShares := sdk.ZeroDec(), sdk.ZeroDec()
+	totalLsTokenMintAmount, lsTokenMintAmount := sdk.ZeroInt(), sdk.ZeroInt()
 	liquidBondDenom := k.GetLiquidBondDenom(ctx)
 	chunkSizeCoins := sdk.NewCoins(sdk.NewCoin(amount.Denom, types.ChunkSize))
 	for {
-		if chunksToCreate.IsZero() {
+		if !chunksToCreate.IsPositive() {
 			break
 		}
 		cheapestIns := pairingInsurances[0]
@@ -685,7 +684,7 @@ func (k Keeper) QueueLiquidUnstake(ctx sdk.Context, msg *types.MsgLiquidUnstake)
 		return
 	}
 
-	chunksToLiquidUnstake := amount.Amount.Quo(types.ChunkSize).Int64()
+	chunksToLiquidUnstake := amount.Amount.Quo(types.ChunkSize)
 
 	nase, pairedChunksWithInsuranceId, pairedInsurances, validatorMap := k.GetNetAmountStateEssentials(ctx)
 
@@ -702,12 +701,12 @@ func (k Keeper) QueueLiquidUnstake(ctx sdk.Context, msg *types.MsgLiquidUnstake)
 		purelyPairedInsurances = append(purelyPairedInsurances, pairedIns)
 	}
 
-	pairedChunks := int64(len(pairedChunksWithInsuranceId))
-	if pairedChunks == 0 {
+	pairedChunks := sdk.NewIntFromUint64(uint64(len(pairedChunksWithInsuranceId)))
+	if pairedChunks.IsZero() {
 		err = types.ErrNoPairedChunk
 		return
 	}
-	if chunksToLiquidUnstake > pairedChunks {
+	if chunksToLiquidUnstake.GT(pairedChunks) {
 		err = sdkerrors.Wrapf(
 			types.ErrExceedAvailableChunks,
 			"requested chunks to liquid unstake: %d, paired chunks: %d",
@@ -722,7 +721,10 @@ func (k Keeper) QueueLiquidUnstake(ctx sdk.Context, msg *types.MsgLiquidUnstake)
 	// How much ls tokens must be burned
 
 	liquidBondDenom := k.GetLiquidBondDenom(ctx)
-	for i := int64(0); i < chunksToLiquidUnstake; i++ {
+	for {
+		if !chunksToLiquidUnstake.IsPositive() {
+			break
+		}
 		// Escrow ls tokens from the delegator
 		lsTokenBurnAmount := types.ChunkSize
 		if nase.LsTokensTotalSupply.IsPositive() {
@@ -735,7 +737,8 @@ func (k Keeper) QueueLiquidUnstake(ctx sdk.Context, msg *types.MsgLiquidUnstake)
 			return
 		}
 
-		mostExpensiveInsurance := purelyPairedInsurances[i]
+		mostExpensiveInsurance := purelyPairedInsurances[0]
+		purelyPairedInsurances = purelyPairedInsurances[1:]
 		chunkToBeUndelegated := pairedChunksWithInsuranceId[mostExpensiveInsurance.Id]
 		_, found := k.GetUnpairingForUnstakingChunkInfo(ctx, chunkToBeUndelegated.Id)
 		if found {
@@ -756,6 +759,7 @@ func (k Keeper) QueueLiquidUnstake(ctx sdk.Context, msg *types.MsgLiquidUnstake)
 		toBeUnstakedChunks = append(toBeUnstakedChunks, pairedChunksWithInsuranceId[mostExpensiveInsurance.Id])
 		infos = append(infos, info)
 		k.SetUnpairingForUnstakingChunkInfo(ctx, info)
+		chunksToLiquidUnstake = chunksToLiquidUnstake.Sub(sdk.OneInt())
 	}
 	return
 }
@@ -928,9 +932,16 @@ func (k Keeper) DoClaimDiscountedReward(ctx sdk.Context, msg *types.MsgClaimDisc
 	var claimableCoin sdk.Coin
 	var burnAmt sdk.Coin
 
-	claimableCoin = k.bankKeeper.GetBalance(ctx, types.RewardPool, k.stakingKeeper.BondDenom(ctx))
+	rewardPoolCoins := k.bankKeeper.SpendableCoins(ctx, types.RewardPool)
+	bondDenom := k.stakingKeeper.BondDenom(ctx)
+	claimableCoin = sdk.NewCoin(bondDenom, rewardPoolCoins.AmountOf(bondDenom))
 	burnAmt = msg.Amount
 
+	// sanity check to avoid division by zero
+	if discountedMintRate.IsZero() {
+		err = sdkerrors.Wrapf(types.ErrInvalidAmount, "discounted mint rate must be greater than zero")
+		return
+	}
 	// claim amount = (ls token amount / discounted mint rate)
 	claimAmt := burnAmt.Amount.ToDec().QuoTruncate(discountedMintRate).TruncateInt()
 	// Requester can claim only up to claimable amount

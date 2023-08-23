@@ -23,7 +23,7 @@ func (nase NetAmountStateEssentials) CalcMintRate() sdk.Dec {
 // CalcDiscountRate calculates the current discount rate.
 // reward module account's balance / (num paired chunks * chunk size)
 func (nase NetAmountStateEssentials) CalcDiscountRate(maximumDiscountRate sdk.Dec) sdk.Dec {
-	if nase.RewardModuleAccBalance.IsZero() || maximumDiscountRate.IsZero() {
+	if nase.RewardModuleAccBalance.IsZero() || maximumDiscountRate.IsZero() || !nase.NetAmount.IsPositive() {
 		return sdk.ZeroDec()
 	}
 	discountRate := nase.RewardModuleAccBalance.ToDec().QuoTruncate(nase.NetAmount)
