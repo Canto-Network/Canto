@@ -149,6 +149,7 @@ import (
 	v5 "github.com/Canto-Network/Canto/v7/app/upgrades/v5"
 	v6 "github.com/Canto-Network/Canto/v7/app/upgrades/v6"
 	v7 "github.com/Canto-Network/Canto/v7/app/upgrades/v7"
+	v8 "github.com/Canto-Network/Canto/v7/app/upgrades/v8"
 )
 
 var (
@@ -1159,6 +1160,12 @@ func (app *Canto) setupUpgradeHandlers() {
 		v7.CreateUpgradeHandler(app.mm, app.configurator, *app.OnboardingKeeper, app.CoinswapKeeper),
 	)
 
+	// v8 upgrade handler
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v8.UpgradeName,
+		v8.CreateUpgradeHandler(app.mm, app.configurator, app.LiquidStakingKeeper),
+	)
+
 	// When a planned update height is reached, the old binary will panic
 	// writing on disk the height and name of the update that triggered it
 	// This will read that value, and execute the preparations for the upgrade.
@@ -1192,6 +1199,10 @@ func (app *Canto) setupUpgradeHandlers() {
 	case v7.UpgradeName:
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Added: []string{onboardingtypes.StoreKey, coinswaptypes.StoreKey},
+		}
+	case v8.UpgradeName:
+		storeUpgrades = &storetypes.StoreUpgrades{
+			Added: []string{liquidstakingtypes.StoreKey},
 		}
 	}
 
