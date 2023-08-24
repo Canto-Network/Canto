@@ -571,3 +571,9 @@ func (b *MockBankKeeper) GetBalance(ctx sdk.Context, addr sdk.AccAddress, denom 
 	args := b.Called(mock.Anything, mock.Anything)
 	return args.Get(0).(sdk.Coin)
 }
+
+func (b *MockBankKeeper) GetParams(ctx sdk.Context) banktypes.Params {
+	return banktypes.DefaultParams()
+}
+
+func (b *MockBankKeeper) SetParams(ctx sdk.Context, params banktypes.Params) {}

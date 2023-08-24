@@ -205,7 +205,7 @@ func TestAppImportExport(t *testing.T) {
 		},
 		{app.keys[distrtypes.StoreKey], newApp.keys[distrtypes.StoreKey], [][]byte{}},
 		{app.keys[paramstypes.StoreKey], newApp.keys[paramstypes.StoreKey], [][]byte{
-			[]byte("evm/EnableExtraEIPs"),
+			[]byte("evm/EnableExtraEIPs"), []byte("bank/SendEnabled"),
 		}},
 		{app.keys[evidencetypes.StoreKey], newApp.keys[evidencetypes.StoreKey], [][]byte{}},
 		{app.keys[capabilitytypes.StoreKey], newApp.keys[capabilitytypes.StoreKey], [][]byte{}},

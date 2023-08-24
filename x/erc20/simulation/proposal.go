@@ -4,10 +4,6 @@ import (
 	"math/rand"
 	"strings"
 
-	"github.com/Canto-Network/Canto/v7/app/params"
-	"github.com/Canto-Network/Canto/v7/contracts"
-	"github.com/Canto-Network/Canto/v7/x/erc20/keeper"
-	"github.com/Canto-Network/Canto/v7/x/erc20/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -16,6 +12,11 @@ import (
 	"github.com/evmos/ethermint/crypto/ethsecp256k1"
 	"github.com/evmos/ethermint/tests"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
+
+	"github.com/Canto-Network/Canto/v7/app/params"
+	"github.com/Canto-Network/Canto/v7/contracts"
+	"github.com/Canto-Network/Canto/v7/x/erc20/keeper"
+	"github.com/Canto-Network/Canto/v7/x/erc20/types"
 )
 
 // Simulation operation weights constants.
@@ -54,6 +55,9 @@ func SimulateRegisterCoinProposal(k keeper.Keeper, bk types.BankKeeper) simtypes
 		if err := bk.MintCoins(ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(coinMetadata.Base, sdk.NewInt(1)))); err != nil {
 			panic(err)
 		}
+		bankparams := bk.GetParams(ctx)
+		bankparams.DefaultSendEnabled = true
+		bk.SetParams(ctx, bankparams)
 
 		params := k.GetParams(ctx)
 		params.EnableErc20 = true

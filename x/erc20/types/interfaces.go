@@ -1,7 +1,7 @@
 package types
 
 import (
-	context "context"
+	"context"
 	"math/big"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -38,6 +38,8 @@ type BankKeeper interface {
 	HasSupply(ctx sdk.Context, denom string) bool
 	GetBalance(ctx sdk.Context, addr sdk.AccAddress, denom string) sdk.Coin
 	SpendableCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
+	GetParams(ctx sdk.Context) banktypes.Params
+	SetParams(ctx sdk.Context, params banktypes.Params)
 }
 
 // EVMKeeper defines the expected EVM keeper interface used on erc20

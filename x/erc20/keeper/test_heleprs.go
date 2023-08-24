@@ -15,6 +15,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/evmos/ethermint/server/config"
 	evm "github.com/evmos/ethermint/x/evm/types"
+	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
 	"github.com/Canto-Network/Canto/v7/contracts"
 	"github.com/Canto-Network/Canto/v7/x/erc20/types"
@@ -50,15 +51,13 @@ func DeployContract(ctx sdk.Context,
 	}
 
 	nonce := evmKeeper.GetNonce(ctx, address)
-	minGasPrice := feemarketKeeper.GetParams(ctx).MinGasPrice.BigInt()
-	minGasPrice = new(big.Int).Add(minGasPrice, big.NewInt(1))
 	erc20DeployTx := evm.NewTxContract(
 		chainID,
 		nonce,
-		nil,         // amount
-		res.Gas,     // gasLimit
-		minGasPrice, // gasPrice
-		feemarketKeeper.GetBaseFee(ctx),
+		nil,     // amount
+		res.Gas, // gasLimit
+		nil,     // gasPrice
+		feemarkettypes.DefaultParams().BaseFee.BigInt(),
 		big.NewInt(1),
 		data,                   // input
 		&ethtypes.AccessList{}, // accesses
