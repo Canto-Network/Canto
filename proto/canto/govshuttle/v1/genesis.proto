@@ -10,5 +10,6 @@ option go_package = "github.com/Canto-Network/Canto/v7/x/govshuttle/types";
 // GenesisState defines the govshuttle module's genesis state.
 message GenesisState {
   Params params = 1 [ (gogoproto.nullable) = false ];
+  bytes port_address = 2;
   // this line is used by starport scaffolding # genesis/proto/state
 }
