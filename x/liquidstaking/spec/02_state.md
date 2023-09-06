@@ -21,7 +21,7 @@ The fee rate is determined by the sum of the insurance fee rate set by the insur
 the commission fee rate set by the validator designated by the insurance provider.
 2. `Unpairing`: A paired chunk enters an `Unpairing` status when paired insurance begins to be withdrawn, its balance becomes less than 5.75% of a chunk's size, or the validator becomes invalid (e.g., tombstoned). The 5.75% represents the minimum amount of tokens required to cover both downtime slashing and double signing slashing penalties once.
     * The calculation of 5.75% involves the sum of the `SlashFractionDoubleSign` and `SlashFractionDowntime` parameters. Modifying these parameters while the `liquidstaking` module is operational can introduce unforeseen risks. To mitigate this, changes to the slashing parameters are restricted via antehandlers. 
-   For more information, please refer to the details provided in the **[Param Change Ante Handlers](10_ante_handlers.md#param-change-ante-handlers)**.
+   For more information, please refer to the details provided in the **[Param Change Ante Handlers](09_ante_handlers.md#param-change-ante-handlers)**.
 3. `UnpairingForUnstaking`: When a delegator (also referred to as a liquid staker) submits a MsgLiquidUnstake, the request is enqueued as UnpairingForUnstakingChunkInfo. 
 At the conclusion of the epoch, the actual undelegation process is initiated, causing the chunk to transition into this state. Following the completion of the unbonding period in the subsequent epoch, tokens equivalent to the chunk's size are restored to the delegator's account, and the related chunk object is subsequently deleted.
 Once the unbonding period is over in next epoch, the tokens corresponding chunk size are returned to the delegator's account and the associated chunk object is removed.
@@ -65,7 +65,7 @@ In the following epoch, the insurance will either remain paired or undergo unpai
 ## UnpairingForUnstakingChunkInfo
 
 This object is created when msgServer receives `MsgLiquidUnstake` for a paired chunk. 
-The actual unbonding process is started on an upcoming epoch (**[Handle Queued Liquid Unstakes](06_end_block.md#handle-queued-liquid-unstakes)**).
+The actual unbonding process is started on an upcoming epoch (check **HandleQueuedLiquidUnstakes** at EndBlocker).
 
 The unstaking request does not take place immediately; it is initiated within the upcoming epoch and the actual unstaking occurs after the unbonding period has elapsed. During the unbonding period, changes in the chunk size may occur (if the insurance is unable to cover all penalties, the chunk size may decrease). In such cases, a portion of the escrowed lsTokens must be refunded. Therefore, the associated object serves to track the quantity of escrowed lsTokens when an unstaking request is made.
 
@@ -77,7 +77,7 @@ type UnpairingForUnstakingChunkInfo struct {
     EscrowedLsTokens sdk.Coin
 }
 ```
-It is removed when the chunk unbonding is finished (**[Cover slashing and handle mature unbondings](06_end_block.md#cover-slashing-and-handle-mature-unbondings)**).
+It is removed when the chunk unbonding is finished (check **CoverSlashingAndHandleMatureUnbondings** at EndBlocker).
 
 
 ## WithdrawInsuranceRequest
@@ -94,7 +94,7 @@ type WithdrawInsuranceRequest struct {
 
 It is created when re-delegation for chunk happens between insurances pointing to different validators at epoch.
 This situation happens when there's a more appealing validator and insurance pair on an epoch. The chunk keeps its paired status while being redelegated to a new validator.
-When the chunk is undergoing redelegation, a separate logic (**[Cover redelegation penalty](05_begin_block.md#Cover-Redelegation-Penalty)**) is followed to ensure that the insurance covers any penalties. Therefore, the object is used to track whether the chunk is being redelegated or not.
+When the chunk is undergoing redelegation, a separate logic (check **CoverRedelegationPenalty** at BeginBlocker) is followed to ensure that the insurance covers any penalties. Therefore, the object is used to track whether the chunk is being redelegated or not.
 
 
 

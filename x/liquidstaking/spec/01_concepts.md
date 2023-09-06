@@ -88,7 +88,7 @@ The `liquidstaking` module fee is calculated as follows: `fee = (delegation rewa
 * if optimal < u <= hardCap then, **fee rate =** `r0 + slope1 + ((u - optimal) / (hardcap - optimal) x slope2)`
 * if hardCap < u, then, **fee rate =** `r0 + slope1 +slope2`
 
-An explanation of the parameters used in the above formula can be found in [09_params.md](09_params.md). 
+An explanation of the parameters used in the above formula can be found in [09_params.md](08_params.md). 
 
 The `liquidstaking` module fee is calculated at the beginning of every epoch and is applied to the delegation rewards of all chunks.
 The calculated fee is burned and the rest of the delegation reward goes to the reward pool.

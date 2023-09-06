@@ -1,4 +1,4 @@
-<!-- order: 10 -->
+<!-- order: 9 -->
 
 # Param Change Ante Handlers
 
