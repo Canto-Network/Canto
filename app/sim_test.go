@@ -35,6 +35,7 @@ import (
 	erc20types "github.com/Canto-Network/Canto/v7/x/erc20/types"
 	govshuttletypes "github.com/Canto-Network/Canto/v7/x/govshuttle/types"
 	inflationtypes "github.com/Canto-Network/Canto/v7/x/inflation/types"
+	liquidstakingtypes "github.com/Canto-Network/Canto/v7/x/liquidstaking/types"
 )
 
 // Get flags every time the simulator is run
@@ -113,8 +114,6 @@ func TestAppImportExport(t *testing.T) {
 		db.Close()
 		require.NoError(t, os.RemoveAll(dir))
 	}()
-
-	sdk.DefaultPowerReduction = sdk.NewIntFromUint64(1000000)
 
 	app := NewCanto(
 		logger,
@@ -219,6 +218,7 @@ func TestAppImportExport(t *testing.T) {
 		//{app.keys[epochstypes.StoreKey], newApp.keys[epochstypes.StoreKey], [][]byte{}},
 		{app.keys[csrtypes.StoreKey], newApp.keys[csrtypes.StoreKey], [][]byte{}},
 		{app.keys[govshuttletypes.StoreKey], newApp.keys[govshuttletypes.StoreKey], [][]byte{}},
+		{app.keys[liquidstakingtypes.StoreKey], newApp.keys[liquidstakingtypes.StoreKey], [][]byte{}},
 	}
 
 	for _, skp := range storeKeysPrefixes {
@@ -248,8 +248,6 @@ func TestAppStateDeterminism(t *testing.T) {
 	numSeeds := config.NumBlocks / 10
 	numTimesToRunPerSeed := 2
 	appHashList := make([]json.RawMessage, numTimesToRunPerSeed)
-
-	sdk.DefaultPowerReduction = sdk.NewIntFromUint64(1000000)
 
 	for i := 0; i < numSeeds; i++ {
 		config.Seed = config.Seed + int64(i)
@@ -318,8 +316,6 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		db.Close()
 		require.NoError(t, os.RemoveAll(dir))
 	}()
-
-	sdk.DefaultPowerReduction = sdk.NewIntFromUint64(1000000)
 
 	app := NewCanto(
 		logger,

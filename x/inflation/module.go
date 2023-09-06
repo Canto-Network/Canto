@@ -184,7 +184,24 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 // AppModuleSimulation functions
 
 // GenerateGenesisState creates a randomized GenState of the inflation module.
-func (am AppModule) GenerateGenesisState(input *module.SimulationState) {
+func (am AppModule) GenerateGenesisState(simState *module.SimulationState) {
+	genesis := types.DefaultGenesisState()
+	genesis.Params = types.Params{
+		MintDenom: sdk.DefaultBondDenom,
+		ExponentialCalculation: types.ExponentialCalculation{
+			A:             sdk.MustNewDecFromStr("1972054"),
+			R:             sdk.ZeroDec(),
+			C:             sdk.ZeroDec(),
+			BondingTarget: sdk.MustNewDecFromStr("0.8"),
+			MaxVariance:   sdk.ZeroDec(),
+		},
+		InflationDistribution: types.InflationDistribution{
+			StakingRewards: sdk.OneDec(),
+			CommunityPool:  sdk.ZeroDec(),
+		},
+		EnableInflation: true,
+	}
+	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(genesis)
 }
 
 // ProposalContents doesn't return any content functions for governance proposals.

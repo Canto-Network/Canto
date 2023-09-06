@@ -1,0 +1,443 @@
+syntax = "proto3";
+package canto.liquidstaking.v1;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "cosmos_proto/cosmos.proto";
+
+option go_package = "github.com/Canto-Network/Canto/v7/x/liquidstaking/types";
+
+// Epoch defines the epoch of the module.
+message Epoch {
+  uint64 current_number = 1;
+  google.protobuf.Timestamp start_time = 2
+      [ (gogoproto.stdtime) = true, (gogoproto.nullable) = false ];
+  google.protobuf.Duration duration = 3
+      [ (gogoproto.stdduration) = true, (gogoproto.nullable) = false ];
+  int64 start_height = 4;
+}
+
+// DynamicFeeRate defines parameters realated with dynamic fee rate mechanism.
+message DynamicFeeRate {
+  // minimum fee rate
+  string r0 = 1 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // Softcap for utilization ratio. If the utilization ratio is below this
+  // value, fee rate is R0.
+  string u_soft_cap = 2 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // Hardcap for utilization ratio. If the utilization ratio cannot bigger than
+  // this value.
+  string u_hard_cap = 3 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // Optimal utilization ratio.
+  string u_optimal = 4 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // If the current utilization ratio is between softcap and optimal, fee rate
+  // increases at a slow pace.
+  string slope1 = 5 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // If the current utilization ratio is above optimal, fee rate increases at a
+  // faster pace.
+  string slope2 = 6 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // Maximum fee rate.
+  string max_fee_rate = 7 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// Params defines the parameters for the module.
+message Params {
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+
+  DynamicFeeRate dynamic_fee_rate = 1 [ (gogoproto.nullable) = false ];
+  string maximum_discount_rate = 2 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// ChunkStatus defines the status of the chunk.
+enum ChunkStatus {
+  option (gogoproto.goproto_enum_prefix) = false;
+
+  CHUNK_STATUS_UNSPECIFIED = 0;
+  // This status indicates that the chunk is ready to be paired with an
+  // insurance.
+  CHUNK_STATUS_PAIRING = 1;
+  // A chunk is paired with an insurance that has the lowest fee rate.
+  // The fee rate is determined by the sum of the insurance fee rate set by
+  // the insurance provider and the commission fee rate set by the validator
+  // designated by the insurance provider.
+  CHUNK_STATUS_PAIRED = 2;
+  // A paired chunk enters this status when paired insurance is started to be
+  // withdrawn or it's balance <= 5.75%(double_sign_fraction +
+  // down_time_fraction) of chunk size tokens or the validator becomes
+  // tombstoned.
+  CHUNK_STATUS_UNPAIRING = 3;
+  // When a delegator (also known as a liquid staker) sends a MsgLiquidUnstake,
+  // it is queued as a UnpairingForUnstakingChunkInfo. At the end of the epoch,
+  // the actual undelegation is triggered and the chunk enters this state.
+  // Once the unbonding period is over in next epoch, the tokens corresponding
+  // chunk size are returned to the delegator's account and the associated chunk
+  // object is removed.
+  CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING = 4;
+}
+
+// Chunk defines the chunk of the module.
+message Chunk {
+  option (gogoproto.goproto_getters) = false;
+
+  // Unique id increased by 1
+  uint64 id = 1;
+  // Id of Paired insurance, 0 means no insurance
+  uint64 paired_insurance_id = 2;
+  // Id of Unpairing insurance, 0 means no insurance
+  uint64 unpairing_insurance_id = 3;
+  ChunkStatus status = 4;
+}
+
+// InsuranceStatus defines the status of the insurance.
+enum InsuranceStatus {
+  option (gogoproto.goproto_enum_prefix) = false;
+
+  INSURANCE_STATUS_UNSPECIFIED = 0;
+  // This is the default status of an insurance when an insurance provider sends
+  // a MsgProvideInsurance. This status indicates that the insurance is ready to
+  // be paired with a chunk. When an empty slot is available and either
+  // msgLiquidStake is received or pairing chunks have been created in the
+  // recent epoch, the insurance with the lowest fee will be paired with the
+  // chunk. Once paired, the insurance contract can be cancelled using
+  // MsgCancelProvideInsurance.
+  INSURANCE_STATUS_PAIRING = 1;
+  // An insurance is paired with a chunk. While the insurance is in this status,
+  // it serves as a form of protection for the chunk by insuring it against
+  // unexpected loss that may occur due to validator slashing. This ensures that
+  // the chunk remains same size and maximize its staking rewards.
+  INSURANCE_STATUS_PAIRED = 2;
+  // A paired insurance enters this status when it no longer has enough balance
+  // (=5.75% of chunk size tokens) to cover slashing penalties, when the
+  // validator is tombstoned, or when the paired chunk is started to be
+  // undelegated by MsgLiquidUnstake. At the next epoch, unpairing will be
+  // unpaired or pairing if it still valid.
+  INSURANCE_STATUS_UNPAIRING = 3;
+  // A paired insurance enters this status when there was a
+  // queued WithdrawalInsuranceRequest created by MsgWithdrawInsurance at the
+  // epoch.
+  INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL = 4;
+  // Unpairing insurances from previous epoch can enter this status.
+  // Unpaired insurance can be withdrawn immediately by MsgWithdrawInsurance.
+  INSURANCE_STATUS_UNPAIRED = 5;
+}
+
+// Insurance defines the insurance of the module.
+message Insurance {
+  option (gogoproto.goproto_getters) = false;
+
+  // Unique id increased by 1
+  uint64 id = 1;
+  // Address of the validator
+  string validator_address = 2;
+  // Address of the insurance provider
+  string provider_address = 3;
+  string fee_rate = 4 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+  // Id of the chunk for which the insurance has a duty
+  uint64 chunk_id = 5;
+  // Status of the insurance
+  InsuranceStatus status = 6;
+}
+
+// NetAmountState is type for net amount raw data and mint rate, This is a value
+// that depends on the several module state every time, so it is used only for
+// calculation and query and is not stored in kv.
+message NetAmountState {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = true;
+  option (gogoproto.goproto_stringer) = false;
+
+  // Calculated by (total supply of ls tokens) / NetAmount
+  string mint_rate = 1 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // Total supply of ls tokens
+  // e.g. 100 ls tokens minted -> 10 ls tokens burned, then total supply is 90
+  // ls tokens
+  string ls_tokens_total_supply = 2 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // Calculated by reward module account's native token balance + all
+  // all chunk's native token balance + sum of token values of all chunk's
+  // delegation shares + sum of all remaining rewards of paired chunks since
+  // last Epoch + all unbonding delegation tokens of unpairing chunks
+  string net_amount = 3 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // The token amount worth of all delegation shares of all paired chunks
+  // (slashing applied amount)
+  string total_liquid_tokens = 4 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // Balance of reward module account
+  string reward_module_acc_balance = 5 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // Fee rate applied when deduct module fee at epoch
+  string fee_rate = 6 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // Utilization ratio
+  string utilization_ratio = 7 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // How many chunks which can be created left?
+  string remaining_chunk_slots = 8 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // Discount rate applied when withdraw rewards
+  string discount_rate = 9 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // --- Chunk related fields
+  // The number of paired chunks
+  string num_paired_chunks = 10 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // Current chunk size tokens
+  string chunk_size = 11 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // Total delegation shares of all paired chunks
+  string total_del_shares = 12 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // The cumulative reward of all chunks delegations from the last distribution
+  string total_remaining_rewards = 13 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // Sum of the balances of all chunks.
+  // Note: Paired chunks can be pairing status for various reasons (such as lack
+  // of insurance). In such cases, the delegated native tokens returns to the
+  // balance of DerivedAddress(Chunk.Id) after un-bonding period is finished.
+  string total_chunks_balance = 14 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // The sum of unbonding balance of all chunks in Unpairing or
+  // UnpairingForUnstaking
+  string total_unbonding_chunks_balance = 15 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // --- Insurance related fields
+  // The sum of all insurances' amount (= DerivedAddress(Insurance.Id).Balance)
+  string total_insurance_tokens = 16 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // The sum of all paired insurances' amount (=
+  // DerivedAddress(Insurance.Id).Balance)
+  string total_paired_insurance_tokens = 17 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // The sum of all unpairing insurances' amount (=
+  // DerivedAddress(Insurance.Id).Balance)
+  string total_unpairing_insurance_tokens = 18 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // The cumulative commissions of all insurances
+  string total_remaining_insurance_commissions = 19 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// NetAmountStateEssentials is a subset of NetAmountState which is used for
+// core logics. Insurance related fields are excluded, because they are not used
+// in core logics(e.g. calculating mint rate).
+message NetAmountStateEssentials {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = true;
+  option (gogoproto.goproto_stringer) = false;
+
+  // Calculated by (total supply of ls tokens) / NetAmount
+  string mint_rate = 1 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // Total supply of ls tokens
+  // e.g. 100 ls tokens minted -> 10 ls tokens burned, then total supply is 90
+  // ls tokens
+  string ls_tokens_total_supply = 2 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // Calculated by reward module account's native token balance + all
+  // all chunk's native token balance + sum of token values of all chunk's
+  // delegation shares + sum of all remaining rewards of paired chunks since
+  // last Epoch + all unbonding delegation tokens of unpairing chunks
+  string net_amount = 3 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // The token amount worth of all delegation shares of all paired chunks
+  // (slashing applied amount)
+  string total_liquid_tokens = 4 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // Balance of reward module account
+  string reward_module_acc_balance = 5 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // Fee rate applied when deduct module fee at epoch
+  string fee_rate = 6 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // Utilization ratio
+  string utilization_ratio = 7 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // How many chunks which can be created left?
+  string remaining_chunk_slots = 8 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // Discount rate applied when withdraw rewards
+  string discount_rate = 9 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // --- Chunk related fields
+  // The number of paired chunks
+  string num_paired_chunks = 10 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // Current chunk size tokens
+  string chunk_size = 11 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // Total delegation shares of all paired chunks
+  string total_del_shares = 12 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // The cumulative reward of all chunks delegations from the last distribution
+  string total_remaining_rewards = 13 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  // Sum of the balances of all chunks.
+  // Note: Paired chunks can be pairing status for various reasons (such as lack
+  // of insurance). In such cases, the delegated native tokens returns to the
+  // balance of DerivedAddress(Chunk.Id) after un-bonding period is finished.
+  string total_chunks_balance = 14 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // The sum of unbonding balance of all chunks in Unpairing or
+  // UnpairingForUnstaking
+  string total_unbonding_chunks_balance = 15 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message UnpairingForUnstakingChunkInfo {
+  // Which chunk is unpairing for unstaking
+  uint64 chunk_id = 1;
+  // Address of delegator (=liquid unstaker)
+  string delegator_address = 2;
+  // How much lstokens will be burned when unbonding finished
+  string escrowed_lstokens = 3 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message WithdrawInsuranceRequest {
+  // Which insurance is requested for withdrawal
+  uint64 insurance_id = 1;
+}
+
+message RedelegationInfo {
+  uint64 chunk_id = 1;
+  google.protobuf.Timestamp completion_time = 2
+      [ (gogoproto.stdtime) = true, (gogoproto.nullable) = false ];
+}

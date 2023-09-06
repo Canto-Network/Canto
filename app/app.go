@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/rakyll/statik/fs"
@@ -134,6 +135,10 @@ import (
 	csrkeeper "github.com/Canto-Network/Canto/v7/x/csr/keeper"
 	csrtypes "github.com/Canto-Network/Canto/v7/x/csr/types"
 
+	"github.com/Canto-Network/Canto/v7/x/liquidstaking"
+	liquidstakingkeeper "github.com/Canto-Network/Canto/v7/x/liquidstaking/keeper"
+	liquidstakingtypes "github.com/Canto-Network/Canto/v7/x/liquidstaking/types"
+
 	"github.com/Canto-Network/Canto/v7/x/coinswap"
 	coinswapkeeper "github.com/Canto-Network/Canto/v7/x/coinswap/keeper"
 	coinswaptypes "github.com/Canto-Network/Canto/v7/x/coinswap/types"
@@ -144,6 +149,18 @@ import (
 	v5 "github.com/Canto-Network/Canto/v7/app/upgrades/v5"
 	v6 "github.com/Canto-Network/Canto/v7/app/upgrades/v6"
 	v7 "github.com/Canto-Network/Canto/v7/app/upgrades/v7"
+	v8 "github.com/Canto-Network/Canto/v7/app/upgrades/v8"
+)
+
+var (
+	enableAdvanceEpoch = "false" // Set this to "true" using build flags to enable AdvanceEpoch msg handling.
+	epochPerBlock      = "-1"
+
+	// EnableAdvanceEpoch and EpochBlock indicates whether we forcefully advance epoch or not.
+	// If those values are enabled, then it will forcefully change the block time and advance epoch.
+	// Never set this to true in production mode. Doing that will expose serious attack vector.
+	EnableAdvanceEpoch = false
+	EpochPerBlock      = -1
 )
 
 func init() {
@@ -159,6 +176,16 @@ func init() {
 	// modify fee market parameter defaults through global
 	feemarkettypes.DefaultMinGasPrice = sdk.NewDec(20_000_000_000)
 	feemarkettypes.DefaultMinGasMultiplier = sdk.NewDecWithPrec(5, 1)
+	EnableAdvanceEpoch, err = strconv.ParseBool(enableAdvanceEpoch)
+	if err != nil {
+		panic(err)
+	}
+	if EnableAdvanceEpoch {
+		EpochPerBlock, err = strconv.Atoi(epochPerBlock)
+		if err != nil {
+			panic(err)
+		}
+	}
 }
 
 // Name defines the application binary name
@@ -204,6 +231,7 @@ var (
 		epochs.AppModuleBasic{},
 		onboarding.AppModuleBasic{},
 		coinswap.AppModuleBasic{},
+		liquidstaking.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -221,6 +249,7 @@ var (
 		govshuttletypes.ModuleName:     {authtypes.Minter, authtypes.Burner},
 		onboardingtypes.ModuleName:     {authtypes.Minter, authtypes.Burner},
 		coinswaptypes.ModuleName:       {authtypes.Minter, authtypes.Burner},
+		liquidstakingtypes.ModuleName:  {authtypes.Minter, authtypes.Burner},
 	}
 
 	// module accounts that are allowed to receive tokens
@@ -279,12 +308,13 @@ type Canto struct {
 	FeeMarketKeeper feemarketkeeper.Keeper
 
 	// Canto keepers
-	InflationKeeper  inflationkeeper.Keeper
-	Erc20Keeper      erc20keeper.Keeper
-	EpochsKeeper     epochskeeper.Keeper
-	OnboardingKeeper *onboardingkeeper.Keeper
-	GovshuttleKeeper govshuttlekeeper.Keeper
-	CSRKeeper        csrkeeper.Keeper
+	InflationKeeper     inflationkeeper.Keeper
+	Erc20Keeper         erc20keeper.Keeper
+	EpochsKeeper        epochskeeper.Keeper
+	OnboardingKeeper    *onboardingkeeper.Keeper
+	GovshuttleKeeper    govshuttlekeeper.Keeper
+	CSRKeeper           csrkeeper.Keeper
+	LiquidStakingKeeper liquidstakingkeeper.Keeper
 
 	// Coinswap keeper
 	CoinswapKeeper coinswapkeeper.Keeper
@@ -350,6 +380,7 @@ func NewCanto(
 		govshuttletypes.StoreKey,
 		// Coinswap keys
 		coinswaptypes.StoreKey,
+		liquidstakingtypes.StoreKey,
 	)
 
 	// Add the EVM transient store key
@@ -494,7 +525,7 @@ func NewCanto(
 
 	app.GovKeeper = *govKeeper.SetHooks(
 		govtypes.NewMultiGovHooks(
-		//insert Gov hooks here
+		// insert Gov hooks here
 		),
 	)
 
@@ -560,6 +591,11 @@ func NewCanto(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
+	app.LiquidStakingKeeper = liquidstakingkeeper.NewKeeper(
+		keys[liquidstakingtypes.StoreKey], appCodec, app.GetSubspace(liquidstakingtypes.ModuleName),
+		app.AccountKeeper, app.BankKeeper, app.DistrKeeper, &stakingKeeper, app.SlashingKeeper, app.EvidenceKeeper,
+	)
+
 	/****  Module Options ****/
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
@@ -602,6 +638,7 @@ func NewCanto(
 		govshuttle.NewAppModule(app.GovshuttleKeeper, app.AccountKeeper),
 		csr.NewAppModule(app.CSRKeeper, app.AccountKeeper),
 		coinswap.NewAppModule(appCodec, app.CoinswapKeeper, app.AccountKeeper, app.BankKeeper),
+		liquidstaking.NewAppModule(appCodec, app.LiquidStakingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.DistrKeeper, app.InflationKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -620,6 +657,7 @@ func NewCanto(
 		distrtypes.ModuleName,
 		slashingtypes.ModuleName,
 		evidencetypes.ModuleName,
+		liquidstakingtypes.ModuleName,
 		stakingtypes.ModuleName,
 		ibchost.ModuleName,
 		// no-op modules
@@ -660,6 +698,7 @@ func NewCanto(
 		slashingtypes.ModuleName,
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
+		liquidstakingtypes.ModuleName,
 		authz.ModuleName,
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
@@ -686,6 +725,7 @@ func NewCanto(
 		// NOTE: staking requires the claiming hook
 		stakingtypes.ModuleName,
 		slashingtypes.ModuleName,
+		liquidstakingtypes.ModuleName,
 		govtypes.ModuleName,
 		ibchost.ModuleName,
 		// Ethermint modules
@@ -748,6 +788,7 @@ func NewCanto(
 		inflation.NewAppModule(app.InflationKeeper, app.AccountKeeper, app.StakingKeeper),
 		feemarket.NewAppModule(app.FeeMarketKeeper),
 		coinswap.NewAppModule(appCodec, app.CoinswapKeeper, app.AccountKeeper, app.BankKeeper),
+		liquidstaking.NewAppModule(appCodec, app.LiquidStakingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.DistrKeeper, app.InflationKeeper),
 
 		// TODO: Modules that have not yet been implemented for simulation
 		// govshuttle, csr, inflation, erc20
@@ -766,17 +807,20 @@ func NewCanto(
 
 	maxGasWanted := cast.ToUint64(appOpts.Get(srvflags.EVMMaxTxGasWanted))
 	options := ante.HandlerOptions{
-		AccountKeeper:   app.AccountKeeper,
-		BankKeeper:      app.BankKeeper,
-		EvmKeeper:       app.EvmKeeper,
-		FeegrantKeeper:  app.FeeGrantKeeper,
-		IBCKeeper:       app.IBCKeeper,
-		FeeMarketKeeper: app.FeeMarketKeeper,
-		SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
-		SigGasConsumer:  SigVerificationGasConsumer,
-		Cdc:             appCodec,
-		MaxTxGasWanted:  maxGasWanted,
-		Simulation:      simulation,
+		AccountKeeper:       app.AccountKeeper,
+		BankKeeper:          app.BankKeeper,
+		EvmKeeper:           app.EvmKeeper,
+		StakingKeeper:       &app.StakingKeeper,
+		SlashingKeeper:      &app.SlashingKeeper,
+		FeegrantKeeper:      app.FeeGrantKeeper,
+		IBCKeeper:           app.IBCKeeper,
+		FeeMarketKeeper:     app.FeeMarketKeeper,
+		LiquidStakingKeeper: &app.LiquidStakingKeeper,
+		SignModeHandler:     encodingConfig.TxConfig.SignModeHandler(),
+		SigGasConsumer:      SigVerificationGasConsumer,
+		Cdc:                 appCodec,
+		MaxTxGasWanted:      maxGasWanted,
+		Simulation:          simulation,
 	}
 
 	if err := options.Validate(); err != nil {
@@ -814,11 +858,41 @@ func (app *Canto) Name() string { return app.BaseApp.Name() }
 // of the new block for every registered module. If there is a registered fork at the current height,
 // BeginBlocker will schedule the upgrade plan and perform the state migration (if any).
 func (app *Canto) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
+	defer func() {
+		// SET ldflag for enableAdvanceEpoch or epochPerBlock on app.go
+		// https://kodeit.dev/go-injecting-variable-values-during-building-binary-creating-build-script/
+		if EnableAdvanceEpoch {
+			if int(ctx.BlockHeight())%EpochPerBlock == 0 {
+				am, ok := app.mm.Modules[liquidstakingtypes.ModuleName].(liquidstaking.AppModule)
+				if !ok {
+					panic("liquid staking module not found")
+				}
+				am.AdvanceEpochBeginBlock(ctx)
+				app.Logger().Debug("beginblocker executed in advance epoch ")
+			}
+		}
+	}()
+
 	return app.mm.BeginBlock(ctx, req)
 }
 
 // EndBlocker updates every end block
 func (app *Canto) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
+	defer func() {
+		// SET ldflag for enableAdvanceEpoch or epochPerBlock on app.go
+		// https://kodeit.dev/go-injecting-variable-values-during-building-binary-creating-build-script/
+		if EnableAdvanceEpoch {
+			if int(ctx.BlockHeight())%EpochPerBlock == 0 {
+				am, ok := app.mm.Modules[liquidstakingtypes.ModuleName].(liquidstaking.AppModule)
+				if !ok {
+					panic("liquid staking module not found")
+				}
+				am.AdvanceEpochEndBlock(ctx)
+				app.Logger().Debug("endblocker executed in advance epoch ")
+			}
+		}
+	}()
+
 	return app.mm.EndBlock(ctx, req)
 }
 
@@ -1047,6 +1121,7 @@ func initParamsKeeper(
 	paramsKeeper.Subspace(govshuttletypes.ModuleName)
 	paramsKeeper.Subspace(csrtypes.ModuleName)
 	paramsKeeper.Subspace(coinswaptypes.ModuleName)
+	paramsKeeper.Subspace(liquidstakingtypes.ModuleName)
 	return paramsKeeper
 }
 
@@ -1085,6 +1160,12 @@ func (app *Canto) setupUpgradeHandlers() {
 		v7.CreateUpgradeHandler(app.mm, app.configurator, *app.OnboardingKeeper, app.CoinswapKeeper),
 	)
 
+	// v8 upgrade handler
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v8.UpgradeName,
+		v8.CreateUpgradeHandler(app.mm, app.configurator, app.LiquidStakingKeeper),
+	)
+
 	// When a planned update height is reached, the old binary will panic
 	// writing on disk the height and name of the update that triggered it
 	// This will read that value, and execute the preparations for the upgrade.
@@ -1118,6 +1199,10 @@ func (app *Canto) setupUpgradeHandlers() {
 	case v7.UpgradeName:
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Added: []string{onboardingtypes.StoreKey, coinswaptypes.StoreKey},
+		}
+	case v8.UpgradeName:
+		storeUpgrades = &storetypes.StoreUpgrades{
+			Added: []string{liquidstakingtypes.StoreKey},
 		}
 	}
 

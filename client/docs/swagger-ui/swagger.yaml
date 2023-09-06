@@ -4012,6 +4012,1686 @@ paths:
           type: string
       tags:
         - Query
+  /canto/liquidstaking/v1/chunk_size:
+    get:
+      summary: ChunkSize returns the chunk size of the module.
+      operationId: ChunkSize
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              chunk_size:
+                type: object
+                properties:
+                  denom:
+                    type: string
+                  amount:
+                    type: string
+                description: >-
+                  Coin defines a token with a denomination and an amount.
+
+
+                  NOTE: The amount field is an Int which implements the custom
+                  method
+
+                  signatures required by gogoproto.
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      tags:
+        - Query
+  /canto/liquidstaking/v1/chunks:
+    get:
+      summary: Chunk returns all chunks on the module.
+      operationId: Chunks
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              chunks:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    chunk:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uint64
+                          title: Unique id increased by 1
+                        paired_insurance_id:
+                          type: string
+                          format: uint64
+                          title: 'Id of Paired insurance, 0 means no insurance'
+                        unpairing_insurance_id:
+                          type: string
+                          format: uint64
+                          title: 'Id of Unpairing insurance, 0 means no insurance'
+                        status:
+                          type: string
+                          enum:
+                            - CHUNK_STATUS_UNSPECIFIED
+                            - CHUNK_STATUS_PAIRING
+                            - CHUNK_STATUS_PAIRED
+                            - CHUNK_STATUS_UNPAIRING
+                            - CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING
+                          default: CHUNK_STATUS_UNSPECIFIED
+                          description: >-
+                            ChunkStatus defines the status of the chunk.
+
+                             - CHUNK_STATUS_PAIRING: This status indicates that the chunk is ready to be paired with an
+                            insurance.
+                             - CHUNK_STATUS_PAIRED: A chunk is paired with an insurance that has the lowest fee rate.
+                            The fee rate is determined by the sum of the
+                            insurance fee rate set by
+
+                            the insurance provider and the commission fee rate
+                            set by the validator
+
+                            designated by the insurance provider.
+                             - CHUNK_STATUS_UNPAIRING: A paired chunk enters this status when paired insurance is started to be
+                            withdrawn or it's balance <=
+                            5.75%(double_sign_fraction +
+
+                            down_time_fraction) of chunk size tokens or the
+                            validator becomes
+
+                            tombstoned.
+                             - CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING: When a delegator (also known as a liquid staker) sends a MsgLiquidUnstake,
+                            it is queued as a UnpairingForUnstakingChunkInfo. At
+                            the end of the epoch,
+
+                            the actual undelegation is triggered and the chunk
+                            enters this state.
+
+                            Once the unbonding period is over in next epoch, the
+                            tokens corresponding
+
+                            chunk size are returned to the delegator's account
+                            and the associated chunk
+
+                            object is removed.
+                      description: Chunk defines the chunk of the module.
+                    derived_address:
+                      type: string
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: status
+          description: >-
+            Query all chunks in a specific status.
+
+             - CHUNK_STATUS_PAIRING: This status indicates that the chunk is ready to be paired with an
+            insurance.
+             - CHUNK_STATUS_PAIRED: A chunk is paired with an insurance that has the lowest fee rate.
+            The fee rate is determined by the sum of the insurance fee rate set
+            by
+
+            the insurance provider and the commission fee rate set by the
+            validator
+
+            designated by the insurance provider.
+             - CHUNK_STATUS_UNPAIRING: A paired chunk enters this status when paired insurance is started to be
+            withdrawn or it's balance <= 5.75%(double_sign_fraction +
+
+            down_time_fraction) of chunk size tokens or the validator becomes
+
+            tombstoned.
+             - CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING: When a delegator (also known as a liquid staker) sends a MsgLiquidUnstake,
+            it is queued as a UnpairingForUnstakingChunkInfo. At the end of the
+            epoch,
+
+            the actual undelegation is triggered and the chunk enters this
+            state.
+
+            Once the unbonding period is over in next epoch, the tokens
+            corresponding
+
+            chunk size are returned to the delegator's account and the
+            associated chunk
+
+            object is removed.
+          in: query
+          required: false
+          type: string
+          enum:
+            - CHUNK_STATUS_UNSPECIFIED
+            - CHUNK_STATUS_PAIRING
+            - CHUNK_STATUS_PAIRED
+            - CHUNK_STATUS_UNPAIRING
+            - CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING
+          default: CHUNK_STATUS_UNSPECIFIED
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+          format: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+          format: boolean
+      tags:
+        - Query
+  '/canto/liquidstaking/v1/chunks/{id}':
+    get:
+      summary: Chunk returns a chunk by id.
+      operationId: Chunk
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              chunk:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uint64
+                    title: Unique id increased by 1
+                  paired_insurance_id:
+                    type: string
+                    format: uint64
+                    title: 'Id of Paired insurance, 0 means no insurance'
+                  unpairing_insurance_id:
+                    type: string
+                    format: uint64
+                    title: 'Id of Unpairing insurance, 0 means no insurance'
+                  status:
+                    type: string
+                    enum:
+                      - CHUNK_STATUS_UNSPECIFIED
+                      - CHUNK_STATUS_PAIRING
+                      - CHUNK_STATUS_PAIRED
+                      - CHUNK_STATUS_UNPAIRING
+                      - CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING
+                    default: CHUNK_STATUS_UNSPECIFIED
+                    description: >-
+                      ChunkStatus defines the status of the chunk.
+
+                       - CHUNK_STATUS_PAIRING: This status indicates that the chunk is ready to be paired with an
+                      insurance.
+                       - CHUNK_STATUS_PAIRED: A chunk is paired with an insurance that has the lowest fee rate.
+                      The fee rate is determined by the sum of the insurance fee
+                      rate set by
+
+                      the insurance provider and the commission fee rate set by
+                      the validator
+
+                      designated by the insurance provider.
+                       - CHUNK_STATUS_UNPAIRING: A paired chunk enters this status when paired insurance is started to be
+                      withdrawn or it's balance <= 5.75%(double_sign_fraction +
+
+                      down_time_fraction) of chunk size tokens or the validator
+                      becomes
+
+                      tombstoned.
+                       - CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING: When a delegator (also known as a liquid staker) sends a MsgLiquidUnstake,
+                      it is queued as a UnpairingForUnstakingChunkInfo. At the
+                      end of the epoch,
+
+                      the actual undelegation is triggered and the chunk enters
+                      this state.
+
+                      Once the unbonding period is over in next epoch, the
+                      tokens corresponding
+
+                      chunk size are returned to the delegator's account and the
+                      associated chunk
+
+                      object is removed.
+                description: Chunk defines the chunk of the module.
+              derived_address:
+                type: string
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
+  '/canto/liquidstaking/v1/chunks/{id}/redelegation_infos':
+    get:
+      operationId: RedelegationInfo
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              redelegation_info:
+                type: object
+                properties:
+                  chunk_id:
+                    type: string
+                    format: uint64
+                  completion_time:
+                    type: string
+                    format: date-time
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
+  '/canto/liquidstaking/v1/chunks/{id}/unpairing_for_unstaking_chunk_infos':
+    get:
+      summary: >-
+        UnpairingForUnstakingChunkInfo returns a unpairing for unstaking chunk
+        info
+
+        by id.
+      operationId: UnpairingForUnstakingChunkInfo
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              unpairing_for_unstaking_chunk_info:
+                type: object
+                properties:
+                  chunk_id:
+                    type: string
+                    format: uint64
+                    title: Which chunk is unpairing for unstaking
+                  delegator_address:
+                    type: string
+                    title: Address of delegator (=liquid unstaker)
+                  escrowed_lstokens:
+                    type: string
+                    title: How much lstokens will be burned when unbonding finished
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
+  /canto/liquidstaking/v1/epoch:
+    get:
+      operationId: Epoch
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              epoch:
+                description: epoch defines the current epoch of the module.
+                type: object
+                properties:
+                  current_number:
+                    type: string
+                    format: uint64
+                  start_time:
+                    type: string
+                    format: date-time
+                  duration:
+                    type: string
+                  start_height:
+                    type: string
+                    format: int64
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      tags:
+        - Query
+  /canto/liquidstaking/v1/insurances:
+    get:
+      summary: Insurances returns all insurances on the module.
+      operationId: Insurances
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              insurances:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    insurance:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uint64
+                          title: Unique id increased by 1
+                        validator_address:
+                          type: string
+                          title: Address of the validator
+                        provider_address:
+                          type: string
+                          title: Address of the insurance provider
+                        fee_rate:
+                          type: string
+                        chunk_id:
+                          type: string
+                          format: uint64
+                          title: Id of the chunk for which the insurance has a duty
+                        status:
+                          title: Status of the insurance
+                          type: string
+                          enum:
+                            - INSURANCE_STATUS_UNSPECIFIED
+                            - INSURANCE_STATUS_PAIRING
+                            - INSURANCE_STATUS_PAIRED
+                            - INSURANCE_STATUS_UNPAIRING
+                            - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL
+                            - INSURANCE_STATUS_UNPAIRED
+                          default: INSURANCE_STATUS_UNSPECIFIED
+                          description: >-
+                            InsuranceStatus defines the status of the insurance.
+
+                             - INSURANCE_STATUS_PAIRING: This is the default status of an insurance when an insurance provider sends
+                            a MsgProvideInsurance. This status indicates that
+                            the insurance is ready to
+
+                            be paired with a chunk. When an empty slot is
+                            available and either
+
+                            msgLiquidStake is received or pairing chunks have
+                            been created in the
+
+                            recent epoch, the insurance with the lowest fee will
+                            be paired with the
+
+                            chunk. Once paired, the insurance contract can be
+                            cancelled using
+
+                            MsgCancelProvideInsurance.
+                             - INSURANCE_STATUS_PAIRED: An insurance is paired with a chunk. While the insurance is in this status,
+                            it serves as a form of protection for the chunk by
+                            insuring it against
+
+                            unexpected loss that may occur due to validator
+                            slashing. This ensures that
+
+                            the chunk remains same size and maximize its staking
+                            rewards.
+                             - INSURANCE_STATUS_UNPAIRING: A paired insurance enters this status when it no longer has enough balance
+                            (=5.75% of chunk size tokens) to cover slashing
+                            penalties, when the
+
+                            validator is tombstoned, or when the paired chunk is
+                            started to be
+
+                            undelegated by MsgLiquidUnstake. At the next epoch,
+                            unpairing will be
+
+                            unpaired or pairing if it still valid.
+                             - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL: A paired insurance enters this status when there was a
+                            queued WithdrawalInsuranceRequest created by
+                            MsgWithdrawInsurance at the
+
+                            epoch.
+                             - INSURANCE_STATUS_UNPAIRED: Unpairing insurances from previous epoch can enter this status.
+                            Unpaired insurance can be withdrawn immediately by
+                            MsgWithdrawInsurance.
+                      description: Insurance defines the insurance of the module.
+                    derived_address:
+                      type: string
+                    fee_pool_address:
+                      type: string
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: status
+          description: >-
+            query all insurances in a specific status.
+
+             - INSURANCE_STATUS_PAIRING: This is the default status of an insurance when an insurance provider sends
+            a MsgProvideInsurance. This status indicates that the insurance is
+            ready to
+
+            be paired with a chunk. When an empty slot is available and either
+
+            msgLiquidStake is received or pairing chunks have been created in
+            the
+
+            recent epoch, the insurance with the lowest fee will be paired with
+            the
+
+            chunk. Once paired, the insurance contract can be cancelled using
+
+            MsgCancelProvideInsurance.
+             - INSURANCE_STATUS_PAIRED: An insurance is paired with a chunk. While the insurance is in this status,
+            it serves as a form of protection for the chunk by insuring it
+            against
+
+            unexpected loss that may occur due to validator slashing. This
+            ensures that
+
+            the chunk remains same size and maximize its staking rewards.
+             - INSURANCE_STATUS_UNPAIRING: A paired insurance enters this status when it no longer has enough balance
+            (=5.75% of chunk size tokens) to cover slashing penalties, when the
+
+            validator is tombstoned, or when the paired chunk is started to be
+
+            undelegated by MsgLiquidUnstake. At the next epoch, unpairing will
+            be
+
+            unpaired or pairing if it still valid.
+             - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL: A paired insurance enters this status when there was a
+            queued WithdrawalInsuranceRequest created by MsgWithdrawInsurance at
+            the
+
+            epoch.
+             - INSURANCE_STATUS_UNPAIRED: Unpairing insurances from previous epoch can enter this status.
+            Unpaired insurance can be withdrawn immediately by
+            MsgWithdrawInsurance.
+          in: query
+          required: false
+          type: string
+          enum:
+            - INSURANCE_STATUS_UNSPECIFIED
+            - INSURANCE_STATUS_PAIRING
+            - INSURANCE_STATUS_PAIRED
+            - INSURANCE_STATUS_UNPAIRING
+            - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL
+            - INSURANCE_STATUS_UNPAIRED
+          default: INSURANCE_STATUS_UNSPECIFIED
+        - name: validator_address
+          description: Query all insurances pointing to a specific validator.
+          in: query
+          required: false
+          type: string
+        - name: provider_address
+          description: Query all insurances provided by ProviderAddress.
+          in: query
+          required: false
+          type: string
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+          format: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+          format: boolean
+      tags:
+        - Query
+  '/canto/liquidstaking/v1/insurances/{id}':
+    get:
+      summary: Insurance returns an insurance by id.
+      operationId: Insurance
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              insurance:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uint64
+                    title: Unique id increased by 1
+                  validator_address:
+                    type: string
+                    title: Address of the validator
+                  provider_address:
+                    type: string
+                    title: Address of the insurance provider
+                  fee_rate:
+                    type: string
+                  chunk_id:
+                    type: string
+                    format: uint64
+                    title: Id of the chunk for which the insurance has a duty
+                  status:
+                    title: Status of the insurance
+                    type: string
+                    enum:
+                      - INSURANCE_STATUS_UNSPECIFIED
+                      - INSURANCE_STATUS_PAIRING
+                      - INSURANCE_STATUS_PAIRED
+                      - INSURANCE_STATUS_UNPAIRING
+                      - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL
+                      - INSURANCE_STATUS_UNPAIRED
+                    default: INSURANCE_STATUS_UNSPECIFIED
+                    description: >-
+                      InsuranceStatus defines the status of the insurance.
+
+                       - INSURANCE_STATUS_PAIRING: This is the default status of an insurance when an insurance provider sends
+                      a MsgProvideInsurance. This status indicates that the
+                      insurance is ready to
+
+                      be paired with a chunk. When an empty slot is available
+                      and either
+
+                      msgLiquidStake is received or pairing chunks have been
+                      created in the
+
+                      recent epoch, the insurance with the lowest fee will be
+                      paired with the
+
+                      chunk. Once paired, the insurance contract can be
+                      cancelled using
+
+                      MsgCancelProvideInsurance.
+                       - INSURANCE_STATUS_PAIRED: An insurance is paired with a chunk. While the insurance is in this status,
+                      it serves as a form of protection for the chunk by
+                      insuring it against
+
+                      unexpected loss that may occur due to validator slashing.
+                      This ensures that
+
+                      the chunk remains same size and maximize its staking
+                      rewards.
+                       - INSURANCE_STATUS_UNPAIRING: A paired insurance enters this status when it no longer has enough balance
+                      (=5.75% of chunk size tokens) to cover slashing penalties,
+                      when the
+
+                      validator is tombstoned, or when the paired chunk is
+                      started to be
+
+                      undelegated by MsgLiquidUnstake. At the next epoch,
+                      unpairing will be
+
+                      unpaired or pairing if it still valid.
+                       - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL: A paired insurance enters this status when there was a
+                      queued WithdrawalInsuranceRequest created by
+                      MsgWithdrawInsurance at the
+
+                      epoch.
+                       - INSURANCE_STATUS_UNPAIRED: Unpairing insurances from previous epoch can enter this status.
+                      Unpaired insurance can be withdrawn immediately by
+                      MsgWithdrawInsurance.
+                description: Insurance defines the insurance of the module.
+              derived_address:
+                type: string
+              fee_pool_address:
+                type: string
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
+  '/canto/liquidstaking/v1/insurances/{id}/withdraw_insurance_requests':
+    get:
+      summary: WithdrawInsuranceRequest returns a withdraw insurance request by id.
+      operationId: WithdrawInsuranceRequest
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              withdraw_insurance_request:
+                type: object
+                properties:
+                  insurance_id:
+                    type: string
+                    format: uint64
+                    title: Which insurance is requested for withdrawal
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
+  /canto/liquidstaking/v1/minimum_collateral:
+    get:
+      summary: |-
+        MinimumCollateral returns the minimum collateral of the module.
+        Insurance providers must provide collateral greater than or equal to the
+        minimum collateral.
+      operationId: MinimumCollateral
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              minimum_collateral:
+                type: object
+                properties:
+                  denom:
+                    type: string
+                  amount:
+                    type: string
+                description: >-
+                  DecCoin defines a token with a denomination and a decimal
+                  amount.
+
+
+                  NOTE: The amount field is an Dec which implements the custom
+                  method
+
+                  signatures required by gogoproto.
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      tags:
+        - Query
+  /canto/liquidstaking/v1/params:
+    get:
+      summary: Params retrieves the total set of minting parameters.
+      operationId: LiquidStakingParams
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                description: params defines the parameters of the module.
+                type: object
+                properties:
+                  dynamic_fee_rate:
+                    type: object
+                    properties:
+                      r0:
+                        type: string
+                        title: minimum fee rate
+                      u_soft_cap:
+                        type: string
+                        description: >-
+                          Softcap for utilization ratio. If the utilization
+                          ratio is below this
+
+                          value, fee rate is R0.
+                      u_hard_cap:
+                        type: string
+                        description: >-
+                          Hardcap for utilization ratio. If the utilization
+                          ratio cannot bigger than
+
+                          this value.
+                      u_optimal:
+                        type: string
+                        description: Optimal utilization ratio.
+                      slope1:
+                        type: string
+                        description: >-
+                          If the current utilization ratio is between softcap
+                          and optimal, fee rate
+
+                          increases at a slow pace.
+                      slope2:
+                        type: string
+                        description: >-
+                          If the current utilization ratio is above optimal, fee
+                          rate increases at a
+
+                          faster pace.
+                      max_fee_rate:
+                        type: string
+                        description: Maximum fee rate.
+                    description: >-
+                      DynamicFeeRate defines parameters realated with dynamic
+                      fee rate mechanism.
+                  maximum_discount_rate:
+                    type: string
+            description: >-
+              QueryParamsResponse is the response type for the Query/Params RPC
+              method.
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      tags:
+        - Query
+  /canto/liquidstaking/v1/redelegation_infos:
+    get:
+      operationId: RedelegationInfos
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              redelegation_infos:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    chunk_id:
+                      type: string
+                      format: uint64
+                    completion_time:
+                      type: string
+                      format: date-time
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+          format: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+          format: boolean
+      tags:
+        - Query
+  /canto/liquidstaking/v1/states:
+    get:
+      summary: States returns the states of the module.
+      operationId: States
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              net_amount_state:
+                type: object
+                properties:
+                  mint_rate:
+                    type: string
+                    title: Calculated by (total supply of ls tokens) / NetAmount
+                  ls_tokens_total_supply:
+                    type: string
+                    title: >-
+                      Total supply of ls tokens
+
+                      e.g. 100 ls tokens minted -> 10 ls tokens burned, then
+                      total supply is 90
+
+                      ls tokens
+                  net_amount:
+                    type: string
+                    title: >-
+                      Calculated by reward module account's native token balance
+                      + all
+
+                      all chunk's native token balance + sum of token values of
+                      all chunk's
+
+                      delegation shares + sum of all remaining rewards of paired
+                      chunks since
+
+                      last Epoch + all unbonding delegation tokens of unpairing
+                      chunks
+                  total_liquid_tokens:
+                    type: string
+                    title: >-
+                      The token amount worth of all delegation shares of all
+                      paired chunks
+
+                      (slashing applied amount)
+                  reward_module_acc_balance:
+                    type: string
+                    title: Balance of reward module account
+                  fee_rate:
+                    type: string
+                    title: Fee rate applied when deduct module fee at epoch
+                  utilization_ratio:
+                    type: string
+                    title: Utilization ratio
+                  remaining_chunk_slots:
+                    type: string
+                    title: How many chunks which can be created left?
+                  discount_rate:
+                    type: string
+                    title: Discount rate applied when withdraw rewards
+                  num_paired_chunks:
+                    type: string
+                    title: |-
+                      --- Chunk related fields
+                      The number of paired chunks
+                  chunk_size:
+                    type: string
+                    title: Current chunk size tokens
+                  total_del_shares:
+                    type: string
+                    title: Total delegation shares of all paired chunks
+                  total_remaining_rewards:
+                    type: string
+                    title: >-
+                      The cumulative reward of all chunks delegations from the
+                      last distribution
+                  total_chunks_balance:
+                    type: string
+                    description: >-
+                      Sum of the balances of all chunks.
+
+                      Note: Paired chunks can be pairing status for various
+                      reasons (such as lack
+
+                      of insurance). In such cases, the delegated native tokens
+                      returns to the
+
+                      balance of DerivedAddress(Chunk.Id) after un-bonding
+                      period is finished.
+                  total_unbonding_chunks_balance:
+                    type: string
+                    title: |-
+                      The sum of unbonding balance of all chunks in Unpairing or
+                      UnpairingForUnstaking
+                  total_insurance_tokens:
+                    type: string
+                    title: >-
+                      --- Insurance related fields
+
+                      The sum of all insurances' amount (=
+                      DerivedAddress(Insurance.Id).Balance)
+                  total_paired_insurance_tokens:
+                    type: string
+                    title: |-
+                      The sum of all paired insurances' amount (=
+                      DerivedAddress(Insurance.Id).Balance)
+                  total_unpairing_insurance_tokens:
+                    type: string
+                    title: |-
+                      The sum of all unpairing insurances' amount (=
+                      DerivedAddress(Insurance.Id).Balance)
+                  total_remaining_insurance_commissions:
+                    type: string
+                    title: The cumulative commissions of all insurances
+                description: >-
+                  NetAmountState is type for net amount raw data and mint rate,
+                  This is a value
+
+                  that depends on the several module state every time, so it is
+                  used only for
+
+                  calculation and query and is not stored in kv.
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      tags:
+        - Query
+  /canto/liquidstaking/v1/unpairing_for_unstaking_chunk_infos:
+    get:
+      summary: >-
+        UnpairingForUnstakingChunkInfos returns all unpairing for unstaking
+        chunk
+
+        infos on the module.
+      operationId: UnpairingForUnstakingChunkInfos
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              unpairing_for_unstaking_chunk_infos:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    chunk_id:
+                      type: string
+                      format: uint64
+                      title: Which chunk is unpairing for unstaking
+                    delegator_address:
+                      type: string
+                      title: Address of delegator (=liquid unstaker)
+                    escrowed_lstokens:
+                      type: string
+                      title: How much lstokens will be burned when unbonding finished
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: delegator_address
+          in: query
+          required: false
+          type: string
+        - name: queued
+          description: |-
+            If queued is true, it means that liquid unstake hasn't started yet.
+            If queued is false, it means that liquid unstake has started.
+          in: query
+          required: false
+          type: boolean
+          format: boolean
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+          format: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+          format: boolean
+      tags:
+        - Query
+  /canto/liquidstaking/v1/withdraw_insurance_requests:
+    get:
+      summary: |-
+        WithdrawInsuranceRequests returns all withdraw insurance requests on the
+        module.
+      operationId: WithdrawInsuranceRequests
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              withdraw_insurance_requests:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    insurance_id:
+                      type: string
+                      format: uint64
+                      title: Which insurance is requested for withdrawal
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: provider_address
+          description: Query all withdraw insurance requests requested by ProviderAddress.
+          in: query
+          required: false
+          type: string
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+          format: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+          format: boolean
+      tags:
+        - Query
   /ethermint/feemarket/v1/base_fee:
     get:
       summary: BaseFee queries the base fee of the parent block of the current block.
@@ -34740,6 +36420,1198 @@ definitions:
         format: boolean
         title: enable return data capture
     description: TraceConfig holds extra parameters to trace functions.
+  canto.liquidstaking.v1.Chunk:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uint64
+        title: Unique id increased by 1
+      paired_insurance_id:
+        type: string
+        format: uint64
+        title: 'Id of Paired insurance, 0 means no insurance'
+      unpairing_insurance_id:
+        type: string
+        format: uint64
+        title: 'Id of Unpairing insurance, 0 means no insurance'
+      status:
+        type: string
+        enum:
+          - CHUNK_STATUS_UNSPECIFIED
+          - CHUNK_STATUS_PAIRING
+          - CHUNK_STATUS_PAIRED
+          - CHUNK_STATUS_UNPAIRING
+          - CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING
+        default: CHUNK_STATUS_UNSPECIFIED
+        description: >-
+          ChunkStatus defines the status of the chunk.
+
+           - CHUNK_STATUS_PAIRING: This status indicates that the chunk is ready to be paired with an
+          insurance.
+           - CHUNK_STATUS_PAIRED: A chunk is paired with an insurance that has the lowest fee rate.
+          The fee rate is determined by the sum of the insurance fee rate set by
+
+          the insurance provider and the commission fee rate set by the
+          validator
+
+          designated by the insurance provider.
+           - CHUNK_STATUS_UNPAIRING: A paired chunk enters this status when paired insurance is started to be
+          withdrawn or it's balance <= 5.75%(double_sign_fraction +
+
+          down_time_fraction) of chunk size tokens or the validator becomes
+
+          tombstoned.
+           - CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING: When a delegator (also known as a liquid staker) sends a MsgLiquidUnstake,
+          it is queued as a UnpairingForUnstakingChunkInfo. At the end of the
+          epoch,
+
+          the actual undelegation is triggered and the chunk enters this state.
+
+          Once the unbonding period is over in next epoch, the tokens
+          corresponding
+
+          chunk size are returned to the delegator's account and the associated
+          chunk
+
+          object is removed.
+    description: Chunk defines the chunk of the module.
+  canto.liquidstaking.v1.ChunkStatus:
+    type: string
+    enum:
+      - CHUNK_STATUS_UNSPECIFIED
+      - CHUNK_STATUS_PAIRING
+      - CHUNK_STATUS_PAIRED
+      - CHUNK_STATUS_UNPAIRING
+      - CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING
+    default: CHUNK_STATUS_UNSPECIFIED
+    description: >-
+      ChunkStatus defines the status of the chunk.
+
+       - CHUNK_STATUS_PAIRING: This status indicates that the chunk is ready to be paired with an
+      insurance.
+       - CHUNK_STATUS_PAIRED: A chunk is paired with an insurance that has the lowest fee rate.
+      The fee rate is determined by the sum of the insurance fee rate set by
+
+      the insurance provider and the commission fee rate set by the validator
+
+      designated by the insurance provider.
+       - CHUNK_STATUS_UNPAIRING: A paired chunk enters this status when paired insurance is started to be
+      withdrawn or it's balance <= 5.75%(double_sign_fraction +
+
+      down_time_fraction) of chunk size tokens or the validator becomes
+
+      tombstoned.
+       - CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING: When a delegator (also known as a liquid staker) sends a MsgLiquidUnstake,
+      it is queued as a UnpairingForUnstakingChunkInfo. At the end of the epoch,
+
+      the actual undelegation is triggered and the chunk enters this state.
+
+      Once the unbonding period is over in next epoch, the tokens corresponding
+
+      chunk size are returned to the delegator's account and the associated
+      chunk
+
+      object is removed.
+  canto.liquidstaking.v1.DynamicFeeRate:
+    type: object
+    properties:
+      r0:
+        type: string
+        title: minimum fee rate
+      u_soft_cap:
+        type: string
+        description: |-
+          Softcap for utilization ratio. If the utilization ratio is below this
+          value, fee rate is R0.
+      u_hard_cap:
+        type: string
+        description: >-
+          Hardcap for utilization ratio. If the utilization ratio cannot bigger
+          than
+
+          this value.
+      u_optimal:
+        type: string
+        description: Optimal utilization ratio.
+      slope1:
+        type: string
+        description: >-
+          If the current utilization ratio is between softcap and optimal, fee
+          rate
+
+          increases at a slow pace.
+      slope2:
+        type: string
+        description: >-
+          If the current utilization ratio is above optimal, fee rate increases
+          at a
+
+          faster pace.
+      max_fee_rate:
+        type: string
+        description: Maximum fee rate.
+    description: >-
+      DynamicFeeRate defines parameters realated with dynamic fee rate
+      mechanism.
+  canto.liquidstaking.v1.Epoch:
+    type: object
+    properties:
+      current_number:
+        type: string
+        format: uint64
+      start_time:
+        type: string
+        format: date-time
+      duration:
+        type: string
+      start_height:
+        type: string
+        format: int64
+    description: Epoch defines the epoch of the module.
+  canto.liquidstaking.v1.Insurance:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uint64
+        title: Unique id increased by 1
+      validator_address:
+        type: string
+        title: Address of the validator
+      provider_address:
+        type: string
+        title: Address of the insurance provider
+      fee_rate:
+        type: string
+      chunk_id:
+        type: string
+        format: uint64
+        title: Id of the chunk for which the insurance has a duty
+      status:
+        title: Status of the insurance
+        type: string
+        enum:
+          - INSURANCE_STATUS_UNSPECIFIED
+          - INSURANCE_STATUS_PAIRING
+          - INSURANCE_STATUS_PAIRED
+          - INSURANCE_STATUS_UNPAIRING
+          - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL
+          - INSURANCE_STATUS_UNPAIRED
+        default: INSURANCE_STATUS_UNSPECIFIED
+        description: >-
+          InsuranceStatus defines the status of the insurance.
+
+           - INSURANCE_STATUS_PAIRING: This is the default status of an insurance when an insurance provider sends
+          a MsgProvideInsurance. This status indicates that the insurance is
+          ready to
+
+          be paired with a chunk. When an empty slot is available and either
+
+          msgLiquidStake is received or pairing chunks have been created in the
+
+          recent epoch, the insurance with the lowest fee will be paired with
+          the
+
+          chunk. Once paired, the insurance contract can be cancelled using
+
+          MsgCancelProvideInsurance.
+           - INSURANCE_STATUS_PAIRED: An insurance is paired with a chunk. While the insurance is in this status,
+          it serves as a form of protection for the chunk by insuring it against
+
+          unexpected loss that may occur due to validator slashing. This ensures
+          that
+
+          the chunk remains same size and maximize its staking rewards.
+           - INSURANCE_STATUS_UNPAIRING: A paired insurance enters this status when it no longer has enough balance
+          (=5.75% of chunk size tokens) to cover slashing penalties, when the
+
+          validator is tombstoned, or when the paired chunk is started to be
+
+          undelegated by MsgLiquidUnstake. At the next epoch, unpairing will be
+
+          unpaired or pairing if it still valid.
+           - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL: A paired insurance enters this status when there was a
+          queued WithdrawalInsuranceRequest created by MsgWithdrawInsurance at
+          the
+
+          epoch.
+           - INSURANCE_STATUS_UNPAIRED: Unpairing insurances from previous epoch can enter this status.
+          Unpaired insurance can be withdrawn immediately by
+          MsgWithdrawInsurance.
+    description: Insurance defines the insurance of the module.
+  canto.liquidstaking.v1.InsuranceStatus:
+    type: string
+    enum:
+      - INSURANCE_STATUS_UNSPECIFIED
+      - INSURANCE_STATUS_PAIRING
+      - INSURANCE_STATUS_PAIRED
+      - INSURANCE_STATUS_UNPAIRING
+      - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL
+      - INSURANCE_STATUS_UNPAIRED
+    default: INSURANCE_STATUS_UNSPECIFIED
+    description: >-
+      InsuranceStatus defines the status of the insurance.
+
+       - INSURANCE_STATUS_PAIRING: This is the default status of an insurance when an insurance provider sends
+      a MsgProvideInsurance. This status indicates that the insurance is ready
+      to
+
+      be paired with a chunk. When an empty slot is available and either
+
+      msgLiquidStake is received or pairing chunks have been created in the
+
+      recent epoch, the insurance with the lowest fee will be paired with the
+
+      chunk. Once paired, the insurance contract can be cancelled using
+
+      MsgCancelProvideInsurance.
+       - INSURANCE_STATUS_PAIRED: An insurance is paired with a chunk. While the insurance is in this status,
+      it serves as a form of protection for the chunk by insuring it against
+
+      unexpected loss that may occur due to validator slashing. This ensures
+      that
+
+      the chunk remains same size and maximize its staking rewards.
+       - INSURANCE_STATUS_UNPAIRING: A paired insurance enters this status when it no longer has enough balance
+      (=5.75% of chunk size tokens) to cover slashing penalties, when the
+
+      validator is tombstoned, or when the paired chunk is started to be
+
+      undelegated by MsgLiquidUnstake. At the next epoch, unpairing will be
+
+      unpaired or pairing if it still valid.
+       - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL: A paired insurance enters this status when there was a
+      queued WithdrawalInsuranceRequest created by MsgWithdrawInsurance at the
+
+      epoch.
+       - INSURANCE_STATUS_UNPAIRED: Unpairing insurances from previous epoch can enter this status.
+      Unpaired insurance can be withdrawn immediately by MsgWithdrawInsurance.
+  canto.liquidstaking.v1.NetAmountState:
+    type: object
+    properties:
+      mint_rate:
+        type: string
+        title: Calculated by (total supply of ls tokens) / NetAmount
+      ls_tokens_total_supply:
+        type: string
+        title: >-
+          Total supply of ls tokens
+
+          e.g. 100 ls tokens minted -> 10 ls tokens burned, then total supply is
+          90
+
+          ls tokens
+      net_amount:
+        type: string
+        title: >-
+          Calculated by reward module account's native token balance + all
+
+          all chunk's native token balance + sum of token values of all chunk's
+
+          delegation shares + sum of all remaining rewards of paired chunks
+          since
+
+          last Epoch + all unbonding delegation tokens of unpairing chunks
+      total_liquid_tokens:
+        type: string
+        title: |-
+          The token amount worth of all delegation shares of all paired chunks
+          (slashing applied amount)
+      reward_module_acc_balance:
+        type: string
+        title: Balance of reward module account
+      fee_rate:
+        type: string
+        title: Fee rate applied when deduct module fee at epoch
+      utilization_ratio:
+        type: string
+        title: Utilization ratio
+      remaining_chunk_slots:
+        type: string
+        title: How many chunks which can be created left?
+      discount_rate:
+        type: string
+        title: Discount rate applied when withdraw rewards
+      num_paired_chunks:
+        type: string
+        title: |-
+          --- Chunk related fields
+          The number of paired chunks
+      chunk_size:
+        type: string
+        title: Current chunk size tokens
+      total_del_shares:
+        type: string
+        title: Total delegation shares of all paired chunks
+      total_remaining_rewards:
+        type: string
+        title: >-
+          The cumulative reward of all chunks delegations from the last
+          distribution
+      total_chunks_balance:
+        type: string
+        description: >-
+          Sum of the balances of all chunks.
+
+          Note: Paired chunks can be pairing status for various reasons (such as
+          lack
+
+          of insurance). In such cases, the delegated native tokens returns to
+          the
+
+          balance of DerivedAddress(Chunk.Id) after un-bonding period is
+          finished.
+      total_unbonding_chunks_balance:
+        type: string
+        title: |-
+          The sum of unbonding balance of all chunks in Unpairing or
+          UnpairingForUnstaking
+      total_insurance_tokens:
+        type: string
+        title: >-
+          --- Insurance related fields
+
+          The sum of all insurances' amount (=
+          DerivedAddress(Insurance.Id).Balance)
+      total_paired_insurance_tokens:
+        type: string
+        title: |-
+          The sum of all paired insurances' amount (=
+          DerivedAddress(Insurance.Id).Balance)
+      total_unpairing_insurance_tokens:
+        type: string
+        title: |-
+          The sum of all unpairing insurances' amount (=
+          DerivedAddress(Insurance.Id).Balance)
+      total_remaining_insurance_commissions:
+        type: string
+        title: The cumulative commissions of all insurances
+    description: >-
+      NetAmountState is type for net amount raw data and mint rate, This is a
+      value
+
+      that depends on the several module state every time, so it is used only
+      for
+
+      calculation and query and is not stored in kv.
+  canto.liquidstaking.v1.Params:
+    type: object
+    properties:
+      dynamic_fee_rate:
+        type: object
+        properties:
+          r0:
+            type: string
+            title: minimum fee rate
+          u_soft_cap:
+            type: string
+            description: >-
+              Softcap for utilization ratio. If the utilization ratio is below
+              this
+
+              value, fee rate is R0.
+          u_hard_cap:
+            type: string
+            description: >-
+              Hardcap for utilization ratio. If the utilization ratio cannot
+              bigger than
+
+              this value.
+          u_optimal:
+            type: string
+            description: Optimal utilization ratio.
+          slope1:
+            type: string
+            description: >-
+              If the current utilization ratio is between softcap and optimal,
+              fee rate
+
+              increases at a slow pace.
+          slope2:
+            type: string
+            description: >-
+              If the current utilization ratio is above optimal, fee rate
+              increases at a
+
+              faster pace.
+          max_fee_rate:
+            type: string
+            description: Maximum fee rate.
+        description: >-
+          DynamicFeeRate defines parameters realated with dynamic fee rate
+          mechanism.
+      maximum_discount_rate:
+        type: string
+    description: Params defines the parameters for the module.
+  canto.liquidstaking.v1.QueryChunkResponse:
+    type: object
+    properties:
+      chunk:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uint64
+            title: Unique id increased by 1
+          paired_insurance_id:
+            type: string
+            format: uint64
+            title: 'Id of Paired insurance, 0 means no insurance'
+          unpairing_insurance_id:
+            type: string
+            format: uint64
+            title: 'Id of Unpairing insurance, 0 means no insurance'
+          status:
+            type: string
+            enum:
+              - CHUNK_STATUS_UNSPECIFIED
+              - CHUNK_STATUS_PAIRING
+              - CHUNK_STATUS_PAIRED
+              - CHUNK_STATUS_UNPAIRING
+              - CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING
+            default: CHUNK_STATUS_UNSPECIFIED
+            description: >-
+              ChunkStatus defines the status of the chunk.
+
+               - CHUNK_STATUS_PAIRING: This status indicates that the chunk is ready to be paired with an
+              insurance.
+               - CHUNK_STATUS_PAIRED: A chunk is paired with an insurance that has the lowest fee rate.
+              The fee rate is determined by the sum of the insurance fee rate
+              set by
+
+              the insurance provider and the commission fee rate set by the
+              validator
+
+              designated by the insurance provider.
+               - CHUNK_STATUS_UNPAIRING: A paired chunk enters this status when paired insurance is started to be
+              withdrawn or it's balance <= 5.75%(double_sign_fraction +
+
+              down_time_fraction) of chunk size tokens or the validator becomes
+
+              tombstoned.
+               - CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING: When a delegator (also known as a liquid staker) sends a MsgLiquidUnstake,
+              it is queued as a UnpairingForUnstakingChunkInfo. At the end of
+              the epoch,
+
+              the actual undelegation is triggered and the chunk enters this
+              state.
+
+              Once the unbonding period is over in next epoch, the tokens
+              corresponding
+
+              chunk size are returned to the delegator's account and the
+              associated chunk
+
+              object is removed.
+        description: Chunk defines the chunk of the module.
+      derived_address:
+        type: string
+  canto.liquidstaking.v1.QueryChunkSizeResponse:
+    type: object
+    properties:
+      chunk_size:
+        type: object
+        properties:
+          denom:
+            type: string
+          amount:
+            type: string
+        description: |-
+          Coin defines a token with a denomination and an amount.
+
+          NOTE: The amount field is an Int which implements the custom method
+          signatures required by gogoproto.
+  canto.liquidstaking.v1.QueryChunksResponse:
+    type: object
+    properties:
+      chunks:
+        type: array
+        items:
+          type: object
+          properties:
+            chunk:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uint64
+                  title: Unique id increased by 1
+                paired_insurance_id:
+                  type: string
+                  format: uint64
+                  title: 'Id of Paired insurance, 0 means no insurance'
+                unpairing_insurance_id:
+                  type: string
+                  format: uint64
+                  title: 'Id of Unpairing insurance, 0 means no insurance'
+                status:
+                  type: string
+                  enum:
+                    - CHUNK_STATUS_UNSPECIFIED
+                    - CHUNK_STATUS_PAIRING
+                    - CHUNK_STATUS_PAIRED
+                    - CHUNK_STATUS_UNPAIRING
+                    - CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING
+                  default: CHUNK_STATUS_UNSPECIFIED
+                  description: >-
+                    ChunkStatus defines the status of the chunk.
+
+                     - CHUNK_STATUS_PAIRING: This status indicates that the chunk is ready to be paired with an
+                    insurance.
+                     - CHUNK_STATUS_PAIRED: A chunk is paired with an insurance that has the lowest fee rate.
+                    The fee rate is determined by the sum of the insurance fee
+                    rate set by
+
+                    the insurance provider and the commission fee rate set by
+                    the validator
+
+                    designated by the insurance provider.
+                     - CHUNK_STATUS_UNPAIRING: A paired chunk enters this status when paired insurance is started to be
+                    withdrawn or it's balance <= 5.75%(double_sign_fraction +
+
+                    down_time_fraction) of chunk size tokens or the validator
+                    becomes
+
+                    tombstoned.
+                     - CHUNK_STATUS_UNPAIRING_FOR_UNSTAKING: When a delegator (also known as a liquid staker) sends a MsgLiquidUnstake,
+                    it is queued as a UnpairingForUnstakingChunkInfo. At the end
+                    of the epoch,
+
+                    the actual undelegation is triggered and the chunk enters
+                    this state.
+
+                    Once the unbonding period is over in next epoch, the tokens
+                    corresponding
+
+                    chunk size are returned to the delegator's account and the
+                    associated chunk
+
+                    object is removed.
+              description: Chunk defines the chunk of the module.
+            derived_address:
+              type: string
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  canto.liquidstaking.v1.QueryEpochResponse:
+    type: object
+    properties:
+      epoch:
+        description: epoch defines the current epoch of the module.
+        type: object
+        properties:
+          current_number:
+            type: string
+            format: uint64
+          start_time:
+            type: string
+            format: date-time
+          duration:
+            type: string
+          start_height:
+            type: string
+            format: int64
+  canto.liquidstaking.v1.QueryInsuranceResponse:
+    type: object
+    properties:
+      insurance:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uint64
+            title: Unique id increased by 1
+          validator_address:
+            type: string
+            title: Address of the validator
+          provider_address:
+            type: string
+            title: Address of the insurance provider
+          fee_rate:
+            type: string
+          chunk_id:
+            type: string
+            format: uint64
+            title: Id of the chunk for which the insurance has a duty
+          status:
+            title: Status of the insurance
+            type: string
+            enum:
+              - INSURANCE_STATUS_UNSPECIFIED
+              - INSURANCE_STATUS_PAIRING
+              - INSURANCE_STATUS_PAIRED
+              - INSURANCE_STATUS_UNPAIRING
+              - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL
+              - INSURANCE_STATUS_UNPAIRED
+            default: INSURANCE_STATUS_UNSPECIFIED
+            description: >-
+              InsuranceStatus defines the status of the insurance.
+
+               - INSURANCE_STATUS_PAIRING: This is the default status of an insurance when an insurance provider sends
+              a MsgProvideInsurance. This status indicates that the insurance is
+              ready to
+
+              be paired with a chunk. When an empty slot is available and either
+
+              msgLiquidStake is received or pairing chunks have been created in
+              the
+
+              recent epoch, the insurance with the lowest fee will be paired
+              with the
+
+              chunk. Once paired, the insurance contract can be cancelled using
+
+              MsgCancelProvideInsurance.
+               - INSURANCE_STATUS_PAIRED: An insurance is paired with a chunk. While the insurance is in this status,
+              it serves as a form of protection for the chunk by insuring it
+              against
+
+              unexpected loss that may occur due to validator slashing. This
+              ensures that
+
+              the chunk remains same size and maximize its staking rewards.
+               - INSURANCE_STATUS_UNPAIRING: A paired insurance enters this status when it no longer has enough balance
+              (=5.75% of chunk size tokens) to cover slashing penalties, when
+              the
+
+              validator is tombstoned, or when the paired chunk is started to be
+
+              undelegated by MsgLiquidUnstake. At the next epoch, unpairing will
+              be
+
+              unpaired or pairing if it still valid.
+               - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL: A paired insurance enters this status when there was a
+              queued WithdrawalInsuranceRequest created by MsgWithdrawInsurance
+              at the
+
+              epoch.
+               - INSURANCE_STATUS_UNPAIRED: Unpairing insurances from previous epoch can enter this status.
+              Unpaired insurance can be withdrawn immediately by
+              MsgWithdrawInsurance.
+        description: Insurance defines the insurance of the module.
+      derived_address:
+        type: string
+      fee_pool_address:
+        type: string
+  canto.liquidstaking.v1.QueryInsurancesResponse:
+    type: object
+    properties:
+      insurances:
+        type: array
+        items:
+          type: object
+          properties:
+            insurance:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uint64
+                  title: Unique id increased by 1
+                validator_address:
+                  type: string
+                  title: Address of the validator
+                provider_address:
+                  type: string
+                  title: Address of the insurance provider
+                fee_rate:
+                  type: string
+                chunk_id:
+                  type: string
+                  format: uint64
+                  title: Id of the chunk for which the insurance has a duty
+                status:
+                  title: Status of the insurance
+                  type: string
+                  enum:
+                    - INSURANCE_STATUS_UNSPECIFIED
+                    - INSURANCE_STATUS_PAIRING
+                    - INSURANCE_STATUS_PAIRED
+                    - INSURANCE_STATUS_UNPAIRING
+                    - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL
+                    - INSURANCE_STATUS_UNPAIRED
+                  default: INSURANCE_STATUS_UNSPECIFIED
+                  description: >-
+                    InsuranceStatus defines the status of the insurance.
+
+                     - INSURANCE_STATUS_PAIRING: This is the default status of an insurance when an insurance provider sends
+                    a MsgProvideInsurance. This status indicates that the
+                    insurance is ready to
+
+                    be paired with a chunk. When an empty slot is available and
+                    either
+
+                    msgLiquidStake is received or pairing chunks have been
+                    created in the
+
+                    recent epoch, the insurance with the lowest fee will be
+                    paired with the
+
+                    chunk. Once paired, the insurance contract can be cancelled
+                    using
+
+                    MsgCancelProvideInsurance.
+                     - INSURANCE_STATUS_PAIRED: An insurance is paired with a chunk. While the insurance is in this status,
+                    it serves as a form of protection for the chunk by insuring
+                    it against
+
+                    unexpected loss that may occur due to validator slashing.
+                    This ensures that
+
+                    the chunk remains same size and maximize its staking
+                    rewards.
+                     - INSURANCE_STATUS_UNPAIRING: A paired insurance enters this status when it no longer has enough balance
+                    (=5.75% of chunk size tokens) to cover slashing penalties,
+                    when the
+
+                    validator is tombstoned, or when the paired chunk is started
+                    to be
+
+                    undelegated by MsgLiquidUnstake. At the next epoch,
+                    unpairing will be
+
+                    unpaired or pairing if it still valid.
+                     - INSURANCE_STATUS_UNPAIRING_FOR_WITHDRAWAL: A paired insurance enters this status when there was a
+                    queued WithdrawalInsuranceRequest created by
+                    MsgWithdrawInsurance at the
+
+                    epoch.
+                     - INSURANCE_STATUS_UNPAIRED: Unpairing insurances from previous epoch can enter this status.
+                    Unpaired insurance can be withdrawn immediately by
+                    MsgWithdrawInsurance.
+              description: Insurance defines the insurance of the module.
+            derived_address:
+              type: string
+            fee_pool_address:
+              type: string
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  canto.liquidstaking.v1.QueryMinimumCollateralResponse:
+    type: object
+    properties:
+      minimum_collateral:
+        type: object
+        properties:
+          denom:
+            type: string
+          amount:
+            type: string
+        description: |-
+          DecCoin defines a token with a denomination and a decimal amount.
+
+          NOTE: The amount field is an Dec which implements the custom method
+          signatures required by gogoproto.
+  canto.liquidstaking.v1.QueryParamsResponse:
+    type: object
+    properties:
+      params:
+        description: params defines the parameters of the module.
+        type: object
+        properties:
+          dynamic_fee_rate:
+            type: object
+            properties:
+              r0:
+                type: string
+                title: minimum fee rate
+              u_soft_cap:
+                type: string
+                description: >-
+                  Softcap for utilization ratio. If the utilization ratio is
+                  below this
+
+                  value, fee rate is R0.
+              u_hard_cap:
+                type: string
+                description: >-
+                  Hardcap for utilization ratio. If the utilization ratio cannot
+                  bigger than
+
+                  this value.
+              u_optimal:
+                type: string
+                description: Optimal utilization ratio.
+              slope1:
+                type: string
+                description: >-
+                  If the current utilization ratio is between softcap and
+                  optimal, fee rate
+
+                  increases at a slow pace.
+              slope2:
+                type: string
+                description: >-
+                  If the current utilization ratio is above optimal, fee rate
+                  increases at a
+
+                  faster pace.
+              max_fee_rate:
+                type: string
+                description: Maximum fee rate.
+            description: >-
+              DynamicFeeRate defines parameters realated with dynamic fee rate
+              mechanism.
+          maximum_discount_rate:
+            type: string
+    description: QueryParamsResponse is the response type for the Query/Params RPC method.
+  canto.liquidstaking.v1.QueryRedelegationInfoResponse:
+    type: object
+    properties:
+      redelegation_info:
+        type: object
+        properties:
+          chunk_id:
+            type: string
+            format: uint64
+          completion_time:
+            type: string
+            format: date-time
+  canto.liquidstaking.v1.QueryRedelegationInfosResponse:
+    type: object
+    properties:
+      redelegation_infos:
+        type: array
+        items:
+          type: object
+          properties:
+            chunk_id:
+              type: string
+              format: uint64
+            completion_time:
+              type: string
+              format: date-time
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  canto.liquidstaking.v1.QueryStatesResponse:
+    type: object
+    properties:
+      net_amount_state:
+        type: object
+        properties:
+          mint_rate:
+            type: string
+            title: Calculated by (total supply of ls tokens) / NetAmount
+          ls_tokens_total_supply:
+            type: string
+            title: >-
+              Total supply of ls tokens
+
+              e.g. 100 ls tokens minted -> 10 ls tokens burned, then total
+              supply is 90
+
+              ls tokens
+          net_amount:
+            type: string
+            title: >-
+              Calculated by reward module account's native token balance + all
+
+              all chunk's native token balance + sum of token values of all
+              chunk's
+
+              delegation shares + sum of all remaining rewards of paired chunks
+              since
+
+              last Epoch + all unbonding delegation tokens of unpairing chunks
+          total_liquid_tokens:
+            type: string
+            title: >-
+              The token amount worth of all delegation shares of all paired
+              chunks
+
+              (slashing applied amount)
+          reward_module_acc_balance:
+            type: string
+            title: Balance of reward module account
+          fee_rate:
+            type: string
+            title: Fee rate applied when deduct module fee at epoch
+          utilization_ratio:
+            type: string
+            title: Utilization ratio
+          remaining_chunk_slots:
+            type: string
+            title: How many chunks which can be created left?
+          discount_rate:
+            type: string
+            title: Discount rate applied when withdraw rewards
+          num_paired_chunks:
+            type: string
+            title: |-
+              --- Chunk related fields
+              The number of paired chunks
+          chunk_size:
+            type: string
+            title: Current chunk size tokens
+          total_del_shares:
+            type: string
+            title: Total delegation shares of all paired chunks
+          total_remaining_rewards:
+            type: string
+            title: >-
+              The cumulative reward of all chunks delegations from the last
+              distribution
+          total_chunks_balance:
+            type: string
+            description: >-
+              Sum of the balances of all chunks.
+
+              Note: Paired chunks can be pairing status for various reasons
+              (such as lack
+
+              of insurance). In such cases, the delegated native tokens returns
+              to the
+
+              balance of DerivedAddress(Chunk.Id) after un-bonding period is
+              finished.
+          total_unbonding_chunks_balance:
+            type: string
+            title: |-
+              The sum of unbonding balance of all chunks in Unpairing or
+              UnpairingForUnstaking
+          total_insurance_tokens:
+            type: string
+            title: >-
+              --- Insurance related fields
+
+              The sum of all insurances' amount (=
+              DerivedAddress(Insurance.Id).Balance)
+          total_paired_insurance_tokens:
+            type: string
+            title: |-
+              The sum of all paired insurances' amount (=
+              DerivedAddress(Insurance.Id).Balance)
+          total_unpairing_insurance_tokens:
+            type: string
+            title: |-
+              The sum of all unpairing insurances' amount (=
+              DerivedAddress(Insurance.Id).Balance)
+          total_remaining_insurance_commissions:
+            type: string
+            title: The cumulative commissions of all insurances
+        description: >-
+          NetAmountState is type for net amount raw data and mint rate, This is
+          a value
+
+          that depends on the several module state every time, so it is used
+          only for
+
+          calculation and query and is not stored in kv.
+  canto.liquidstaking.v1.QueryUnpairingForUnstakingChunkInfoResponse:
+    type: object
+    properties:
+      unpairing_for_unstaking_chunk_info:
+        type: object
+        properties:
+          chunk_id:
+            type: string
+            format: uint64
+            title: Which chunk is unpairing for unstaking
+          delegator_address:
+            type: string
+            title: Address of delegator (=liquid unstaker)
+          escrowed_lstokens:
+            type: string
+            title: How much lstokens will be burned when unbonding finished
+  canto.liquidstaking.v1.QueryUnpairingForUnstakingChunkInfosResponse:
+    type: object
+    properties:
+      unpairing_for_unstaking_chunk_infos:
+        type: array
+        items:
+          type: object
+          properties:
+            chunk_id:
+              type: string
+              format: uint64
+              title: Which chunk is unpairing for unstaking
+            delegator_address:
+              type: string
+              title: Address of delegator (=liquid unstaker)
+            escrowed_lstokens:
+              type: string
+              title: How much lstokens will be burned when unbonding finished
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  canto.liquidstaking.v1.QueryWithdrawInsuranceRequestResponse:
+    type: object
+    properties:
+      withdraw_insurance_request:
+        type: object
+        properties:
+          insurance_id:
+            type: string
+            format: uint64
+            title: Which insurance is requested for withdrawal
+  canto.liquidstaking.v1.QueryWithdrawInsuranceRequestsResponse:
+    type: object
+    properties:
+      withdraw_insurance_requests:
+        type: array
+        items:
+          type: object
+          properties:
+            insurance_id:
+              type: string
+              format: uint64
+              title: Which insurance is requested for withdrawal
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  canto.liquidstaking.v1.RedelegationInfo:
+    type: object
+    properties:
+      chunk_id:
+        type: string
+        format: uint64
+      completion_time:
+        type: string
+        format: date-time
+  canto.liquidstaking.v1.UnpairingForUnstakingChunkInfo:
+    type: object
+    properties:
+      chunk_id:
+        type: string
+        format: uint64
+        title: Which chunk is unpairing for unstaking
+      delegator_address:
+        type: string
+        title: Address of delegator (=liquid unstaker)
+      escrowed_lstokens:
+        type: string
+        title: How much lstokens will be burned when unbonding finished
+  canto.liquidstaking.v1.WithdrawInsuranceRequest:
+    type: object
+    properties:
+      insurance_id:
+        type: string
+        format: uint64
+        title: Which insurance is requested for withdrawal
+  cosmos.base.v1beta1.Coin:
+    type: object
+    properties:
+      denom:
+        type: string
+      amount:
+        type: string
+    description: |-
+      Coin defines a token with a denomination and an amount.
+
+      NOTE: The amount field is an Int which implements the custom method
+      signatures required by gogoproto.
   ethermint.feemarket.v1.Params:
     type: object
     properties:
@@ -35193,18 +38065,6 @@ definitions:
                 signatures required by gogoproto.
         title: Params defines token module's parameters
     description: QueryParamsResponse is response type for the Query/Params RPC method.
-  cosmos.base.v1beta1.Coin:
-    type: object
-    properties:
-      denom:
-        type: string
-      amount:
-        type: string
-    description: |-
-      Coin defines a token with a denomination and an amount.
-
-      NOTE: The amount field is an Int which implements the custom method
-      signatures required by gogoproto.
   ibc.applications.transfer.v1.DenomTrace:
     type: object
     properties:

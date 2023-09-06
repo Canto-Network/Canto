@@ -1,0 +1,27 @@
+syntax = "proto3";
+package canto.liquidstaking.v1;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "cosmos_proto/cosmos.proto";
+import "canto/liquidstaking/v1/liquidstaking.proto";
+
+option go_package = "github.com/Canto-Network/Canto/v7/x/liquidstaking/types";
+option (gogoproto.goproto_getters_all) = false;
+
+message GenesisState {
+  string liquid_bond_denom = 1;
+  Params params = 2 [ (gogoproto.nullable) = false ];
+  Epoch epoch = 3 [ (gogoproto.nullable) = false ];
+  uint64 last_chunk_id = 4;
+  uint64 last_insurance_id = 5;
+  repeated Chunk chunks = 6 [ (gogoproto.nullable) = false ];
+  repeated Insurance insurances = 7 [ (gogoproto.nullable) = false ];
+  repeated UnpairingForUnstakingChunkInfo unpairing_for_unstaking_chunk_infos =
+      9 [ (gogoproto.nullable) = false ];
+  repeated WithdrawInsuranceRequest withdraw_insurance_requests = 10
+      [ (gogoproto.nullable) = false ];
+  repeated RedelegationInfo redelegation_infos = 11
+      [ (gogoproto.nullable) = false ];
+}

@@ -109,6 +109,14 @@ func SimulateMsgAddLiquidity(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAddLiquidity, "tokenDenom should not be liquidity token"), nil, err
 		}
 
+		params := k.GetParams(ctx)
+		if !params.MaxSwapAmount.AmountOf(maxToken.Denom).IsPositive() {
+			return simtypes.NoOpMsg(
+				types.ModuleName, types.TypeMsgAddLiquidity,
+				fmt.Sprintf("maxToken %s is not registered in max swap amount", maxToken.Denom),
+			), nil, err
+		}
+
 		if !maxToken.Amount.IsPositive() {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAddLiquidity, "maxToken must is positive"), nil, err
 		}

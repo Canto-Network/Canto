@@ -1,0 +1,32 @@
+package types
+
+import sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
+var (
+	ErrNoPairingInsurance                            = sdkerrors.Register(ModuleName, 30002, "pairing insurance must exist to accept liquid stake request.")
+	ErrInvalidAmount                                 = sdkerrors.Register(ModuleName, 30003, "amount of coin must be multiple of the chunk size")
+	ErrTombstonedValidator                           = sdkerrors.Register(ModuleName, 30004, "validator is tombstoned")
+	ErrInvalidValidatorStatus                        = sdkerrors.Register(ModuleName, 30005, "invalid validator status")
+	ErrNotProviderOfInsurance                        = sdkerrors.Register(ModuleName, 30006, "not provider of insurance")
+	ErrNotFoundInsurance                             = sdkerrors.Register(ModuleName, 30007, "insurance not found")
+	ErrNoPairedChunk                                 = sdkerrors.Register(ModuleName, 30008, "no paired chunk")
+	ErrInvalidChunkStatus                            = sdkerrors.Register(ModuleName, 30009, "invalid chunk status")
+	ErrInvalidInsuranceStatus                        = sdkerrors.Register(ModuleName, 30010, "invalid insurance status")
+	ErrExceedAvailableChunks                         = sdkerrors.Register(ModuleName, 30011, "exceed available chunks")
+	ErrInvalidBondDenom                              = sdkerrors.Register(ModuleName, 30012, "invalid bond denom")
+	ErrInvalidLiquidBondDenom                        = sdkerrors.Register(ModuleName, 30013, "invalid liquid bond denom")
+	ErrNotInWithdrawableStatus                       = sdkerrors.Register(ModuleName, 30014, "insurance is not in withdrawable status")
+	ErrInvalidChunkId                                = sdkerrors.Register(ModuleName, 30015, "invalid chunk id")
+	ErrInvalidInsuranceId                            = sdkerrors.Register(ModuleName, 30016, "invalid insurance id")
+	ErrNotFoundUnpairingForUnstakingChunkInfoChunkId = sdkerrors.Register(ModuleName, 30017, "unpairing for unstake chunk corresponding unpairing for unstaking info must exists")
+	ErrNotFoundWithdrawInsuranceRequestInsuranceId   = sdkerrors.Register(ModuleName, 30018, "insurance corresponding withdraw insurance request must exists")
+	ErrAlreadyInQueue                                = sdkerrors.Register(ModuleName, 30019, "liquid ustaking is already in queue")
+	ErrDiscountRateTooLow                            = sdkerrors.Register(ModuleName, 30020, "discount rate must be gte than msg.minimum")
+	ErrInvalidEpochDuration                          = sdkerrors.Register(ModuleName, 30021, "epoch duration must be same with unbonding time")
+	ErrInvalidEpochStartTime                         = sdkerrors.Register(ModuleName, 30022, "epoch start time must be before current time")
+	ErrNotFoundUnpairingInsurance                    = sdkerrors.Register(ModuleName, 30023, "unpairing insurance not found")
+	ErrNotFoundRedelegationInfoChunkId               = sdkerrors.Register(ModuleName, 30024, "redelegation info corresponding chunk id must exists")
+	ErrMustHaveNoPairedInsurance                     = sdkerrors.Register(ModuleName, 30025, "must have no paired insurance")
+	ErrMustHaveNoUnbondingDelegation                 = sdkerrors.Register(ModuleName, 30026, "must have no unbonding delegation")
+	ErrInsCommissionsNotWithdrawable                 = sdkerrors.Register(ModuleName, 30027, "insurance fee pool is not withdrawable")
+)

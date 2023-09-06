@@ -35,6 +35,14 @@
       }
     },
     {
+      "url": "./tmp-swagger-gen/canto/liquidstaking/v1/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "LiquidStakingParams"
+        }
+      }
+    },
+    {
       "url": "./tmp-swagger-gen/ethermint/feemarket/v1/query.swagger.json",
       "operationIds": {
         "rename": {

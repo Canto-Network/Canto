@@ -20,7 +20,7 @@ protoc_gen_doc() {
 echo "1"
 
 protoc_gen_gocosmos
-protoc_gen_doc
+#protoc_gen_doc
 
 echo "2"
 
