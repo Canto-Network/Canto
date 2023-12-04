@@ -4,6 +4,7 @@ package canto.erc20.v1;
 import "google/api/annotations.proto";
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
+import "cosmos_proto/cosmos.proto";
 
 option go_package = "github.com/Canto-Network/Canto/v7/x/erc20/types";
 
@@ -42,6 +43,7 @@ message MsgConvertERC20 {
   string contract_address = 1;
   // amount of ERC20 tokens to convert
   string amount = 2 [
+    (cosmos_proto.scalar) = "cosmos.Int",
     (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.nullable) = false
   ];
