@@ -14,13 +14,13 @@ import (
 	"github.com/Canto-Network/Canto/v7/x/csr/client/cli"
 	"github.com/Canto-Network/Canto/v7/x/csr/keeper"
 	"github.com/Canto-Network/Canto/v7/x/csr/types"
+	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 var (
@@ -113,6 +113,12 @@ func NewAppModule(
 	}
 }
 
+// IsOnePerModuleType implements the depinject.OnePerModuleType interface.
+func (am AppModule) IsOnePerModuleType() {}
+
+// IsAppModule implements the appmodule.AppModule interface.
+func (am AppModule) IsAppModule() {}
+
 // Name returns the csr module's name.
 func (am AppModule) Name() string {
 	return am.AppModuleBasic.Name()
@@ -120,19 +126,6 @@ func (am AppModule) Name() string {
 
 func (am AppModule) NewHandler() sdk.Handler {
 	return NewHandler(am.keeper)
-}
-
-// Route returns the csr module's message routing key.
-func (am AppModule) Route() sdk.Route {
-	return sdk.NewRoute(types.RouterKey, am.NewHandler())
-}
-
-// QuerierRoute returns the csr module's query routing key.
-func (AppModule) QuerierRoute() string { return types.RouterKey }
-
-// LegacyQuerierHandler returns the csr module's Querier.
-func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
-	return nil
 }
 
 // RegisterServices registers a GRPC query service to respond to the
@@ -166,7 +159,7 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 func (AppModule) ConsensusVersion() uint64 { return 2 }
 
 // BeginBlock executes all ABCI BeginBlock logic respective to the csr module.
-func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
+func (am AppModule) BeginBlock(ctx sdk.Context) {
 	// check in begin block whether the Turnstile has been deployed, if not, deploy it and set it to state
 	if _, found := am.keeper.GetTurnstile(ctx); !found {
 		if am.keeper.GetParams(ctx).EnableCsr { // only deploy if csr is enabled

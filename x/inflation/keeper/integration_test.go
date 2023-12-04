@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	sdkmath "cosmossdk.io/math"
 	epochstypes "github.com/Canto-Network/Canto/v7/x/epochs/types"
 	"github.com/Canto-Network/Canto/v7/x/inflation/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
@@ -17,7 +18,7 @@ import (
 var (
 	epochNumber int64
 	skipped     uint64
-	provision   sdk.Dec
+	provision   sdkmath.LegacyDec
 	found       bool
 )
 
@@ -65,7 +66,7 @@ var _ = Describe("Inflation", Ordered, func() {
 					stakingBal := s.app.BankKeeper.GetAllBalances(s.ctx, staking)
 					// fees distributed
 					Expect(balanceCommunityPool.AmountOf(denomMint).Equal(expectedStaking)).To(BeTrue())
-					Expect(stakingBal.AmountOf(denomMint).Equal(sdk.NewInt(0))).To(BeTrue())
+					Expect(stakingBal.AmountOf(denomMint).Equal(sdkmath.NewInt(0))).To(BeTrue())
 				})
 			})
 		})
@@ -164,7 +165,7 @@ var _ = Describe("Inflation", Ordered, func() {
 							// fmt.Println("provisionAfter: ", provisionAfter)
 							Expect(provisionAfter).ToNot(Equal(provision))
 							fmt.Println("provision after: ", provisionAfter)
-							Expect(provisionAfter).To(Equal(sdk.MustNewDecFromStr("10597826200000000000000000.000000000000000000")))
+							Expect(provisionAfter).To(Equal(sdkmath.LegacyMustNewDecFromStr("10597826200000000000000000.000000000000000000")))
 						})
 					})
 				})
@@ -179,7 +180,7 @@ var _ = Describe("Inflation", Ordered, func() {
 		valAddrs := MakeValAccts(1)
 		pk := GenKeys(1)
 		// instantiate validator
-		v, err := stakingtypes.NewValidator(valAddrs[0], pk[0].PubKey(), stakingtypes.Description{})
+		v, err := stakingtypes.NewValidator(valAddrs[0].String(), pk[0].PubKey(), stakingtypes.Description{})
 		s.Require().NoError(err)
 		s.Require().Equal(stakingtypes.Unbonded, v.Status)
 		// Increment Validator balance + power Index
@@ -190,8 +191,8 @@ var _ = Describe("Inflation", Ordered, func() {
 		s.app.StakingKeeper.SetValidatorByPowerIndex(s.ctx, v)
 		//update validator set
 		_, err = s.app.StakingKeeper.ApplyAndReturnValidatorSetUpdates(s.ctx) // failing bc validator tokens are not enough
-		v, found := s.app.StakingKeeper.GetValidator(s.ctx, valAddrs[0])
-		s.Require().True(found)
+		s.Require().NoError(err)
+		v, err = s.app.StakingKeeper.GetValidator(s.ctx, valAddrs[0])
 		s.Require().NoError(err)
 		s.Require().Equal(stakingtypes.Bonded, v.Status)
 		// set consAddress
@@ -213,7 +214,7 @@ var _ = Describe("Inflation", Ordered, func() {
 		It("Commit Block Before Epoch and check rewards", func() {
 			s.CommitAfter(time.Minute)
 			valBal := s.app.BankKeeper.GetAllBalances(s.ctx, sdk.AccAddress(sdk.AccAddress(s.consAddress)))
-			Expect(valBal.AmountOf(denomMint).Equal(sdk.NewInt(0))).To(BeTrue())
+			Expect(valBal.AmountOf(denomMint).Equal(sdkmath.NewInt(0))).To(BeTrue())
 		})
 		It("Commit block after Epoch and balance will be Epoch Mint Provision", func() {
 			provision, _ := s.app.InflationKeeper.GetEpochMintProvision(s.ctx)
@@ -222,7 +223,8 @@ var _ = Describe("Inflation", Ordered, func() {
 			s.app.DistrKeeper.GetFeePoolCommunityCoins(s.ctx) //Get Fee Pool befor
 			//
 			valAddr, _ := sdk.ValAddressFromBech32(v.OperatorAddress)
-			valBal := s.app.DistrKeeper.GetValidatorCurrentRewards(s.ctx, valAddr)
+			valBal, err := s.app.DistrKeeper.GetValidatorCurrentRewards(s.ctx, valAddr)
+			s.Require().NoError(err)
 			Expect(valBal.Rewards.AmountOf(denomMint).Equal(provision)).To(BeFalse())
 		})
 	})
@@ -231,9 +233,11 @@ var _ = Describe("Inflation", Ordered, func() {
 func (s *KeeperTestSuite) clearValidatorsAndInitPool(power int64) {
 	amt := s.app.StakingKeeper.TokensFromConsensusPower(s.ctx, power)
 	notBondedPool := s.app.StakingKeeper.GetNotBondedPool(s.ctx)
-	totalSupply := sdk.NewCoins(sdk.NewCoin(s.app.StakingKeeper.BondDenom(s.ctx), amt))
+	bondDenom, err := s.app.StakingKeeper.BondDenom(s.ctx)
+	s.Require().NoError(err)
+	totalSupply := sdk.NewCoins(sdk.NewCoin(bondDenom, amt))
 	s.app.AccountKeeper.SetModuleAccount(s.ctx, notBondedPool)
-	err := FundModuleAccount(s.app.BankKeeper, s.ctx, notBondedPool.GetName(), totalSupply)
+	err = FundModuleAccount(s.app.BankKeeper, s.ctx, notBondedPool.GetName(), totalSupply)
 	s.Require().NoError(err)
 }
 

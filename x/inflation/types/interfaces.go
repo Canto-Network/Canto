@@ -1,16 +1,18 @@
 package types // noalias
 
 import (
+	"context"
+
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
 // AccountKeeper defines the contract required for account APIs.
 type AccountKeeper interface {
 	GetModuleAddress(name string) sdk.AccAddress
-	GetModuleAccount(ctx sdk.Context, moduleName string) types.ModuleAccountI
-	GetAccount(sdk.Context, sdk.AccAddress) types.AccountI
-	SetAccount(sdk.Context, types.AccountI)
+	GetModuleAccount(ctx context.Context, moduleName string) sdk.ModuleAccountI
+	GetAccount(context.Context, sdk.AccAddress) sdk.AccountI
+	SetAccount(context.Context, sdk.AccountI)
 }
 
 // BankKeeper defines the contract needed to be fulfilled for banking and supply
@@ -35,7 +37,7 @@ type DistrKeeper interface {
 // StakingKeeper expected staking keeper
 type StakingKeeper interface {
 	// BondedRatio the fraction of the staking tokens which are currently bonded
-	BondedRatio(ctx sdk.Context) sdk.Dec
-	StakingTokenSupply(ctx sdk.Context) sdk.Int
-	TotalBondedTokens(ctx sdk.Context) sdk.Int
+	BondedRatio(ctx context.Context) (sdkmath.LegacyDec, error)
+	StakingTokenSupply(ctx context.Context) (sdkmath.Int, error)
+	TotalBondedTokens(ctx context.Context) (sdkmath.Int, error)
 }

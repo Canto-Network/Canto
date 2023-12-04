@@ -6,29 +6,32 @@ import (
 	"os"
 	"testing"
 
+	sdkmath "cosmossdk.io/math"
+	"cosmossdk.io/simapp"
+	"cosmossdk.io/store"
+	storetypes "cosmossdk.io/store/types"
+	evidencetypes "cosmossdk.io/x/evidence/types"
+	"cosmossdk.io/x/feegrant"
+	"github.com/cometbft/cometbft/libs/log"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/baseapp"
-	"github.com/cosmos/cosmos-sdk/simapp"
-	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
-	evidencetypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
-	"github.com/cosmos/cosmos-sdk/x/feegrant"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
+
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	ibctransfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
-	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
+	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
+	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
+	ibchost "github.com/cosmos/ibc-go/v8/modules/core/24-host"
 	"github.com/evmos/ethermint/encoding"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 	"github.com/stretchr/testify/require"
-	"github.com/tendermint/tendermint/libs/log"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
-	dbm "github.com/tendermint/tm-db"
 
 	cantoconfig "github.com/Canto-Network/Canto/v7/cmd/config"
 	csrtypes "github.com/Canto-Network/Canto/v7/x/csr/types"
@@ -43,8 +46,8 @@ func init() {
 }
 
 type StoreKeysPrefixes struct {
-	A        sdk.StoreKey
-	B        sdk.StoreKey
+	A        storetypes.StoreKey
+	B        storetypes.StoreKey
 	Prefixes [][]byte
 }
 
@@ -114,7 +117,7 @@ func TestAppImportExport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(dir))
 	}()
 
-	sdk.DefaultPowerReduction = sdk.NewIntFromUint64(1000000)
+	sdk.DefaultPowerReduction = sdkmath.NewIntFromUint64(1000000)
 
 	app := NewCanto(
 		logger,
@@ -187,8 +190,8 @@ func TestAppImportExport(t *testing.T) {
 	err = json.Unmarshal(exported.AppState, &genesisState)
 	require.NoError(t, err)
 
-	ctxA := app.NewContext(true, tmproto.Header{Height: app.LastBlockHeight()})
-	ctxB := newApp.NewContext(true, tmproto.Header{ChainID: config.ChainID, Height: app.LastBlockHeight()})
+	ctxA := app.NewContextLegacy(true, tmproto.Header{Height: app.LastBlockHeight()})
+	ctxB := newApp.NewContextLegacy(true, tmproto.Header{ChainID: config.ChainID, Height: app.LastBlockHeight()})
 	newApp.mm.InitGenesis(ctxB, app.AppCodec(), genesisState)
 	newApp.StoreConsensusParams(ctxB, exported.ConsensusParams)
 
@@ -249,7 +252,7 @@ func TestAppStateDeterminism(t *testing.T) {
 	numTimesToRunPerSeed := 2
 	appHashList := make([]json.RawMessage, numTimesToRunPerSeed)
 
-	sdk.DefaultPowerReduction = sdk.NewIntFromUint64(1000000)
+	sdk.DefaultPowerReduction = sdkmath.NewIntFromUint64(1000000)
 
 	for i := 0; i < numSeeds; i++ {
 		config.Seed = config.Seed + int64(i)
@@ -319,7 +322,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(dir))
 	}()
 
-	sdk.DefaultPowerReduction = sdk.NewIntFromUint64(1000000)
+	sdk.DefaultPowerReduction = sdkmath.NewIntFromUint64(1000000)
 
 	app := NewCanto(
 		logger,
@@ -397,7 +400,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 	err = json.Unmarshal(exported.AppState, &genesisState)
 	require.NoError(t, err)
 
-	ctx := newApp.NewContext(true, tmproto.Header{ChainID: config.ChainID, Height: app.LastBlockHeight()})
+	ctx := newApp.NewContextLegacy(true, tmproto.Header{ChainID: config.ChainID, Height: app.LastBlockHeight()})
 	newApp.mm.InitGenesis(ctx, app.AppCodec(), genesisState)
 	newApp.StoreConsensusParams(ctx, exported.ConsensusParams)
 

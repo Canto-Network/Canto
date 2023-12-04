@@ -4,7 +4,6 @@ import (
 	"github.com/Canto-Network/Canto/v7/x/govshuttle/keeper"
 	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 )
 
@@ -18,7 +17,7 @@ func NewgovshuttleProposalHandler(k *keeper.Keeper) govtypes.Handler {
 		case *types.TreasuryProposal:
 			return handleTreasuryProposal(ctx, k, c)
 		default:
-			return sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s proposal content type: %T", types.ModuleName, c)
+			return errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s proposal content type: %T", types.ModuleName, c)
 		}
 	}
 }

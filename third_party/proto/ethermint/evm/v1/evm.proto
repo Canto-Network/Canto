@@ -34,13 +34,13 @@ message Params {
 message ChainConfig {
   // Homestead switch block (nil no fork, 0 = already homestead)
   string homestead_block = 1 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.moretags) = "yaml:\"homestead_block\""
   ];
   // TheDAO hard-fork switch block (nil no fork)
   string dao_fork_block = 2 [
     (gogoproto.customname) = "DAOForkBlock",
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.moretags) = "yaml:\"dao_fork_block\""
   ];
   // Whether the nodes supports or opposes the DAO hard-fork
@@ -52,7 +52,7 @@ message ChainConfig {
   // (https://github.com/ethereum/EIPs/issues/150) EIP150 HF block (nil no fork)
   string eip150_block = 4 [
     (gogoproto.customname) = "EIP150Block",
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.moretags) = "yaml:\"eip150_block\""
   ];
   // EIP150 HF hash (needed for header only clients as only gas pricing changed)
@@ -63,43 +63,43 @@ message ChainConfig {
   // EIP155Block HF block
   string eip155_block = 6 [
     (gogoproto.customname) = "EIP155Block",
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.moretags) = "yaml:\"eip155_block\""
   ];
   // EIP158 HF block
   string eip158_block = 7 [
     (gogoproto.customname) = "EIP158Block",
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.moretags) = "yaml:\"eip158_block\""
   ];
   // Byzantium switch block (nil no fork, 0 = already on byzantium)
   string byzantium_block = 8 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.moretags) = "yaml:\"byzantium_block\""
   ];
   // Constantinople switch block (nil no fork, 0 = already activated)
   string constantinople_block = 9 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.moretags) = "yaml:\"constantinople_block\""
   ];
   // Petersburg switch block (nil same as Constantinople)
   string petersburg_block = 10 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.moretags) = "yaml:\"petersburg_block\""
   ];
   // Istanbul switch block (nil no fork, 0 = already on istanbul)
   string istanbul_block = 11 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.moretags) = "yaml:\"istanbul_block\""
   ];
   // Eip-2384 (bomb delay) switch block (nil no fork, 0 = already activated)
   string muir_glacier_block = 12 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.moretags) = "yaml:\"muir_glacier_block\""
   ];
   // Berlin switch block (nil = no fork, 0 = already on berlin)
   string berlin_block = 13 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.moretags) = "yaml:\"berlin_block\""
   ];
   // DEPRECATED: EWASM, YOLOV3 and Catalyst block have been deprecated
@@ -107,17 +107,17 @@ message ChainConfig {
   reserved "yolo_v3_block", "ewasm_block", "catalyst_block";
   // London switch block (nil = no fork, 0 = already on london)
   string london_block = 17 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.moretags) = "yaml:\"london_block\""
   ];
   // Eip-4345 (bomb delay) switch block (nil = no fork, 0 = already activated)
   string arrow_glacier_block = 18 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.moretags) = "yaml:\"arrow_glacier_block\""
   ];
   // EIP-3675 (TheMerge) switch block (nil = no fork, 0 = already in merge proceedings)
   string merge_fork_block = 19 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.moretags) = "yaml:\"merge_fork_block\""
   ];
 }

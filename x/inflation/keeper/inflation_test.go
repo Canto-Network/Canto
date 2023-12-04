@@ -3,6 +3,7 @@ package keeper_test
 import (
 	"fmt"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/Canto-Network/Canto/v7/x/inflation/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -20,17 +21,17 @@ func (suite *KeeperTestSuite) TestMintAndAllocateInflation() {
 	}{
 		{
 			"pass",
-			sdk.NewCoin(denomMint, sdk.NewInt(1_000_000)),
+			sdk.NewCoin(denomMint, sdkmath.NewInt(1_000_000)),
 			func() {},
-			sdk.NewCoin(denomMint, sdk.NewInt(1_000_000)),
+			sdk.NewCoin(denomMint, sdkmath.NewInt(1_000_000)),
 			sdk.DecCoins(nil),
 			true,
 		},
 		{
 			"pass - no coins minted ",
-			sdk.NewCoin(denomMint, sdk.ZeroInt()),
+			sdk.NewCoin(denomMint, sdkmath.ZeroInt()),
 			func() {},
-			sdk.NewCoin(denomMint, sdk.ZeroInt()),
+			sdk.NewCoin(denomMint, sdkmath.ZeroInt()),
 			sdk.DecCoins(nil),
 			true,
 		},
@@ -75,15 +76,15 @@ func (suite *KeeperTestSuite) TestGetCirculatingSupplyAndInflationRate() {
 		name             string
 		bankSupply       int64
 		malleate         func()
-		expInflationRate sdk.Dec
+		expInflationRate sdkmath.LegacyDec
 	}{
 		{
 			"no mint provision",
 			400_000_000,
 			func() {
-				suite.app.InflationKeeper.SetEpochMintProvision(suite.ctx, sdk.ZeroDec())
+				suite.app.InflationKeeper.SetEpochMintProvision(suite.ctx, sdkmath.LegacyZeroDec())
 			},
-			sdk.ZeroDec(),
+			sdkmath.LegacyZeroDec(),
 		},
 		{
 			"no epochs per period",
@@ -91,19 +92,19 @@ func (suite *KeeperTestSuite) TestGetCirculatingSupplyAndInflationRate() {
 			func() {
 				suite.app.InflationKeeper.SetEpochsPerPeriod(suite.ctx, 0)
 			},
-			sdk.ZeroDec(),
+			sdkmath.LegacyZeroDec(),
 		},
 		{
 			"high supply",
 			800_000_000,
 			func() {},
-			sdk.MustNewDecFromStr("2.038043500000000000"),
+			sdkmath.LegacyMustNewDecFromStr("2.038043500000000000"),
 		},
 		{
 			"low supply",
 			400_000_000,
 			func() {},
-			sdk.MustNewDecFromStr("4.076087000000000000"),
+			sdkmath.LegacyMustNewDecFromStr("4.076087000000000000"),
 		},
 	}
 	for _, tc := range testCases {

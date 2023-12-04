@@ -3,7 +3,7 @@ package types
 import (
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkmath "cosmossdk.io/math"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
@@ -12,7 +12,7 @@ var (
 	ParamStoreKeyEnableOnboarding     = []byte("EnableOnboarding")
 	ParamStoreKeyAutoSwapThreshold    = []byte("AutoSwapThreshold")
 	ParamsStoreKeyWhitelistedChannels = []byte("WhitelistedChannels")
-	DefaultAutoSwapThreshold          = sdk.NewIntWithDecimal(4, 18) // 4 Canto
+	DefaultAutoSwapThreshold          = sdkmath.NewIntWithDecimal(4, 18) // 4 Canto
 	DefaultWhitelistedChannels        = []string{"channel-0"}
 )
 
@@ -26,7 +26,7 @@ func ParamKeyTable() paramtypes.KeyTable {
 // NewParams creates a new Params instance
 func NewParams(
 	enableOnboarding bool,
-	autoSwapThreshold sdk.Int,
+	autoSwapThreshold sdkmath.Int,
 	whitelistedChannels []string,
 ) Params {
 	return Params{
@@ -73,7 +73,7 @@ func validateBool(i interface{}) error {
 }
 
 func validateAutoSwapThreshold(i interface{}) error {
-	v, ok := i.(sdk.Int)
+	v, ok := i.(sdkmath.Int)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}

@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/testutil"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
 	"github.com/evmos/ethermint/encoding"
@@ -19,11 +19,11 @@ import (
 
 func TestUpdateParams(t *testing.T) {
 	encCfg := encoding.MakeConfig(app.ModuleBasics)
-	erc20Key := sdk.NewKVStoreKey(erc20types.StoreKey)
-	tErc20Key := sdk.NewTransientStoreKey(fmt.Sprintf("%s_test", erc20types.StoreKey))
+	erc20Key := storetypes.NewKVStoreKey(erc20types.StoreKey)
+	tErc20Key := storetypes.NewTransientStoreKey(fmt.Sprintf("%s_test", erc20types.StoreKey))
 	ctx := testutil.DefaultContext(erc20Key, tErc20Key)
 	paramstore := paramtypes.NewSubspace(
-		encCfg.Marshaler, encCfg.Amino, erc20Key, tErc20Key, "erc20",
+		encCfg.Codec, encCfg.Amino, erc20Key, tErc20Key, "erc20",
 	)
 	paramstore = paramstore.WithKeyTable(erc20types.ParamKeyTable())
 	require.True(t, paramstore.HasKeyTable())

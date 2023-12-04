@@ -9,13 +9,14 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/suite"
 
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 
-	transfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
-	clienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
-	channeltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
+	transfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
+	clienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
+	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 
 	"github.com/Canto-Network/Canto/v7/app"
 	ibcgotesting "github.com/Canto-Network/Canto/v7/ibc/testing"
@@ -62,8 +63,8 @@ func (suite *IBCTestingSuite) SetupTest() {
 	suite.coordinator.CommitNBlocks(suite.IBCCosmosChain, 2)
 
 	// Mint coins on the gravity side which we'll use to unlock our acanto
-	coinUsdc := sdk.NewCoin("uUSDC", sdk.NewIntWithDecimal(10000, 6))
-	coinUsdt := sdk.NewCoin("uUSDT", sdk.NewIntWithDecimal(10000, 6))
+	coinUsdc := sdk.NewCoin("uUSDC", sdkmath.NewIntWithDecimal(10000, 6))
+	coinUsdt := sdk.NewCoin("uUSDT", sdkmath.NewIntWithDecimal(10000, 6))
 	coins := sdk.NewCoins(coinUsdc, coinUsdt)
 	err := suite.IBCGravityChain.GetSimApp().BankKeeper.MintCoins(suite.IBCGravityChain.GetContext(), minttypes.ModuleName, coins)
 	suite.Require().NoError(err)
@@ -71,7 +72,7 @@ func (suite *IBCTestingSuite) SetupTest() {
 	suite.Require().NoError(err)
 
 	// Mint coins on the cosmos side which we'll use to unlock our acanto
-	coinAtom := sdk.NewCoin("uatom", sdk.NewIntWithDecimal(10000, 6))
+	coinAtom := sdk.NewCoin("uatom", sdkmath.NewIntWithDecimal(10000, 6))
 	coins = sdk.NewCoins(coinAtom)
 	err = suite.IBCCosmosChain.GetSimApp().BankKeeper.MintCoins(suite.IBCCosmosChain.GetContext(), minttypes.ModuleName, coins)
 	suite.Require().NoError(err)
@@ -120,22 +121,22 @@ func (suite *IBCTestingSuite) setupRegisterCoin(metadata banktypes.Metadata) *er
 
 // CreatePool creates a pool with acanto and the given denom
 func (suite *IBCTestingSuite) CreatePool(denom string) {
-	coincanto := sdk.NewCoin("acanto", sdk.NewIntWithDecimal(10000, 18))
-	coinIBC := sdk.NewCoin(denom, sdk.NewIntWithDecimal(10000, 6))
+	coincanto := sdk.NewCoin("acanto", sdkmath.NewIntWithDecimal(10000, 18))
+	coinIBC := sdk.NewCoin(denom, sdkmath.NewIntWithDecimal(10000, 6))
 	coins := sdk.NewCoins(coincanto, coinIBC)
 	suite.FundCantoChain(coins)
 
 	coinswapKeeper := suite.cantoChain.App.(*app.Canto).CoinswapKeeper
 	coinswapKeeper.SetStandardDenom(suite.cantoChain.GetContext(), "acanto")
 	coinswapParams := coinswapKeeper.GetParams(suite.cantoChain.GetContext())
-	coinswapParams.MaxSwapAmount = sdk.NewCoins(sdk.NewCoin(denom, sdk.NewIntWithDecimal(10, 6)))
+	coinswapParams.MaxSwapAmount = sdk.NewCoins(sdk.NewCoin(denom, sdkmath.NewIntWithDecimal(10, 6)))
 	coinswapKeeper.SetParams(suite.cantoChain.GetContext(), coinswapParams)
 
 	// Create a message to add liquidity to the pool
 	msgAddLiquidity := coinswaptypes.MsgAddLiquidity{
-		MaxToken:         sdk.NewCoin(denom, sdk.NewIntWithDecimal(10000, 6)),
-		ExactStandardAmt: sdk.NewIntWithDecimal(10000, 18),
-		MinLiquidity:     sdk.NewInt(1),
+		MaxToken:         sdk.NewCoin(denom, sdkmath.NewIntWithDecimal(10000, 6)),
+		ExactStandardAmt: sdkmath.NewIntWithDecimal(10000, 18),
+		MinLiquidity:     sdkmath.NewInt(1),
 		Deadline:         time.Now().Add(time.Minute * 10).Unix(),
 		Sender:           suite.cantoChain.SenderAccount.GetAddress().String(),
 	}
@@ -168,12 +169,12 @@ var (
 // SendAndReceiveMessage sends a transfer message from the origin chain to the destination chain
 func (suite *IBCTestingSuite) SendAndReceiveMessage(path *ibcgotesting.Path, origin *ibcgotesting.TestChain, coin string, amount int64, sender string, receiver string, seq uint64) *sdk.Result {
 	// Send coin from A to B
-	transferMsg := transfertypes.NewMsgTransfer(path.EndpointA.ChannelConfig.PortID, path.EndpointA.ChannelID, sdk.NewCoin(coin, sdk.NewInt(amount)), sender, receiver, timeoutHeight, 0)
+	transferMsg := transfertypes.NewMsgTransfer(path.EndpointA.ChannelConfig.PortID, path.EndpointA.ChannelID, sdk.NewCoin(coin, sdkmath.NewInt(amount)), sender, receiver, timeoutHeight, 0, "")
 	_, err := origin.SendMsgs(transferMsg)
 	suite.Require().NoError(err) // message committed
 
 	// Recreate the packet that was sent
-	transfer := transfertypes.NewFungibleTokenPacketData(coin, strconv.Itoa(int(amount)), sender, receiver)
+	transfer := transfertypes.NewFungibleTokenPacketData(coin, strconv.Itoa(int(amount)), sender, receiver, "")
 	packet := channeltypes.NewPacket(transfer.GetBytes(), seq, path.EndpointA.ChannelConfig.PortID, path.EndpointA.ChannelID, path.EndpointB.ChannelConfig.PortID, path.EndpointB.ChannelID, timeoutHeight, 0)
 
 	// patched RelayPacket call to get res

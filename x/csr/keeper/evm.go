@@ -3,10 +3,10 @@ package keeper
 import (
 	"math/big"
 
+	errorsmod "cosmossdk.io/errors"
 	"github.com/Canto-Network/Canto/v7/contracts"
 	"github.com/Canto-Network/Canto/v7/x/csr/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ethereum/go-ethereum/common"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -24,7 +24,7 @@ func (k Keeper) DeployTurnstile(
 ) (common.Address, error) {
 	addr, err := k.DeployContract(ctx, contracts.TurnstileContract)
 	if err != nil {
-		return common.Address{}, sdkerrors.Wrapf(ErrContractDeployments,
+		return common.Address{}, errorsmod.Wrapf(ErrContractDeployments,
 			"EVM::DeployTurnstile error deploying Turnstile: %s", err.Error())
 	}
 	return addr, nil
@@ -42,7 +42,7 @@ func (k Keeper) DeployContract(
 	// method name is nil in this case, we are calling the constructor
 	ctorArgs, err := contract.ABI.Pack("", args...)
 	if err != nil {
-		return common.Address{}, sdkerrors.Wrapf(ErrContractDeployments,
+		return common.Address{}, errorsmod.Wrapf(ErrContractDeployments,
 			"EVM::DeployContract error packing data: %s", err.Error())
 	}
 
@@ -59,7 +59,7 @@ func (k Keeper) DeployContract(
 	nonce, err := k.accountKeeper.GetSequence(ctx, types.ModuleAddress.Bytes())
 	if err != nil {
 		return common.Address{},
-			sdkerrors.Wrapf(ErrContractDeployments,
+			errorsmod.Wrapf(ErrContractDeployments,
 				"EVM::DeployContract error retrieving nonce: %s", err.Error())
 	}
 
@@ -67,7 +67,7 @@ func (k Keeper) DeployContract(
 	_, err = k.CallEVM(ctx, types.ModuleAddress, nil, amount, data, true)
 	if err != nil {
 		return common.Address{},
-			sdkerrors.Wrapf(ErrContractDeployments,
+			errorsmod.Wrapf(ErrContractDeployments,
 				"EVM::DeployContract error deploying contract: %s", err.Error())
 	}
 
@@ -91,13 +91,13 @@ func (k Keeper) CallMethod(
 	// pack method args
 	data, err := contract.ABI.Pack(method, args...)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(ErrMethodCall, "EVM::CallMethod there was an issue packing the arguments into the method signature: %s", err.Error())
+		return nil, errorsmod.Wrapf(ErrMethodCall, "EVM::CallMethod there was an issue packing the arguments into the method signature: %s", err.Error())
 	}
 
 	// call method
 	resp, err := k.CallEVM(ctx, from, contractAddr, amount, data, true)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(ErrMethodCall, "EVM::CallMethod error applying message: %s", err.Error())
+		return nil, errorsmod.Wrapf(ErrMethodCall, "EVM::CallMethod error applying message: %s", err.Error())
 	}
 
 	return resp, nil
@@ -147,7 +147,7 @@ func (k Keeper) CallEVM(
 	}
 
 	if res.Failed() {
-		return nil, sdkerrors.Wrap(evmtypes.ErrVMExecution, res.VmError)
+		return nil, errorsmod.Wrap(evmtypes.ErrVMExecution, res.VmError)
 	}
 	return res, nil
 }

@@ -1,15 +1,16 @@
 package ante
 
 import (
+	errorsmod "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
-var minCommission = sdk.NewDecWithPrec(5, 2) // 5%
+var minCommission = sdkmath.LegacyNewDecWithPrec(5, 2) // 5%
 
 // TODO: remove once Cosmos SDK is upgraded to v0.46
 
@@ -53,7 +54,7 @@ func (vcd ValidatorCommissionDecorator) validateAuthz(ctx sdk.Context, execMsg *
 		var innerMsg sdk.Msg
 		err := vcd.cdc.UnpackAny(v, &innerMsg)
 		if err != nil {
-			return sdkerrors.Wrap(err, "cannot unmarshal authz exec msgs")
+			return errorsmod.Wrap(err, "cannot unmarshal authz exec msgs")
 		}
 
 		if err := vcd.validateMsg(ctx, innerMsg); err != nil {
@@ -69,13 +70,13 @@ func (vcd ValidatorCommissionDecorator) validateMsg(_ sdk.Context, msg sdk.Msg) 
 	switch msg := msg.(type) {
 	case *stakingtypes.MsgCreateValidator:
 		if msg.Commission.Rate.LT(minCommission) {
-			return sdkerrors.Wrapf(
+			return errorsmod.Wrapf(
 				sdkerrors.ErrInvalidRequest,
 				"validator commission %s be lower than minimum of %s", msg.Commission.Rate, minCommission)
 		}
 	case *stakingtypes.MsgEditValidator:
 		if msg.CommissionRate != nil && msg.CommissionRate.LT(minCommission) {
-			return sdkerrors.Wrapf(
+			return errorsmod.Wrapf(
 				sdkerrors.ErrInvalidRequest,
 				"validator commission %s be lower than minimum of %s", msg.CommissionRate, minCommission)
 		}

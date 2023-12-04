@@ -8,17 +8,18 @@ import (
 	"os"
 	"time"
 
+	sdkmath "cosmossdk.io/math"
+	tmjson "github.com/cometbft/cometbft/libs/json"
+	tmtypes "github.com/cometbft/cometbft/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
-	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
+	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	tmjson "github.com/tendermint/tendermint/libs/json"
-	tmtypes "github.com/tendermint/tendermint/types"
 
 	"github.com/evmos/ethermint/crypto/ethsecp256k1"
 )
@@ -88,7 +89,7 @@ func AppStateFn(cdc codec.JSONCodec, simManager *module.SimulationManager) simty
 			panic(err)
 		}
 		// compute not bonded balance
-		notBondedTokens := sdk.ZeroInt()
+		notBondedTokens := sdkmath.ZeroInt()
 		for _, val := range stakingState.Validators {
 			if val.Status != stakingtypes.Unbonded {
 				continue
@@ -143,17 +144,18 @@ func AppStateRandomizedFn(
 	numAccs := int64(len(accs))
 	genesisState := NewDefaultGenesisState()
 
-	var initalStake, numInitiallyBonded int64
-	appParams.GetOrGenerate(
-		cdc,
-		simappparams.StakePerAccount,
-		&initalStake,
-		r,
-		func(r *rand.Rand) { initalStake = r.Int63n(1e12) },
+	var (
+		numInitiallyBonded int64
+		initialStake       sdkmath.Int
 	)
 	appParams.GetOrGenerate(
-		cdc,
-		simappparams.InitiallyBondedValidators,
+		simtestutil.StakePerAccount,
+		&initialStake,
+		r,
+		func(r *rand.Rand) { initialStake = sdkmath.NewInt(r.Int63n(1e12)) },
+	)
+	appParams.GetOrGenerate(
+		simtestutil.InitiallyBondedValidators,
 		&numInitiallyBonded,
 		r,
 		func(r *rand.Rand) { numInitiallyBonded = int64(r.Intn(300)) },
@@ -169,7 +171,7 @@ func AppStateRandomizedFn(
   StakePerAccount: %d,
   InitiallyBondedValidators: %d,
 }
-`, initalStake, numInitiallyBonded)
+`, initialStake, numInitiallyBonded)
 
 	simState := &module.SimulationState{
 		AppParams:    appParams,
@@ -177,7 +179,7 @@ func AppStateRandomizedFn(
 		Rand:         r,
 		GenState:     genesisState,
 		Accounts:     accs,
-		InitialStake: initalStake,
+		InitialStake: initialStake,
 		NumBonded:    numInitiallyBonded,
 		GenTimestamp: genesisTimestamp,
 	}

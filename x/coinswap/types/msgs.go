@@ -1,6 +1,8 @@
 package types
 
 import (
+	errorsmod "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -67,7 +69,7 @@ func (msg MsgSwapOrder) ValidateBasic() error {
 	}
 
 	if msg.Input.Coin.Denom == msg.Output.Coin.Denom {
-		return sdkerrors.Wrap(ErrEqualDenom, "invalid swap")
+		return errorsmod.Wrap(ErrEqualDenom, "invalid swap")
 	}
 
 	return ValidateDeadline(msg.Deadline)
@@ -94,8 +96,8 @@ func (msg MsgSwapOrder) GetSigners() []sdk.AccAddress {
 // NewMsgAddLiquidity creates a new MsgAddLiquidity object.
 func NewMsgAddLiquidity(
 	maxToken sdk.Coin,
-	exactStandardAmt sdk.Int,
-	minLiquidity sdk.Int,
+	exactStandardAmt sdkmath.Int,
+	minLiquidity sdkmath.Int,
 	deadline int64,
 	sender string,
 ) *MsgAddLiquidity {
@@ -133,7 +135,7 @@ func (msg MsgAddLiquidity) ValidateBasic() error {
 	}
 
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	return nil
 }
@@ -158,9 +160,9 @@ func (msg MsgAddLiquidity) GetSigners() []sdk.AccAddress {
 
 // NewMsgRemoveLiquidity creates a new MsgRemoveLiquidity object
 func NewMsgRemoveLiquidity(
-	minToken sdk.Int,
+	minToken sdkmath.Int,
 	withdrawLiquidity sdk.Coin,
-	minStandardAmt sdk.Int,
+	minStandardAmt sdkmath.Int,
 	deadline int64,
 	sender string,
 ) *MsgRemoveLiquidity {
@@ -198,7 +200,7 @@ func (msg MsgRemoveLiquidity) ValidateBasic() error {
 	}
 
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	return nil
 }

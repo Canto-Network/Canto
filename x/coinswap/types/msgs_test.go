@@ -3,8 +3,9 @@ package types
 import (
 	"testing"
 
-	"github.com/tendermint/tendermint/crypto/tmhash"
+	"github.com/cometbft/cometbft/crypto/tmhash"
 
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -50,8 +51,8 @@ func TestMsgSwapOrder_ValidateBasic(t *testing.T) {
 func TestMsgAddLiquidity_ValidateBasic(t *testing.T) {
 	type fields struct {
 		MaxToken         sdk.Coin
-		ExactStandardAmt sdk.Int
-		MinLiquidity     sdk.Int
+		ExactStandardAmt sdkmath.Int
+		MinLiquidity     sdkmath.Int
 		Deadline         int64
 		Sender           string
 	}
@@ -65,8 +66,8 @@ func TestMsgAddLiquidity_ValidateBasic(t *testing.T) {
 			wantErr: true,
 			fields: fields{
 				MaxToken:         buildCoin("131stake", 1000),
-				ExactStandardAmt: sdk.NewInt(100),
-				MinLiquidity:     sdk.NewInt(100),
+				ExactStandardAmt: sdkmath.NewInt(100),
+				MinLiquidity:     sdkmath.NewInt(100),
 				Deadline:         1611213344,
 				Sender:           sender,
 			},
@@ -76,8 +77,8 @@ func TestMsgAddLiquidity_ValidateBasic(t *testing.T) {
 			wantErr: true,
 			fields: fields{
 				MaxToken:         buildCoin("stake", -1000),
-				ExactStandardAmt: sdk.NewInt(100),
-				MinLiquidity:     sdk.NewInt(100),
+				ExactStandardAmt: sdkmath.NewInt(100),
+				MinLiquidity:     sdkmath.NewInt(100),
 				Deadline:         1611213344,
 				Sender:           sender,
 			},
@@ -87,8 +88,8 @@ func TestMsgAddLiquidity_ValidateBasic(t *testing.T) {
 			wantErr: true,
 			fields: fields{
 				MaxToken:         buildCoin("stake", 1000),
-				ExactStandardAmt: sdk.NewInt(-100),
-				MinLiquidity:     sdk.NewInt(100),
+				ExactStandardAmt: sdkmath.NewInt(-100),
+				MinLiquidity:     sdkmath.NewInt(100),
 				Deadline:         1611213344,
 				Sender:           sender,
 			},
@@ -98,8 +99,8 @@ func TestMsgAddLiquidity_ValidateBasic(t *testing.T) {
 			wantErr: true,
 			fields: fields{
 				MaxToken:         buildCoin("stake", 1000),
-				ExactStandardAmt: sdk.NewInt(100),
-				MinLiquidity:     sdk.NewInt(-100),
+				ExactStandardAmt: sdkmath.NewInt(100),
+				MinLiquidity:     sdkmath.NewInt(-100),
 				Deadline:         1611213344,
 				Sender:           sender,
 			},
@@ -109,8 +110,8 @@ func TestMsgAddLiquidity_ValidateBasic(t *testing.T) {
 			wantErr: true,
 			fields: fields{
 				MaxToken:         buildCoin("stake", 1000),
-				ExactStandardAmt: sdk.NewInt(100),
-				MinLiquidity:     sdk.NewInt(100),
+				ExactStandardAmt: sdkmath.NewInt(100),
+				MinLiquidity:     sdkmath.NewInt(100),
 				Deadline:         0,
 				Sender:           sender,
 			},
@@ -120,8 +121,8 @@ func TestMsgAddLiquidity_ValidateBasic(t *testing.T) {
 			wantErr: true,
 			fields: fields{
 				MaxToken:         buildCoin("stake", 1000),
-				ExactStandardAmt: sdk.NewInt(100),
-				MinLiquidity:     sdk.NewInt(100),
+				ExactStandardAmt: sdkmath.NewInt(100),
+				MinLiquidity:     sdkmath.NewInt(100),
 				Deadline:         0,
 				Sender:           "",
 			},
@@ -146,8 +147,8 @@ func TestMsgAddLiquidity_ValidateBasic(t *testing.T) {
 func TestMsgRemoveLiquidity_ValidateBasic(t *testing.T) {
 	type fields struct {
 		WithdrawLiquidity sdk.Coin
-		MinToken          sdk.Int
-		MinStandardAmt    sdk.Int
+		MinToken          sdkmath.Int
+		MinStandardAmt    sdkmath.Int
 		Deadline          int64
 		Sender            string
 	}
@@ -161,8 +162,8 @@ func TestMsgRemoveLiquidity_ValidateBasic(t *testing.T) {
 			wantErr: true,
 			fields: fields{
 				WithdrawLiquidity: buildCoin("stake", 1000),
-				MinToken:          sdk.NewInt(100),
-				MinStandardAmt:    sdk.NewInt(100),
+				MinToken:          sdkmath.NewInt(100),
+				MinStandardAmt:    sdkmath.NewInt(100),
 				Deadline:          1611213344,
 				Sender:            sender,
 			},
@@ -172,8 +173,8 @@ func TestMsgRemoveLiquidity_ValidateBasic(t *testing.T) {
 			wantErr: true,
 			fields: fields{
 				WithdrawLiquidity: buildCoin("131stake", 1000),
-				MinToken:          sdk.NewInt(100),
-				MinStandardAmt:    sdk.NewInt(100),
+				MinToken:          sdkmath.NewInt(100),
+				MinStandardAmt:    sdkmath.NewInt(100),
 				Deadline:          1611213344,
 				Sender:            sender,
 			},
@@ -183,8 +184,8 @@ func TestMsgRemoveLiquidity_ValidateBasic(t *testing.T) {
 			wantErr: true,
 			fields: fields{
 				WithdrawLiquidity: buildCoin("stake", -1000),
-				MinToken:          sdk.NewInt(-100),
-				MinStandardAmt:    sdk.NewInt(100),
+				MinToken:          sdkmath.NewInt(-100),
+				MinStandardAmt:    sdkmath.NewInt(100),
 				Deadline:          1611213344,
 				Sender:            sender,
 			},
@@ -194,8 +195,8 @@ func TestMsgRemoveLiquidity_ValidateBasic(t *testing.T) {
 			wantErr: true,
 			fields: fields{
 				WithdrawLiquidity: buildCoin("stake", 1000),
-				MinToken:          sdk.NewInt(100),
-				MinStandardAmt:    sdk.NewInt(-100),
+				MinToken:          sdkmath.NewInt(100),
+				MinStandardAmt:    sdkmath.NewInt(-100),
 				Deadline:          1611213344,
 				Sender:            sender,
 			},
@@ -205,8 +206,8 @@ func TestMsgRemoveLiquidity_ValidateBasic(t *testing.T) {
 			wantErr: true,
 			fields: fields{
 				WithdrawLiquidity: buildCoin("stake", 1000),
-				MinToken:          sdk.NewInt(100),
-				MinStandardAmt:    sdk.NewInt(100),
+				MinToken:          sdkmath.NewInt(100),
+				MinStandardAmt:    sdkmath.NewInt(100),
 				Deadline:          0,
 				Sender:            sender,
 			},
@@ -216,8 +217,8 @@ func TestMsgRemoveLiquidity_ValidateBasic(t *testing.T) {
 			wantErr: true,
 			fields: fields{
 				WithdrawLiquidity: buildCoin("stake", 1000),
-				MinToken:          sdk.NewInt(100),
-				MinStandardAmt:    sdk.NewInt(100),
+				MinToken:          sdkmath.NewInt(100),
+				MinStandardAmt:    sdkmath.NewInt(100),
 				Deadline:          0,
 				Sender:            "",
 			},
@@ -242,6 +243,6 @@ func TestMsgRemoveLiquidity_ValidateBasic(t *testing.T) {
 func buildCoin(denom string, amt int64) sdk.Coin {
 	return sdk.Coin{
 		Denom:  denom,
-		Amount: sdk.NewInt(amt),
+		Amount: sdkmath.NewInt(amt),
 	}
 }

@@ -5,8 +5,8 @@ import (
 
 	gogotypes "github.com/gogo/protobuf/types"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/Canto-Network/Canto/v7/x/coinswap/types"
 )
@@ -74,7 +74,7 @@ func (k Keeper) GetPoolBalances(ctx sdk.Context, escrowAddress string) (coins sd
 	}
 	acc := k.ak.GetAccount(ctx, address)
 	if acc == nil {
-		return nil, sdkerrors.Wrap(types.ErrReservePoolNotExists, escrowAddress)
+		return nil, errorsmod.Wrap(types.ErrReservePoolNotExists, escrowAddress)
 	}
 	return k.bk.GetAllBalances(ctx, acc.GetAddress()), nil
 }
@@ -83,7 +83,7 @@ func (k Keeper) GetPoolBalancesByLptDenom(ctx sdk.Context, lptDenom string) (coi
 	address := types.GetReservePoolAddr(lptDenom)
 	acc := k.ak.GetAccount(ctx, address)
 	if acc == nil {
-		return nil, sdkerrors.Wrap(types.ErrReservePoolNotExists, address.String())
+		return nil, errorsmod.Wrap(types.ErrReservePoolNotExists, address.String())
 	}
 	return k.bk.GetAllBalances(ctx, acc.GetAddress()), nil
 }
@@ -96,7 +96,7 @@ func (k Keeper) GetLptDenomFromDenoms(ctx sdk.Context, denom1, denom2 string) (s
 
 	standardDenom := k.GetStandardDenom(ctx)
 	if denom1 != standardDenom && denom2 != standardDenom {
-		return "", sdkerrors.Wrap(types.ErrNotContainStandardDenom, fmt.Sprintf("standard denom: %s, denom1: %s, denom2: %s", standardDenom, denom1, denom2))
+		return "", errorsmod.Wrap(types.ErrNotContainStandardDenom, fmt.Sprintf("standard denom: %s, denom1: %s, denom2: %s", standardDenom, denom1, denom2))
 	}
 
 	counterpartyDenom := denom1
@@ -106,7 +106,7 @@ func (k Keeper) GetLptDenomFromDenoms(ctx sdk.Context, denom1, denom2 string) (s
 	poolId := types.GetPoolId(counterpartyDenom)
 	pool, has := k.GetPool(ctx, poolId)
 	if !has {
-		return "", sdkerrors.Wrapf(types.ErrReservePoolNotExists, "liquidity pool token: %s", counterpartyDenom)
+		return "", errorsmod.Wrapf(types.ErrReservePoolNotExists, "liquidity pool token: %s", counterpartyDenom)
 	}
 	return pool.LptDenom, nil
 }
@@ -119,7 +119,7 @@ func (k Keeper) ValidatePool(ctx sdk.Context, lptDenom string) error {
 
 	pool, has := k.GetPoolByLptDenom(ctx, lptDenom)
 	if !has {
-		return sdkerrors.Wrapf(types.ErrReservePoolNotExists, "liquidity pool token: %s", lptDenom)
+		return errorsmod.Wrapf(types.ErrReservePoolNotExists, "liquidity pool token: %s", lptDenom)
 	}
 
 	_, err := k.GetPoolBalances(ctx, pool.EscrowAddress)

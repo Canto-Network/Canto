@@ -7,7 +7,7 @@ import (
 	govshuttlesimulation "github.com/Canto-Network/Canto/v7/x/govshuttle/simulation"
 	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
-	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
+	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
@@ -18,7 +18,7 @@ import (
 var (
 	//_ = sample.AccAddress
 	_ = govshuttlesimulation.FindAccount
-	_ = simappparams.StakePerAccount
+	_ = simtestutil.StakePerAccount
 	_ = simulation.MsgEntryKind
 	_ = baseapp.Paramspace
 )

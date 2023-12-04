@@ -3,6 +3,7 @@ package govshuttle
 import (
 	"fmt"
 
+	errorsmod "cosmossdk.io/errors"
 	"github.com/Canto-Network/Canto/v7/x/govshuttle/keeper"
 	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -20,7 +21,7 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		// this line is used by starport scaffolding # 1
 		default:
 			errMsg := fmt.Sprintf("unrecognized %s message type: %T", types.ModuleName, msg)
-			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
+			return nil, errorsmod.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 		}
 	}
 }

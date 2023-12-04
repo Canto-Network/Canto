@@ -6,16 +6,16 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	"github.com/evmos/ethermint/crypto/ethsecp256k1"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
-	abci "github.com/tendermint/tendermint/abci/types"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	abci "github.com/cometbft/cometbft/abci/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	chain "github.com/Canto-Network/Canto/v7/app"
 	v7 "github.com/Canto-Network/Canto/v7/app/upgrades/v7"
@@ -39,7 +39,7 @@ func (s *UpgradeTestSuite) SetupTest() {
 
 	s.app = chain.Setup(false, feemarkettypes.DefaultGenesisState())
 
-	s.ctx = s.app.BaseApp.NewContext(false, tmproto.Header{
+	s.ctx = s.app.BaseApp.NewContextLegacy(false, tmproto.Header{
 		ChainID:         "canto_9001-1",
 		Height:          1,
 		Time:            time.Date(2023, 5, 9, 8, 0, 0, 0, time.UTC),
@@ -48,10 +48,12 @@ func (s *UpgradeTestSuite) SetupTest() {
 
 	// Set Validator
 	valAddr := sdk.ValAddress(s.consAddress.Bytes())
-	validator, err := stakingtypes.NewValidator(valAddr, priv.PubKey(), stakingtypes.Description{})
+	validator, err := stakingtypes.NewValidator(valAddr.String(), priv.PubKey(), stakingtypes.Description{})
 	s.NoError(err)
 	validator = stakingkeeper.TestingUpdateValidator(s.app.StakingKeeper, s.ctx, validator, true)
-	s.app.StakingKeeper.AfterValidatorCreated(s.ctx, validator.GetOperator())
+	valbz, err := s.app.StakingKeeper.ValidatorAddressCodec().StringToBytes(validator.GetOperator())
+	s.NoError(err)
+	s.app.StakingKeeper.Hooks().AfterValidatorCreated(s.ctx, valbz)
 	err = s.app.StakingKeeper.SetValidatorByConsAddr(s.ctx, validator)
 	s.NoError(err)
 
@@ -106,13 +108,15 @@ func (s *UpgradeTestSuite) TestUpgradeV7() {
 			plan := upgradetypes.Plan{Name: v7.UpgradeName, Height: testUpgradeHeight}
 			err := s.app.UpgradeKeeper.ScheduleUpgrade(s.ctx, plan)
 			s.Require().NoError(err)
-			_, exists := s.app.UpgradeKeeper.GetUpgradePlan(s.ctx)
-			s.Require().True(exists)
+			_, err = s.app.UpgradeKeeper.GetUpgradePlan(s.ctx)
+			s.Require().NoError(err)
 
 			s.ctx = s.ctx.WithBlockHeight(testUpgradeHeight)
 			s.Require().NotPanics(func() {
 				s.ctx.WithProposer(s.consAddress)
-				s.app.BeginBlocker(s.ctx, abci.RequestBeginBlock{})
+				s.app.FinalizeBlock(&abci.RequestFinalizeBlock{
+					Height: s.app.LastBlockHeight() + 1,
+				})
 			})
 
 			tc.after()

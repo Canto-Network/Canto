@@ -18,7 +18,7 @@ message Params {
   bool enable_onboarding = 1;
 
   string auto_swap_threshold = 3 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.nullable) = false
   ];
   repeated string whitelisted_channels = 4;

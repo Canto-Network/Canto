@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 	"github.com/stretchr/testify/require"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	simapp "github.com/Canto-Network/Canto/v7/app"
 	"github.com/Canto-Network/Canto/v7/x/epochs"
@@ -20,7 +20,7 @@ func TestEpochsExportGenesis(t *testing.T) {
 	feemarketGenesis.Params.NoBaseFee = false
 
 	app := simapp.Setup(false, feemarketGenesis)
-	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
+	ctx := app.BaseApp.NewContextLegacy(false, tmproto.Header{})
 
 	chainStartTime := ctx.BlockTime()
 	chainStartHeight := ctx.BlockHeight()
@@ -51,7 +51,7 @@ func TestEpochsInitGenesis(t *testing.T) {
 	feemarketGenesis.Params.NoBaseFee = false
 
 	app := simapp.Setup(false, feemarketGenesis)
-	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
+	ctx := app.BaseApp.NewContextLegacy(false, tmproto.Header{})
 
 	// On init genesis, default epochs information is set
 	// To check init genesis again, should make it fresh status

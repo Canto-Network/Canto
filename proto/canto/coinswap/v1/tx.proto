@@ -31,12 +31,12 @@ message MsgAddLiquidity {
   ];
   string exact_standard_amt = 2 [
     (gogoproto.moretags) = "yaml:\"exact_standard_amt\"",
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.nullable) = false
   ];
   string min_liquidity = 3 [
     (gogoproto.moretags) = "yaml:\"min_liquidity\"",
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.nullable) = false
   ];
   int64 deadline = 4;
@@ -54,12 +54,12 @@ message MsgRemoveLiquidity {
   ];
   string min_token = 2 [
     (gogoproto.moretags) = "yaml:\"min_token\"",
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.nullable) = false
   ];
   string min_standard_amt = 3 [
     (gogoproto.moretags) = "yaml:\"min_standard_amt\"",
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.nullable) = false
   ];
   int64 deadline = 4;

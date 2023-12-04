@@ -42,7 +42,7 @@ message MsgConvertERC20 {
   string contract_address = 1;
   // amount of ERC20 tokens to convert
   string amount = 2 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.nullable) = false
   ];
   // bech32 address to receive native Cosmos coins

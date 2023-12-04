@@ -18,8 +18,9 @@ import (
 	"github.com/Canto-Network/Canto/v7/testutil"
 	"github.com/Canto-Network/Canto/v7/x/erc20/types"
 
+	sdkmath "cosmossdk.io/math"
+	abci "github.com/cometbft/cometbft/abci/types"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
-	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 var _ = Describe("Performing EVM transactions", Ordered, func() {
@@ -79,7 +80,7 @@ var _ = Describe("Performing EVM transactions", Ordered, func() {
 })
 
 var _ = Describe("ERC20: Converting", Ordered, func() {
-	amt := sdk.NewInt(100)
+	amt := sdkmath.NewInt(100)
 	priv, _ := ethsecp256k1.GenerateKey()
 	addrBz := priv.PubKey().Address().Bytes()
 	accAddr := sdk.AccAddress(addrBz)
@@ -164,7 +165,7 @@ var _ = Describe("ERC20: Converting", Ordered, func() {
 			// denom := s.app.ClaimsKeeper.GetParams(s.ctx).ClaimsDenom
 			denom := "acanto" //use default denom for claimsDenom
 
-			err := testutil.FundAccount(s.app.BankKeeper, s.ctx, accAddr, sdk.NewCoins(sdk.NewCoin(denom, sdk.NewInt(1000))))
+			err := testutil.FundAccount(s.app.BankKeeper, s.ctx, accAddr, sdk.NewCoins(sdk.NewCoin(denom, sdkmath.NewInt(1000))))
 			s.Require().NoError(err)
 
 			_ = s.MintERC20Token(contract, s.address, addr, big.NewInt(amt.Int64()))
@@ -227,7 +228,7 @@ func convertCoin(priv *ethsecp256k1.PrivKey, coin sdk.Coin) {
 	Expect(res.IsOK()).To(BeTrue(), "failed to convert coin: %s", res.Log)
 }
 
-func convertERC20(priv *ethsecp256k1.PrivKey, amt sdk.Int, contract common.Address) {
+func convertERC20(priv *ethsecp256k1.PrivKey, amt sdkmath.Int, contract common.Address) {
 	addrBz := priv.PubKey().Address().Bytes()
 
 	convertERC20Msg := types.NewMsgConvertERC20(amt, sdk.AccAddress(addrBz), contract, common.BytesToAddress(addrBz))
@@ -244,7 +245,7 @@ func deliverTx(priv *ethsecp256k1.PrivKey, msgs ...sdk.Msg) abci.ResponseDeliver
 	txBuilder := encodingConfig.TxConfig.NewTxBuilder()
 
 	txBuilder.SetGasLimit(100_000_000)
-	txBuilder.SetFeeAmount(sdk.Coins{{Denom: denom, Amount: sdk.NewInt(1)}})
+	txBuilder.SetFeeAmount(sdk.Coins{{Denom: denom, Amount: sdkmath.NewInt(1)}})
 	err := txBuilder.SetMsgs(msgs...)
 	s.Require().NoError(err)
 

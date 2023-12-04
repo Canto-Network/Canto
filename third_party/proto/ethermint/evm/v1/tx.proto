@@ -46,14 +46,14 @@ message LegacyTx {
   uint64 nonce = 1;
   // gas price defines the value for each gas unit
   string gas_price = 2
-      [ (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int" ];
+      [ (gogoproto.customtype) = "cosmossdk.io/math.Int" ];
   // gas defines the gas limit defined for the transaction.
   uint64 gas = 3 [ (gogoproto.customname) = "GasLimit" ];
   // hex formatted address of the recipient
   string to = 4;
   // value defines the unsigned integer value of the transaction amount.
   string value = 5 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.customname) = "Amount"
   ];
   // input defines the data payload bytes of the transaction.
@@ -73,7 +73,7 @@ message AccessListTx {
 
   // destination EVM chain ID
   string chain_id = 1 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.customname) = "ChainID",
     (gogoproto.jsontag) = "chainID"
   ];
@@ -81,14 +81,14 @@ message AccessListTx {
   uint64 nonce = 2;
   // gas price defines the value for each gas unit
   string gas_price = 3
-      [ (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int" ];
+      [ (gogoproto.customtype) = "cosmossdk.io/math.Int" ];
   // gas defines the gas limit defined for the transaction.
   uint64 gas = 4 [ (gogoproto.customname) = "GasLimit" ];
   // hex formatted address of the recipient
   string to = 5;
   // value defines the unsigned integer value of the transaction amount.
   string value = 6 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.customname) = "Amount"
   ];
   // input defines the data payload bytes of the transaction.
@@ -113,7 +113,7 @@ message DynamicFeeTx {
 
   // destination EVM chain ID
   string chain_id = 1 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.customname) = "ChainID",
     (gogoproto.jsontag) = "chainID"
   ];
@@ -121,17 +121,17 @@ message DynamicFeeTx {
   uint64 nonce = 2;
   // gas tip cap defines the max value for the gas tip
   string gas_tip_cap = 3
-      [ (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int" ];
+      [ (gogoproto.customtype) = "cosmossdk.io/math.Int" ];
   // gas fee cap defines the max value for the gas fee
   string gas_fee_cap = 4
-      [ (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int" ];
+      [ (gogoproto.customtype) = "cosmossdk.io/math.Int" ];
   // gas defines the gas limit defined for the transaction.
   uint64 gas = 5 [ (gogoproto.customname) = "GasLimit" ];
   // hex formatted address of the recipient
   string to = 6;
   // value defines the the transaction amount.
   string value = 7 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.customname) = "Amount"
   ];
   // input defines the data payload bytes of the transaction.

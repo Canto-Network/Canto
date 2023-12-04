@@ -6,12 +6,11 @@ import (
 	"strings"
 	"time"
 
+	errorsmod "cosmossdk.io/errors"
+	simappparams "cosmossdk.io/simapp/params"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/simapp/helpers"
-	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
@@ -89,7 +88,7 @@ func SimulateMsgAddLiquidity(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 
 		var (
 			maxToken     sdk.Coin
-			minLiquidity sdk.Int
+			minLiquidity sdkmath.Int
 		)
 
 		standardDenom := k.GetStandardDenom(ctx)
@@ -349,8 +348,8 @@ func SimulateMsgRemoveLiquidity(k keeper.Keeper, ak types.AccountKeeper, bk type
 		standardDenom := k.GetStandardDenom(ctx)
 
 		var (
-			minToken          sdk.Int
-			minStandardAmt    sdk.Int
+			minToken          sdkmath.Int
+			minStandardAmt    sdkmath.Int
 			withdrawLiquidity sdk.Coin
 		)
 
@@ -472,7 +471,7 @@ func doubleSwapBill(inputCoin, outputCoin sdk.Coin, ctx sdk.Context, k keeper.Ke
 	outputReserve := reservePool.AmountOf(outputCoin.Denom)
 	inputReserve := reservePool.AmountOf(standardDenom)
 	if outputCoin.Amount.GTE(outputReserve) {
-		return sdk.Coin{}, sdk.Coin{}, sdkerrors.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("insufficient amount of %s, user expected: %s, actual: %s", outputCoin.Denom, outputCoin.Amount, outputReserve))
+		return sdk.Coin{}, sdk.Coin{}, errorsmod.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("insufficient amount of %s, user expected: %s, actual: %s", outputCoin.Denom, outputCoin.Amount, outputReserve))
 	}
 	soldStandardAmount := keeper.GetOutputPrice(outputCoin.Amount, inputReserve, outputReserve, param.Fee)
 	soldStandardCoin := sdk.NewCoin(standardDenom, soldStandardAmount)

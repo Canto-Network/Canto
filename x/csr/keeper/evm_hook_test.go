@@ -3,6 +3,7 @@ package keeper_test
 import (
 	"math/big"
 
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/common"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
@@ -38,7 +39,7 @@ func (suite *KeeperTestSuite) TestCSRHook() {
 
 	// Send some initial funds to the fee module account
 	evmDenom := suite.app.EvmKeeper.GetParams(suite.ctx).EvmDenom
-	coins := sdk.Coins{{Denom: evmDenom, Amount: sdk.NewIntFromUint64(1000000000)}}
+	coins := sdk.Coins{{Denom: evmDenom, Amount: sdkmath.NewIntFromUint64(1000000000)}}
 	suite.app.BankKeeper.MintCoins(suite.ctx, csrTypes.ModuleName, coins)
 	suite.app.BankKeeper.SendCoinsFromModuleToModule(suite.ctx, csrTypes.ModuleName, suite.app.CSRKeeper.FeeCollectorName, coins)
 

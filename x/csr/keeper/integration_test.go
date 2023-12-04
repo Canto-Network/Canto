@@ -16,6 +16,7 @@ import (
 
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -43,7 +44,7 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 
 		// Variables to track the state of CSR
 		turnstileAddress common.Address
-		csrShares        sdk.Dec
+		csrShares        sdkmath.LegacyDec
 		csrContracts     map[uint64][]string
 		revenueByNFT     map[uint64]*big.Int
 
@@ -66,7 +67,7 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 		s.Require().NoError(err)
 
 		// Initial balances for the account
-		initAmount := sdk.NewInt(int64(math.Pow10(18) * 4))
+		initAmount := sdkmath.NewInt(int64(math.Pow10(18) * 4))
 		initBalance := sdk.NewCoins(sdk.NewCoin(s.denom, initAmount))
 
 		// Set up account that will be used to deploy smart contracts

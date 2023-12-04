@@ -8,12 +8,13 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	ibcgotesting "github.com/cosmos/ibc-go/v3/testing"
+	ibcgotesting "github.com/cosmos/ibc-go/v8/testing"
 
-	"github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
-	clienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
+	"github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
+	clienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 
 	"github.com/Canto-Network/Canto/v7/app"
 	"github.com/Canto-Network/Canto/v7/contracts"
@@ -76,8 +77,8 @@ func (suite *TransferTestSuite) TestHandleMsgTransfer() {
 
 	// Fund chainB
 	coins := sdk.NewCoins(
-		sdk.NewCoin(ibcBase, sdk.NewInt(1000000000000)),
-		sdk.NewCoin("acanto", sdk.NewInt(10000000000)),
+		sdk.NewCoin(ibcBase, sdkmath.NewInt(1000000000000)),
+		sdk.NewCoin("acanto", sdkmath.NewInt(10000000000)),
 	)
 	err := suite.chainB.App.(*app.Canto).BankKeeper.MintCoins(suite.chainB.GetContext(), inflationtypes.ModuleName, coins)
 	suite.Require().NoError(err)
@@ -89,11 +90,11 @@ func (suite *TransferTestSuite) TestHandleMsgTransfer() {
 	coinswapKeeper.SetStandardDenom(suite.chainB.GetContext(), "acanto")
 	params := coinswapKeeper.GetParams(suite.chainB.GetContext())
 
-	params.MaxSwapAmount = sdk.NewCoins(sdk.NewCoin(ibcBase, sdk.NewInt(10000000)))
+	params.MaxSwapAmount = sdk.NewCoins(sdk.NewCoin(ibcBase, sdkmath.NewInt(10000000)))
 	coinswapKeeper.SetParams(suite.chainB.GetContext(), params)
 
 	middlewareParams := suite.chainB.App.(*app.Canto).GetOnboardingKeeper().GetParams(suite.chainB.GetContext())
-	middlewareParams.AutoSwapThreshold = sdk.NewInt(4000000)
+	middlewareParams.AutoSwapThreshold = sdkmath.NewInt(4000000)
 	suite.chainB.App.(*app.Canto).GetOnboardingKeeper().SetParams(suite.chainB.GetContext(), middlewareParams)
 
 	erc20Keeper := suite.chainB.App.(*app.Canto).GetErc20Keeper()
@@ -102,9 +103,9 @@ func (suite *TransferTestSuite) TestHandleMsgTransfer() {
 
 	// Pool creation
 	msgAddLiquidity := coinswaptypes.MsgAddLiquidity{
-		MaxToken:         sdk.NewCoin(ibcBase, sdk.NewInt(10000000000)),
-		ExactStandardAmt: sdk.NewInt(10000000000),
-		MinLiquidity:     sdk.NewInt(1),
+		MaxToken:         sdk.NewCoin(ibcBase, sdkmath.NewInt(10000000000)),
+		ExactStandardAmt: sdkmath.NewInt(10000000000),
+		MinLiquidity:     sdkmath.NewInt(1),
 		Deadline:         time.Now().Add(time.Minute * 10).Unix(),
 		Sender:           suite.chainB.SenderAccount.GetAddress().String(),
 	}
@@ -114,7 +115,7 @@ func (suite *TransferTestSuite) TestHandleMsgTransfer() {
 
 	timeoutHeight := clienttypes.NewHeight(10, 100)
 
-	amount, ok := sdk.NewIntFromString("9223372036854775808") // 2^63 (one above int64)
+	amount, ok := sdkmath.NewIntFromString("9223372036854775808") // 2^63 (one above int64)
 	suite.Require().True(ok)
 	coinToSendToB := sdk.NewCoin(sdk.DefaultBondDenom, amount)
 
@@ -140,9 +141,9 @@ func (suite *TransferTestSuite) TestHandleMsgTransfer() {
 
 	events := res.GetEvents()
 	attrs := onboardingtest.ExtractAttributes(onboardingtest.FindEvent(events, "swap"))
-	swapAmount, ok := sdk.NewIntFromString(attrs["amount"])
+	swapAmount, ok := sdkmath.NewIntFromString(attrs["amount"])
 	if !ok {
-		swapAmount = sdk.ZeroInt()
+		swapAmount = sdkmath.ZeroInt()
 	}
 
 	// check balances on chainB after the IBC transfer
@@ -163,9 +164,9 @@ func (suite *TransferTestSuite) TestHandleMsgTransfer() {
 	}
 
 	// Check that the convert is successful
-	before := sdk.NewIntFromBigInt(balanceErc20Before)
+	before := sdkmath.NewIntFromBigInt(balanceErc20Before)
 	suite.Require().True(before.IsZero())
-	suite.Require().Equal(coinSentFromAToB.Amount.Sub(swapAmount), sdk.NewIntFromBigInt(balanceErc20))
+	suite.Require().Equal(coinSentFromAToB.Amount.Sub(swapAmount), sdkmath.NewIntFromBigInt(balanceErc20))
 
 	// IBC transfer to blocked address
 	blockedAddr := "canto10d07y265gmmuvt4z0w9aw880jnsr700jg5j4zm"
@@ -207,9 +208,9 @@ func (suite *TransferTestSuite) TestHandleMsgTransfer() {
 
 	events = res.GetEvents()
 	attrs = onboardingtest.ExtractAttributes(onboardingtest.FindEvent(events, "swap"))
-	swapAmount, ok = sdk.NewIntFromString(attrs["amount"])
+	swapAmount, ok = sdkmath.NewIntFromString(attrs["amount"])
 	if !ok {
-		swapAmount = sdk.ZeroInt()
+		swapAmount = sdkmath.ZeroInt()
 	}
 
 	coinSentFromAToB = types.GetTransferCoin(path.EndpointB.ChannelConfig.PortID, path.EndpointB.ChannelID, sdk.DefaultBondDenom, coinToSendToB.Amount)
@@ -219,7 +220,7 @@ func (suite *TransferTestSuite) TestHandleMsgTransfer() {
 
 	suite.Require().Equal(balanceCantoBefore, balanceCanto)
 	suite.Require().Equal(balanceVoucherBefore, balanceVoucher)
-	suite.Require().Equal(sdk.NewIntFromBigInt(balanceErc20Before).Add(coinSentFromAToB.Amount).Sub(swapAmount), sdk.NewIntFromBigInt(balanceErc20))
+	suite.Require().Equal(sdkmath.NewIntFromBigInt(balanceErc20Before).Add(coinSentFromAToB.Amount).Sub(swapAmount), sdkmath.NewIntFromBigInt(balanceErc20))
 
 }
 

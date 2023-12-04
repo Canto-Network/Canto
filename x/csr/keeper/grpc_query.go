@@ -4,8 +4,8 @@ import (
 	"context"
 	"strings"
 
+	"cosmossdk.io/store/prefix"
 	"github.com/Canto-Network/Canto/v7/x/csr/types"
-	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	ethermint "github.com/evmos/ethermint/types"

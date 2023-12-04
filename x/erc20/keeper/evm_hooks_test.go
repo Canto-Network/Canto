@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/big"
 
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/common"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
@@ -156,12 +157,12 @@ func (suite *KeeperTestSuite) TestEvmHooksRegisteredCoin() {
 			sender := sdk.AccAddress(suite.address.Bytes())
 			contractAddr := common.HexToAddress(pair.Erc20Address)
 
-			coins := sdk.NewCoins(sdk.NewCoin(cosmosTokenBase, sdk.NewInt(tc.mint)))
+			coins := sdk.NewCoins(sdk.NewCoin(cosmosTokenBase, sdkmath.NewInt(tc.mint)))
 			suite.app.BankKeeper.MintCoins(suite.ctx, types.ModuleName, coins)
 			suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, sender, coins)
 
 			convertCoin := types.NewMsgConvertCoin(
-				sdk.NewCoin(cosmosTokenBase, sdk.NewInt(tc.burn)),
+				sdk.NewCoin(cosmosTokenBase, sdkmath.NewInt(tc.burn)),
 				suite.address,
 				sender,
 			)
@@ -173,7 +174,7 @@ func (suite *KeeperTestSuite) TestEvmHooksRegisteredCoin() {
 
 			balance := suite.BalanceOf(common.HexToAddress(pair.Erc20Address), suite.address)
 			cosmosBalance := suite.app.BankKeeper.GetBalance(suite.ctx, sender, metadata.Base)
-			suite.Require().Equal(cosmosBalance.Amount.Int64(), sdk.NewInt(tc.mint-tc.burn).Int64())
+			suite.Require().Equal(cosmosBalance.Amount.Int64(), sdkmath.NewInt(tc.mint-tc.burn).Int64())
 			suite.Require().Equal(balance, big.NewInt(tc.burn))
 
 			// Burn the 10 tokens of suite.address (owner)
@@ -185,11 +186,11 @@ func (suite *KeeperTestSuite) TestEvmHooksRegisteredCoin() {
 			if tc.result {
 				// Check if the execution was successful
 				suite.Require().NoError(err)
-				suite.Require().Equal(cosmosBalance.Amount, sdk.NewInt(tc.mint-tc.burn+tc.reconvert))
+				suite.Require().Equal(cosmosBalance.Amount, sdkmath.NewInt(tc.mint-tc.burn+tc.reconvert))
 			} else {
 				// Check that no changes were made to the account
 				suite.Require().Error(err)
-				suite.Require().Equal(cosmosBalance.Amount, sdk.NewInt(tc.mint-tc.burn))
+				suite.Require().Equal(cosmosBalance.Amount, sdkmath.NewInt(tc.mint-tc.burn))
 			}
 		})
 	}

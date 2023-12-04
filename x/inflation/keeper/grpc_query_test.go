@@ -3,6 +3,7 @@ package keeper_test
 import (
 	"fmt"
 
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/Canto-Network/Canto/v7/x/inflation/types"
@@ -78,7 +79,7 @@ func (suite *KeeperTestSuite) TestEpochMintProvision() {
 					params,
 					uint64(0),
 					30,
-					sdk.OneDec(),
+					sdkmath.LegacyOneDec(),
 				)
 				req = &types.QueryEpochMintProvisionRequest{}
 				expRes = &types.QueryEpochMintProvisionResponse{
@@ -90,7 +91,7 @@ func (suite *KeeperTestSuite) TestEpochMintProvision() {
 		{
 			"set epochMintProvision",
 			func() {
-				epochMintProvision := sdk.NewDec(1_000_000)
+				epochMintProvision := sdkmath.LegacyNewDec(1_000_000)
 				suite.app.InflationKeeper.SetEpochMintProvision(suite.ctx, epochMintProvision)
 				suite.Commit()
 
@@ -195,7 +196,7 @@ func (suite *KeeperTestSuite) TestQueryInflationRate() {
 	err := suite.app.InflationKeeper.MintCoins(suite.ctx, mintCoin)
 	suite.Require().NoError(err)
 
-	expInflationRate := sdk.MustNewDecFromStr("4.076087000000000000")
+	expInflationRate := sdkmath.LegacyMustNewDecFromStr("4.076087000000000000")
 	res, err := suite.queryClient.InflationRate(ctx, &types.QueryInflationRateRequest{})
 	suite.Require().NoError(err)
 	suite.Require().Equal(expInflationRate, res.InflationRate)

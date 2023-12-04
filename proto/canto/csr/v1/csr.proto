@@ -16,7 +16,7 @@ message CSR {
   uint64 txs = 3;
   // The cumulative revenue for this CSR NFT -> represented as a sdk.Int
   string revenue = 4 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.nullable) = false
   ];
 }

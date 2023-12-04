@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -26,7 +27,7 @@ func (m msgServer) AddLiquidity(goCtx context.Context, msg *types.MsgAddLiquidit
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	// check that deadline has not passed
 	if ctx.BlockHeader().Time.After(time.Unix(msg.Deadline, 0)) {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDeadline, "deadline has passed for MsgAddLiquidity")
+		return nil, errorsmod.Wrap(types.ErrInvalidDeadline, "deadline has passed for MsgAddLiquidity")
 	}
 
 	mintToken, err := m.Keeper.AddLiquidity(ctx, msg)
@@ -51,7 +52,7 @@ func (m msgServer) RemoveLiquidity(goCtx context.Context, msg *types.MsgRemoveLi
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	// check that deadline has not passed
 	if ctx.BlockHeader().Time.After(time.Unix(msg.Deadline, 0)) {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDeadline, "deadline has passed for MsgRemoveLiquidity")
+		return nil, errorsmod.Wrap(types.ErrInvalidDeadline, "deadline has passed for MsgRemoveLiquidity")
 	}
 	withdrawCoins, err := m.Keeper.RemoveLiquidity(ctx, msg)
 	if err != nil {
@@ -80,11 +81,11 @@ func (m msgServer) SwapCoin(goCtx context.Context, msg *types.MsgSwapOrder) (*ty
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	// check that deadline has not passed
 	if ctx.BlockHeader().Time.After(time.Unix(msg.Deadline, 0)) {
-		return nil, sdkerrors.Wrap(types.ErrInvalidDeadline, "deadline has passed for MsgSwapOrder")
+		return nil, errorsmod.Wrap(types.ErrInvalidDeadline, "deadline has passed for MsgSwapOrder")
 	}
 
 	if m.Keeper.blockedAddrs[msg.Output.Address] {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to receive external funds", msg.Output.Address)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to receive external funds", msg.Output.Address)
 	}
 
 	if err := m.Keeper.Swap(ctx, msg); err != nil {

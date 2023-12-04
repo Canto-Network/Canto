@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	errorsmod "cosmossdk.io/errors"
 	"github.com/ethereum/go-ethereum/common"
 
 	"github.com/Canto-Network/Canto/v7/x/csr/types"
@@ -31,7 +31,7 @@ func (k Keeper) RegisterEvent(ctx sdk.Context, data []byte) error {
 	nftID := event.TokenId.Uint64()
 	_, found := k.GetCSR(ctx, nftID)
 	if found {
-		return sdkerrors.Wrapf(ErrDuplicateNFTID, "EventHandler::RegisterEvent this NFT id has already been registered: %d", nftID)
+		return errorsmod.Wrapf(ErrDuplicateNFTID, "EventHandler::RegisterEvent this NFT id has already been registered: %d", nftID)
 	}
 
 	// Create CSR object and perform stateless validation
@@ -71,7 +71,7 @@ func (k Keeper) UpdateEvent(ctx sdk.Context, data []byte) error {
 	nftID := event.TokenId.Uint64()
 	csr, found := k.GetCSR(ctx, nftID)
 	if !found {
-		return sdkerrors.Wrapf(ErrNFTNotFound, "EventHandler::UpdateEvent the nft entered does not currently exist: %d", nftID)
+		return errorsmod.Wrapf(ErrNFTNotFound, "EventHandler::UpdateEvent the nft entered does not currently exist: %d", nftID)
 	}
 	// Add the new smart contract to the CSR NFT and validate
 	csr.Contracts = append(csr.Contracts, event.SmartContract.String())
@@ -91,14 +91,14 @@ func (k Keeper) ValidateContract(ctx sdk.Context, contract common.Address) error
 	// Check if the smart contract is already registered -> prevent double registration
 	nftID, found := k.GetNFTByContract(ctx, contract.String())
 	if found {
-		return sdkerrors.Wrapf(ErrPrevRegisteredSmartContract,
+		return errorsmod.Wrapf(ErrPrevRegisteredSmartContract,
 			"EventHandler::ValidateContract this smart contract is already registered to an existing NFT: %d", nftID)
 	}
 
 	// Check if the user is attempting to register a non-smart contract address (i.e. an EOA or non-existent address)
 	account := k.evmKeeper.GetAccount(ctx, contract)
 	if account == nil || !account.IsContract() {
-		return sdkerrors.Wrapf(ErrRegisterInvalidContract,
+		return errorsmod.Wrapf(ErrRegisterInvalidContract,
 			"EventHandler::ValidateContract user is attempting to register/assign a nil or non-smart contract address")
 	}
 	return nil

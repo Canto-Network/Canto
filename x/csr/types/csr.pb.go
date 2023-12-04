@@ -33,7 +33,7 @@ type CSR struct {
 	Id uint64 `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
 	// The total number of transactions for this CSR NFT
 	Txs uint64 `protobuf:"varint,3,opt,name=txs,proto3" json:"txs,omitempty"`
-	// The cumulative revenue for this CSR NFT -> represented as a sdk.Int
+	// The cumulative revenue for this CSR NFT -> represented as a sdkmath.Int
 	Revenue github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,4,opt,name=revenue,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"revenue"`
 }
 

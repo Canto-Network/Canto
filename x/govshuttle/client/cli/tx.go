@@ -13,7 +13,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/gov/client/cli"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	errorsmod "cosmossdk.io/errors"
 
 	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
 )
@@ -90,7 +90,7 @@ Where metadata.json contains (example):
 
 			propMetaData, err := ParseLendingMarketMetadata(clientCtx.Codec, args[0])
 			if err != nil {
-				return sdkerrors.Wrap(err, "Failure to parse JSON object")
+				return errorsmod.Wrap(err, "Failure to parse JSON object")
 			}
 
 			from := clientCtx.GetFromAddress()
@@ -173,7 +173,7 @@ Where metadata.json contains (example):
 
 			propMetaData, err := ParseTreasuryMetadata(clientCtx.Codec, args[0])
 			if err != nil {
-				return sdkerrors.Wrap(err, "Failure to parse JSON object")
+				return errorsmod.Wrap(err, "Failure to parse JSON object")
 			}
 
 			from := clientCtx.GetFromAddress()
