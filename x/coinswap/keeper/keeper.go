@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	storetypes "cosmossdk.io/store/types"
 	gogotypes "github.com/gogo/protobuf/types"
 
 	errorsmod "cosmossdk.io/errors"
@@ -19,7 +20,7 @@ import (
 // Keeper of the coinswap store
 type Keeper struct {
 	cdc              codec.BinaryCodec
-	storeKey         sdk.StoreKey
+	storeKey         storetypes.StoreKey
 	bk               types.BankKeeper
 	ak               types.AccountKeeper
 	paramSpace       paramstypes.Subspace
@@ -33,7 +34,7 @@ type Keeper struct {
 // - sending to and from ModuleAccounts
 func NewKeeper(
 	cdc codec.BinaryCodec,
-	key sdk.StoreKey,
+	key storetypes.StoreKey,
 	paramSpace paramstypes.Subspace,
 	bk types.BankKeeper,
 	ak types.AccountKeeper,
