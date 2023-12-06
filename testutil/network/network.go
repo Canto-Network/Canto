@@ -9,29 +9,30 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strings"
 	"sync"
+	"syscall"
 	"testing"
 	"time"
 
-	tmcfg "github.com/cometbft/cometbft/config"
-	tmflags "github.com/cometbft/cometbft/libs/cli/flags"
-	"github.com/cometbft/cometbft/libs/log"
+	"golang.org/x/sync/errgroup"
+
 	tmrand "github.com/cometbft/cometbft/libs/rand"
 	"github.com/cometbft/cometbft/node"
 	tmclient "github.com/cometbft/cometbft/rpc/client"
-	dbm "github.com/cosmos/cosmos-db"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 
+	"cosmossdk.io/log"
 	sdkmath "cosmossdk.io/math"
 	"cosmossdk.io/simapp"
 	"cosmossdk.io/simapp/params"
 	pruningtypes "cosmossdk.io/store/pruning/types"
-	storetypes "cosmossdk.io/store/types"
+	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -44,6 +45,7 @@ import (
 	srvconfig "github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/testutil"
+	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -53,7 +55,6 @@ import (
 
 	"github.com/Canto-Network/Canto/v7/app"
 
-	"github.com/evmos/ethermint/encoding"
 	"github.com/evmos/ethermint/server/config"
 	ethermint "github.com/evmos/ethermint/types"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
@@ -65,6 +66,26 @@ var lock = new(sync.Mutex)
 // AppConstructor defines a function which accepts a network configuration and
 // creates an ABCI Application to provide to Tendermint.
 type AppConstructor = func(val Validator) servertypes.Application
+
+// NewAppConstructor returns a new simapp AppConstructor
+func NewAppConstructor(chainID string) AppConstructor {
+	return func(val Validator) servertypes.Application {
+		return app.NewCanto(
+			val.Ctx.Logger,
+			dbm.NewMemDB(),
+			nil,
+			true,
+			make(map[int64]bool),
+			val.Ctx.Config.RootDir,
+			0,
+			true,
+			simtestutil.NewAppOptionsWithFlagHome(val.Ctx.Config.RootDir),
+			baseapp.SetPruning(pruningtypes.NewPruningOptionsFromString(val.AppConfig.Pruning)),
+			baseapp.SetMinGasPrices(val.AppConfig.MinGasPrices),
+			baseapp.SetChainID(chainID),
+		)
+	}
+}
 
 // Config defines the necessary configuration used to bootstrap and start an
 // in-process local testing network.
@@ -99,18 +120,36 @@ type Config struct {
 // DefaultConfig returns a sane default configuration suitable for nearly all
 // testing requirements.
 func DefaultConfig() Config {
-	encCfg := encoding.MakeConfig(app.ModuleBasics)
+	tempApp := app.NewCanto(
+		log.NewNopLogger(),
+		dbm.NewMemDB(),
+		nil,
+		true,
+		map[int64]bool{},
+		app.DefaultNodeHome,
+		0,
+		true,
+		simtestutil.NewAppOptionsWithFlagHome(app.DefaultNodeHome),
+	)
 
+	encCfg := params.EncodingConfig{
+		InterfaceRegistry: tempApp.InterfaceRegistry(),
+		Codec:             tempApp.AppCodec(),
+		TxConfig:          tempApp.TxConfig(),
+		Amino:             tempApp.LegacyAmino(),
+	}
+
+	chainID := fmt.Sprintf("canto_%d-1", tmrand.Int63n(9999999999999)+1)
 	return Config{
 		Codec:             encCfg.Codec,
 		TxConfig:          encCfg.TxConfig,
 		LegacyAmino:       encCfg.Amino,
 		InterfaceRegistry: encCfg.InterfaceRegistry,
 		AccountRetriever:  authtypes.AccountRetriever{},
-		AppConstructor:    NewAppConstructor(encCfg),
-		GenesisState:      app.ModuleBasics.DefaultGenesis(encCfg.Codec),
+		AppConstructor:    NewAppConstructor(chainID),
+		GenesisState:      tempApp.DefaultGenesis(),
 		TimeoutCommit:     2 * time.Second,
-		ChainID:           fmt.Sprintf("canto_%d-1", tmrand.Int63n(9999999999999)+1),
+		ChainID:           chainID,
 		NumValidators:     4,
 		BondDenom:         ethermint.AttoPhoton,
 		MinGasPrices:      fmt.Sprintf("0.000006%s", ethermint.AttoPhoton),
@@ -122,20 +161,6 @@ func DefaultConfig() Config {
 		SigningAlgo:       string(hd.EthSecp256k1Type),
 		KeyringOptions:    []keyring.Option{hd.EthSecp256k1Option()},
 		PrintMnemonic:     false,
-	}
-}
-
-// NewAppConstructor returns a new canto AppConstructor
-func NewAppConstructor(encodingCfg params.EncodingConfig) AppConstructor {
-	return func(val Validator) servertypes.Application {
-		return app.NewCanto(
-			val.Ctx.Logger, dbm.NewMemDB(), nil, true, make(map[int64]bool), val.Ctx.Config.RootDir, 0,
-			false,
-			encodingCfg,
-			simapp.EmptyAppOptions{},
-			baseapp.SetPruning(storetypes.NewPruningOptionsFromString(val.AppConfig.Pruning)),
-			baseapp.SetMinGasPrices(val.AppConfig.MinGasPrices),
-		)
 	}
 }
 
@@ -177,10 +202,13 @@ type (
 		RPCClient     tmclient.Client
 		JSONRPCClient *ethclient.Client
 
-		tmNode      *node.Node
-		api         *api.Server
-		grpc        *grpc.Server
-		grpcWeb     *http.Server
+		tmNode   *node.Node
+		api      *api.Server
+		grpc     *grpc.Server
+		grpcWeb  *http.Server
+		errGroup *errgroup.Group
+		cancelFn context.CancelFunc
+
 		jsonrpc     *http.Server
 		jsonrpcDone chan struct{}
 	}
@@ -271,7 +299,7 @@ func New(l Logger, baseDir string, cfg Config) (*Network, error) {
 				apiListenAddr = cfg.APIAddress
 			} else {
 				var err error
-				apiListenAddr, _, err = server.FreeTCPAddr()
+				apiListenAddr, _, _, err = FreeTCPAddr()
 				if err != nil {
 					return nil, err
 				}
@@ -287,7 +315,7 @@ func New(l Logger, baseDir string, cfg Config) (*Network, error) {
 			if cfg.RPCAddress != "" {
 				tmCfg.RPC.ListenAddress = cfg.RPCAddress
 			} else {
-				rpcAddr, _, err := server.FreeTCPAddr()
+				rpcAddr, _, _, err := FreeTCPAddr()
 				if err != nil {
 					return nil, err
 				}
@@ -297,25 +325,19 @@ func New(l Logger, baseDir string, cfg Config) (*Network, error) {
 			if cfg.GRPCAddress != "" {
 				appCfg.GRPC.Address = cfg.GRPCAddress
 			} else {
-				_, grpcPort, err := server.FreeTCPAddr()
+				_, grpcPort, _, err := FreeTCPAddr()
 				if err != nil {
 					return nil, err
 				}
 				appCfg.GRPC.Address = fmt.Sprintf("0.0.0.0:%s", grpcPort)
 			}
 			appCfg.GRPC.Enable = true
-
-			_, grpcWebPort, err := server.FreeTCPAddr()
-			if err != nil {
-				return nil, err
-			}
-			appCfg.GRPCWeb.Address = fmt.Sprintf("0.0.0.0:%s", grpcWebPort)
 			appCfg.GRPCWeb.Enable = true
 
 			if cfg.JSONRPCAddress != "" {
 				appCfg.JSONRPC.Address = cfg.JSONRPCAddress
 			} else {
-				_, jsonRPCPort, err := server.FreeTCPAddr()
+				_, jsonRPCPort, _, err := FreeTCPAddr()
 				if err != nil {
 					return nil, err
 				}
@@ -327,8 +349,7 @@ func New(l Logger, baseDir string, cfg Config) (*Network, error) {
 
 		logger := log.NewNopLogger()
 		if cfg.EnableTMLogging {
-			logger = log.NewTMLogger(log.NewSyncWriter(os.Stdout))
-			logger, _ = tmflags.ParseLogLevel("info", logger, tmcfg.DefaultLogLevel)
+			logger = log.NewLogger(os.Stdout)
 		}
 
 		ctx.Logger = logger
@@ -352,13 +373,13 @@ func New(l Logger, baseDir string, cfg Config) (*Network, error) {
 		tmCfg.Moniker = nodeDirName
 		monikers[i] = nodeDirName
 
-		proxyAddr, _, err := server.FreeTCPAddr()
+		proxyAddr, _, _, err := FreeTCPAddr()
 		if err != nil {
 			return nil, err
 		}
 		tmCfg.ProxyApp = proxyAddr
 
-		p2pAddr, _, err := server.FreeTCPAddr()
+		p2pAddr, _, _, err := FreeTCPAddr()
 		if err != nil {
 			return nil, err
 		}
@@ -373,7 +394,7 @@ func New(l Logger, baseDir string, cfg Config) (*Network, error) {
 		nodeIDs[i] = nodeID
 		valPubKeys[i] = pubKey
 
-		kb, err := keyring.New(sdk.KeyringServiceName(), keyring.BackendTest, clientDir, buf, cfg.KeyringOptions...)
+		kb, err := keyring.New(sdk.KeyringServiceName(), keyring.BackendTest, clientDir, buf, cfg.Codec, cfg.KeyringOptions...)
 		if err != nil {
 			return nil, err
 		}
@@ -459,7 +480,7 @@ func New(l Logger, baseDir string, cfg Config) (*Network, error) {
 			WithKeybase(kb).
 			WithTxConfig(cfg.TxConfig)
 
-		if err := tx.Sign(txFactory, nodeDirName, txBuilder, true); err != nil {
+		if err := tx.Sign(context.Background(), txFactory, nodeDirName, txBuilder, true); err != nil {
 			return nil, err
 		}
 
@@ -531,9 +552,33 @@ func New(l Logger, baseDir string, cfg Config) (*Network, error) {
 
 	// Ensure we cleanup incase any test was abruptly halted (e.g. SIGINT) as any
 	// defer in a test would not be called.
-	server.TrapSignal(network.Cleanup)
+	trapSignal(network.Cleanup)
 
 	return network, nil
+}
+
+// trapSignal traps SIGINT and SIGTERM and calls os.Exit once a signal is received.
+func trapSignal(cleanupFunc func()) {
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		sig := <-sigs
+
+		if cleanupFunc != nil {
+			cleanupFunc()
+		}
+		exitCode := 128
+
+		switch sig {
+		case syscall.SIGINT:
+			exitCode += int(syscall.SIGINT)
+		case syscall.SIGTERM:
+			exitCode += int(syscall.SIGTERM)
+		}
+
+		os.Exit(exitCode)
+	}()
 }
 
 // LatestHeight returns the latest height of the network or an error if the

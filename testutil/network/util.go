@@ -1,11 +1,16 @@
 package network
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"net"
 	"path/filepath"
-	"time"
 
+	"github.com/ethereum/go-ethereum/ethclient"
+	"golang.org/x/sync/errgroup"
+
+	tmcfg "github.com/cometbft/cometbft/config"
 	tmos "github.com/cometbft/cometbft/libs/os"
 	"github.com/cometbft/cometbft/node"
 	"github.com/cometbft/cometbft/p2p"
@@ -14,18 +19,18 @@ import (
 	"github.com/cometbft/cometbft/rpc/client/local"
 	"github.com/cometbft/cometbft/types"
 	tmtime "github.com/cometbft/cometbft/types/time"
-	"github.com/ethereum/go-ethereum/ethclient"
 
 	inflationtypes "github.com/Canto-Network/Canto/v7/x/inflation/types"
 	"github.com/cosmos/cosmos-sdk/server/api"
 	servergrpc "github.com/cosmos/cosmos-sdk/server/grpc"
-	srvtypes "github.com/cosmos/cosmos-sdk/server/types"
+	servercmtlog "github.com/cosmos/cosmos-sdk/server/log"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	"github.com/evmos/ethermint/server"
@@ -48,16 +53,24 @@ func startInProcess(cfg Config, val *Validator) error {
 
 	app := cfg.AppConstructor(*val)
 
-	genDocProvider := node.DefaultGenesisDocProviderFunc(tmCfg)
+	appGenesisProvider := func() (*types.GenesisDoc, error) {
+		appGenesis, err := genutiltypes.AppGenesisFromFile(tmCfg.GenesisFile())
+		if err != nil {
+			return nil, err
+		}
+		return appGenesis.ToGenesisDoc()
+	}
+
+	cmtApp := server.NewCometABCIWrapper(app)
 	tmNode, err := node.NewNode(
 		tmCfg,
 		pvm.LoadOrGenFilePV(tmCfg.PrivValidatorKeyFile(), tmCfg.PrivValidatorStateFile()),
 		nodeKey,
-		proxy.NewLocalClientCreator(app),
-		genDocProvider,
-		node.DefaultDBProvider,
+		proxy.NewLocalClientCreator(cmtApp),
+		appGenesisProvider,
+		tmcfg.DefaultDBProvider,
 		node.DefaultMetricsProvider(tmCfg.Instrumentation),
-		logger.With("module", val.Moniker),
+		servercmtlog.CometLoggerWrapper{Logger: logger.With("module", val.Moniker)},
 	)
 	if err != nil {
 		return err
@@ -83,43 +96,40 @@ func startInProcess(cfg Config, val *Validator) error {
 
 		// Add the tendermint queries service in the gRPC router.
 		app.RegisterTendermintService(val.ClientCtx)
+
+		app.RegisterNodeService(val.ClientCtx, val.AppConfig.Config)
 	}
 
-	if val.AppConfig.API.Enable && val.APIAddress != "" {
-		apiSrv := api.New(val.ClientCtx, logger.With("module", "api-server"))
-		app.RegisterAPIRoutes(apiSrv, val.AppConfig.API)
+	ctx := context.Background()
+	ctx, val.cancelFn = context.WithCancel(ctx)
+	val.errGroup, ctx = errgroup.WithContext(ctx)
 
-		errCh := make(chan error)
+	grpcCfg := val.AppConfig.GRPC
 
-		go func() {
-			if err := apiSrv.Start(val.AppConfig.Config); err != nil {
-				errCh <- err
-			}
-		}()
-
-		select {
-		case err := <-errCh:
-			return err
-		case <-time.After(srvtypes.ServerStartTime): // assume server started successfully
-		}
-
-		val.api = apiSrv
-	}
-
-	if val.AppConfig.GRPC.Enable {
-		grpcSrv, err := servergrpc.StartGRPCServer(val.ClientCtx, app, val.AppConfig.GRPC.Address)
+	if grpcCfg.Enable {
+		grpcSrv, err := servergrpc.NewGRPCServer(val.ClientCtx, app, grpcCfg)
 		if err != nil {
 			return err
 		}
 
-		val.grpc = grpcSrv
+		// Start the gRPC server in a goroutine. Note, the provided ctx will ensure
+		// that the server is gracefully shut down.
+		val.errGroup.Go(func() error {
+			return servergrpc.StartGRPCServer(ctx, logger.With("module", "grpc-server"), grpcCfg, grpcSrv)
+		})
 
-		if val.AppConfig.GRPCWeb.Enable {
-			val.grpcWeb, err = servergrpc.StartGRPCWeb(grpcSrv, val.AppConfig.Config)
-			if err != nil {
-				return err
-			}
-		}
+		val.grpc = grpcSrv
+	}
+
+	if val.AppConfig.API.Enable && val.APIAddress != "" {
+		apiSrv := api.New(val.ClientCtx, logger.With("module", "api-server"), val.grpc)
+		app.RegisterAPIRoutes(apiSrv, val.AppConfig.API)
+
+		val.errGroup.Go(func() error {
+			return apiSrv.Start(ctx, val.AppConfig.Config)
+		})
+
+		val.api = apiSrv
 	}
 
 	if val.AppConfig.JSONRPC.Enable && val.AppConfig.JSONRPC.Address != "" {
@@ -128,7 +138,7 @@ func startInProcess(cfg Config, val *Validator) error {
 		}
 
 		tmEndpoint := "/websocket"
-		tmRPCAddr := fmt.Sprintf("tcp://%s", val.AppConfig.GRPC.Address)
+		tmRPCAddr := val.RPCAddress
 
 		val.jsonrpc, val.jsonrpcDone, err = server.StartJSONRPC(val.Ctx, val.ClientCtx, tmRPCAddr, tmEndpoint, val.AppConfig, nil)
 		if err != nil {
@@ -161,13 +171,21 @@ func collectGenFiles(cfg Config, vals []*Validator, outputDir string) error {
 		initCfg := genutiltypes.NewInitConfig(cfg.ChainID, gentxsDir, vals[i].NodeID, vals[i].PubKey)
 
 		genFile := tmCfg.GenesisFile()
-		genDoc, err := types.GenesisDocFromFile(genFile)
+		appGenesis, err := genutiltypes.AppGenesisFromFile(genFile)
 		if err != nil {
 			return err
 		}
 
-		appState, err := genutil.GenAppStateFromConfig(cfg.Codec, cfg.TxConfig,
-			tmCfg, initCfg, *genDoc, banktypes.GenesisBalancesIterator{})
+		appState, err := genutil.GenAppStateFromConfig(
+			cfg.Codec,
+			cfg.TxConfig,
+			tmCfg,
+			initCfg,
+			appGenesis,
+			banktypes.GenesisBalancesIterator{},
+			genutiltypes.DefaultMessageValidator,
+			cfg.TxConfig.SigningContext().ValidatorAddressCodec(),
+		)
 		if err != nil {
 			return err
 		}
@@ -205,7 +223,7 @@ func initGenFiles(cfg Config, genAccounts []authtypes.GenesisAccount, genBalance
 	stakingGenState.Params.BondDenom = cfg.BondDenom
 	cfg.GenesisState[stakingtypes.ModuleName] = cfg.Codec.MustMarshalJSON(&stakingGenState)
 
-	var govGenState govtypes.GenesisState
+	var govGenState govv1.GenesisState
 	cfg.Codec.MustUnmarshalJSON(cfg.GenesisState[govtypes.ModuleName], &govGenState)
 
 	govGenState.DepositParams.MinDeposit[0].Denom = cfg.BondDenom
@@ -259,4 +277,22 @@ func WriteFile(name string, dir string, contents []byte) error {
 	}
 
 	return tmos.WriteFile(file, contents, 0o644)
+}
+
+// Get a free address for a test CometBFT server
+// protocol is either tcp, http, etc
+func FreeTCPAddr() (addr, port string, closeFn func() error, err error) {
+	l, err := net.Listen("tcp", "localhost:0")
+	if err != nil {
+		return "", "", nil, err
+	}
+
+	closeFn = func() error {
+		return l.Close()
+	}
+
+	portI := l.Addr().(*net.TCPAddr).Port
+	port = fmt.Sprintf("%d", portI)
+	addr = fmt.Sprintf("tcp://0.0.0.0:%s", port)
+	return
 }
