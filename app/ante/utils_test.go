@@ -106,7 +106,7 @@ func (suite *AnteTestSuite) CommitAfter(t time.Duration) {
 }
 
 func (s *AnteTestSuite) CreateTestTxBuilder(gasPrice sdkmath.Int, denom string, msgs ...sdk.Msg) client.TxBuilder {
-	encodingConfig := encoding.MakeConfig(app.ModuleBasics)
+	encodingConfig := encoding.MakeTestEncodingConfig()
 	gasLimit := uint64(1000000)
 
 	txBuilder := encodingConfig.TxConfig.NewTxBuilder()
@@ -120,7 +120,7 @@ func (s *AnteTestSuite) CreateTestTxBuilder(gasPrice sdkmath.Int, denom string, 
 }
 
 func (s *AnteTestSuite) CreateEthTestTxBuilder(msgEthereumTx *evmtypes.MsgEthereumTx) client.TxBuilder {
-	encodingConfig := encoding.MakeConfig(app.ModuleBasics)
+	encodingConfig := encoding.MakeTestEncodingConfig()
 	option, err := codectypes.NewAnyWithValue(&evmtypes.ExtensionOptionsEthereumTx{})
 	s.Require().NoError(err)
 

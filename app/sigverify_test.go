@@ -53,7 +53,7 @@ func TestConsumeSignatureVerificationGas(t *testing.T) {
 	params := authtypes.DefaultParams()
 	msg := []byte{1, 2, 3, 4}
 
-	encodingConfig := encoding.MakeConfig(ModuleBasics)
+	encodingConfig := encoding.MakeTestEncodingConfig()
 	cdc := encodingConfig.Amino
 
 	p := authtypes.DefaultParams()

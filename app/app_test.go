@@ -7,19 +7,28 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"cosmossdk.io/log"
+
 	abci "github.com/cometbft/cometbft/abci/types"
-	"github.com/cometbft/cometbft/libs/log"
 	dbm "github.com/cosmos/cosmos-db"
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
-
-	"github.com/evmos/ethermint/encoding"
 
 	"github.com/Canto-Network/Canto/v7/types"
 )
 
 func TestCantoExport(t *testing.T) {
 	db := dbm.NewMemDB()
-	app := NewCanto(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, DefaultNodeHome, 0, false, encoding.MakeConfig(ModuleBasics), simtestutil.NewAppOptionsWithFlagHome(DefaultNodeHome))
+	app := NewCanto(
+		log.NewLogger(os.Stdout),
+		db,
+		nil,
+		true,
+		map[int64]bool{},
+		DefaultNodeHome,
+		0,
+		false,
+		simtestutil.NewAppOptionsWithFlagHome(DefaultNodeHome),
+	)
 
 	genesisState := NewDefaultGenesisState()
 	stateBytes, err := json.MarshalIndent(genesisState, "", "  ")
@@ -36,7 +45,17 @@ func TestCantoExport(t *testing.T) {
 	app.Commit()
 
 	// Making a new app object with the db, so that initchain hasn't been called
-	app2 := NewCanto(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, DefaultNodeHome, 0, false, encoding.MakeConfig(ModuleBasics), simtestutil.NewAppOptionsWithFlagHome(DefaultNodeHome))
-	_, err = app2.ExportAppStateAndValidators(false, []string{})
+	app2 := NewCanto(
+		log.NewLogger(os.Stdout),
+		db,
+		nil,
+		true,
+		map[int64]bool{},
+		DefaultNodeHome,
+		0,
+		false,
+		simtestutil.NewAppOptionsWithFlagHome(DefaultNodeHome),
+	)
+	_, err = app2.ExportAppStateAndValidators(false, []string{}, []string{})
 	require.NoError(t, err, "ExportAppStateAndValidators should not have an error")
 }

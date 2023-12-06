@@ -15,13 +15,13 @@ import (
 
 // AccountKeeper defines the expected interface needed to retrieve account info.
 type AccountKeeper interface {
-	GetSequence(ctx sdk.Context, addr sdk.AccAddress) (uint64, error)
+	GetSequence(ctx context.Context, addr sdk.AccAddress) (uint64, error)
 }
 
 // BankKeeper defines the expected interface needed to send tx fees from the fee collector module to the CSR module for distribution.
 type BankKeeper interface {
-	SendCoinsFromModuleToModule(ctx sdk.Context, senderModule string, recipientModule string, amt sdk.Coins) error
-	BurnCoins(ctx sdk.Context, moduleName string, amt sdk.Coins) error
+	SendCoinsFromModuleToModule(ctx context.Context, senderModule string, recipientModule string, amt sdk.Coins) error
+	BurnCoins(ctx context.Context, moduleName string, amt sdk.Coins) error
 }
 
 // EVMKeeper defines the expected EVM keeper interface used to make EVM deployments and txs from the module account.

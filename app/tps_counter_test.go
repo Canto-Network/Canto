@@ -11,7 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cometbft/cometbft/libs/log"
+	"cosmossdk.io/log"
+
 	"github.com/stretchr/testify/require"
 )
 

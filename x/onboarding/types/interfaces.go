@@ -13,10 +13,8 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	transfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	clienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 
 	coinswaptypes "github.com/Canto-Network/Canto/v7/x/coinswap/types"
@@ -71,13 +69,6 @@ type AccountKeeper interface {
 // TransferKeeper defines the expected IBC transfer keeper.
 type TransferKeeper interface {
 	GetDenomTrace(ctx sdk.Context, denomTraceHash tmbytes.HexBytes) (transfertypes.DenomTrace, bool)
-	SendTransfer(
-		ctx sdk.Context,
-		sourcePort, sourceChannel string,
-		token sdk.Coin,
-		sender sdk.AccAddress, receiver string,
-		timeoutHeight clienttypes.Height, timeoutTimestamp uint64,
-	) error
 }
 
 // ChannelKeeper defines the expected IBC channel keeper.
