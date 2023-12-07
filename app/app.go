@@ -98,6 +98,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/group"
 	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
 	groupmodule "github.com/cosmos/cosmos-sdk/x/group/module"
+	// mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper" // TODO(dudong2): consider mint, vesting
+	// minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
@@ -113,7 +115,7 @@ import (
 	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
 	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
 
-	ibcfeekeeper "github.com/cosmos/ibc-go/v8/modules/apps/29-fee/keeper" // TODO(dudong2): need it?
+	ibcfeekeeper "github.com/cosmos/ibc-go/v8/modules/apps/29-fee/keeper"
 	"github.com/cosmos/ibc-go/v8/modules/apps/transfer"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
@@ -231,10 +233,11 @@ type Canto struct {
 	memKeys map[string]*storetypes.MemoryStoreKey
 
 	// keepers
-	AccountKeeper         authkeeper.AccountKeeper
-	BankKeeper            bankkeeper.Keeper
-	StakingKeeper         *stakingkeeper.Keeper
-	SlashingKeeper        slashingkeeper.Keeper
+	AccountKeeper  authkeeper.AccountKeeper
+	BankKeeper     bankkeeper.Keeper
+	StakingKeeper  *stakingkeeper.Keeper
+	SlashingKeeper slashingkeeper.Keeper
+	// MintKeeper            mintkeeper.Keeper
 	DistrKeeper           distrkeeper.Keeper
 	GovKeeper             govkeeper.Keeper
 	CrisisKeeper          *crisiskeeper.Keeper
@@ -247,8 +250,8 @@ type Canto struct {
 	NFTKeeper             nftkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
 	CircuitKeeper         circuitkeeper.Keeper
-	IBCKeeper             *ibckeeper.Keeper   // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	IBCFeeKeeper          ibcfeekeeper.Keeper // TODO(dudong2): need it?
+	IBCKeeper             *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+	IBCFeeKeeper          ibcfeekeeper.Keeper
 	TransferKeeper        ibctransferkeeper.Keeper
 	CapabilityKeeper      *capabilitykeeper.Keeper
 
@@ -344,7 +347,7 @@ func NewCanto(
 	enccodec.RegisterLegacyAminoCodec(legacyAmino)
 	enccodec.RegisterInterfaces(interfaceRegistry)
 
-	eip712.SetEncodingConfig(encodingConfig) // TODO(dudong2)
+	eip712.SetEncodingConfig(encodingConfig)
 
 	// create and set dummy vote extension handler
 	voteExtOp := func(bApp *baseapp.BaseApp) {
@@ -369,19 +372,20 @@ func NewCanto(
 	bApp.SetInterfaceRegistry(interfaceRegistry)
 	bApp.SetTxEncoder(txConfig.TxEncoder())
 
-	keys := storetypes.NewKVStoreKeys( // TODO(dudong2): add other store keys
+	keys := storetypes.NewKVStoreKeys(
 		// SDK keys
-		authtypes.StoreKey, banktypes.StoreKey, stakingtypes.StoreKey,
-		distrtypes.StoreKey, slashingtypes.StoreKey,
-		govtypes.StoreKey, paramstypes.StoreKey, upgradetypes.StoreKey,
-		evidencetypes.StoreKey,
-		feegrant.StoreKey, authzkeeper.StoreKey,
+		authtypes.StoreKey, banktypes.StoreKey, stakingtypes.StoreKey, crisistypes.StoreKey,
+		/* minttypes.StoreKey, */ distrtypes.StoreKey, slashingtypes.StoreKey,
+		govtypes.StoreKey, paramstypes.StoreKey, consensusparamkeeper.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
+		evidencetypes.StoreKey, circuittypes.StoreKey,
+		authzkeeper.StoreKey, nftkeeper.StoreKey, group.StoreKey,
 		// ibc keys
 		ibcexported.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		// ethermint keys
 		evmtypes.StoreKey, feemarkettypes.StoreKey,
 		// Canto keys
-		inflationtypes.StoreKey, erc20types.StoreKey,
+		inflationtypes.StoreKey,
+		erc20types.StoreKey,
 		epochstypes.StoreKey,
 		onboardingtypes.StoreKey,
 		csrtypes.StoreKey,
@@ -474,7 +478,15 @@ func NewCanto(
 		authcodec.NewBech32Codec(sdk.GetConfig().GetBech32ValidatorAddrPrefix()),
 		authcodec.NewBech32Codec(sdk.GetConfig().GetBech32ConsensusAddrPrefix()),
 	)
-	// TODO(dudong2): MintKeeper
+	// app.MintKeeper = mintkeeper.NewKeeper(
+	// 	appCodec,
+	// 	runtime.NewKVStoreService(keys[minttypes.StoreKey]),
+	// 	app.StakingKeeper,
+	// 	app.AccountKeeper,
+	// 	app.BankKeeper,
+	// 	authtypes.FeeCollectorName,
+	// 	authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	// )
 	app.DistrKeeper = distrkeeper.NewKeeper(
 		appCodec,
 		runtime.NewKVStoreService(keys[distrtypes.StoreKey]),
@@ -611,7 +623,7 @@ func NewCanto(
 	// Create Transfer Keepers
 	app.TransferKeeper = ibctransferkeeper.NewKeeper(
 		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName),
-		app.IBCFeeKeeper, // ISC4 Wrapper: fee IBC middleware // TODO(dudong2)
+		app.IBCFeeKeeper, // ISC4 Wrapper: fee IBC middleware
 		app.IBCKeeper.ChannelKeeper, app.IBCKeeper.PortKeeper,
 		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
@@ -756,12 +768,12 @@ func NewCanto(
 			txConfig,
 		),
 		auth.NewAppModule(appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts, app.GetSubspace(authtypes.ModuleName)),
-		// vesting.NewAppModule(app.AccountKeeper, app.BankKeeper), // TODO(dudong2)
+		// vesting.NewAppModule(app.AccountKeeper, app.BankKeeper),
 		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper, app.GetSubspace(banktypes.ModuleName)),
 		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.GetSubspace(crisistypes.ModuleName)),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
 		gov.NewAppModule(appCodec, &app.GovKeeper, app.AccountKeeper, app.BankKeeper, app.GetSubspace(govtypes.ModuleName)),
-		// mint.NewAppModule(appCodec, app.MintKeeper, app.AccountKeeper, nil, app.GetSubspace(minttypes.ModuleName)), // TODO(dudong2)
+		// mint.NewAppModule(appCodec, app.MintKeeper, app.AccountKeeper, nil, app.GetSubspace(minttypes.ModuleName)),
 		slashing.NewAppModule(
 			appCodec,
 			app.SlashingKeeper,
@@ -828,33 +840,39 @@ func NewCanto(
 	// NOTE: upgrade module must go first to handle software upgrades.
 	// NOTE: staking module is required if HistoricalEntries param > 0.
 	// NOTE: capability module's beginblocker must come before any modules using capabilities (e.g. IBC)
-	app.ModuleManager.SetOrderBeginBlockers( // TODO(dudong2): maybe remove no-op modules
-		upgradetypes.ModuleName,
-		capabilitytypes.ModuleName,
+	app.ModuleManager.SetOrderBeginBlockers(
 		// Note: epochs' begin should be "real" start of epochs, we keep epochs beginblock at the beginning
 		epochstypes.ModuleName,
-		feemarkettypes.ModuleName,
-		evmtypes.ModuleName,
+		capabilitytypes.ModuleName,
 		distrtypes.ModuleName,
-		slashingtypes.ModuleName,
-		evidencetypes.ModuleName,
 		stakingtypes.ModuleName,
+		slashingtypes.ModuleName,
+		// minttypes.ModuleName,
 		ibcexported.ModuleName,
+		evmtypes.ModuleName,
+		feemarkettypes.ModuleName,
+		evidencetypes.ModuleName,
+		authz.ModuleName,
+		csrtypes.ModuleName,
 		// no-op modules
-		ibctransfertypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
 		govtypes.ModuleName,
-		crisistypes.ModuleName,
 		genutiltypes.ModuleName,
-		authz.ModuleName,
+		ibctransfertypes.ModuleName,
 		feegrant.ModuleName,
+		nft.ModuleName,
+		group.ModuleName,
 		paramstypes.ModuleName,
+		upgradetypes.ModuleName,
+		// vestingtypes.ModuleName,
+		consensusparamtypes.ModuleName,
+		circuittypes.ModuleName,
+		crisistypes.ModuleName,
 		inflationtypes.ModuleName,
 		erc20types.ModuleName,
 		onboardingtypes.ModuleName,
 		govshuttletypes.ModuleName,
-		csrtypes.ModuleName,
 		coinswaptypes.ModuleName,
 	)
 
@@ -862,13 +880,13 @@ func NewCanto(
 	app.ModuleManager.SetOrderEndBlockers(
 		crisistypes.ModuleName,
 		govtypes.ModuleName,
-		stakingtypes.ModuleName,
 		evmtypes.ModuleName,
 		feemarkettypes.ModuleName,
-		// Note: epochs' endblock should be "real" end of epochs, we keep epochs endblock at the end
-		epochstypes.ModuleName,
+		feegrant.ModuleName,
+		group.ModuleName,
 		onboardingtypes.ModuleName,
 		// no-op modules
+		stakingtypes.ModuleName,
 		ibcexported.ModuleName,
 		ibctransfertypes.ModuleName,
 		capabilitytypes.ModuleName,
@@ -876,18 +894,23 @@ func NewCanto(
 		banktypes.ModuleName,
 		distrtypes.ModuleName,
 		slashingtypes.ModuleName,
+		// minttypes.ModuleName,
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		authz.ModuleName,
-		feegrant.ModuleName,
+		nft.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
-		// Canto modules
+		// vestingtypes.ModuleName,
+		consensusparamtypes.ModuleName,
+		circuittypes.ModuleName,
 		inflationtypes.ModuleName,
 		erc20types.ModuleName,
 		govshuttletypes.ModuleName,
 		csrtypes.ModuleName,
 		coinswaptypes.ModuleName,
+		// Note: epochs' endblock should be "real" end of epochs, we keep epochs endblock at the end
+		epochstypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -905,7 +928,7 @@ func NewCanto(
 		stakingtypes.ModuleName,
 		slashingtypes.ModuleName,
 		govtypes.ModuleName,
-		// minttypes.ModuleName, // TODO(dudong2)
+		// minttypes.ModuleName,
 		ibcexported.ModuleName,
 		// evm module denomination is used by the feemarket module, in AnteHandle
 		evmtypes.ModuleName,
@@ -921,7 +944,7 @@ func NewCanto(
 		group.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
-		// vestingtypes.ModuleName, // TODO(dudong2)
+		// vestingtypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		circuittypes.ModuleName,
 		// Canto modules
@@ -1056,7 +1079,7 @@ func NewCanto(
 }
 
 // use Canto's custom AnteHandler
-func (app *Canto) setAnteHandler(txConfig client.TxConfig, maxGasWanted uint64) { // TODO(dudong2)
+func (app *Canto) setAnteHandler(txConfig client.TxConfig, maxGasWanted uint64) {
 	anteHandler, err := ante.NewAnteHandler(
 		ante.HandlerOptions{
 			AccountKeeper:          app.AccountKeeper,
@@ -1072,7 +1095,7 @@ func (app *Canto) setAnteHandler(txConfig client.TxConfig, maxGasWanted uint64) 
 			TxFeeChecker:           ethante.NewDynamicFeeChecker(app.EvmKeeper),
 			DisabledAuthzMsgs: []string{
 				sdk.MsgTypeURL(&evmtypes.MsgEthereumTx{}),
-				// sdk.MsgTypeURL(&vestingtypes.MsgCreateVestingAccount{}), // TODO(dudong2)
+				// sdk.MsgTypeURL(&vestingtypes.MsgCreateVestingAccount{}),
 			},
 		},
 	)
@@ -1448,7 +1471,7 @@ func (app *Canto) setupUpgradeHandlers() {
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Added: []string{onboardingtypes.StoreKey, coinswaptypes.StoreKey},
 		}
-		// case v8.UpgradeName: // TODO(dudong2)
+		// case v8.UpgradeName: // TODO(dudong2): maybe implement v8 upgrade
 	}
 
 	if storeUpgrades != nil {

@@ -159,24 +159,19 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 func (AppModule) ConsensusVersion() uint64 { return 2 }
 
 // BeginBlock executes all ABCI BeginBlock logic respective to the csr module.
-func (am AppModule) BeginBlock(ctx sdk.Context) {
+func (am AppModule) BeginBlock(ctx context.Context) {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	// check in begin block whether the Turnstile has been deployed, if not, deploy it and set it to state
-	if _, found := am.keeper.GetTurnstile(ctx); !found {
-		if am.keeper.GetParams(ctx).EnableCsr { // only deploy if csr is enabled
+	if _, found := am.keeper.GetTurnstile(sdkCtx); !found {
+		if am.keeper.GetParams(sdkCtx).EnableCsr { // only deploy if csr is enabled
 			// deploy turnstile
-			turnstile, err := am.keeper.DeployTurnstile(ctx)
+			turnstile, err := am.keeper.DeployTurnstile(sdkCtx)
 			// panic on errors, (Turnstile existence is invariant)
 			if err != nil {
 				panic(err)
 			}
 			// set the Turnstile address to state
-			am.keeper.SetTurnstile(ctx, turnstile)
+			am.keeper.SetTurnstile(sdkCtx, turnstile)
 		}
 	}
-}
-
-// EndBlock executes all ABCI EndBlock logic respective to the csr module. It
-// returns no validator updates.
-func (am AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-	return []abci.ValidatorUpdate{}
 }

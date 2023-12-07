@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"context"
 	"strconv"
 	"time"
 
@@ -11,19 +12,19 @@ import (
 )
 
 // BeginBlocker of epochs module
-func (k Keeper) BeginBlocker(ctx sdk.Context) {
+func (k Keeper) BeginBlocker(ctx context.Context) {
 	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyBeginBlocker)
 
-	logger := k.Logger(ctx)
-
-	k.IterateEpochInfo(ctx, func(_ int64, epochInfo types.EpochInfo) (stop bool) {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	logger := k.Logger(sdkCtx)
+	k.IterateEpochInfo(sdkCtx, func(_ int64, epochInfo types.EpochInfo) (stop bool) {
 		// Has it not started, and is the block time > initial epoch start time
-		shouldInitialEpochStart := !epochInfo.EpochCountingStarted && !epochInfo.StartTime.After(ctx.BlockTime())
+		shouldInitialEpochStart := !epochInfo.EpochCountingStarted && !epochInfo.StartTime.After(sdkCtx.BlockTime())
 
 		epochEndTime := epochInfo.CurrentEpochStartTime.Add(epochInfo.Duration)
-		shouldEpochEnd := ctx.BlockTime().After(epochEndTime) && !shouldInitialEpochStart && !epochInfo.StartTime.After(ctx.BlockTime())
+		shouldEpochEnd := sdkCtx.BlockTime().After(epochEndTime) && !shouldInitialEpochStart && !epochInfo.StartTime.After(sdkCtx.BlockTime())
 
-		epochInfo.CurrentEpochStartHeight = ctx.BlockHeight()
+		epochInfo.CurrentEpochStartHeight = sdkCtx.BlockHeight()
 
 		switch {
 		case shouldInitialEpochStart:
@@ -35,21 +36,21 @@ func (k Keeper) BeginBlocker(ctx sdk.Context) {
 
 			logger.Info("ending epoch", "identifier", epochInfo.Identifier)
 
-			ctx.EventManager().EmitEvent(
+			sdkCtx.EventManager().EmitEvent(
 				sdk.NewEvent(
 					types.EventTypeEpochEnd,
 					sdk.NewAttribute(types.AttributeEpochNumber, strconv.FormatInt(epochInfo.CurrentEpoch, 10)),
 				),
 			)
-			k.AfterEpochEnd(ctx, epochInfo.Identifier, epochInfo.CurrentEpoch)
+			k.AfterEpochEnd(sdkCtx, epochInfo.Identifier, epochInfo.CurrentEpoch)
 		default:
 			// continue
 			return false
 		}
 
-		k.SetEpochInfo(ctx, epochInfo)
+		k.SetEpochInfo(sdkCtx, epochInfo)
 
-		ctx.EventManager().EmitEvent(
+		sdkCtx.EventManager().EmitEvent(
 			sdk.NewEvent(
 				types.EventTypeEpochStart,
 				sdk.NewAttribute(types.AttributeEpochNumber, strconv.FormatInt(epochInfo.CurrentEpoch, 10)),
@@ -57,7 +58,7 @@ func (k Keeper) BeginBlocker(ctx sdk.Context) {
 			),
 		)
 
-		k.BeforeEpochStart(ctx, epochInfo.Identifier, epochInfo.CurrentEpoch)
+		k.BeforeEpochStart(sdkCtx, epochInfo.Identifier, epochInfo.CurrentEpoch)
 
 		return false
 	})

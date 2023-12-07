@@ -45,6 +45,8 @@ import (
 	"github.com/Canto-Network/Canto/v7/app"
 	cmdcfg "github.com/Canto-Network/Canto/v7/cmd/config"
 	cantokr "github.com/Canto-Network/Canto/v7/crypto/keyring"
+
+	rosettacmd "github.com/cosmos/rosetta/cmd"
 )
 
 const (
@@ -144,7 +146,6 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		tmcli.NewCompletionCmd(rootCmd, true),
 		NewTestnetCmd(tempApp.BasicModuleManager, banktypes.GenesisBalancesIterator{}),
 		debug.Cmd(),
-		// config.Cmd(), // TODO(dudong2)
 	)
 
 	a := appCreator{encodingConfig}
@@ -163,7 +164,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	}
 
 	// add rosetta
-	// rootCmd.AddCommand(sdkserver.RosettaCommand(encodingConfig.InterfaceRegistry, encodingConfig.Codec)) // TODO(dudong2)
+	rootCmd.AddCommand(rosettacmd.RosettaCommand(encodingConfig.InterfaceRegistry, encodingConfig.Codec))
 
 	return rootCmd, encodingConfig
 }
