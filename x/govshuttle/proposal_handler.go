@@ -1,10 +1,12 @@
 package govshuttle
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	"github.com/Canto-Network/Canto/v7/x/govshuttle/keeper"
 	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 )
 
 // Return governance handler to process Compound Proposal

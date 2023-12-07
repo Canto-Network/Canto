@@ -7,7 +7,7 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	ethermint "github.com/evmos/ethermint/types"
 )
@@ -30,9 +30,9 @@ func init() {
 	govtypes.RegisterProposalType(ProposalTypeRegisterCoin)
 	govtypes.RegisterProposalType(ProposalTypeRegisterERC20)
 	govtypes.RegisterProposalType(ProposalTypeToggleTokenConversion)
-	govtypes.RegisterProposalTypeCodec(&RegisterCoinProposal{}, "erc20/RegisterCoinProposal")
-	govtypes.RegisterProposalTypeCodec(&RegisterERC20Proposal{}, "erc20/RegisterERC20Proposal")
-	govtypes.RegisterProposalTypeCodec(&ToggleTokenConversionProposal{}, "erc20/ToggleTokenConversionProposal")
+	//govtypes.RegisterProposalTypeCodec(&RegisterCoinProposal{}, "erc20/RegisterCoinProposal")
+	//govtypes.RegisterProposalTypeCodec(&RegisterERC20Proposal{}, "erc20/RegisterERC20Proposal")
+	//govtypes.RegisterProposalTypeCodec(&ToggleTokenConversionProposal{}, "erc20/ToggleTokenConversionProposal")
 }
 
 // CreateDenomDescription generates a string with the coin description

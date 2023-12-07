@@ -5,6 +5,7 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
 	"github.com/Canto-Network/Canto/v7/x/inflation/types"
@@ -18,7 +19,7 @@ type Keeper struct {
 
 	accountKeeper    types.AccountKeeper
 	bankKeeper       types.BankKeeper
-	distrKeeper      types.DistrKeeper
+	distrKeeper      distrkeeper.Keeper
 	stakingKeeper    types.StakingKeeper
 	feeCollectorName string
 }
@@ -30,7 +31,7 @@ func NewKeeper(
 	ps paramtypes.Subspace,
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
-	dk types.DistrKeeper,
+	dk distrkeeper.Keeper,
 	sk types.StakingKeeper,
 	feeCollectorName string,
 ) Keeper {
@@ -62,5 +63,6 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 }
 
 func (k Keeper) GetComPool(ctx sdk.Context) sdk.DecCoins {
-	return k.distrKeeper.GetFeePoolCommunityCoins(ctx)
+	feePool, _ := k.distrKeeper.FeePool.Get(ctx)
+	return feePool.CommunityPool
 }

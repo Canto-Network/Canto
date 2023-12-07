@@ -57,7 +57,7 @@ func (k Keeper) OnRecvPacket(
 	// Get recipient addresses in `canto1` and the original bech32 format
 	_, recipient, senderBech32, recipientBech32, err := ibc.GetTransferSenderRecipient(packet)
 	if err != nil {
-		return channeltypes.NewErrorAcknowledgement(err.Error())
+		return channeltypes.NewErrorAcknowledgement(err)
 	}
 
 	//get the recipient account
@@ -75,7 +75,7 @@ func (k Keeper) OnRecvPacket(
 		// NOTE: shouldn't happen as the packet has already
 		// been decoded on ICS20 transfer logic
 		err = errorsmod.Wrapf(types.ErrInvalidType, "cannot unmarshal ICS-20 transfer packet data")
-		return channeltypes.NewErrorAcknowledgement(err.Error())
+		return channeltypes.NewErrorAcknowledgement(err)
 	}
 
 	// parse the transferred denom

@@ -2,6 +2,7 @@ package erc20
 
 import (
 	errorsmod "cosmossdk.io/errors"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
@@ -9,7 +10,7 @@ import (
 )
 
 // NewHandler defines the erc20 module handler instance
-func NewHandler(server types.MsgServer) sdk.Handler {
+func NewHandler(server types.MsgServer) baseapp.MsgServiceHandler {
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 

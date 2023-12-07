@@ -20,7 +20,7 @@ func (k *Keeper) AppendLendingMarketProposal(ctx sdk.Context, lm *types.LendingM
 	m := lm.GetMetadata()
 	var err error
 	if m.GetPropId() == 0 {
-		m.PropId, err = k.govKeeper.GetProposalID(ctx)
+		m.PropId, err = k.govKeeper.ProposalID.Peek(ctx)
 	}
 
 	if err != nil {

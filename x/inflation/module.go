@@ -7,6 +7,7 @@ import (
 	"math/rand"
 
 	abci "github.com/cometbft/cometbft/abci/types"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -127,7 +128,7 @@ func (AppModule) Name() string {
 func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {}
 
 // NewHandler returns nil inflation module doesn't expose tx gRPC endpoints
-func (am AppModule) NewHandler() sdk.Handler {
+func (am AppModule) NewHandler() baseapp.MsgServiceHandler {
 	return nil
 }
 
@@ -174,12 +175,12 @@ func (am AppModule) ProposalContents(simState module.SimulationState) []simtypes
 }
 
 // RandomizedParams creates randomized inflation param changes for the simulator.
-func (am AppModule) RandomizedParams(r *rand.Rand) []simtypes.ParamChange {
-	return []simtypes.ParamChange{}
+func (am AppModule) RandomizedParams(r *rand.Rand) []simtypes.LegacyParamChange {
+	return []simtypes.LegacyParamChange{}
 }
 
 // RegisterStoreDecoder registers a decoder for inflation module's types.
-func (am AppModule) RegisterStoreDecoder(decoderRegistry sdk.StoreDecoderRegistry) {
+func (am AppModule) RegisterStoreDecoder(decoderRegistry simtypes.StoreDecoderRegistry) {
 }
 
 // WeightedOperations doesn't return any inflation module operation.

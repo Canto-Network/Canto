@@ -5,6 +5,7 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 )
 
 const (
@@ -15,19 +16,19 @@ const (
 )
 
 var (
-	_ govtypes.Content = &LendingMarketProposal{}
-	_ govtypes.Content = &TreasuryProposal{}
+	_ govv1beta1.Content = &LendingMarketProposal{}
+	_ govv1beta1.Content = &TreasuryProposal{}
 )
 
 // Register Compound Proposal type as a valid proposal type in goveranance module
 func init() {
-	govtypes.RegisterProposalType(ProposalTypeLendingMarket)
-	govtypes.RegisterProposalType(ProposalTypeTreasury)
-	govtypes.RegisterProposalTypeCodec(&LendingMarketProposal{}, "govshuttle/LendingMarketProposal")
-	govtypes.RegisterProposalTypeCodec(&TreasuryProposal{}, "govshuttle/TreasuryProposal")
+	govv1beta1.RegisterProposalType(ProposalTypeLendingMarket)
+	govv1beta1.RegisterProposalType(ProposalTypeTreasury)
+	//govtypes.RegisterProposalTypeCodec(&LendingMarketProposal{}, "govshuttle/LendingMarketProposal")
+	//govtypes.RegisterProposalTypeCodec(&TreasuryProposal{}, "govshuttle/TreasuryProposal")
 }
 
-func NewLendingMarketProposal(title, description string, m *LendingMarketMetadata) govtypes.Content {
+func NewLendingMarketProposal(title, description string, m *LendingMarketMetadata) govv1beta1.Content {
 	return &LendingMarketProposal{
 		Title:       title,
 		Description: description,
@@ -35,7 +36,7 @@ func NewLendingMarketProposal(title, description string, m *LendingMarketMetadat
 	}
 }
 
-func NewTreasuryProposal(title, description string, tm *TreasuryProposalMetadata) govtypes.Content {
+func NewTreasuryProposal(title, description string, tm *TreasuryProposalMetadata) govv1beta1.Content {
 	return &TreasuryProposal{
 		Title:       title,
 		Description: description,
@@ -56,7 +57,7 @@ func (*LendingMarketProposal) ProposalType() string {
 }
 
 func (lm *LendingMarketProposal) ValidateBasic() error {
-	if err := govtypes.ValidateAbstract(lm); err != nil {
+	if err := govv1beta1.ValidateAbstract(lm); err != nil {
 		return err
 	}
 
@@ -75,7 +76,7 @@ func (lm *LendingMarketProposal) ValidateBasic() error {
 }
 
 func (tp *TreasuryProposal) ValidateBasic() error {
-	if err := govtypes.ValidateAbstract(tp); err != nil {
+	if err := govv1beta1.ValidateAbstract(tp); err != nil {
 		return err
 	}
 

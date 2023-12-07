@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/rand"
 
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
@@ -112,7 +113,7 @@ func (AppModule) Name() string {
 func (AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {}
 
 // NewHandler returns nil onboarding module doesn't expose tx gRPC endpoints
-func (AppModule) NewHandler() sdk.Handler {
+func (AppModule) NewHandler() baseapp.MsgServiceHandler {
 	return nil
 }
 
@@ -140,11 +141,11 @@ func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedP
 	return []simtypes.WeightedProposalContent{}
 }
 
-func (AppModule) RandomizedParams(_ *rand.Rand) []simtypes.ParamChange {
-	return []simtypes.ParamChange{}
+func (AppModule) RandomizedParams(_ *rand.Rand) []simtypes.LegacyParamChange {
+	return []simtypes.LegacyParamChange{}
 }
 
-func (AppModule) RegisterStoreDecoder(_ sdk.StoreDecoderRegistry) {
+func (AppModule) RegisterStoreDecoder(_ simtypes.StoreDecoderRegistry) {
 }
 
 func (AppModule) WeightedOperations(_ module.SimulationState) []simtypes.WeightedOperation {

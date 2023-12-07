@@ -11,6 +11,7 @@ import (
 	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
@@ -22,7 +23,7 @@ type (
 
 		accKeeper   types.AccountKeeper
 		erc20Keeper types.ERC20Keeper
-		govKeeper   types.GovKeeper
+		govKeeper   *govkeeper.Keeper
 	}
 )
 
@@ -33,7 +34,7 @@ func NewKeeper(
 
 	ak types.AccountKeeper,
 	ek types.ERC20Keeper,
-	gk types.GovKeeper,
+	gk *govkeeper.Keeper,
 
 ) Keeper {
 	// set KeyTable if it has not already been set

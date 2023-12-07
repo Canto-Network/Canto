@@ -3,6 +3,7 @@ package onboarding
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
+	clienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 
 	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 	porttypes "github.com/cosmos/ibc-go/v8/modules/core/05-port/types"
@@ -51,9 +52,13 @@ func (im IBCMiddleware) OnRecvPacket(
 func (im IBCMiddleware) SendPacket(
 	ctx sdk.Context,
 	chanCap *capabilitytypes.Capability,
-	packet exported.PacketI,
-) error {
-	return im.keeper.SendPacket(ctx, chanCap, packet)
+	sourcePort string,
+	sourceChannel string,
+	timeoutHeight clienttypes.Height,
+	timeoutTimestamp uint64,
+	data []byte,
+) (uint64, error) {
+	return im.keeper.SendPacket(ctx, chanCap, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
 }
 
 // WriteAcknowledgement implements the ICS4 Wrapper interface
@@ -64,4 +69,8 @@ func (im IBCMiddleware) WriteAcknowledgement(
 	ack exported.Acknowledgement,
 ) error {
 	return im.keeper.WriteAcknowledgement(ctx, chanCap, packet, ack)
+}
+
+func (im IBCMiddleware) GetAppVersion(ctx sdk.Context, portID, channelID string) (string, bool) {
+	return im.keeper.GetAppVersion(ctx, portID, channelID)
 }

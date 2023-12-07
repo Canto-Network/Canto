@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/rand"
 
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
 	"github.com/gorilla/mux"
@@ -121,7 +122,7 @@ func (am AppModule) Name() string {
 }
 
 // NewHandler returns nil inflation module doesn't expose tx gRPC endpoints
-func (am AppModule) NewHandler() sdk.Handler {
+func (am AppModule) NewHandler() baseapp.MsgServiceHandler {
 	return nil
 }
 
@@ -169,12 +170,12 @@ func (AppModule) ProposalContents(simState module.SimulationState) []simtypes.We
 }
 
 // RandomizedParams creates randomizedepochs param changes for the simulator.
-func (AppModule) RandomizedParams(r *rand.Rand) []simtypes.ParamChange {
-	return []simtypes.ParamChange{}
+func (AppModule) RandomizedParams(r *rand.Rand) []simtypes.LegacyParamChange {
+	return []simtypes.LegacyParamChange{}
 }
 
 // RegisterStoreDecoder registers a decoder for supply module's types
-func (am AppModule) RegisterStoreDecoder(sdr sdk.StoreDecoderRegistry) {
+func (am AppModule) RegisterStoreDecoder(sdr simtypes.StoreDecoderRegistry) {
 }
 
 // WeightedOperations returns the all the gov module operations with their respective weights.

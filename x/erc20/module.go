@@ -7,6 +7,7 @@ import (
 	"math/rand"
 
 	abci "github.com/cometbft/cometbft/abci/types"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -117,7 +118,7 @@ func (AppModule) Name() string {
 
 func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {}
 
-func (am AppModule) NewHandler() sdk.Handler {
+func (am AppModule) NewHandler() baseapp.MsgServiceHandler {
 	return NewHandler(am.keeper)
 }
 
@@ -156,11 +157,11 @@ func (am AppModule) ProposalContents(simState module.SimulationState) []simtypes
 	return []simtypes.WeightedProposalContent{}
 }
 
-func (am AppModule) RandomizedParams(r *rand.Rand) []simtypes.ParamChange {
-	return []simtypes.ParamChange{}
+func (am AppModule) RandomizedParams(r *rand.Rand) []simtypes.LegacyParamChange {
+	return []simtypes.LegacyParamChange{}
 }
 
-func (am AppModule) RegisterStoreDecoder(decoderRegistry sdk.StoreDecoderRegistry) {
+func (am AppModule) RegisterStoreDecoder(decoderRegistry simtypes.StoreDecoderRegistry) {
 }
 
 func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {

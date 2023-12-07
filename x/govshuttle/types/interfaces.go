@@ -29,6 +29,10 @@ type AccountKeeper interface {
 	GetSequence(context.Context, sdk.AccAddress) (uint64, error)
 }
 
+type GovKeeper interface {
+	GetProposalID(ctx sdk.Context) (uint64, error)
+}
+
 // BankKeeper defines the expected interface needed to retrieve account balances.
 // type BankKeeper interface {
 // 	SpendableCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins

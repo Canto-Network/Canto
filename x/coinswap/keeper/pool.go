@@ -6,6 +6,7 @@ import (
 	gogotypes "github.com/gogo/protobuf/types"
 
 	errorsmod "cosmossdk.io/errors"
+	storetypes "cosmossdk.io/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/Canto-Network/Canto/v7/x/coinswap/types"
@@ -43,7 +44,7 @@ func (k Keeper) GetPool(ctx sdk.Context, poolId string) (types.Pool, bool) {
 // GetAllPools return all the liquidity pools
 func (k Keeper) GetAllPools(ctx sdk.Context) (pools []types.Pool) {
 	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, []byte(types.KeyPool))
+	iterator := storetypes.KVStorePrefixIterator(store, []byte(types.KeyPool))
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var pool types.Pool

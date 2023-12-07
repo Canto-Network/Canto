@@ -12,7 +12,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/gov/client/cli"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 
 	"github.com/ethereum/go-ethereum/common"
 
@@ -208,9 +208,9 @@ Where metadata.json contains (example):
 				return err
 			}
 
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
+			//if err := msg.ValidateBasic(); err != nil {
+			//	return err
+			//}
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
@@ -274,9 +274,9 @@ func NewRegisterERC20ProposalCmd() *cobra.Command {
 				return err
 			}
 
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
+			//if err := msg.ValidateBasic(); err != nil {
+			//	return err
+			//}
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
@@ -340,9 +340,9 @@ func NewToggleTokenConversionProposalCmd() *cobra.Command {
 				return err
 			}
 
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
+			//if err := msg.ValidateBasic(); err != nil {
+			//	return err
+			//}
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},

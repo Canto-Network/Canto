@@ -5,10 +5,11 @@ import (
 	"math/big"
 
 	errorsmod "cosmossdk.io/errors"
-	"github.com/hashicorp/go-metrics"
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/hashicorp/go-metrics"
 
 	"github.com/Canto-Network/Canto/v7/contracts"
 	"github.com/Canto-Network/Canto/v7/x/erc20/types"
