@@ -103,7 +103,7 @@ func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 	if suite.mintFeeCollector {
 		// mint some coin to fee collector
 		coins := sdk.NewCoins(sdk.NewCoin(evm.DefaultEVMDenom, sdkmath.NewInt(int64(params.TxGas)-1)))
-		genesisState := app.ModuleBasics.DefaultGenesis(suite.app.AppCodec())
+		genesisState := app.NewDefaultGenesisState()
 		balances := []banktypes.Balance{
 			{
 				Address: suite.app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName).String(),
@@ -111,7 +111,7 @@ func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 			},
 		}
 		// update total supply
-		bankGenesis := banktypes.NewGenesisState(banktypes.DefaultGenesisState().Params, balances, sdk.NewCoins(sdk.NewCoin(evm.DefaultEVMDenom, sdkmath.NewInt((int64(params.TxGas)-1)))), []banktypes.Metadata{})
+		bankGenesis := banktypes.NewGenesisState(banktypes.DefaultGenesisState().Params, balances, sdk.NewCoins(sdk.NewCoin(evm.DefaultEVMDenom, sdkmath.NewInt((int64(params.TxGas)-1)))), []banktypes.Metadata{}, []banktypes.SendEnabled{})
 		bz := suite.app.AppCodec().MustMarshalJSON(bankGenesis)
 		require.NotNil(t, bz)
 		genesisState[banktypes.ModuleName] = suite.app.AppCodec().MustMarshalJSON(bankGenesis)
@@ -178,7 +178,7 @@ func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 	require.NoError(t, err)
 	suite.app.StakingKeeper.SetValidator(suite.ctx, validator)
 
-	encodingConfig := encoding.MakeConfig(app.ModuleBasics)
+	encodingConfig := encoding.MakeTestEncodingConfig()
 	suite.clientCtx = client.Context{}.WithTxConfig(encodingConfig.TxConfig)
 	suite.ethSigner = ethtypes.LatestSignerForChainID(suite.app.EvmKeeper.ChainID())
 }
@@ -497,27 +497,27 @@ type MockBankKeeper struct {
 	mock.Mock
 }
 
-func (b *MockBankKeeper) SendCoinsFromModuleToAccount(ctx sdk.Context, senderModule string, recipientAddr sdk.AccAddress, amt sdk.Coins) error {
+func (b *MockBankKeeper) SendCoinsFromModuleToAccount(ctx context.Context, senderModule string, recipientAddr sdk.AccAddress, amt sdk.Coins) error {
 	args := b.Called(mock.Anything, mock.Anything, mock.Anything, mock.Anything)
 	return args.Error(0)
 }
 
-func (b *MockBankKeeper) SendCoinsFromAccountToModule(ctx sdk.Context, senderAddr sdk.AccAddress, recipientModule string, amt sdk.Coins) error {
+func (b *MockBankKeeper) SendCoinsFromAccountToModule(ctx context.Context, senderAddr sdk.AccAddress, recipientModule string, amt sdk.Coins) error {
 	args := b.Called(mock.Anything, mock.Anything, mock.Anything, mock.Anything)
 	return args.Error(0)
 }
 
-func (b *MockBankKeeper) MintCoins(ctx sdk.Context, moduleName string, amt sdk.Coins) error {
+func (b *MockBankKeeper) MintCoins(ctx context.Context, moduleName string, amt sdk.Coins) error {
 	args := b.Called(mock.Anything, mock.Anything, mock.Anything)
 	return args.Error(0)
 }
 
-func (b *MockBankKeeper) BurnCoins(ctx sdk.Context, moduleName string, amt sdk.Coins) error {
+func (b *MockBankKeeper) BurnCoins(ctx context.Context, moduleName string, amt sdk.Coins) error {
 	args := b.Called(mock.Anything, mock.Anything, mock.Anything)
 	return args.Error(0)
 }
 
-func (b *MockBankKeeper) IsSendEnabledCoin(ctx sdk.Context, coin sdk.Coin) bool {
+func (b *MockBankKeeper) IsSendEnabledCoin(ctx context.Context, coin sdk.Coin) bool {
 	args := b.Called(mock.Anything, mock.Anything)
 	return args.Bool(0)
 }
@@ -527,20 +527,20 @@ func (b *MockBankKeeper) BlockedAddr(addr sdk.AccAddress) bool {
 	return args.Bool(0)
 }
 
-func (b *MockBankKeeper) GetDenomMetaData(ctx sdk.Context, denom string) (banktypes.Metadata, bool) {
+func (b *MockBankKeeper) GetDenomMetaData(ctx context.Context, denom string) (banktypes.Metadata, bool) {
 	args := b.Called(mock.Anything, mock.Anything)
 	return args.Get(0).(banktypes.Metadata), args.Bool(1)
 }
 
-func (b *MockBankKeeper) SetDenomMetaData(ctx sdk.Context, denomMetaData banktypes.Metadata) {
+func (b *MockBankKeeper) SetDenomMetaData(ctx context.Context, denomMetaData banktypes.Metadata) {
 }
 
-func (b *MockBankKeeper) HasSupply(ctx sdk.Context, denom string) bool {
+func (b *MockBankKeeper) HasSupply(ctx context.Context, denom string) bool {
 	args := b.Called(mock.Anything, mock.Anything)
 	return args.Bool(0)
 }
 
-func (b *MockBankKeeper) GetBalance(ctx sdk.Context, addr sdk.AccAddress, denom string) sdk.Coin {
+func (b *MockBankKeeper) GetBalance(ctx context.Context, addr sdk.AccAddress, denom string) sdk.Coin {
 	args := b.Called(mock.Anything, mock.Anything)
 	return args.Get(0).(sdk.Coin)
 }

@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"context"
 	"math/big"
 
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -14,12 +15,10 @@ import (
 	"github.com/evmos/ethermint/encoding"
 	ethermint "github.com/evmos/ethermint/types"
 
-	"github.com/Canto-Network/Canto/v7/app"
 	"github.com/Canto-Network/Canto/v7/testutil"
 	"github.com/Canto-Network/Canto/v7/x/erc20/types"
 
 	sdkmath "cosmossdk.io/math"
-	abci "github.com/cometbft/cometbft/abci/types"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 )
 
@@ -224,20 +223,21 @@ func convertCoin(priv *ethsecp256k1.PrivKey, coin sdk.Coin) {
 	addrBz := priv.PubKey().Address().Bytes()
 
 	convertCoinMsg := types.NewMsgConvertCoin(coin, common.BytesToAddress(addrBz), sdk.AccAddress(addrBz))
-	res := deliverTx(priv, convertCoinMsg)
-	Expect(res.IsOK()).To(BeTrue(), "failed to convert coin: %s", res.Log)
+	_, result, err := deliverTx(priv, convertCoinMsg)
+	s.Require().NoError(err, result.Log)
 }
 
 func convertERC20(priv *ethsecp256k1.PrivKey, amt sdkmath.Int, contract common.Address) {
 	addrBz := priv.PubKey().Address().Bytes()
 
 	convertERC20Msg := types.NewMsgConvertERC20(amt, sdk.AccAddress(addrBz), contract, common.BytesToAddress(addrBz))
-	res := deliverTx(priv, convertERC20Msg)
-	Expect(res.IsOK()).To(BeTrue(), "failed to convert ERC20: %s", res.Log)
+	_, result, err := deliverTx(priv, convertERC20Msg)
+	s.Require().NoError(err, result.Log)
 }
 
-func deliverTx(priv *ethsecp256k1.PrivKey, msgs ...sdk.Msg) abci.ResponseDeliverTx {
-	encodingConfig := encoding.MakeConfig(app.ModuleBasics)
+func deliverTx(priv *ethsecp256k1.PrivKey, msgs ...sdk.Msg) (sdk.GasInfo, *sdk.Result, error) {
+	encodingConfig := encoding.MakeTestEncodingConfig()
+
 	accountAddress := sdk.AccAddress(priv.PubKey().Address().Bytes())
 	// denom := s.app.ClaimsKeeper.GetParams(s.ctx).ClaimsDenom
 	denom := "acanto"
@@ -257,7 +257,7 @@ func deliverTx(priv *ethsecp256k1.PrivKey, msgs ...sdk.Msg) abci.ResponseDeliver
 	sigV2 := signing.SignatureV2{
 		PubKey: priv.PubKey(),
 		Data: &signing.SingleSignatureData{
-			SignMode:  encodingConfig.TxConfig.SignModeHandler().DefaultMode(),
+			SignMode:  signing.SignMode(encodingConfig.TxConfig.SignModeHandler().DefaultMode()),
 			Signature: nil,
 		},
 		Sequence: seq,
@@ -276,7 +276,8 @@ func deliverTx(priv *ethsecp256k1.PrivKey, msgs ...sdk.Msg) abci.ResponseDeliver
 		Sequence:      seq,
 	}
 	sigV2, err = tx.SignWithPrivKey(
-		encodingConfig.TxConfig.SignModeHandler().DefaultMode(), signerData,
+		context.TODO(),
+		signing.SignMode(encodingConfig.TxConfig.SignModeHandler().DefaultMode()), signerData,
 		txBuilder, priv, encodingConfig.TxConfig,
 		seq,
 	)
@@ -286,11 +287,12 @@ func deliverTx(priv *ethsecp256k1.PrivKey, msgs ...sdk.Msg) abci.ResponseDeliver
 	err = txBuilder.SetSignatures(sigsV2...)
 	s.Require().NoError(err)
 
-	// bz are bytes to be broadcasted over the network
-	bz, err := encodingConfig.TxConfig.TxEncoder()(txBuilder.GetTx())
-	s.Require().NoError(err)
+	return s.app.BaseApp.SimDeliver(encodingConfig.TxConfig.TxEncoder(), txBuilder.GetTx())
+	//// bz are bytes to be broadcasted over the network
+	//bz, err := encodingConfig.TxConfig.TxEncoder()(txBuilder.GetTx())
+	//s.Require().NoError(err)
 
-	req := abci.RequestDeliverTx{Tx: bz}
-	res := s.app.BaseApp.DeliverTx(req)
-	return res
+	//req := abci.RequestDeliverTx{Tx: bz}
+	//res := s.app.BaseApp.DeliverTx(req)
+	//return res
 }

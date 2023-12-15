@@ -42,9 +42,10 @@ var _ = Describe("Inflation", Ordered, func() {
 					s.CommitAfter(time.Hour * 23) // End Epoch
 				})
 				It("should not allocate funds to the community pool", func() {
-					balance := s.app.DistrKeeper.GetFeePoolCommunityCoins(s.ctx)
-					fmt.Println("Community Pool balance before epoch end: ", balance.AmountOf(denomMint))
-					Expect(balance.IsZero()).To(BeTrue())
+					feePool, err := s.app.DistrKeeper.FeePool.Get(s.ctx)
+					s.Require().NoError(err)
+					fmt.Println("Community Pool balance before epoch end: ", feePool.CommunityPool.AmountOf(denomMint))
+					Expect(feePool.CommunityPool.IsZero()).To(BeTrue())
 				})
 			})
 
@@ -54,8 +55,8 @@ var _ = Describe("Inflation", Ordered, func() {
 					s.CommitAfter(time.Hour * 25) // End Epoch
 				})
 				It("should allocate staking provision funds to the community pool", func() {
-					balanceCommunityPool := s.app.DistrKeeper.GetFeePoolCommunityCoins(s.ctx)
-
+					feePool, err := s.app.DistrKeeper.FeePool.Get(s.ctx)
+					s.Require().NoError(err)
 					provision, _ := s.app.InflationKeeper.GetEpochMintProvision(s.ctx)
 					params := s.app.InflationKeeper.GetParams(s.ctx)
 
@@ -65,7 +66,7 @@ var _ = Describe("Inflation", Ordered, func() {
 					staking := s.app.AccountKeeper.GetModuleAddress("fee_collector")
 					stakingBal := s.app.BankKeeper.GetAllBalances(s.ctx, staking)
 					// fees distributed
-					Expect(balanceCommunityPool.AmountOf(denomMint).Equal(expectedStaking)).To(BeTrue())
+					Expect(feePool.CommunityPool.AmountOf(denomMint).Equal(expectedStaking)).To(BeTrue())
 					Expect(stakingBal.AmountOf(denomMint).Equal(sdkmath.NewInt(0))).To(BeTrue())
 				})
 			})
@@ -219,8 +220,8 @@ var _ = Describe("Inflation", Ordered, func() {
 		It("Commit block after Epoch and balance will be Epoch Mint Provision", func() {
 			provision, _ := s.app.InflationKeeper.GetEpochMintProvision(s.ctx)
 			s.CommitAfter(time.Minute)
-			s.CommitAfter(time.Hour * 25)                     // epoch will have ended
-			s.app.DistrKeeper.GetFeePoolCommunityCoins(s.ctx) //Get Fee Pool befor
+			s.CommitAfter(time.Hour * 25) // epoch will have ended
+			//s.app.DistrKeeper.GetFeePoolCommunityCoins(s.ctx) //Get Fee Pool befor
 			//
 			valAddr, _ := sdk.ValAddressFromBech32(v.OperatorAddress)
 			valBal, err := s.app.DistrKeeper.GetValidatorCurrentRewards(s.ctx, valAddr)

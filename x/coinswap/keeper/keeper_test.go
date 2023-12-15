@@ -20,7 +20,7 @@ import (
 	"github.com/Canto-Network/Canto/v7/x/coinswap/types"
 )
 
-const (
+var (
 	denomStandard = sdk.DefaultBondDenom
 	denomBTC      = "btc"
 	denomETH      = "eth"

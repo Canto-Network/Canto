@@ -258,10 +258,10 @@ func EVMTX(
 	gasTipCap *big.Int,
 	data []byte,
 	accesses *ethtypes.AccessList,
-) abci.ResponseDeliverTx {
+) (sdk.GasInfo, *sdk.Result, error) {
 	msgEthereumTx := BuildEthTx(priv, to, amount, gasLimit, gasPrice, gasFeeCap, gasTipCap, data, accesses)
-	res := DeliverEthTx(priv, msgEthereumTx)
-	return res
+	gasInfo, result, err := DeliverEthTx(priv, msgEthereumTx)
+	return gasInfo, result, err
 }
 
 // Helper function that creates an ethereum transaction
@@ -296,28 +296,17 @@ func BuildEthTx(
 	return msgEthereumTx
 }
 
-func DeliverEthTx(priv *ethsecp256k1.PrivKey, msgEthereumTx *evmtypes.MsgEthereumTx) abci.ResponseDeliverTx {
-	bz := PrepareEthTx(priv, msgEthereumTx)
-	req := abci.RequestDeliverTx{Tx: bz}
-	res := s.app.BaseApp.DeliverTx(req)
-	return res
+func DeliverEthTx(priv *ethsecp256k1.PrivKey, msgEthereumTx *evmtypes.MsgEthereumTx) (sdk.GasInfo, *sdk.Result, error) {
+	ethTx := PrepareEthTx(priv, msgEthereumTx)
+	encodingConfig := encoding.MakeTestEncodingConfig()
+	txEncoder := encodingConfig.TxConfig.TxEncoder()
+	return s.app.BaseApp.SimDeliver(txEncoder, ethTx)
 }
 
-func PrepareEthTx(priv *ethsecp256k1.PrivKey, msgEthereumTx *evmtypes.MsgEthereumTx) []byte {
+func PrepareEthTx(priv *ethsecp256k1.PrivKey, msgEthereumTx *evmtypes.MsgEthereumTx) *evmtypes.MsgEthereumTx {
 	// Sign transaction
 	err := msgEthereumTx.Sign(s.ethSigner, tests.NewSigner(priv))
 	s.Require().NoError(err)
 
-	// Assemble transaction from fields
-	encodingConfig := encoding.MakeConfig(app.ModuleBasics)
-	txBuilder := encodingConfig.TxConfig.NewTxBuilder()
-	tx, err := msgEthereumTx.BuildTx(txBuilder, s.app.EvmKeeper.GetParams(s.ctx).EvmDenom)
-	s.Require().NoError(err)
-
-	// Encode transaction by default Tx encoder and broadcasted over the network
-	txEncoder := encodingConfig.TxConfig.TxEncoder()
-	bz, err := txEncoder(tx)
-	s.Require().NoError(err)
-
-	return bz
+	return msgEthereumTx
 }

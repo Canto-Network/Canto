@@ -125,7 +125,8 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 			s.Require().NoError(err)
 
 			// Register the smart contract
-			response := EVMTX(userKey, &contractAddress, amount, gasLimit, gasPrice, gasFeeCap, gasTipCap, data, accesses)
+			gasInfo, _, err := EVMTX(userKey, &contractAddress, amount, gasLimit, gasPrice, gasFeeCap, gasTipCap, data, accesses)
+			s.Require().NoError(err)
 			s.Commit()
 
 			// Track contracts added to NFT
@@ -136,7 +137,7 @@ var _ = Describe("CSR Distribution : ", Ordered, func() {
 			s.Require().True(found)
 
 			// Calculate the expected revenue for the transaction
-			expectedFee := CalculateExpectedFee(uint64(response.GasUsed), gasPrice, csrShares).BigInt()
+			expectedFee := CalculateExpectedFee(uint64(gasInfo.GasUsed), gasPrice, csrShares).BigInt()
 			revenueByNFT[1] = expectedFee
 
 			// Check CSR obj values
