@@ -153,8 +153,8 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 }
 
 // BeginBlock executes all ABCI BeginBlock logic respective to the epochs module.
-func (am AppModule) BeginBlock(ctx context.Context) {
-	am.keeper.BeginBlocker(ctx)
+func (am AppModule) BeginBlock(ctx context.Context) error {
+	return am.keeper.BeginBlocker(ctx)
 }
 
 // ___________________________________________________________________________

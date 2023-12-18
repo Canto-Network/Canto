@@ -160,7 +160,7 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 func (AppModule) ConsensusVersion() uint64 { return 2 }
 
 // BeginBlock executes all ABCI BeginBlock logic respective to the csr module.
-func (am AppModule) BeginBlock(ctx context.Context) {
+func (am AppModule) BeginBlock(ctx context.Context) error {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	// check in begin block whether the Turnstile has been deployed, if not, deploy it and set it to state
 	if _, found := am.keeper.GetTurnstile(sdkCtx); !found {
@@ -175,4 +175,5 @@ func (am AppModule) BeginBlock(ctx context.Context) {
 			am.keeper.SetTurnstile(sdkCtx, turnstile)
 		}
 	}
+	return nil
 }
