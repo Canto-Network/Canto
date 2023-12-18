@@ -469,7 +469,7 @@ func NewCanto(
 	// }
 	// app.txConfig = txConfig
 
-	stakingKeeper := stakingkeeper.NewKeeper(
+	app.StakingKeeper = stakingkeeper.NewKeeper(
 		appCodec,
 		runtime.NewKVStoreService(keys[stakingtypes.StoreKey]),
 		app.AccountKeeper,
@@ -670,7 +670,7 @@ func NewCanto(
 		app.AccountKeeper,
 		app.BankKeeper,
 		app.DistrKeeper,
-		stakingKeeper,
+		app.StakingKeeper,
 		authtypes.FeeCollectorName,
 	)
 
