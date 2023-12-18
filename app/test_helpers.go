@@ -6,6 +6,7 @@ import (
 
 	"cosmossdk.io/log"
 	sdkmath "cosmossdk.io/math"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -60,7 +61,7 @@ func Setup(
 	feemarketGenesis *feemarkettypes.GenesisState,
 ) *Canto {
 	db := dbm.NewMemDB()
-	app := NewCanto(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, false, simtestutil.NewAppOptionsWithFlagHome(DefaultNodeHome))
+	app := NewCanto(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 5, false, simtestutil.NewAppOptionsWithFlagHome(DefaultNodeHome), baseapp.SetChainID(types.MainnetChainID+"-1"))
 	if !isCheckTx {
 		// init chain must be called to stop deliverState from being nil
 		genesisState := NewDefaultGenesisState()
