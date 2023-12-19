@@ -22,6 +22,7 @@ import (
 
 	"github.com/Canto-Network/Canto/v7/x/epochs/client/cli"
 	"github.com/Canto-Network/Canto/v7/x/epochs/keeper"
+	"github.com/Canto-Network/Canto/v7/x/epochs/simulation"
 	"github.com/Canto-Network/Canto/v7/x/epochs/types"
 )
 
@@ -174,7 +175,9 @@ func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.Val
 // AppModuleSimulation functions
 
 // GenerateGenesisState creates a randomized GenState of theepochs module.
-func (AppModule) GenerateGenesisState(simState *module.SimulationState) {}
+func (am AppModule) GenerateGenesisState(simState *module.SimulationState) {
+	simulation.RandomizedGenState(simState)
+}
 
 // ProposalContents doesn't return any content functions for governance proposals.
 func (AppModule) ProposalContents(simState module.SimulationState) []simtypes.WeightedProposalContent {
@@ -188,6 +191,7 @@ func (AppModule) RandomizedParams(r *rand.Rand) []simtypes.ParamChange {
 
 // RegisterStoreDecoder registers a decoder for supply module's types
 func (am AppModule) RegisterStoreDecoder(sdr sdk.StoreDecoderRegistry) {
+	sdr[types.StoreKey] = simulation.NewDecodeStore(am.cdc)
 }
 
 // WeightedOperations returns the all the gov module operations with their respective weights.

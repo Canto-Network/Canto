@@ -1,10 +1,9 @@
 package simulation
 
 import (
-	"fmt"
+	"encoding/json"
 	"math/rand"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
@@ -18,7 +17,51 @@ func ParamChanges(r *rand.Rand) []simtypes.ParamChange {
 		simulation.NewSimParamChange(
 			types.ModuleName, string(types.KeyFee),
 			func(r *rand.Rand) string {
-				return fmt.Sprintf("\"%s\"", sdk.NewDecWithPrec(r.Int63n(3), 3)) // 0.1%~0.3%
+				bz, err := json.Marshal(generateRandomFee(r))
+				if err != nil {
+					panic(err)
+				}
+				return string(bz)
+			},
+		),
+		simulation.NewSimParamChange(
+			types.ModuleName, string(types.KeyPoolCreationFee),
+			func(r *rand.Rand) string {
+				bz, err := json.Marshal(generateRandomPoolCreationFee(r))
+				if err != nil {
+					panic(err)
+				}
+				return string(bz)
+			},
+		),
+		simulation.NewSimParamChange(
+			types.ModuleName, string(types.KeyTaxRate),
+			func(r *rand.Rand) string {
+				bz, err := json.Marshal(generateRandomTaxRate(r))
+				if err != nil {
+					panic(err)
+				}
+				return string(bz)
+			},
+		),
+		simulation.NewSimParamChange(
+			types.ModuleName, string(types.KeyMaxStandardCoinPerPool),
+			func(r *rand.Rand) string {
+				bz, err := json.Marshal(generateRandomMaxStandardCoinPerPool(r))
+				if err != nil {
+					panic(err)
+				}
+				return string(bz)
+			},
+		),
+		simulation.NewSimParamChange(
+			types.ModuleName, string(types.KeyMaxSwapAmount),
+			func(r *rand.Rand) string {
+				bz, err := json.Marshal(generateRandomMaxSwapAmount(r))
+				if err != nil {
+					panic(err)
+				}
+				return string(bz)
 			},
 		),
 	}

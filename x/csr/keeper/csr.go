@@ -25,6 +25,27 @@ func (k Keeper) GetCSR(ctx sdk.Context, nftId uint64) (*types.CSR, bool) {
 	return csr, true
 }
 
+func (k Keeper) IterateAllCSRs(ctx sdk.Context, cb func(csr types.CSR) (stop bool)) {
+	store := ctx.KVStore(k.storeKey)
+	iter := sdk.KVStorePrefixIterator(store, types.KeyPrefixCSR)
+	defer iter.Close()
+	for ; iter.Valid(); iter.Next() {
+		var csr types.CSR
+		k.cdc.MustUnmarshal(iter.Value(), &csr)
+		if cb(csr) {
+			break
+		}
+	}
+}
+
+func (k Keeper) GetAllCSRs(ctx sdk.Context) (csrs []types.CSR) {
+	k.IterateAllCSRs(ctx, func(csr types.CSR) (stop bool) {
+		csrs = append(csrs, csr)
+		return false
+	})
+	return
+}
+
 // Returns the NFT ID associated with a smart contract address. If the smart contract address
 // entered does belong to some NFT, then it will return (id, true), otherwise (0, false).
 func (k Keeper) GetNFTByContract(ctx sdk.Context, address string) (uint64, bool) {

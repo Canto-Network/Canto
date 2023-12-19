@@ -442,8 +442,8 @@ func NewCanto(
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
 		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper)).
-		AddRoute(erc20types.RouterKey, erc20.NewErc20ProposalHandler(&app.Erc20Keeper)).
-		AddRoute(govshuttletypes.RouterKey, govshuttle.NewgovshuttleProposalHandler(&app.GovshuttleKeeper))
+		AddRoute(erc20types.RouterKey, erc20keeper.NewErc20ProposalHandler(&app.Erc20Keeper)).
+		AddRoute(govshuttletypes.RouterKey, govshuttlekeeper.NewgovshuttleProposalHandler(&app.GovshuttleKeeper))
 
 	govKeeper := govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName),
@@ -595,12 +595,12 @@ func NewCanto(
 		evm.NewAppModule(app.EvmKeeper, app.AccountKeeper),
 		feemarket.NewAppModule(app.FeeMarketKeeper),
 		// Canto app modules
-		inflation.NewAppModule(app.InflationKeeper, app.AccountKeeper, app.StakingKeeper),
-		erc20.NewAppModule(app.Erc20Keeper, app.AccountKeeper),
+		inflation.NewAppModule(appCodec, app.InflationKeeper, app.AccountKeeper, app.StakingKeeper),
+		erc20.NewAppModule(appCodec, app.Erc20Keeper, app.AccountKeeper, app.BankKeeper, app.EvmKeeper, app.FeeMarketKeeper),
 		epochs.NewAppModule(appCodec, app.EpochsKeeper),
 		onboarding.NewAppModule(*app.OnboardingKeeper),
-		govshuttle.NewAppModule(app.GovshuttleKeeper, app.AccountKeeper),
-		csr.NewAppModule(app.CSRKeeper, app.AccountKeeper),
+		govshuttle.NewAppModule(appCodec, app.GovshuttleKeeper, app.AccountKeeper),
+		csr.NewAppModule(appCodec, app.CSRKeeper, app.AccountKeeper),
 		coinswap.NewAppModule(appCodec, app.CoinswapKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
@@ -745,9 +745,12 @@ func NewCanto(
 		// canto, ethermint modules
 		evm.NewAppModule(app.EvmKeeper, app.AccountKeeper),
 		epochs.NewAppModule(appCodec, app.EpochsKeeper),
-		inflation.NewAppModule(app.InflationKeeper, app.AccountKeeper, app.StakingKeeper),
+		inflation.NewAppModule(appCodec, app.InflationKeeper, app.AccountKeeper, app.StakingKeeper),
 		feemarket.NewAppModule(app.FeeMarketKeeper),
 		coinswap.NewAppModule(appCodec, app.CoinswapKeeper, app.AccountKeeper, app.BankKeeper),
+		csr.NewAppModule(appCodec, app.CSRKeeper, app.AccountKeeper),
+		govshuttle.NewAppModule(appCodec, app.GovshuttleKeeper, app.AccountKeeper),
+		erc20.NewAppModule(appCodec, app.Erc20Keeper, app.AccountKeeper, app.BankKeeper, app.EvmKeeper, app.FeeMarketKeeper),
 
 		// TODO: Modules that have not yet been implemented for simulation
 		// govshuttle, csr, inflation, erc20

@@ -1,4 +1,4 @@
-package erc20
+package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -6,12 +6,11 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/ethereum/go-ethereum/common"
 
-	"github.com/Canto-Network/Canto/v7/x/erc20/keeper"
 	"github.com/Canto-Network/Canto/v7/x/erc20/types"
 )
 
 // NewErc20ProposalHandler creates a governance handler to manage new proposal types.
-func NewErc20ProposalHandler(k *keeper.Keeper) govtypes.Handler {
+func NewErc20ProposalHandler(k *Keeper) govtypes.Handler {
 	return func(ctx sdk.Context, content govtypes.Content) error {
 		switch c := content.(type) {
 		case *types.RegisterCoinProposal:
@@ -27,7 +26,7 @@ func NewErc20ProposalHandler(k *keeper.Keeper) govtypes.Handler {
 	}
 }
 
-func handleRegisterCoinProposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterCoinProposal) error {
+func handleRegisterCoinProposal(ctx sdk.Context, k *Keeper, p *types.RegisterCoinProposal) error {
 	pair, err := k.RegisterCoin(ctx, p.Metadata)
 	if err != nil {
 		return err
@@ -43,7 +42,7 @@ func handleRegisterCoinProposal(ctx sdk.Context, k *keeper.Keeper, p *types.Regi
 	return nil
 }
 
-func handleRegisterERC20Proposal(ctx sdk.Context, k *keeper.Keeper, p *types.RegisterERC20Proposal) error {
+func handleRegisterERC20Proposal(ctx sdk.Context, k *Keeper, p *types.RegisterERC20Proposal) error {
 	pair, err := k.RegisterERC20(ctx, common.HexToAddress(p.Erc20Address))
 	if err != nil {
 		return err
@@ -59,7 +58,7 @@ func handleRegisterERC20Proposal(ctx sdk.Context, k *keeper.Keeper, p *types.Reg
 	return nil
 }
 
-func handleToggleConversionProposal(ctx sdk.Context, k *keeper.Keeper, p *types.ToggleTokenConversionProposal) error {
+func handleToggleConversionProposal(ctx sdk.Context, k *Keeper, p *types.ToggleTokenConversionProposal) error {
 	pair, err := k.ToggleConversion(ctx, p.Token)
 	if err != nil {
 		return err
