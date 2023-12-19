@@ -57,13 +57,15 @@ func (suite *KeeperTestSuite) TestMintAndAllocateInflation() {
 				feeCollector,
 				denomMint,
 			)
-			balanceCommunityPool := suite.app.DistrKeeper.GetFeePoolCommunityCoins(suite.ctx)
+
+			feePool, err := s.app.DistrKeeper.FeePool.Get(s.ctx)
+			s.Require().NoError(err)
 
 			if tc.expPass {
 				suite.Require().NoError(err, tc.name)
 				suite.Require().True(balanceModule.IsZero())
 				suite.Require().Equal(tc.expStakingRewardAmt, balanceStakingRewards)
-				suite.Require().Equal(tc.expCommunityPoolAmt, balanceCommunityPool)
+				suite.Require().Equal(tc.expCommunityPoolAmt, feePool.CommunityPool)
 			} else {
 				suite.Require().Error(err)
 			}

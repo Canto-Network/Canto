@@ -164,8 +164,9 @@ func (suite *KeeperTestSuite) Commit() {
 func (suite *KeeperTestSuite) CommitAfter(t time.Duration) {
 	header := suite.ctx.BlockHeader()
 	suite.app.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height: header.Height,
-		Time:   header.Time,
+		Height:          header.Height,
+		Time:            header.Time,
+		ProposerAddress: header.ProposerAddress,
 	})
 
 	suite.app.Commit()
@@ -173,8 +174,9 @@ func (suite *KeeperTestSuite) CommitAfter(t time.Duration) {
 	header.Height += 1
 	header.Time = header.Time.Add(t)
 	suite.app.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height: header.Height,
-		Time:   header.Time,
+		Height:          header.Height,
+		Time:            header.Time,
+		ProposerAddress: header.ProposerAddress,
 	})
 
 	// update ctx

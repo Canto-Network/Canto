@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	abci "github.com/cometbft/cometbft/abci/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
@@ -24,7 +25,7 @@ var _ = Describe("Onboarding: Performing an IBC Transfer followed by autoswap an
 		sender, receiver string
 		senderAcc        sdk.AccAddress
 		receiverAcc      sdk.AccAddress
-		result           *sdk.Result
+		result           *abci.ExecTxResult
 		tokenPair        *types.TokenPair
 	)
 
@@ -92,7 +93,12 @@ var _ = Describe("Onboarding: Performing an IBC Transfer followed by autoswap an
 				})
 				It("Convert: ERC20 token balance should be same with the converted IBC voucher amount", func() {
 					events := result.GetEvents()
-					attrs := onboardingtest.ExtractAttributes(onboardingtest.FindEvent(events, "convert_coin"))
+					var sdkEvents []sdk.Event
+					for _, event := range events {
+						sdkEvents = append(sdkEvents, sdk.Event(event))
+					}
+
+					attrs := onboardingtest.ExtractAttributes(onboardingtest.FindEvent(sdkEvents, "convert_coin"))
 					convertAmount, _ := sdkmath.NewIntFromString(attrs["amount"])
 					erc20balance := s.cantoChain.App.(*app.Canto).Erc20Keeper.BalanceOf(s.cantoChain.GetContext(), contracts.ERC20MinterBurnerDecimalsContract.ABI, tokenPair.GetERC20Contract(), common.BytesToAddress(receiverAcc.Bytes()))
 					Expect(erc20balance).To(Equal(convertAmount.BigInt()))
@@ -121,7 +127,11 @@ var _ = Describe("Onboarding: Performing an IBC Transfer followed by autoswap an
 					})
 					It("Convert: ERC20 token balance should be same with the converted IBC voucher amount", func() {
 						events := result.GetEvents()
-						attrs := onboardingtest.ExtractAttributes(onboardingtest.FindEvent(events, "convert_coin"))
+						var sdkEvents []sdk.Event
+						for _, event := range events {
+							sdkEvents = append(sdkEvents, sdk.Event(event))
+						}
+						attrs := onboardingtest.ExtractAttributes(onboardingtest.FindEvent(sdkEvents, "convert_coin"))
 						convertAmount, _ := sdkmath.NewIntFromString(attrs["amount"])
 						erc20balance := s.cantoChain.App.(*app.Canto).Erc20Keeper.BalanceOf(s.cantoChain.GetContext(), contracts.ERC20MinterBurnerDecimalsContract.ABI, tokenPair.GetERC20Contract(), common.BytesToAddress(receiverAcc.Bytes()))
 						Expect(erc20balance).To(Equal(convertAmount.BigInt()))
@@ -143,14 +153,22 @@ var _ = Describe("Onboarding: Performing an IBC Transfer followed by autoswap an
 					})
 					It("Convert: ERC20 token balance should be same with the difference between transferred IBC voucher amount and the swapped amount", func() {
 						events := result.GetEvents()
-						attrs := onboardingtest.ExtractAttributes(onboardingtest.FindEvent(events, "swap"))
+						var sdkEvents []sdk.Event
+						for _, event := range events {
+							sdkEvents = append(sdkEvents, sdk.Event(event))
+						}
+						attrs := onboardingtest.ExtractAttributes(onboardingtest.FindEvent(sdkEvents, "swap"))
 						swappedAmount, _ := sdkmath.NewIntFromString(attrs["amount"])
 						erc20balance := s.cantoChain.App.(*app.Canto).Erc20Keeper.BalanceOf(s.cantoChain.GetContext(), contracts.ERC20MinterBurnerDecimalsContract.ABI, tokenPair.GetERC20Contract(), common.BytesToAddress(receiverAcc.Bytes()))
 						Expect(erc20balance).To(Equal(coinUsdc.Amount.Sub(swappedAmount).BigInt()))
 					})
 					It("Convert: ERC20 token balance should be same with the converted IBC voucher amount", func() {
 						events := result.GetEvents()
-						attrs := onboardingtest.ExtractAttributes(onboardingtest.FindEvent(events, "convert_coin"))
+						var sdkEvents []sdk.Event
+						for _, event := range events {
+							sdkEvents = append(sdkEvents, sdk.Event(event))
+						}
+						attrs := onboardingtest.ExtractAttributes(onboardingtest.FindEvent(sdkEvents, "convert_coin"))
 						convertAmount, _ := sdkmath.NewIntFromString(attrs["amount"])
 						erc20balance := s.cantoChain.App.(*app.Canto).Erc20Keeper.BalanceOf(s.cantoChain.GetContext(), contracts.ERC20MinterBurnerDecimalsContract.ABI, tokenPair.GetERC20Contract(), common.BytesToAddress(receiverAcc.Bytes()))
 						Expect(erc20balance).To(Equal(convertAmount.BigInt()))
@@ -173,14 +191,22 @@ var _ = Describe("Onboarding: Performing an IBC Transfer followed by autoswap an
 					})
 					It("Convert: ERC20 token balance should be same with the difference between transferred IBC voucher amount and the swapped amount", func() {
 						events := result.GetEvents()
-						attrs := onboardingtest.ExtractAttributes(onboardingtest.FindEvent(events, "swap"))
+						var sdkEvents []sdk.Event
+						for _, event := range events {
+							sdkEvents = append(sdkEvents, sdk.Event(event))
+						}
+						attrs := onboardingtest.ExtractAttributes(onboardingtest.FindEvent(sdkEvents, "swap"))
 						swappedAmount, _ := sdkmath.NewIntFromString(attrs["amount"])
 						erc20balance := s.cantoChain.App.(*app.Canto).Erc20Keeper.BalanceOf(s.cantoChain.GetContext(), contracts.ERC20MinterBurnerDecimalsContract.ABI, tokenPair.GetERC20Contract(), common.BytesToAddress(receiverAcc.Bytes()))
 						Expect(erc20balance).To(Equal(coinUsdc.Amount.Sub(swappedAmount).BigInt()))
 					})
 					It("Convert: ERC20 token balance should be same with the converted IBC voucher amount", func() {
 						events := result.GetEvents()
-						attrs := onboardingtest.ExtractAttributes(onboardingtest.FindEvent(events, "convert_coin"))
+						var sdkEvents []sdk.Event
+						for _, event := range events {
+							sdkEvents = append(sdkEvents, sdk.Event(event))
+						}
+						attrs := onboardingtest.ExtractAttributes(onboardingtest.FindEvent(sdkEvents, "convert_coin"))
 						convertAmount, _ := sdkmath.NewIntFromString(attrs["amount"])
 						erc20balance := s.cantoChain.App.(*app.Canto).Erc20Keeper.BalanceOf(s.cantoChain.GetContext(), contracts.ERC20MinterBurnerDecimalsContract.ABI, tokenPair.GetERC20Contract(), common.BytesToAddress(receiverAcc.Bytes()))
 						Expect(erc20balance).To(Equal(convertAmount.BigInt()))
@@ -205,7 +231,11 @@ var _ = Describe("Onboarding: Performing an IBC Transfer followed by autoswap an
 					})
 					It("Convert: ERC20 token balance should be same with the converted IBC voucher amount", func() {
 						events := result.GetEvents()
-						attrs := onboardingtest.ExtractAttributes(onboardingtest.FindEvent(events, "convert_coin"))
+						var sdkEvents []sdk.Event
+						for _, event := range events {
+							sdkEvents = append(sdkEvents, sdk.Event(event))
+						}
+						attrs := onboardingtest.ExtractAttributes(onboardingtest.FindEvent(sdkEvents, "convert_coin"))
 						convertAmount, _ := sdkmath.NewIntFromString(attrs["amount"])
 						erc20balance := s.cantoChain.App.(*app.Canto).Erc20Keeper.BalanceOf(s.cantoChain.GetContext(), contracts.ERC20MinterBurnerDecimalsContract.ABI, tokenPair.GetERC20Contract(), common.BytesToAddress(receiverAcc.Bytes()))
 						Expect(erc20balance).To(Equal(convertAmount.BigInt()))
@@ -237,7 +267,11 @@ var _ = Describe("Onboarding: Performing an IBC Transfer followed by autoswap an
 			})
 			It("No convert: Canto chain's IBC voucher balance should be same with (original balance + transferred amount - swapped amount)", func() {
 				events := result.GetEvents()
-				attrs := onboardingtest.ExtractAttributes(onboardingtest.FindEvent(events, "swap"))
+				var sdkEvents []sdk.Event
+				for _, event := range events {
+					sdkEvents = append(sdkEvents, sdk.Event(event))
+				}
+				attrs := onboardingtest.ExtractAttributes(onboardingtest.FindEvent(sdkEvents, "swap"))
 				swappedAmount, _ := sdkmath.NewIntFromString(attrs["amount"])
 				ibcUsdc := s.cantoChain.App.(*app.Canto).BankKeeper.GetBalance(s.cantoChain.GetContext(), receiverAcc, uusdcIbcdenom)
 				Expect(ibcUsdc.Amount).To(Equal(ibcBalance.Amount.Add(sdkmath.NewInt(10000000000)).Sub(swappedAmount)))
@@ -262,7 +296,11 @@ var _ = Describe("Onboarding: Performing an IBC Transfer followed by autoswap an
 			})
 			It("No convert: Canto chain's IBC voucher balance should be same with (original balance + transferred amount - swapped amount)", func() {
 				events := result.GetEvents()
-				attrs := onboardingtest.ExtractAttributes(onboardingtest.FindEvent(events, "swap"))
+				var sdkEvents []sdk.Event
+				for _, event := range events {
+					sdkEvents = append(sdkEvents, sdk.Event(event))
+				}
+				attrs := onboardingtest.ExtractAttributes(onboardingtest.FindEvent(sdkEvents, "swap"))
 				swappedAmount, _ := sdkmath.NewIntFromString(attrs["amount"])
 				ibcUsdc := s.cantoChain.App.(*app.Canto).BankKeeper.GetBalance(s.cantoChain.GetContext(), receiverAcc, uusdcIbcdenom)
 				Expect(ibcUsdc.Amount).To(Equal(ibcBalance.Amount.Add(sdkmath.NewInt(10000000000)).Sub(swappedAmount)))

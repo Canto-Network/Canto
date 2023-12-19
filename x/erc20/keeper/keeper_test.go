@@ -342,8 +342,13 @@ func (suite *KeeperTestSuite) DeployContractDirectBalanceManipulation(name strin
 }
 
 func (suite *KeeperTestSuite) Commit() {
-	suite.app.Commit()
 	header := suite.ctx.BlockHeader()
+	suite.app.FinalizeBlock(&abci.RequestFinalizeBlock{
+		Height: header.Height,
+	})
+
+	suite.app.Commit()
+
 	header.Height += 1
 	suite.app.FinalizeBlock(&abci.RequestFinalizeBlock{
 		Height: header.Height,

@@ -121,7 +121,7 @@ func (suite *TransferTestSuite) TestHandleMsgTransfer() {
 
 	// send coins from chainA to chainB
 	// auto swap and auto convert should happen
-	msg := types.NewMsgTransfer(path.EndpointA.ChannelConfig.PortID, path.EndpointA.ChannelID, coinToSendToB, suite.chainA.SenderAccount.GetAddress().String(), suite.chainB.SenderAccount.GetAddress().String(), timeoutHeight, 0)
+	msg := types.NewMsgTransfer(path.EndpointA.ChannelConfig.PortID, path.EndpointA.ChannelID, coinToSendToB, suite.chainA.SenderAccount.GetAddress().String(), suite.chainB.SenderAccount.GetAddress().String(), timeoutHeight, 0, "")
 	res, err := suite.chainA.SendMsgs(msg)
 	suite.Require().NoError(err) // message committed
 
@@ -140,7 +140,11 @@ func (suite *TransferTestSuite) TestHandleMsgTransfer() {
 	suite.Require().NoError(err) // relay committed
 
 	events := res.GetEvents()
-	attrs := onboardingtest.ExtractAttributes(onboardingtest.FindEvent(events, "swap"))
+	var sdkEvents []sdk.Event
+	for _, event := range events {
+		sdkEvents = append(sdkEvents, sdk.Event(event))
+	}
+	attrs := onboardingtest.ExtractAttributes(onboardingtest.FindEvent(sdkEvents, "swap"))
 	swapAmount, ok := sdkmath.NewIntFromString(attrs["amount"])
 	if !ok {
 		swapAmount = sdkmath.ZeroInt()
@@ -171,7 +175,7 @@ func (suite *TransferTestSuite) TestHandleMsgTransfer() {
 	// IBC transfer to blocked address
 	blockedAddr := "canto10d07y265gmmuvt4z0w9aw880jnsr700jg5j4zm"
 	coinToSendToB = suite.chainA.GetSimApp().BankKeeper.GetBalance(suite.chainA.GetContext(), suite.chainA.SenderAccount.GetAddress(), sdk.DefaultBondDenom)
-	msg = types.NewMsgTransfer(path.EndpointA.ChannelConfig.PortID, path.EndpointA.ChannelID, coinToSendToB, suite.chainA.SenderAccount.GetAddress().String(), blockedAddr, timeoutHeight, 0)
+	msg = types.NewMsgTransfer(path.EndpointA.ChannelConfig.PortID, path.EndpointA.ChannelID, coinToSendToB, suite.chainA.SenderAccount.GetAddress().String(), blockedAddr, timeoutHeight, 0, "")
 
 	res, err = suite.chainA.SendMsgs(msg)
 	suite.Require().NoError(err) // message committed
@@ -194,7 +198,7 @@ func (suite *TransferTestSuite) TestHandleMsgTransfer() {
 	balanceCantoBefore = suite.chainB.App.(*app.Canto).BankKeeper.GetBalance(suite.chainB.GetContext(), suite.chainB.SenderAccount.GetAddress(), "acanto")
 	balanceErc20Before = erc20Keeper.BalanceOf(suite.chainB.GetContext(), contracts.ERC20MinterBurnerDecimalsContract.ABI, pair.GetERC20Contract(), common.BytesToAddress(suite.chainB.SenderAccount.GetAddress().Bytes()))
 
-	msg = types.NewMsgTransfer(path.EndpointA.ChannelConfig.PortID, path.EndpointA.ChannelID, coinToSendToB, suite.chainA.SenderAccount.GetAddress().String(), suite.chainB.SenderAccount.GetAddress().String(), timeoutHeight, 0)
+	msg = types.NewMsgTransfer(path.EndpointA.ChannelConfig.PortID, path.EndpointA.ChannelID, coinToSendToB, suite.chainA.SenderAccount.GetAddress().String(), suite.chainB.SenderAccount.GetAddress().String(), timeoutHeight, 0, "")
 
 	res, err = suite.chainA.SendMsgs(msg)
 	suite.Require().NoError(err) // message committed
@@ -207,7 +211,11 @@ func (suite *TransferTestSuite) TestHandleMsgTransfer() {
 	suite.Require().NoError(err) // relay committed
 
 	events = res.GetEvents()
-	attrs = onboardingtest.ExtractAttributes(onboardingtest.FindEvent(events, "swap"))
+	sdkEvents = nil
+	for _, event := range events {
+		sdkEvents = append(sdkEvents, sdk.Event(event))
+	}
+	attrs = onboardingtest.ExtractAttributes(onboardingtest.FindEvent(sdkEvents, "swap"))
 	swapAmount, ok = sdkmath.NewIntFromString(attrs["amount"])
 	if !ok {
 		swapAmount = sdkmath.ZeroInt()

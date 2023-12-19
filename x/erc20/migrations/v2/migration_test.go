@@ -12,13 +12,12 @@ import (
 
 	"github.com/evmos/ethermint/encoding"
 
-	"github.com/Canto-Network/Canto/v7/app"
 	v2 "github.com/Canto-Network/Canto/v7/x/erc20/migrations/v2"
 	erc20types "github.com/Canto-Network/Canto/v7/x/erc20/types"
 )
 
 func TestUpdateParams(t *testing.T) {
-	encCfg := encoding.MakeConfig(app.ModuleBasics)
+	encCfg := encoding.MakeTestEncodingConfig()
 	erc20Key := storetypes.NewKVStoreKey(erc20types.StoreKey)
 	tErc20Key := storetypes.NewTransientStoreKey(fmt.Sprintf("%s_test", erc20types.StoreKey))
 	ctx := testutil.DefaultContext(erc20Key, tErc20Key)

@@ -7,6 +7,6 @@ import (
 )
 
 var (
-	LendingMarketProposalHandler = govclient.NewProposalHandler(cli.NewLendingMarketProposalCmd, rest.RegisterCoinProposalRESTHandler)
-	TreasuryProposalHandler      = govclient.NewProposalHandler(cli.NewTreasuryProposalCmd, rest.RegisterCoinProposalRESTHandler)
+	LendingMarketProposalHandler = govclient.NewProposalHandler(cli.NewLendingMarketProposalCmd)
+	TreasuryProposalHandler      = govclient.NewProposalHandler(cli.NewTreasuryProposalCmd)
 )

@@ -159,8 +159,12 @@ func (suite *KeeperTestSuite) Commit() {
 }
 
 func (suite *KeeperTestSuite) CommitAfter(t time.Duration) {
-	suite.app.Commit()
 	header := suite.ctx.BlockHeader()
+	suite.app.FinalizeBlock(&abci.RequestFinalizeBlock{
+		Height: header.Height,
+		Time:   header.Time,
+	})
+	suite.app.Commit()
 	header.Height += 1
 	header.Time = header.Time.Add(t)
 	suite.app.FinalizeBlock(&abci.RequestFinalizeBlock{
