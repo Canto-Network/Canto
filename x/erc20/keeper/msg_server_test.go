@@ -667,7 +667,7 @@ func (suite *KeeperTestSuite) TestConvertERC20NativeERC20() {
 
 			suite.MintERC20Token(contractAddr, suite.address, suite.address, big.NewInt(tc.mint))
 			suite.Commit()
-			ctx := sdk.WrapSDKContext(suite.ctx)
+			ctx := suite.ctx
 
 			tc.extra()
 			res, err := suite.app.Erc20Keeper.ConvertERC20(ctx, msg)

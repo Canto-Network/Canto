@@ -11,6 +11,7 @@ import (
 
 	abci "github.com/cometbft/cometbft/abci/types"
 	dbm "github.com/cosmos/cosmos-db"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 
 	"github.com/Canto-Network/Canto/v7/types"
@@ -28,6 +29,7 @@ func TestCantoExport(t *testing.T) {
 		0,
 		false,
 		simtestutil.NewAppOptionsWithFlagHome(DefaultNodeHome),
+		baseapp.SetChainID(types.MainnetChainID+"-1"),
 	)
 
 	genesisState := NewDefaultGenesisState()
@@ -37,11 +39,15 @@ func TestCantoExport(t *testing.T) {
 	// Initialize the chain
 	app.InitChain(
 		&abci.RequestInitChain{
-			ChainId:       types.MainnetChainID + "-1",
-			Validators:    []abci.ValidatorUpdate{},
-			AppStateBytes: stateBytes,
+			ChainId:         types.MainnetChainID + "-1",
+			Validators:      []abci.ValidatorUpdate{},
+			ConsensusParams: DefaultConsensusParams,
+			AppStateBytes:   stateBytes,
 		},
 	)
+	app.FinalizeBlock(&abci.RequestFinalizeBlock{
+		Height: app.LastBlockHeight() + 1,
+	})
 	app.Commit()
 
 	// Making a new app object with the db, so that initchain hasn't been called
@@ -55,6 +61,7 @@ func TestCantoExport(t *testing.T) {
 		0,
 		false,
 		simtestutil.NewAppOptionsWithFlagHome(DefaultNodeHome),
+		baseapp.SetChainID(types.MainnetChainID+"-1"),
 	)
 	_, err = app2.ExportAppStateAndValidators(false, []string{}, []string{})
 	require.NoError(t, err, "ExportAppStateAndValidators should not have an error")
