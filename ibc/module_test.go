@@ -137,7 +137,7 @@ func (m MockIBCModule) OnTimeoutPacket(
 
 func TestModule(t *testing.T) {
 	mockModule := &MockIBCModule{}
-	mockModule.On("OnChanOpenInit").Return(nil)
+	mockModule.On("OnChanOpenInit").Return("", nil)
 	mockModule.On("OnChanOpenTry").Return("", nil)
 	mockModule.On("OnChanOpenAck").Return(nil)
 	mockModule.On("OnChanOpenConfirm").Return(nil)

@@ -29,12 +29,6 @@ func NewMsgConvertCoin(coin sdk.Coin, receiver common.Address, sender sdk.AccAdd
 	}
 }
 
-// Route should return the name of the module
-func (msg MsgConvertCoin) Route() string { return RouterKey }
-
-// Type should return the action
-func (msg MsgConvertCoin) Type() string { return TypeMsgConvertCoin }
-
 // ValidateBasic runs stateless checks on the message
 func (msg MsgConvertCoin) ValidateBasic() error {
 	if err := ValidateErc20Denom(msg.Coin.Denom); err != nil {
@@ -56,17 +50,6 @@ func (msg MsgConvertCoin) ValidateBasic() error {
 	return nil
 }
 
-// GetSignBytes encodes the message for signing
-func (msg MsgConvertCoin) GetSignBytes() []byte {
-	return sdk.MustSortJSON(AminoCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners defines whose signature is required
-func (msg MsgConvertCoin) GetSigners() []sdk.AccAddress {
-	addr := sdk.MustAccAddressFromBech32(msg.Sender)
-	return []sdk.AccAddress{addr}
-}
-
 // NewMsgConvertERC20 creates a new instance of MsgConvertERC20
 func NewMsgConvertERC20(amount sdkmath.Int, receiver sdk.AccAddress, contract, sender common.Address) *MsgConvertERC20 { // nolint: interfacer
 	return &MsgConvertERC20{
@@ -76,12 +59,6 @@ func NewMsgConvertERC20(amount sdkmath.Int, receiver sdk.AccAddress, contract, s
 		Sender:          sender.Hex(),
 	}
 }
-
-// Route should return the name of the module
-func (msg MsgConvertERC20) Route() string { return RouterKey }
-
-// Type should return the action
-func (msg MsgConvertERC20) Type() string { return TypeMsgConvertERC20 }
 
 // ValidateBasic runs stateless checks on the message
 func (msg MsgConvertERC20) ValidateBasic() error {
@@ -99,15 +76,4 @@ func (msg MsgConvertERC20) ValidateBasic() error {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender hex address %s", msg.Sender)
 	}
 	return nil
-}
-
-// GetSignBytes encodes the message for signing
-func (msg MsgConvertERC20) GetSignBytes() []byte {
-	return sdk.MustSortJSON(AminoCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners defines whose signature is required
-func (msg MsgConvertERC20) GetSigners() []sdk.AccAddress {
-	addr := common.HexToAddress(msg.Sender)
-	return []sdk.AccAddress{addr.Bytes()}
 }

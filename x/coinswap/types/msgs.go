@@ -52,12 +52,6 @@ func NewMsgSwapOrder(
 	}
 }
 
-// Route implements Msg.
-func (msg MsgSwapOrder) Route() string { return RouterKey }
-
-// Type implements Msg.
-func (msg MsgSwapOrder) Type() string { return TypeMsgSwapOrder }
-
 // ValidateBasic implements Msg.
 func (msg MsgSwapOrder) ValidateBasic() error {
 	if err := ValidateInput(msg.Input); err != nil {
@@ -73,20 +67,6 @@ func (msg MsgSwapOrder) ValidateBasic() error {
 	}
 
 	return ValidateDeadline(msg.Deadline)
-}
-
-// GetSignBytes implements Msg.
-func (msg MsgSwapOrder) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners implements Msg.
-func (msg MsgSwapOrder) GetSigners() []sdk.AccAddress {
-	from, err := sdk.AccAddressFromBech32(msg.Input.Address)
-	if err != nil {
-		panic(err)
-	}
-	return []sdk.AccAddress{from}
 }
 
 /* --------------------------------------------------------------------------- */
@@ -109,12 +89,6 @@ func NewMsgAddLiquidity(
 		Sender:           sender,
 	}
 }
-
-// Route implements Msg.
-func (msg MsgAddLiquidity) Route() string { return RouterKey }
-
-// Type implements Msg.
-func (msg MsgAddLiquidity) Type() string { return TypeMsgAddLiquidity }
 
 // ValidateBasic implements Msg.
 func (msg MsgAddLiquidity) ValidateBasic() error {
@@ -140,20 +114,6 @@ func (msg MsgAddLiquidity) ValidateBasic() error {
 	return nil
 }
 
-// GetSignBytes implements Msg.
-func (msg MsgAddLiquidity) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners implements Msg.
-func (msg MsgAddLiquidity) GetSigners() []sdk.AccAddress {
-	from, err := sdk.AccAddressFromBech32(msg.Sender)
-	if err != nil {
-		panic(err)
-	}
-	return []sdk.AccAddress{from}
-}
-
 /* --------------------------------------------------------------------------- */
 // MsgRemoveLiquidity
 /* --------------------------------------------------------------------------- */
@@ -174,12 +134,6 @@ func NewMsgRemoveLiquidity(
 		Sender:            sender,
 	}
 }
-
-// Route implements Msg.
-func (msg MsgRemoveLiquidity) Route() string { return RouterKey }
-
-// Type implements Msg.
-func (msg MsgRemoveLiquidity) Type() string { return TypeMsgRemoveLiquidity }
 
 // ValidateBasic implements Msg.
 func (msg MsgRemoveLiquidity) ValidateBasic() error {
@@ -203,18 +157,4 @@ func (msg MsgRemoveLiquidity) ValidateBasic() error {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	return nil
-}
-
-// GetSignBytes implements Msg.
-func (msg MsgRemoveLiquidity) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners implements Msg.
-func (msg MsgRemoveLiquidity) GetSigners() []sdk.AccAddress {
-	from, err := sdk.AccAddressFromBech32(msg.Sender)
-	if err != nil {
-		panic(err)
-	}
-	return []sdk.AccAddress{from}
 }

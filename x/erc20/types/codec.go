@@ -22,15 +22,8 @@ var (
 	AminoCdc = codec.NewAminoCodec(amino)
 )
 
-const (
-	// Amino names
-	convertERC20Name = "canto/MsgConvertERC20"
-	convertCoinName  = "canto/MsgConvertCoin"
-)
-
 // NOTE: This is required for the GetSignBytes function
 func init() {
-	RegisterLegacyAminoCodec(amino)
 	amino.Seal()
 }
 
@@ -49,12 +42,4 @@ func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
-}
-
-// RegisterLegacyAminoCodec registers the necessary x/erc20 interfaces and
-// concrete types on the provided LegacyAmino codec. These types are used for
-// Amino JSON serialization and EIP-712 compatibility.
-func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&MsgConvertERC20{}, convertERC20Name, nil)
-	cdc.RegisterConcrete(&MsgConvertCoin{}, convertCoinName, nil)
 }

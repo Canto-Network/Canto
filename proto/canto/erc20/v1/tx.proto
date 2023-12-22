@@ -6,6 +6,7 @@ import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "cosmos_proto/cosmos.proto";
 import "cosmos/msg/v1/msg.proto";
+import "amino/amino.proto";
 
 option go_package = "github.com/Canto-Network/Canto/v7/x/erc20/types";
 
@@ -27,6 +28,9 @@ service Msg {
 
 // MsgConvertCoin defines a Msg to convert a native Cosmos coin to a ERC20 token
 message MsgConvertCoin {
+  option (cosmos.msg.v1.signer) = "sender";
+  option (amino.name) = "canto/MsgConvertCoin";
+
   // Cosmos coin which denomination is registered in a token pair. The coin
   // amount defines the amount of coins to convert.
   cosmos.base.v1beta1.Coin coin = 1 [ (gogoproto.nullable) = false ];
@@ -42,6 +46,9 @@ message MsgConvertCoinResponse {}
 // MsgConvertERC20 defines a Msg to convert a ERC20 token to a native Cosmos
 // coin.
 message MsgConvertERC20 {
+  option (cosmos.msg.v1.signer) = "sender";
+  option (amino.name) = "canto/MsgConvertERC20";
+
   // ERC20 token contract address registered in a token pair
   string contract_address = 1;
   // amount of ERC20 tokens to convert
