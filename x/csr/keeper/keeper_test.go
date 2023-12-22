@@ -14,14 +14,15 @@ import (
 	"github.com/Canto-Network/Canto/v7/contracts"
 	"github.com/Canto-Network/Canto/v7/x/csr/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/evmos/ethermint/crypto/ethsecp256k1"
-	"github.com/evmos/ethermint/encoding"
 	"github.com/evmos/ethermint/tests"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
@@ -265,10 +266,10 @@ func EVMTX(
 	gasTipCap *big.Int,
 	data []byte,
 	accesses *ethtypes.AccessList,
-) (sdk.GasInfo, *sdk.Result, error) {
+) (*abci.ResponseFinalizeBlock, error) {
 	msgEthereumTx := BuildEthTx(priv, to, amount, gasLimit, gasPrice, gasFeeCap, gasTipCap, data, accesses)
-	gasInfo, result, err := DeliverEthTx(priv, msgEthereumTx)
-	return gasInfo, result, err
+	result, err := FinalizeEthBlock(priv, msgEthereumTx)
+	return result, err
 }
 
 // Helper function that creates an ethereum transaction
@@ -303,17 +304,44 @@ func BuildEthTx(
 	return msgEthereumTx
 }
 
-func DeliverEthTx(priv *ethsecp256k1.PrivKey, msgEthereumTx *evmtypes.MsgEthereumTx) (sdk.GasInfo, *sdk.Result, error) {
-	ethTx := PrepareEthTx(priv, msgEthereumTx)
-	encodingConfig := encoding.MakeTestEncodingConfig()
-	txEncoder := encodingConfig.TxConfig.TxEncoder()
-	return s.app.BaseApp.SimDeliver(txEncoder, ethTx)
+func FinalizeEthBlock(priv *ethsecp256k1.PrivKey, msgEthereumTx *evmtypes.MsgEthereumTx) (*abci.ResponseFinalizeBlock, error) {
+	bz := PrepareEthTx(priv, msgEthereumTx)
+	res, err := s.app.BaseApp.FinalizeBlock(&abci.RequestFinalizeBlock{
+		Height:          s.app.LastBlockHeight() + 1,
+		Txs:             [][]byte{bz},
+		ProposerAddress: s.ctx.BlockHeader().ProposerAddress,
+	})
+	return res, err
 }
 
-func PrepareEthTx(priv *ethsecp256k1.PrivKey, msgEthereumTx *evmtypes.MsgEthereumTx) *evmtypes.MsgEthereumTx {
-	// Sign transaction
-	err := msgEthereumTx.Sign(s.ethSigner, tests.NewSigner(priv))
+func PrepareEthTx(priv *ethsecp256k1.PrivKey, msgEthereumTx *evmtypes.MsgEthereumTx) []byte {
+	txConfig := s.app.TxConfig()
+	option, err := codectypes.NewAnyWithValue(&evmtypes.ExtensionOptionsEthereumTx{})
 	s.Require().NoError(err)
 
-	return msgEthereumTx
+	txBuilder := txConfig.NewTxBuilder()
+	builder, ok := txBuilder.(authtx.ExtensionOptionsTxBuilder)
+	s.Require().True(ok)
+	builder.SetExtensionOptions(option)
+
+	err = msgEthereumTx.Sign(s.ethSigner, tests.NewSigner(priv))
+	s.Require().NoError(err)
+
+	msgEthereumTx.From = ""
+	err = txBuilder.SetMsgs(msgEthereumTx)
+	s.Require().NoError(err)
+
+	txData, err := evmtypes.UnpackTxData(msgEthereumTx.Data)
+	s.Require().NoError(err)
+
+	evmDenom := s.app.EvmKeeper.GetParams(s.ctx).EvmDenom
+	fees := sdk.Coins{{Denom: evmDenom, Amount: sdkmath.NewIntFromBigInt(txData.Fee())}}
+	builder.SetFeeAmount(fees)
+	builder.SetGasLimit(msgEthereumTx.GetGas())
+
+	// bz are bytes to be broadcasted over the network
+	bz, err := txConfig.TxEncoder()(txBuilder.GetTx())
+	s.Require().NoError(err)
+
+	return bz
 }

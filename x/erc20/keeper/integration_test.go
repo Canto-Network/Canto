@@ -11,11 +11,13 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/evmos/ethermint/crypto/ethsecp256k1"
 	"github.com/evmos/ethermint/encoding"
 	ethermint "github.com/evmos/ethermint/types"
 
 	"github.com/Canto-Network/Canto/v7/testutil"
+	"github.com/Canto-Network/Canto/v7/x/erc20"
 	"github.com/Canto-Network/Canto/v7/x/erc20/types"
 
 	sdkmath "cosmossdk.io/math"
@@ -223,20 +225,21 @@ func convertCoin(priv *ethsecp256k1.PrivKey, coin sdk.Coin) {
 	addrBz := priv.PubKey().Address().Bytes()
 
 	convertCoinMsg := types.NewMsgConvertCoin(coin, common.BytesToAddress(addrBz), sdk.AccAddress(addrBz))
-	_, result, err := deliverTx(priv, convertCoinMsg)
-	s.Require().NoError(err, result.Log)
+	_, err := finalizeBlock(priv, convertCoinMsg)
+	s.Require().NoError(err)
 }
 
 func convertERC20(priv *ethsecp256k1.PrivKey, amt sdkmath.Int, contract common.Address) {
 	addrBz := priv.PubKey().Address().Bytes()
 
 	convertERC20Msg := types.NewMsgConvertERC20(amt, sdk.AccAddress(addrBz), contract, common.BytesToAddress(addrBz))
-	_, result, err := deliverTx(priv, convertERC20Msg)
-	s.Require().NoError(err, result.Log)
+	_, err := finalizeBlock(priv, convertERC20Msg)
+	s.Require().NoError(err)
 }
 
-func deliverTx(priv *ethsecp256k1.PrivKey, msgs ...sdk.Msg) (sdk.GasInfo, *sdk.Result, error) {
-	encodingConfig := encoding.MakeTestEncodingConfig()
+func finalizeBlock(priv *ethsecp256k1.PrivKey, msgs ...sdk.Msg) (*abci.ResponseFinalizeBlock, error) {
+	txConfig := s.app.TxConfig()
+	encodingConfig := encoding.MakeTestEncodingConfig(erc20.AppModule{})
 
 	accountAddress := sdk.AccAddress(priv.PubKey().Address().Bytes())
 	// denom := s.app.ClaimsKeeper.GetParams(s.ctx).ClaimsDenom
@@ -274,6 +277,7 @@ func deliverTx(priv *ethsecp256k1.PrivKey, msgs ...sdk.Msg) (sdk.GasInfo, *sdk.R
 		ChainID:       s.ctx.ChainID(),
 		AccountNumber: accNumber,
 		Sequence:      seq,
+		PubKey:        priv.PubKey(),
 	}
 	sigV2, err = tx.SignWithPrivKey(
 		context.TODO(),
@@ -287,7 +291,15 @@ func deliverTx(priv *ethsecp256k1.PrivKey, msgs ...sdk.Msg) (sdk.GasInfo, *sdk.R
 	err = txBuilder.SetSignatures(sigsV2...)
 	s.Require().NoError(err)
 
-	return s.app.BaseApp.SimDeliver(encodingConfig.TxConfig.TxEncoder(), txBuilder.GetTx())
+	bz, err := txConfig.TxEncoder()(txBuilder.GetTx())
+	s.Require().NoError(err)
+
+	res, err := s.app.FinalizeBlock(&abci.RequestFinalizeBlock{
+		Height: s.app.LastBlockHeight() + 1,
+		Txs:    [][]byte{bz},
+	})
+
+	return res, err
 	//// bz are bytes to be broadcasted over the network
 	//bz, err := encodingConfig.TxConfig.TxEncoder()(txBuilder.GetTx())
 	//s.Require().NoError(err)
