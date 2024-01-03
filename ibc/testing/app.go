@@ -23,8 +23,8 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
 
+	"github.com/Canto-Network/Canto/v7/ibc/testing/simapp"
 	"github.com/cosmos/ibc-go/v8/modules/core/keeper"
-	"github.com/cosmos/ibc-go/v8/testing/simapp"
 	ibctestingtypes "github.com/cosmos/ibc-go/v8/testing/types"
 
 	ethermint "github.com/evmos/ethermint/types"
@@ -108,7 +108,7 @@ func SetupWithGenesisValSet(tb testing.TB, valSet *tmtypes.ValidatorSet, genAccs
 		}
 
 		validators = append(validators, validator)
-		delegations = append(delegations, stakingtypes.NewDelegation(genAccs[0].GetAddress().String(), val.Address.String(), sdkmath.LegacyOneDec()))
+		delegations = append(delegations, stakingtypes.NewDelegation(genAccs[0].GetAddress().String(), sdk.ValAddress(val.Address).String(), sdkmath.LegacyOneDec()))
 	}
 
 	// set validators and delegations
