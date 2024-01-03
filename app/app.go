@@ -1092,7 +1092,7 @@ func (app *Canto) setAnteHandler(txConfig client.TxConfig, maxGasWanted uint64) 
 			FeeMarketKeeper:        app.FeeMarketKeeper,
 			MaxTxGasWanted:         maxGasWanted,
 			ExtensionOptionChecker: ethermint.HasDynamicFeeExtensionOption,
-			TxFeeChecker:           ethante.NewDynamicFeeChecker(app.EvmKeeper),
+			// TxFeeChecker:           ethante.NewDynamicFeeChecker(app.EvmKeeper), // TODO(dudong2): consider it
 			DisabledAuthzMsgs: []string{
 				sdk.MsgTypeURL(&evmtypes.MsgEthereumTx{}),
 				// sdk.MsgTypeURL(&vestingtypes.MsgCreateVestingAccount{}),
