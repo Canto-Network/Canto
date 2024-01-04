@@ -46,7 +46,7 @@ message MsgConvertCoinResponse {}
 // MsgConvertERC20 defines a Msg to convert a ERC20 token to a native Cosmos
 // coin.
 message MsgConvertERC20 {
-  option (cosmos.msg.v1.signer) = "sender";
+  //  option (cosmos.msg.v1.signer) = "sender";
   option (amino.name) = "canto/MsgConvertERC20";
 
   // ERC20 token contract address registered in a token pair

@@ -286,7 +286,7 @@ func NewTestChainCanto(t *testing.T, coord *Coordinator, chainID string) *TestCh
 
 // GetContext returns the current context for the application.
 func (chain *TestChain) GetContext() sdk.Context {
-	return chain.App.GetBaseApp().NewContextLegacy(false, chain.CurrentHeader)
+	return chain.App.GetBaseApp().NewUncachedContext(false, chain.CurrentHeader)
 }
 
 // GetSimApp returns the SimApp to allow usage ofnon-interface fields.

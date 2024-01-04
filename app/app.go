@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 
 	"github.com/cosmos/gogoproto/proto"
+	ibctm "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
 	"github.com/gorilla/mux"
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
@@ -126,6 +127,7 @@ import (
 	ibctesting "github.com/cosmos/ibc-go/v8/testing"
 	ibctestingtypes "github.com/cosmos/ibc-go/v8/testing/types"
 
+	erc20v1 "github.com/Canto-Network/Canto/v7/api/canto/erc20/v1"
 	evmv1 "github.com/evmos/ethermint/api/ethermint/evm/v1"
 	feemarketv1 "github.com/evmos/ethermint/api/ethermint/feemarket/v1"
 	ethante "github.com/evmos/ethermint/app/ante"
@@ -329,6 +331,7 @@ func NewCanto(
 	signingOptions.DefineCustomGetSigners(protov2.MessageName(&evmv1.MsgEthereumTx{}), evmtypes.GetSignersFromMsgEthereumTxV2)
 	signingOptions.DefineCustomGetSigners(protov2.MessageName(&evmv1.MsgUpdateParams{}), evmtypes.GetSignersFromMsgUpdateParamsV2)
 	signingOptions.DefineCustomGetSigners(protov2.MessageName(&feemarketv1.MsgUpdateParams{}), feemarkettypes.GetSignersFromMsgUpdateParamsV2)
+	signingOptions.DefineCustomGetSigners(protov2.MessageName(&erc20v1.MsgConvertERC20{}), erc20types.GetSignersFromMsgConvertERC20V2)
 
 	interfaceRegistry, _ := types.NewInterfaceRegistryWithOptions(types.InterfaceRegistryOptions{
 		ProtoFiles:     proto.HybridResolver,
@@ -798,6 +801,7 @@ func NewCanto(
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
 		capability.NewAppModule(appCodec, *app.CapabilityKeeper, false),
+		ibctm.NewAppModule(),
 
 		// Ethermint app modules
 		evm.NewAppModule(app.EvmKeeper, app.AccountKeeper, evmSs),

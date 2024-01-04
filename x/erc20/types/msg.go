@@ -3,8 +3,10 @@ package types
 import (
 	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
+	erc20v1 "github.com/Canto-Network/Canto/v7/api/canto/erc20/v1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	protov2 "google.golang.org/protobuf/proto"
 
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	"github.com/ethereum/go-ethereum/common"
@@ -110,4 +112,22 @@ func (msg MsgConvertERC20) GetSignBytes() []byte {
 func (msg MsgConvertERC20) GetSigners() []sdk.AccAddress {
 	addr := common.HexToAddress(msg.Sender)
 	return []sdk.AccAddress{addr.Bytes()}
+}
+
+func GetSignersFromMsgConvertERC20V2(msg protov2.Message) ([][]byte, error) {
+	msgv2, ok := msg.(*erc20v1.MsgConvertERC20)
+	if !ok {
+		return nil, nil
+	}
+
+	msgv1 := MsgConvertERC20{
+		Sender: msgv2.Sender,
+	}
+
+	signers := [][]byte{}
+	for _, signer := range msgv1.GetSigners() {
+		signers = append(signers, signer.Bytes())
+	}
+
+	return signers, nil
 }

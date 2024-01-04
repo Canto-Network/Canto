@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"context"
+	"fmt"
 	"math/big"
 
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -89,8 +90,9 @@ var _ = Describe("ERC20: Converting", Ordered, func() {
 	moduleAcc := s.app.AccountKeeper.GetModuleAccount(s.ctx, types.ModuleName).GetAddress()
 
 	var (
-		pair *types.TokenPair
-		coin sdk.Coin
+		pair      *types.TokenPair
+		tokenPair types.TokenPair
+		coin      sdk.Coin
 	)
 
 	BeforeEach(func() {
@@ -160,13 +162,13 @@ var _ = Describe("ERC20: Converting", Ordered, func() {
 		BeforeEach(func() {
 			contract := s.setupRegisterERC20Pair(contractMinterBurner)
 			id := s.app.Erc20Keeper.GetTokenPairID(s.ctx, contract.String())
-			*pair, _ = s.app.Erc20Keeper.GetTokenPair(s.ctx, id)
-			coin = sdk.NewCoin(pair.Denom, amt)
+			tokenPair, _ = s.app.Erc20Keeper.GetTokenPair(s.ctx, id)
+			coin = sdk.NewCoin(tokenPair.Denom, amt)
 
 			// denom := s.app.ClaimsKeeper.GetParams(s.ctx).ClaimsDenom
 			denom := "acanto" //use default denom for claimsDenom
 
-			err := testutil.FundAccount(s.app.BankKeeper, s.ctx, accAddr, sdk.NewCoins(sdk.NewCoin(denom, sdkmath.NewInt(1000))))
+			err := testutil.FundAccount(s.app.BankKeeper, s.ctx, accAddr, sdk.NewCoins(sdk.NewCoin(denom, sdkmath.NewIntWithDecimal(1, 17))))
 			s.Require().NoError(err)
 
 			_ = s.MintERC20Token(contract, s.address, addr, big.NewInt(amt.Int64()))
@@ -175,46 +177,46 @@ var _ = Describe("ERC20: Converting", Ordered, func() {
 
 		Describe("an ERC20 token into a Cosmos coin", func() {
 			BeforeEach(func() {
-				convertERC20(priv, amt, pair.GetERC20Contract())
+				convertERC20(priv, amt, tokenPair.GetERC20Contract())
 			})
 
 			It("should decrease tokens on the sender account", func() {
-				balanceERC20 := s.BalanceOf(pair.GetERC20Contract(), addr).(*big.Int)
+				balanceERC20 := s.BalanceOf(tokenPair.GetERC20Contract(), addr).(*big.Int)
 				Expect(balanceERC20.Int64()).To(Equal(int64(0)))
 			})
 
 			It("should escrow tokens on the module account", func() {
 				moduleAddr := common.BytesToAddress(moduleAcc.Bytes())
-				balanceERC20 := s.BalanceOf(pair.GetERC20Contract(), moduleAddr).(*big.Int)
+				balanceERC20 := s.BalanceOf(tokenPair.GetERC20Contract(), moduleAddr).(*big.Int)
 				Expect(balanceERC20.Int64()).To(Equal(amt.Int64()))
 			})
 
 			It("should send coins to the recevier account", func() {
-				balanceCoin := s.app.BankKeeper.GetBalance(s.ctx, accAddr, pair.Denom)
+				balanceCoin := s.app.BankKeeper.GetBalance(s.ctx, accAddr, tokenPair.Denom)
 				Expect(balanceCoin).To(Equal(coin))
 			})
 		})
 
 		Describe("a Cosmos coin into an ERC20 token", func() {
 			BeforeEach(func() {
-				convertERC20(priv, amt, pair.GetERC20Contract())
+				convertERC20(priv, amt, tokenPair.GetERC20Contract())
 				s.Commit()
 				convertCoin(priv, coin)
 			})
 
 			It("should increase tokens on the sender account", func() {
-				balanceERC20 := s.BalanceOf(pair.GetERC20Contract(), addr).(*big.Int)
+				balanceERC20 := s.BalanceOf(tokenPair.GetERC20Contract(), addr).(*big.Int)
 				Expect(balanceERC20.Int64()).To(Equal(amt.Int64()))
 			})
 
 			It("should unescrow tokens on the module account", func() {
 				moduleAddr := common.BytesToAddress(moduleAcc.Bytes())
-				balanceERC20 := s.BalanceOf(pair.GetERC20Contract(), moduleAddr).(*big.Int)
+				balanceERC20 := s.BalanceOf(tokenPair.GetERC20Contract(), moduleAddr).(*big.Int)
 				Expect(balanceERC20.Int64()).To(Equal(int64(0)))
 			})
 
 			It("should burn coins to the recevier account", func() {
-				balanceCoin := s.app.BankKeeper.GetBalance(s.ctx, accAddr, pair.Denom)
+				balanceCoin := s.app.BankKeeper.GetBalance(s.ctx, accAddr, tokenPair.Denom)
 				Expect(balanceCoin.IsZero()).To(BeTrue())
 			})
 		})
@@ -247,8 +249,8 @@ func finalizeBlock(priv *ethsecp256k1.PrivKey, msgs ...sdk.Msg) (*abci.ResponseF
 
 	txBuilder := encodingConfig.TxConfig.NewTxBuilder()
 
-	txBuilder.SetGasLimit(100_000_000)
-	txBuilder.SetFeeAmount(sdk.Coins{{Denom: denom, Amount: sdkmath.NewInt(1)}})
+	txBuilder.SetGasLimit(10_000_000)
+	txBuilder.SetFeeAmount(sdk.Coins{{Denom: denom, Amount: sdkmath.NewIntWithDecimal(1, 16)}})
 	err := txBuilder.SetMsgs(msgs...)
 	s.Require().NoError(err)
 
@@ -294,17 +296,15 @@ func finalizeBlock(priv *ethsecp256k1.PrivKey, msgs ...sdk.Msg) (*abci.ResponseF
 	bz, err := txConfig.TxEncoder()(txBuilder.GetTx())
 	s.Require().NoError(err)
 
+	test, err := txConfig.TxJSONEncoder()(txBuilder.GetTx())
+	s.Require().NoError(err)
+	fmt.Println(string(test))
+
 	res, err := s.app.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height: s.app.LastBlockHeight() + 1,
-		Txs:    [][]byte{bz},
+		Height:          s.app.LastBlockHeight() + 1,
+		Txs:             [][]byte{bz},
+		ProposerAddress: s.consAddress.Bytes(),
 	})
 
 	return res, err
-	//// bz are bytes to be broadcasted over the network
-	//bz, err := encodingConfig.TxConfig.TxEncoder()(txBuilder.GetTx())
-	//s.Require().NoError(err)
-
-	//req := abci.RequestDeliverTx{Tx: bz}
-	//res := s.app.BaseApp.DeliverTx(req)
-	//return res
 }
