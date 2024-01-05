@@ -9,15 +9,15 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	ibctesting "github.com/cosmos/ibc-go/v8/testing"
+	ibctesting "github.com/Canto-Network/Canto/v7/ibc/testing"
 )
 
 func TestChangeValSet(t *testing.T) {
-	coord := ibctesting.NewCoordinator(t, 2)
-	chainA := coord.GetChain(ibctesting.GetChainID(1))
-	chainB := coord.GetChain(ibctesting.GetChainID(2))
+	coord := ibctesting.NewCoordinator(t, 1, 1)
+	chainA := coord.GetChain(ibctesting.GetChainID(2))
+	chainB := coord.GetChain(ibctesting.GetChainIDCanto(1))
 
-	path := ibctesting.NewPath(chainA, chainB)
+	path := ibctesting.NewTransferPath(chainA, chainB)
 	coord.Setup(path)
 
 	amount, ok := sdkmath.NewIntFromString("10000000000000000000")
