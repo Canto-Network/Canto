@@ -286,6 +286,7 @@ func NewTestChainCanto(t *testing.T, coord *Coordinator, chainID string) *TestCh
 
 // GetContext returns the current context for the application.
 func (chain *TestChain) GetContext() sdk.Context {
+	// return chain.App.GetBaseApp().NewContextLegacy(false, chain.CurrentHeader)
 	return chain.App.GetBaseApp().NewUncachedContext(false, chain.CurrentHeader)
 }
 
@@ -389,6 +390,7 @@ func (chain *TestChain) NextBlock() {
 		Height:             chain.CurrentHeader.Height,
 		Time:               chain.CurrentHeader.GetTime(),
 		NextValidatorsHash: chain.NextVals.Hash(),
+		ProposerAddress:    chain.CurrentHeader.ProposerAddress,
 	})
 	require.NoError(chain.TB, err)
 	chain.commitBlock(res)
@@ -442,6 +444,7 @@ func (chain *TestChain) SendMsgs(msgs ...sdk.Msg) (*abci.ExecTxResult, error) {
 		chain.TB,
 		chain.TxConfig,
 		chain.App.GetBaseApp(),
+		chain.CurrentHeader,
 		msgs,
 		chain.ChainID,
 		[]uint64{chain.SenderAccount.GetAccountNumber()},
@@ -738,7 +741,7 @@ func (chain *TestChain) GetTimeoutHeight() clienttypes.Height {
 //
 // CONTRACT: BeginBlock must be called before this function.
 func SignAndDeliver(
-	tb testing.TB, txCfg client.TxConfig, app *bam.BaseApp, msgs []sdk.Msg,
+	tb testing.TB, txCfg client.TxConfig, app *bam.BaseApp, header tmproto.Header, msgs []sdk.Msg,
 	chainID string, accNums, accSeqs []uint64, expPass bool, blockTime time.Time, nextValHash []byte, priv ...cryptotypes.PrivKey,
 ) (*abci.ResponseFinalizeBlock, error) {
 	tb.Helper()
@@ -763,6 +766,7 @@ func SignAndDeliver(
 		Time:               blockTime,
 		NextValidatorsHash: nextValHash,
 		Txs:                [][]byte{txBytes},
+		ProposerAddress:    header.ProposerAddress,
 	})
 }
 
