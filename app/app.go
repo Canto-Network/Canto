@@ -632,12 +632,6 @@ func NewCanto(
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
-	transferIBCModule := transfer.NewIBCModule(app.TransferKeeper)
-
-	// Create static IBC router, add transfer route, then set and seal it
-	ibcRouter := porttypes.NewRouter()
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
-	app.IBCKeeper.SetRouter(ibcRouter)
 
 	// Create Ethermint keepers
 	feeMarketSs := app.GetSubspace(feemarkettypes.ModuleName)
@@ -755,6 +749,11 @@ func NewCanto(
 
 	transferStack = transfer.NewIBCModule(app.TransferKeeper)
 	transferStack = onboarding.NewIBCMiddleware(*app.OnboardingKeeper, transferStack)
+
+	// Create static IBC router, add transfer route, then set and seal it
+	ibcRouter := porttypes.NewRouter()
+	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferStack)
+	app.IBCKeeper.SetRouter(ibcRouter)
 
 	/****  Module Options ****/
 

@@ -7,7 +7,6 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	transfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
@@ -64,7 +63,7 @@ func (k Keeper) OnRecvPacket(
 	account := k.accountKeeper.GetAccount(ctx, recipient)
 
 	// onboarding is not supported for module accounts
-	if _, isModuleAccount := account.(authtypes.ModuleAccountI); isModuleAccount {
+	if _, isModuleAccount := account.(sdk.ModuleAccountI); isModuleAccount {
 		return ack
 	}
 
