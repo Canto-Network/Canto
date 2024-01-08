@@ -165,15 +165,9 @@ func (suite *KeeperTestSuite) CommitAfter(t time.Duration) {
 		Time:   header.Time,
 	})
 	suite.app.Commit()
-	header.Height += 1
-	header.Time = header.Time.Add(t)
-	suite.app.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height: header.Height,
-		Time:   header.Time,
-	})
 
 	// update ctx
-	suite.ctx = suite.app.BaseApp.NewContextLegacy(false, header)
+	suite.ctx = suite.app.BaseApp.NewUncachedContext(false, header)
 
 	queryHelper := baseapp.NewQueryServerTestHelper(suite.ctx, suite.app.InterfaceRegistry())
 	evm.RegisterQueryServer(queryHelper, suite.app.EvmKeeper)
