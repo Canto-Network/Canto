@@ -150,6 +150,7 @@ func (suite *KeeperTestSuite) Commit() {
 
 func (suite *KeeperTestSuite) CommitAfter(t time.Duration) {
 	header := suite.ctx.BlockHeader()
+	header.Time = header.Time.Add(t)
 	suite.app.FinalizeBlock(&abci.RequestFinalizeBlock{
 		Height: header.Height,
 		Time:   header.Time,
@@ -157,6 +158,7 @@ func (suite *KeeperTestSuite) CommitAfter(t time.Duration) {
 	suite.app.Commit()
 
 	// update ctx
+	header.Height += 1
 	suite.ctx = suite.app.BaseApp.NewUncachedContext(false, header)
 
 	queryHelper := baseapp.NewQueryServerTestHelper(suite.ctx, suite.app.InterfaceRegistry())
