@@ -188,7 +188,7 @@ func (suite *TransferTestSuite) TestHandleMsgTransfer() {
 	suite.Require().NoError(err)
 	ack, err := ibcgotesting.ParseAckFromEvents(res.GetEvents())
 	suite.Require().NoError(err)
-	suite.Require().Equal(ack, []byte(`{"error":"ABCI code: 4: error handling packet on destination chain: see events for details"}`))
+	suite.Require().Equal(ack, []byte(`{"error":"ABCI code: 4: error handling packet: see events for details"}`))
 
 	// Send again from chainA to chainB
 	// auto swap should not happen
