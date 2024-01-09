@@ -68,4 +68,4 @@ cantod validate-genesis
 
 
 rem Start the node (remove the --pruning=nothing flag if historical queries are not needed)
-cantod start --pruning=nothing %TRACE% --log_level %LOGLEVEL% --minimum-gas-prices=0.0001acanto
+cantod start --pruning=nothing %TRACE% --log_level %LOGLEVEL% --minimum-gas-prices=0.0001acanto --chain-id %CHAINID%
