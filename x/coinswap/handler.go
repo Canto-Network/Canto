@@ -30,6 +30,10 @@ func NewHandler(k keeper.Keeper) baseapp.MsgServiceHandler {
 			res, err := msgServer.RemoveLiquidity(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
+		case *types.MsgUpdateParams:
+			res, err := msgServer.UpdateParams(sdk.WrapSDKContext(ctx), msg)
+			return sdk.WrapServiceResult(ctx, res, err)
+
 		default:
 			return nil, errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", types.ModuleName, msg)
 		}

@@ -26,6 +26,12 @@ service Msg {
   // SwapCoin defines a method for swapping a token with the other token from
   // the liquidity pool
   rpc SwapCoin(MsgSwapOrder) returns (MsgSwapCoinResponse);
+
+  // UpdateParams defines a governance operation for updating the x/coinswap
+  // module parameters. The authority is defined in the keeper.
+  //
+  // Since: cosmos-sdk 0.47
+  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
 }
 
 // MsgAddLiquidity defines a msg for adding liquidity to a reserve pool
@@ -99,3 +105,25 @@ message MsgSwapOrder {
 
 // MsgSwapCoinResponse defines the Msg/SwapCoin response type
 message MsgSwapCoinResponse {}
+
+// Since: cosmos-sdk 0.47
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) = "authority";
+
+  // authority is the address that controls the module (defaults to x/gov unless
+  // overwritten).
+  string authority = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  option (amino.name) = "canto/MsgUpdateParams";
+
+  // params defines the x/coinswap parameters to update.
+  //
+  // NOTE: All parameters must be supplied.
+  Params params = 2
+      [ (gogoproto.nullable) = false, (amino.dont_omitempty) = true ];
+}
+
+// MsgUpdateParamsResponse defines the response structure for executing a
+// MsgUpdateParams message.
+//
+// Since: cosmos-sdk 0.47
+message MsgUpdateParamsResponse {}

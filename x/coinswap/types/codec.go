@@ -24,6 +24,9 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgSwapOrder{}, "coinswap/coinswap/MsgSwapOrder", nil)
 	cdc.RegisterConcrete(&MsgAddLiquidity{}, "coinswap/coinswap/MsgAddLiquidity", nil)
 	cdc.RegisterConcrete(&MsgRemoveLiquidity{}, "coinswap/coinswap/MsgRemoveLiquidity", nil)
+	cdc.RegisterConcrete(&MsgUpdateParams{}, "coinswap/coinswap/MsgUpdateParams", nil)
+	cdc.RegisterConcrete(&Params{}, "coinswap/coinswap/Params", nil)
+
 }
 
 func RegisterInterfaces(registry types.InterfaceRegistry) {
@@ -31,6 +34,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgSwapOrder{},
 		&MsgAddLiquidity{},
 		&MsgRemoveLiquidity{},
+		&MsgUpdateParams{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)

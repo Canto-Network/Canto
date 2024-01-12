@@ -22,6 +22,7 @@ const (
 	Msg_AddLiquidity_FullMethodName    = "/canto.coinswap.v1.Msg/AddLiquidity"
 	Msg_RemoveLiquidity_FullMethodName = "/canto.coinswap.v1.Msg/RemoveLiquidity"
 	Msg_SwapCoin_FullMethodName        = "/canto.coinswap.v1.Msg/SwapCoin"
+	Msg_UpdateParams_FullMethodName    = "/canto.coinswap.v1.Msg/UpdateParams"
 )
 
 // MsgClient is the client API for Msg service.
@@ -37,6 +38,11 @@ type MsgClient interface {
 	// SwapCoin defines a method for swapping a token with the other token from
 	// the liquidity pool
 	SwapCoin(ctx context.Context, in *MsgSwapOrder, opts ...grpc.CallOption) (*MsgSwapCoinResponse, error)
+	// UpdateParams defines a governance operation for updating the x/coinswap
+	// module parameters. The authority is defined in the keeper.
+	//
+	// Since: cosmos-sdk 0.47
+	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
 }
 
 type msgClient struct {
@@ -74,6 +80,15 @@ func (c *msgClient) SwapCoin(ctx context.Context, in *MsgSwapOrder, opts ...grpc
 	return out, nil
 }
 
+func (c *msgClient) UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error) {
+	out := new(MsgUpdateParamsResponse)
+	err := c.cc.Invoke(ctx, Msg_UpdateParams_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility
@@ -87,6 +102,11 @@ type MsgServer interface {
 	// SwapCoin defines a method for swapping a token with the other token from
 	// the liquidity pool
 	SwapCoin(context.Context, *MsgSwapOrder) (*MsgSwapCoinResponse, error)
+	// UpdateParams defines a governance operation for updating the x/coinswap
+	// module parameters. The authority is defined in the keeper.
+	//
+	// Since: cosmos-sdk 0.47
+	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }
 
@@ -102,6 +122,9 @@ func (UnimplementedMsgServer) RemoveLiquidity(context.Context, *MsgRemoveLiquidi
 }
 func (UnimplementedMsgServer) SwapCoin(context.Context, *MsgSwapOrder) (*MsgSwapCoinResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SwapCoin not implemented")
+}
+func (UnimplementedMsgServer) UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateParams not implemented")
 }
 func (UnimplementedMsgServer) mustEmbedUnimplementedMsgServer() {}
 
@@ -170,6 +193,24 @@ func _Msg_SwapCoin_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_UpdateParams_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateParams)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UpdateParams(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_UpdateParams_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UpdateParams(ctx, req.(*MsgUpdateParams))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Msg_ServiceDesc is the grpc.ServiceDesc for Msg service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -188,6 +229,10 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SwapCoin",
 			Handler:    _Msg_SwapCoin_Handler,
+		},
+		{
+			MethodName: "UpdateParams",
+			Handler:    _Msg_UpdateParams_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

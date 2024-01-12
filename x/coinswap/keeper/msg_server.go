@@ -7,6 +7,7 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	"github.com/Canto-Network/Canto/v7/x/coinswap/types"
 )
@@ -100,4 +101,22 @@ func (m msgServer) SwapCoin(goCtx context.Context, msg *types.MsgSwapOrder) (*ty
 		),
 	)
 	return &types.MsgSwapCoinResponse{}, nil
+}
+
+func (k msgServer) UpdateParams(goCtx context.Context, req *types.MsgUpdateParams) (*types.MsgUpdateParamsResponse, error) {
+	if k.GetAuthority() != req.Authority {
+		return nil, errorsmod.Wrapf(govtypes.ErrInvalidSigner, "invalid authority; expected %s, got %s", k.GetAuthority(), req.Authority)
+	}
+
+	if err := req.Params.Validate(); err != nil {
+		return nil, err
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	k.SetParams(ctx, req.Params)
+	//if err := k.SetParams(ctx, req.Params); err != nil {
+	//	return nil, err
+	//}
+
+	return &types.MsgUpdateParamsResponse{}, nil
 }

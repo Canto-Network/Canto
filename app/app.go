@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/cosmos/cosmos-sdk/x/auth/migrations/legacytx"
 	"github.com/cosmos/gogoproto/proto"
 	ibctm "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
 	"github.com/gorilla/mux"
@@ -349,6 +350,7 @@ func NewCanto(
 
 	enccodec.RegisterLegacyAminoCodec(legacyAmino)
 	enccodec.RegisterInterfaces(interfaceRegistry)
+	legacytx.RegressionTestingAminoCodec = legacyAmino
 
 	eip712.SetEncodingConfig(encodingConfig)
 
@@ -658,6 +660,7 @@ func NewCanto(
 		app.AccountKeeper,
 		app.ModuleAccountAddrs(),
 		authtypes.FeeCollectorName,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
 	app.InflationKeeper = inflationkeeper.NewKeeper(

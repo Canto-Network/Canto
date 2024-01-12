@@ -26,6 +26,10 @@ type Keeper struct {
 	paramSpace       paramstypes.Subspace
 	feeCollectorName string
 	blockedAddrs     map[string]bool
+
+	// the address capable of executing a MsgUpdateParams message. Typically, this
+	// should be the x/gov module account.
+	authority string
 }
 
 // NewKeeper returns a coinswap keeper. It handles:
@@ -40,6 +44,7 @@ func NewKeeper(
 	ak types.AccountKeeper,
 	blockedAddrs map[string]bool,
 	feeCollectorName string,
+	authority string,
 ) Keeper {
 	// ensure coinswap module account is set
 	if addr := ak.GetModuleAddress(types.ModuleName); addr == nil {
@@ -59,7 +64,13 @@ func NewKeeper(
 		paramSpace:       paramSpace,
 		blockedAddrs:     blockedAddrs,
 		feeCollectorName: feeCollectorName,
+		authority:        authority,
 	}
+}
+
+// GetAuthority returns the x/coinswap module's authority.
+func (k Keeper) GetAuthority() string {
+	return k.authority
 }
 
 // Logger returns a module-specific logger.
