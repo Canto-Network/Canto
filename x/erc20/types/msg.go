@@ -1,11 +1,15 @@
 package types
 
 import (
+	"fmt"
+	"strings"
+
 	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	erc20v1 "github.com/Canto-Network/Canto/v7/api/canto/erc20/v1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	ethermint "github.com/evmos/ethermint/types"
 	protov2 "google.golang.org/protobuf/proto"
 
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
@@ -130,4 +134,16 @@ func GetSignersFromMsgConvertERC20V2(msg protov2.Message) ([][]byte, error) {
 	}
 
 	return signers, nil
+}
+
+// ValidateErc20Denom checks if a denom is a valid erc20/
+// denomination
+func ValidateErc20Denom(denom string) error {
+	denomSplit := strings.SplitN(denom, "/", 2)
+
+	if len(denomSplit) != 2 || denomSplit[0] != ModuleName {
+		return fmt.Errorf("invalid denom. %s denomination should be prefixed with the format 'erc20/", denom)
+	}
+
+	return ethermint.ValidateAddress(denomSplit[1])
 }

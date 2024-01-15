@@ -19,9 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Msg_ConvertCoin_FullMethodName  = "/canto.erc20.v1.Msg/ConvertCoin"
-	Msg_ConvertERC20_FullMethodName = "/canto.erc20.v1.Msg/ConvertERC20"
-	Msg_UpdateParams_FullMethodName = "/canto.erc20.v1.Msg/UpdateParams"
+	Msg_ConvertCoin_FullMethodName                   = "/canto.erc20.v1.Msg/ConvertCoin"
+	Msg_ConvertERC20_FullMethodName                  = "/canto.erc20.v1.Msg/ConvertERC20"
+	Msg_UpdateParams_FullMethodName                  = "/canto.erc20.v1.Msg/UpdateParams"
+	Msg_RegisterCoinProposal_FullMethodName          = "/canto.erc20.v1.Msg/RegisterCoinProposal"
+	Msg_RegisterERC20Proposal_FullMethodName         = "/canto.erc20.v1.Msg/RegisterERC20Proposal"
+	Msg_ToggleTokenConversionProposal_FullMethodName = "/canto.erc20.v1.Msg/ToggleTokenConversionProposal"
 )
 
 // MsgClient is the client API for Msg service.
@@ -36,6 +39,15 @@ type MsgClient interface {
 	ConvertERC20(ctx context.Context, in *MsgConvertERC20, opts ...grpc.CallOption) (*MsgConvertERC20Response, error)
 	// UpdateParams updates the parameters of the x/erc20 module.
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
+	// RegisterCoinProposal defines a method to create a proposal to register a
+	// token pair for a native Cosmos coin.
+	RegisterCoinProposal(ctx context.Context, in *MsgRegisterCoinProposal, opts ...grpc.CallOption) (*MsgRegisterCoinProposalResponse, error)
+	// RegisterERC20Proposal defines a method to create a proposal to register a
+	// token pair for an ERC20 token.
+	RegisterERC20Proposal(ctx context.Context, in *MsgRegisterERC20Proposal, opts ...grpc.CallOption) (*MsgRegisterERC20ProposalResponse, error)
+	// ToggleTokenConversionProposal defines a method to create a proposal to
+	// toggle the conversion of a token pair.
+	ToggleTokenConversionProposal(ctx context.Context, in *MsgToggleTokenConversionProposal, opts ...grpc.CallOption) (*MsgToggleTokenConversionProposalResponse, error)
 }
 
 type msgClient struct {
@@ -73,6 +85,33 @@ func (c *msgClient) UpdateParams(ctx context.Context, in *MsgUpdateParams, opts 
 	return out, nil
 }
 
+func (c *msgClient) RegisterCoinProposal(ctx context.Context, in *MsgRegisterCoinProposal, opts ...grpc.CallOption) (*MsgRegisterCoinProposalResponse, error) {
+	out := new(MsgRegisterCoinProposalResponse)
+	err := c.cc.Invoke(ctx, Msg_RegisterCoinProposal_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) RegisterERC20Proposal(ctx context.Context, in *MsgRegisterERC20Proposal, opts ...grpc.CallOption) (*MsgRegisterERC20ProposalResponse, error) {
+	out := new(MsgRegisterERC20ProposalResponse)
+	err := c.cc.Invoke(ctx, Msg_RegisterERC20Proposal_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) ToggleTokenConversionProposal(ctx context.Context, in *MsgToggleTokenConversionProposal, opts ...grpc.CallOption) (*MsgToggleTokenConversionProposalResponse, error) {
+	out := new(MsgToggleTokenConversionProposalResponse)
+	err := c.cc.Invoke(ctx, Msg_ToggleTokenConversionProposal_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility
@@ -85,6 +124,15 @@ type MsgServer interface {
 	ConvertERC20(context.Context, *MsgConvertERC20) (*MsgConvertERC20Response, error)
 	// UpdateParams updates the parameters of the x/erc20 module.
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
+	// RegisterCoinProposal defines a method to create a proposal to register a
+	// token pair for a native Cosmos coin.
+	RegisterCoinProposal(context.Context, *MsgRegisterCoinProposal) (*MsgRegisterCoinProposalResponse, error)
+	// RegisterERC20Proposal defines a method to create a proposal to register a
+	// token pair for an ERC20 token.
+	RegisterERC20Proposal(context.Context, *MsgRegisterERC20Proposal) (*MsgRegisterERC20ProposalResponse, error)
+	// ToggleTokenConversionProposal defines a method to create a proposal to
+	// toggle the conversion of a token pair.
+	ToggleTokenConversionProposal(context.Context, *MsgToggleTokenConversionProposal) (*MsgToggleTokenConversionProposalResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }
 
@@ -100,6 +148,15 @@ func (UnimplementedMsgServer) ConvertERC20(context.Context, *MsgConvertERC20) (*
 }
 func (UnimplementedMsgServer) UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateParams not implemented")
+}
+func (UnimplementedMsgServer) RegisterCoinProposal(context.Context, *MsgRegisterCoinProposal) (*MsgRegisterCoinProposalResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterCoinProposal not implemented")
+}
+func (UnimplementedMsgServer) RegisterERC20Proposal(context.Context, *MsgRegisterERC20Proposal) (*MsgRegisterERC20ProposalResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterERC20Proposal not implemented")
+}
+func (UnimplementedMsgServer) ToggleTokenConversionProposal(context.Context, *MsgToggleTokenConversionProposal) (*MsgToggleTokenConversionProposalResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ToggleTokenConversionProposal not implemented")
 }
 func (UnimplementedMsgServer) mustEmbedUnimplementedMsgServer() {}
 
@@ -168,6 +225,60 @@ func _Msg_UpdateParams_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_RegisterCoinProposal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgRegisterCoinProposal)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).RegisterCoinProposal(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_RegisterCoinProposal_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).RegisterCoinProposal(ctx, req.(*MsgRegisterCoinProposal))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_RegisterERC20Proposal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgRegisterERC20Proposal)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).RegisterERC20Proposal(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_RegisterERC20Proposal_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).RegisterERC20Proposal(ctx, req.(*MsgRegisterERC20Proposal))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_ToggleTokenConversionProposal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgToggleTokenConversionProposal)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).ToggleTokenConversionProposal(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_ToggleTokenConversionProposal_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).ToggleTokenConversionProposal(ctx, req.(*MsgToggleTokenConversionProposal))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Msg_ServiceDesc is the grpc.ServiceDesc for Msg service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -186,6 +297,18 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateParams",
 			Handler:    _Msg_UpdateParams_Handler,
+		},
+		{
+			MethodName: "RegisterCoinProposal",
+			Handler:    _Msg_RegisterCoinProposal_Handler,
+		},
+		{
+			MethodName: "RegisterERC20Proposal",
+			Handler:    _Msg_RegisterERC20Proposal_Handler,
+		},
+		{
+			MethodName: "ToggleTokenConversionProposal",
+			Handler:    _Msg_ToggleTokenConversionProposal_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
