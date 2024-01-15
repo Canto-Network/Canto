@@ -681,6 +681,7 @@ func NewCanto(
 		app.AccountKeeper,
 		app.BankKeeper,
 		app.EvmKeeper,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
 	app.GovshuttleKeeper = govshuttlekeeper.NewKeeper(

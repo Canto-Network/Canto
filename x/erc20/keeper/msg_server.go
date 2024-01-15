@@ -8,6 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hashicorp/go-metrics"
 
@@ -523,4 +524,22 @@ func (k Keeper) convertCoinNativeERC20(
 	)
 
 	return &types.MsgConvertCoinResponse{}, nil
+}
+
+func (k Keeper) UpdateParams(goCtx context.Context, req *types.MsgUpdateParams) (*types.MsgUpdateParamsResponse, error) {
+	if k.GetAuthority() != req.Authority {
+		return nil, errorsmod.Wrapf(govtypes.ErrInvalidSigner, "invalid authority; expected %s, got %s", k.GetAuthority(), req.Authority)
+	}
+
+	if err := req.Params.Validate(); err != nil {
+		return nil, err
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	k.SetParams(ctx, req.Params)
+	//if err := k.SetParams(ctx, req.Params); err != nil {
+	//	return nil, err
+	//}
+
+	return &types.MsgUpdateParamsResponse{}, nil
 }

@@ -21,6 +21,10 @@ type Keeper struct {
 	accountKeeper types.AccountKeeper
 	bankKeeper    types.BankKeeper
 	evmKeeper     types.EVMKeeper
+
+	// the address capable of executing a MsgUpdateParams message. Typically, this
+	// should be the x/gov module account.
+	authority string
 }
 
 // NewKeeper creates new instances of the erc20 Keeper
@@ -31,6 +35,8 @@ func NewKeeper(
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
 	evmKeeper types.EVMKeeper,
+	authority string,
+
 ) Keeper {
 	// set KeyTable if it has not already been set
 	if !ps.HasKeyTable() {
@@ -44,7 +50,13 @@ func NewKeeper(
 		accountKeeper: ak,
 		bankKeeper:    bk,
 		evmKeeper:     evmKeeper,
+		authority:     authority,
 	}
+}
+
+// GetAuthority returns the x/erc20 module's authority.
+func (k Keeper) GetAuthority() string {
+	return k.authority
 }
 
 // Logger returns a module-specific logger.
