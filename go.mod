@@ -45,6 +45,8 @@ require (
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.5 // indirect
 	github.com/tklauser/numcpus v0.2.2 // indirect
+	golang.org/x/mod v0.14.0 // indirect
+	golang.org/x/tools v0.17.0 // indirect
 )
 
 require (
@@ -158,13 +160,13 @@ require (
 	github.com/tyler-smith/go-bip39 v1.1.0 // indirect
 	github.com/zondax/hid v0.9.0 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
-	golang.org/x/crypto v0.12.0 // indirect
+	golang.org/x/crypto v0.18.0 // indirect
 	golang.org/x/exp v0.0.0-20230811145659-89c5cff77bcb
-	golang.org/x/net v0.14.0 // indirect
-	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.11.0 // indirect
-	golang.org/x/term v0.11.0 // indirect
-	golang.org/x/text v0.12.0 // indirect
+	golang.org/x/net v0.20.0 // indirect
+	golang.org/x/sync v0.6.0 // indirect
+	golang.org/x/sys v0.16.0 // indirect
+	golang.org/x/term v0.16.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

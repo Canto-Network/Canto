@@ -152,7 +152,7 @@ func init() {
 		panic(err)
 	}
 
-	DefaultNodeHome = filepath.Join(userHomeDir, ".cantod")
+	DefaultNodeHome = filepath.Join(userHomeDir, ".razord")
 
 	// manually update the power reduction by replacing micro (u) -> atto (a) Canto
 	sdk.DefaultPowerReduction = ethermint.PowerReduction
@@ -162,7 +162,7 @@ func init() {
 }
 
 // Name defines the application binary name
-const Name = "cantod"
+const Name = "razord"
 
 var (
 	// DefaultNodeHome default home directories for the application daemon

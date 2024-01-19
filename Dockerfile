@@ -16,8 +16,8 @@ RUN apt-get install ca-certificates jq -y
 
 WORKDIR /root
 
-COPY --from=build-env /go/src/github.com/canto/canto/build/cantod /usr/bin/cantod
+COPY --from=build-env /go/src/github.com/canto/canto/build/razord /usr/bin/razord
 
 EXPOSE 26656 26657 1317 9090
 
-CMD ["cantod"]
+CMD ["razord"]

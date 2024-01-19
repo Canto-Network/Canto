@@ -27,8 +27,8 @@ COMMIT := $(shell git log -1 --format='%H')
 LEDGER_ENABLED ?= true
 GOPATH ?= $(shell $(GO) env GOPATH)
 BINDIR ?= $(GOPATH)/bin
-canto_BINARY = cantod
-canto_DIR = cantod
+canto_BINARY = razord
+canto_DIR = razord
 BUILDDIR ?= $(CURDIR)/build
 SIMAPP = ./app
 HTTPS_GIT := https://github.com/canto/canto.git
@@ -147,7 +147,7 @@ build-reproducible: go.sum
 	$(DOCKER) rm latest-build || true
 	$(DOCKER) run --volume=$(CURDIR):/sources:ro \
         --env TARGET_PLATFORMS='linux/amd64' \
-        --env APP=cantod \
+        --env APP=razord \
         --env VERSION=$(VERSION) \
         --env COMMIT=$(COMMIT) \
         --env CGO_ENABLED=1 \
@@ -167,7 +167,7 @@ build-docker:
 	$(DOCKER) create --name canto -t -i ${DOCKER_IMAGE}:latest canto
 	# move the binaries to the ./build directory
 	mkdir -p ./build/
-	$(DOCKER) cp canto:/usr/bin/cantod ./build/
+	$(DOCKER) cp canto:/usr/bin/razord ./build/
 
 push-docker: build-docker
 	$(DOCKER) push ${DOCKER_IMAGE}:${DOCKER_TAG}
@@ -561,13 +561,13 @@ ifeq ($(OS),Windows_NT)
 	mkdir localnet-setup &
 	@$(MAKE) localnet-build
 
-	IF not exist "build/node0/$(canto_BINARY)/config/genesis.json" docker run --rm -v $(CURDIR)/build\canto\Z cantod/node "./cantod testnet --v 4 -o /canto --keyring-backend=test --ip-addresses cantodnode0,cantodnode1,cantodnode2,cantodnode3"
+	IF not exist "build/node0/$(canto_BINARY)/config/genesis.json" docker run --rm -v $(CURDIR)/build\canto\Z razord/node "./razord testnet --v 4 -o /canto --keyring-backend=test --ip-addresses cantodnode0,cantodnode1,cantodnode2,cantodnode3"
 	docker-compose up -d
 else
 	mkdir -p localnet-setup
 	@$(MAKE) localnet-build
 
-	if ! [ -f localnet-setup/node0/$(canto_BINARY)/config/genesis.json ]; then docker run --rm -v $(CURDIR)/localnet-setup:/canto:Z cantod/node "./cantod testnet --v 4 -o /canto --keyring-backend=test --ip-addresses cantodnode0,cantodnode1,cantodnode2,cantodnode3"; fi
+	if ! [ -f localnet-setup/node0/$(canto_BINARY)/config/genesis.json ]; then docker run --rm -v $(CURDIR)/localnet-setup:/canto:Z razord/node "./razord testnet --v 4 -o /canto --keyring-backend=test --ip-addresses cantodnode0,cantodnode1,cantodnode2,cantodnode3"; fi
 	docker-compose up -d
 endif
 
@@ -584,15 +584,15 @@ localnet-clean:
 localnet-unsafe-reset:
 	docker-compose down
 ifeq ($(OS),Windows_NT)
-	@docker run --rm -v $(CURDIR)\localnet-setup\node0\cantod:canto\Z cantod/node "./cantod unsafe-reset-all --home=/canto"
-	@docker run --rm -v $(CURDIR)\localnet-setup\node1\cantod:canto\Z cantod/node "./cantod unsafe-reset-all --home=/canto"
-	@docker run --rm -v $(CURDIR)\localnet-setup\node2\cantod:canto\Z cantod/node "./cantod unsafe-reset-all --home=/canto"
-	@docker run --rm -v $(CURDIR)\localnet-setup\node3\cantod:canto\Z cantod/node "./cantod unsafe-reset-all --home=/canto"
+	@docker run --rm -v $(CURDIR)\localnet-setup\node0\razord:canto\Z razord/node "./razord unsafe-reset-all --home=/canto"
+	@docker run --rm -v $(CURDIR)\localnet-setup\node1\razord:canto\Z razord/node "./razord unsafe-reset-all --home=/canto"
+	@docker run --rm -v $(CURDIR)\localnet-setup\node2\razord:canto\Z razord/node "./razord unsafe-reset-all --home=/canto"
+	@docker run --rm -v $(CURDIR)\localnet-setup\node3\razord:canto\Z razord/node "./razord unsafe-reset-all --home=/canto"
 else
-	@docker run --rm -v $(CURDIR)/localnet-setup/node0/cantod:/canto:Z cantod/node "./cantod unsafe-reset-all --home=/canto"
-	@docker run --rm -v $(CURDIR)/localnet-setup/node1/cantod:/canto:Z cantod/node "./cantod unsafe-reset-all --home=/canto"
-	@docker run --rm -v $(CURDIR)/localnet-setup/node2/cantod:/canto:Z cantod/node "./cantod unsafe-reset-all --home=/canto"
-	@docker run --rm -v $(CURDIR)/localnet-setup/node3/cantod:/canto:Z cantod/node "./cantod unsafe-reset-all --home=/canto"
+	@docker run --rm -v $(CURDIR)/localnet-setup/node0/razord:/canto:Z razord/node "./razord unsafe-reset-all --home=/canto"
+	@docker run --rm -v $(CURDIR)/localnet-setup/node1/razord:/canto:Z razord/node "./razord unsafe-reset-all --home=/canto"
+	@docker run --rm -v $(CURDIR)/localnet-setup/node2/razord:/canto:Z razord/node "./razord unsafe-reset-all --home=/canto"
+	@docker run --rm -v $(CURDIR)/localnet-setup/node3/razord:/canto:Z razord/node "./razord unsafe-reset-all --home=/canto"
 endif
 
 # Clean testnet

@@ -23,29 +23,29 @@ RUN apt-get update &&\
 
 RUN snap install go --classic
 
-# builds out cantod
+# builds out razord
 RUN git clone https://github.com/Canto-Network/Canto-Testnet
-WORKDIR /Canto-Testnet/cmd/cantod
+WORKDIR /Canto-Testnet/cmd/razord
 RUN go install -tags ledger ./... &&\
-    mv $HOME/go/bin/cantod /usr/bin/
+    mv $HOME/go/bin/razord /usr/bin/
 
 # generate keys
-RUN cantod keys add $KEY_NAME
-    # cantod keys add $KEY_NAME --recover &&\
-    # cantod keys add $KEY_NAME --ledger 
+RUN razord keys add $KEY_NAME
+    # razord keys add $KEY_NAME --recover &&\
+    # razord keys add $KEY_NAME --ledger 
 
 # initialize node
-RUN cantod init $MONIKER --chain-id canto_9624-1
+RUN razord init $MONIKER --chain-id canto_9624-1
 
 # get genesis file
-RUN wget https://github.com/Canto-Network/Canto-Testnet-v2/raw/main/genesis.json -P $HOME/.cantod/config/
-RUN sed -i 's/minimum-gas-prices = ""/minimum-gas-prices = "0.0001acanto"/g' $HOME/.cantod/config/app.toml
-RUN wget https://github.com/Canto-Network/Canto-Testnet-v2/raw/main/Docker/cantod.service -P $HOME/systemd/system/
+RUN wget https://github.com/Canto-Network/Canto-Testnet-v2/raw/main/genesis.json -P $HOME/.razord/config/
+RUN sed -i 's/minimum-gas-prices = ""/minimum-gas-prices = "0.0001acanto"/g' $HOME/.razord/config/app.toml
+RUN wget https://github.com/Canto-Network/Canto-Testnet-v2/raw/main/Docker/razord.service -P $HOME/systemd/system/
 
-# run cantod
-WORKDIR /Canto-Testnet/cmd/cantod
+# run razord
+WORKDIR /Canto-Testnet/cmd/razord
 RUN sudo systemctl daemon-reload &&\
-    sudo systemctl enable cantod.service &&\
-    systemctl start cantod && journalctl -u cantod -f
+    sudo systemctl enable razord.service &&\
+    systemctl start razord && journalctl -u razord -f
 
 ENTRYPOINT ["/bin/bash"]

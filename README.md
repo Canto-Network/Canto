@@ -2,7 +2,7 @@
 
 **How to validate on the Canto Mainnet**
 
-*(canto_7700-1)*
+_(canto_7700-1)_
 
 > Genesis file [Published](https://github.com/Canto-Network/Canto/raw/main/Mainnet/genesis.json)
 > Peers list [Published](https://github.com/Canto-Network/Canto/blob/main/Mainnet/peers.txt)
@@ -10,20 +10,23 @@
 ## Hardware Requirements
 
 ### Minimum:
-* 16 GB RAM
-* 100 GB NVME SSD
-* 3.2 GHz x4 CPU
+
+- 16 GB RAM
+- 100 GB NVME SSD
+- 3.2 GHz x4 CPU
 
 ### Recommended:
-* 32 GB RAM
-* 500 GB NVME SSD
-* 4.2 GHz x6 CPU
+
+- 32 GB RAM
+- 500 GB NVME SSD
+- 4.2 GHz x6 CPU
 
 ### Operating System:
-* Linux (x86_64) or Linux (amd64)
-* Recommended Ubuntu or Arch Linux
 
-## Install dependencies 
+- Linux (x86_64) or Linux (amd64)
+- Recommended Ubuntu or Arch Linux
+
+## Install dependencies
 
 **If using Ubuntu:**
 
@@ -33,27 +36,27 @@ Install all dependencies:
 
 Or install individually:
 
-* go1.18+: `sudo snap install go --classic`
-* git: `sudo apt-get install git`
-* gcc: `sudo apt-get install gcc`
-* make: `sudo apt-get install make`
+- go1.18+: `sudo snap install go --classic`
+- git: `sudo apt-get install git`
+- gcc: `sudo apt-get install gcc`
+- make: `sudo apt-get install make`
 
 **If using Arch Linux:**
 
-* go1.18+: `pacman -S go`
-* git: `pacman -S git`
-* gcc: `pacman -S gcc`
-* make: `pacman -S make`
+- go1.18+: `pacman -S go`
+- git: `pacman -S git`
+- gcc: `pacman -S gcc`
+- make: `pacman -S make`
 
-## Install `cantod`
+## Install `razord`
 
 ### Clone git repository
 
 ```bash
 git clone https://github.com/Canto-Network/Canto.git
-cd Canto/cmd/cantod
+cd Canto/cmd/razord
 go install -tags ledger ./...
-sudo mv $HOME/go/bin/cantod /usr/bin/
+sudo mv $HOME/go/bin/razord /usr/bin/
 
 ```
 
@@ -61,9 +64,9 @@ sudo mv $HOME/go/bin/cantod /usr/bin/
 
 Replace `<keyname>` below with whatever you'd like to name your key.
 
-*  `cantod keys add <key_name>`
-*  `cantod keys add <key_name> --recover` to regenerate keys with your mnemonic
-*  `cantod keys add <key_name> --ledger` to generate keys with ledger device
+- `razord keys add <key_name>`
+- `razord keys add <key_name> --recover` to regenerate keys with your mnemonic
+- `razord keys add <key_name> --ledger` to generate keys with ledger device
 
 Store a backup of your keys and mnemonic securely offline.
 
@@ -82,36 +85,36 @@ You'll use this file later when creating your validator txn.
 
 ## Set up validator
 
-Install cantod binary from `Canto` directory: 
+Install razord binary from `Canto` directory:
 
 `sudo make install`
 
 Initialize the node. Replace `<moniker>` with whatever you'd like to name your validator.
 
-`cantod init <moniker> --chain-id canto_7700-1`
+`razord init <moniker> --chain-id canto_7700-1`
 
 If this runs successfully, it should dump a blob of JSON to the terminal.
 
-Download the Genesis file: 
+Download the Genesis file:
 
-`wget https://raw.githubusercontent.com/Canto-Network/Canto/genesis/Networks/Mainnet/genesis.json -P $HOME/.cantod/config/` 
+`wget https://raw.githubusercontent.com/Canto-Network/Canto/genesis/Networks/Mainnet/genesis.json -P $HOME/.razord/config/`
 
-> _**Note:** If you later get `Error: couldn't read GenesisDoc file: open /root/.cantod/config/genesis.json: no such file or directory` put the genesis.json file wherever it wants instead, such as:
-> 
-> `sudo wget https://github.com/Canto-Network/Canto/raw/main/Mainnet/genesis.json -P/root/.cantod/config/`
+> \_**Note:** If you later get `Error: couldn't read GenesisDoc file: open /root/.razord/config/genesis.json: no such file or directory` put the genesis.json file wherever it wants instead, such as:
+>
+> `sudo wget https://github.com/Canto-Network/Canto/raw/main/Mainnet/genesis.json -P/root/.razord/config/`
 
-Edit the minimum-gas-prices in `${HOME}/.cantod/config/app.toml`:
+Edit the minimum-gas-prices in `${HOME}/.razord/config/app.toml`:
 
-`sed -i 's/minimum-gas-prices = "0acanto"/minimum-gas-prices = "0.0001acanto"/g' $HOME/.cantod/config/app.toml`
+`sed -i 's/minimum-gas-prices = "0acanto"/minimum-gas-prices = "0.0001acanto"/g' $HOME/.razord/config/app.toml`
 
-Add persistent peers to `$HOME/.cantod/config/config.toml`:
-`sed -i 's/persistent_peers = ""/persistent_peers = "ec770ae4fd0fb4871b9a7c09f61764a0b010b293@164.90.134.106:26656"/g' $HOME/.cantod/config/config.toml`
+Add persistent peers to `$HOME/.razord/config/config.toml`:
+`sed -i 's/persistent_peers = ""/persistent_peers = "ec770ae4fd0fb4871b9a7c09f61764a0b010b293@164.90.134.106:26656"/g' $HOME/.razord/config/config.toml`
 
-### Set `cantod` to run automatically
+### Set `razord` to run automatically
 
-* Start `cantod` by creating a systemd service to run the node in the background: 
-* Edit the file: `sudo nano /etc/systemd/system/cantod.service`
-* Then copy and paste the following text into your service file. Be sure to edit as you see fit.
+- Start `razord` by creating a systemd service to run the node in the background:
+- Edit the file: `sudo nano /etc/systemd/system/razord.service`
+- Then copy and paste the following text into your service file. Be sure to edit as you see fit.
 
 ```bash
 
@@ -123,7 +126,7 @@ After=network.target
 Type=simple
 User=root
 WorkingDirectory=/root/
-ExecStart=/root/go/bin/cantod start --trace --log_level info --json-rpc.api eth,txpool,net,debug,web3 --api.enable
+ExecStart=/root/go/bin/razord start --trace --log_level info --json-rpc.api eth,txpool,net,debug,web3 --api.enable
 Restart=on-failure
 StartLimitInterval=0
 RestartSec=3
@@ -137,17 +140,17 @@ WantedBy=multi-user.target
 
 ## Start the node
 
-Reload the service files: 
+Reload the service files:
 
 `sudo systemctl daemon-reload`
 
-Create the symlinlk: 
+Create the symlinlk:
 
-`sudo systemctl enable cantod.service`
+`sudo systemctl enable razord.service`
 
-Start the node: 
+Start the node:
 
-`sudo systemctl start cantod && journalctl -u cantod -f`
+`sudo systemctl start razord && journalctl -u razord -f`
 
 You should then get several lines of log files and then see: `No addresses to dial. Falling back to seeds module=pex server=node`
 
@@ -166,7 +169,7 @@ Modify the following items below, removing the `<>`
 
 ```bash
 
-cantod tx staking create-validator \
+razord tx staking create-validator \
 --from <KEY_NAME> \
 --chain-id canto_7700-1 \
 --moniker="<VALIDATOR_NAME>" \
@@ -176,7 +179,7 @@ cantod tx staking create-validator \
 --details="<DESCRIPTION>" \
 --security-contact="<SECURITY_CONTACT_EMAIL>" \
 --website="<YOUR_WEBSITE>" \
---pubkey $(cantod tendermint show-validator) \
+--pubkey $(razord tendermint show-validator) \
 --min-self-delegation="1" \
 --amount <TOKEN_DELEGATION>acanto \
 --fees 20acanto
