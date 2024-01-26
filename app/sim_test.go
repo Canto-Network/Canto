@@ -67,7 +67,7 @@ func interBlockCacheOpt() func(app *baseapp.BaseApp) {
 
 func TestFullAppSimulation(t *testing.T) {
 	config := simcli.NewConfigFromFlags()
-	config.ChainID = "canto_9000-1"
+	config.ChainID = types.TestnetChainID + "-1"
 
 	db, dir, logger, skip, err := simtestutil.SetupSimulation(config, "leveldb-app-sim", "Simulation", simcli.FlagVerboseValue, simcli.FlagEnabledValue)
 	if skip {
@@ -83,9 +83,10 @@ func TestFullAppSimulation(t *testing.T) {
 	appOptions := make(simtestutil.AppOptionsMap, 0)
 	appOptions[flags.FlagHome] = DefaultNodeHome
 	appOptions[server.FlagInvCheckPeriod] = simcli.FlagPeriodValue
+	appOptions[flags.FlagChainID] = "canto_9000-1"
 
 	// TODO: shadowed
-	cantoApp := NewCanto(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, simcli.FlagPeriodValue, true, appOptions, fauxMerkleModeOpt)
+	cantoApp := NewCanto(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, simcli.FlagPeriodValue, true, appOptions, fauxMerkleModeOpt, baseapp.SetChainID(types.TestnetChainID+"-1"))
 	require.Equal(t, cantoconfig.AppName, cantoApp.Name())
 
 	// run randomized simulation

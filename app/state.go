@@ -9,7 +9,6 @@ import (
 	"time"
 
 	sdkmath "cosmossdk.io/math"
-	tmjson "github.com/cometbft/cometbft/libs/json"
 	tmtypes "github.com/cometbft/cometbft/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
@@ -19,6 +18,7 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	"github.com/evmos/ethermint/crypto/ethsecp256k1"
@@ -197,19 +197,8 @@ func AppStateRandomizedFn(
 
 // AppStateFromGenesisFileFn util function to generate the genesis AppState
 // from a genesis.json file.
-func AppStateFromGenesisFileFn(r io.Reader, cdc codec.JSONCodec, genesisFile string) (tmtypes.GenesisDoc, []simtypes.Account) {
-	bytes, err := os.ReadFile(genesisFile)
-	if err != nil {
-		panic(err)
-	}
-
-	var genesis tmtypes.GenesisDoc
-	if err := tmjson.Unmarshal(bytes, &genesis); err != nil {
-		panic(err)
-	}
-
-	var appState GenesisState
-	err = json.Unmarshal(genesis.AppState, &appState)
+func AppStateFromGenesisFileFn(r io.Reader, cdc codec.JSONCodec, genesisFile string) (*tmtypes.GenesisDoc, []simtypes.Account) {
+	appState, genDoc, err := genutiltypes.GenesisStateFromGenFile(genesisFile)
 	if err != nil {
 		panic(err)
 	}
@@ -244,5 +233,9 @@ func AppStateFromGenesisFileFn(r io.Reader, cdc codec.JSONCodec, genesisFile str
 		newAccs[i] = simAcc
 	}
 
-	return genesis, newAccs
+	tmtypesGenesis, err := genDoc.ToGenesisDoc()
+	if err != nil {
+		panic(err)
+	}
+	return tmtypesGenesis, newAccs
 }
