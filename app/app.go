@@ -991,28 +991,8 @@ func NewCanto(
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetPreBlocker(app.PreBlocker)
-
-	maxGasWanted := cast.ToUint64(appOpts.Get(srvflags.EVMMaxTxGasWanted))
-	options := ante.HandlerOptions{
-		AccountKeeper:   app.AccountKeeper,
-		BankKeeper:      app.BankKeeper,
-		EvmKeeper:       app.EvmKeeper,
-		FeegrantKeeper:  app.FeeGrantKeeper,
-		IBCKeeper:       app.IBCKeeper,
-		FeeMarketKeeper: app.FeeMarketKeeper,
-		SignModeHandler: txConfig.SignModeHandler(),
-		SigGasConsumer:  SigVerificationGasConsumer,
-		Cdc:             appCodec,
-		MaxTxGasWanted:  maxGasWanted,
-		Simulation:      simulation,
-	}
-
-	if err := options.Validate(); err != nil {
-		panic(err)
-	}
-
 	app.SetEndBlocker(app.EndBlocker)
-	app.setAnteHandler(txConfig, cast.ToUint64(appOpts.Get(srvflags.EVMMaxTxGasWanted)))
+	app.setAnteHandler(txConfig, cast.ToUint64(appOpts.Get(srvflags.EVMMaxTxGasWanted)), appCodec, simulation)
 	app.setupUpgradeHandlers()
 
 	// In v0.46, the SDK introduces _postHandlers_. PostHandlers are like
@@ -1064,7 +1044,7 @@ func NewCanto(
 }
 
 // use Canto's custom AnteHandler
-func (app *Canto) setAnteHandler(txConfig client.TxConfig, maxGasWanted uint64) {
+func (app *Canto) setAnteHandler(txConfig client.TxConfig, maxGasWanted uint64, cdc codec.BinaryCodec, simulation bool) {
 	anteHandler, err := ante.NewAnteHandler(
 		ante.HandlerOptions{
 			AccountKeeper:          app.AccountKeeper,
@@ -1081,6 +1061,8 @@ func (app *Canto) setAnteHandler(txConfig client.TxConfig, maxGasWanted uint64) 
 				sdk.MsgTypeURL(&evmtypes.MsgEthereumTx{}),
 				sdk.MsgTypeURL(&vestingtypes.MsgCreateVestingAccount{}),
 			},
+			Cdc:        cdc,
+			Simulation: simulation,
 		},
 	)
 	if err != nil {
