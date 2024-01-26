@@ -3,6 +3,7 @@ package keeper_test
 import (
 	"fmt"
 
+	"github.com/cosmos/cosmos-sdk/runtime"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/ethereum/go-ethereum/common"
@@ -92,7 +93,7 @@ func (suite *KeeperTestSuite) TestBalanceOf() {
 		mockEVMKeeper = &MockEVMKeeper{}
 		sp, found := suite.app.ParamsKeeper.GetSubspace(types.ModuleName)
 		suite.Require().True(found)
-		suite.app.Erc20Keeper = keeper.NewKeeper(suite.app.GetKey("erc20"), suite.app.AppCodec(), sp, suite.app.AccountKeeper, suite.app.BankKeeper, mockEVMKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
+		suite.app.Erc20Keeper = keeper.NewKeeper(runtime.NewKVStoreService(suite.app.GetKey("erc20")), suite.app.AppCodec(), sp, suite.app.AccountKeeper, suite.app.BankKeeper, mockEVMKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
 
 		tc.malleate()
 
@@ -279,7 +280,7 @@ func (suite *KeeperTestSuite) TestForceFail() {
 			mockEVMKeeper = &MockEVMKeeper{}
 			sp, found := suite.app.ParamsKeeper.GetSubspace(types.ModuleName)
 			suite.Require().True(found)
-			suite.app.Erc20Keeper = keeper.NewKeeper(suite.app.GetKey("erc20"), suite.app.AppCodec(), sp, suite.app.AccountKeeper, suite.app.BankKeeper, mockEVMKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
+			suite.app.Erc20Keeper = keeper.NewKeeper(runtime.NewKVStoreService(suite.app.GetKey("erc20")), suite.app.AppCodec(), sp, suite.app.AccountKeeper, suite.app.BankKeeper, mockEVMKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
 
 			tc.malleate()
 
@@ -367,7 +368,7 @@ func (suite *KeeperTestSuite) TestQueryERC20ForceFail() {
 		mockEVMKeeper = &MockEVMKeeper{}
 		sp, found := suite.app.ParamsKeeper.GetSubspace(types.ModuleName)
 		suite.Require().True(found)
-		suite.app.Erc20Keeper = keeper.NewKeeper(suite.app.GetKey("erc20"), suite.app.AppCodec(), sp, suite.app.AccountKeeper, suite.app.BankKeeper, mockEVMKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
+		suite.app.Erc20Keeper = keeper.NewKeeper(runtime.NewKVStoreService(suite.app.GetKey("erc20")), suite.app.AppCodec(), sp, suite.app.AccountKeeper, suite.app.BankKeeper, mockEVMKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
 
 		tc.malleate()
 

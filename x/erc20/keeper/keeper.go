@@ -3,8 +3,8 @@ package keeper
 import (
 	"fmt"
 
+	"cosmossdk.io/core/store"
 	"cosmossdk.io/log"
-	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
@@ -14,9 +14,9 @@ import (
 
 // Keeper of this module maintains collections of erc20.
 type Keeper struct {
-	storeKey   storetypes.StoreKey
-	cdc        codec.BinaryCodec
-	paramstore paramtypes.Subspace
+	storeService store.KVStoreService
+	cdc          codec.BinaryCodec
+	paramstore   paramtypes.Subspace
 
 	accountKeeper types.AccountKeeper
 	bankKeeper    types.BankKeeper
@@ -29,7 +29,7 @@ type Keeper struct {
 
 // NewKeeper creates new instances of the erc20 Keeper
 func NewKeeper(
-	storeKey storetypes.StoreKey,
+	storeService store.KVStoreService,
 	cdc codec.BinaryCodec,
 	ps paramtypes.Subspace,
 	ak types.AccountKeeper,
@@ -44,7 +44,7 @@ func NewKeeper(
 	}
 
 	return Keeper{
-		storeKey:      storeKey,
+		storeService:  storeService,
 		cdc:           cdc,
 		paramstore:    ps,
 		accountKeeper: ak,

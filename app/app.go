@@ -665,7 +665,7 @@ func NewCanto(
 	)
 
 	app.Erc20Keeper = erc20keeper.NewKeeper(
-		keys[erc20types.StoreKey],
+		runtime.NewKVStoreService(keys[erc20types.StoreKey]),
 		appCodec,
 		app.GetSubspace(erc20types.ModuleName),
 		app.AccountKeeper,
