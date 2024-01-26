@@ -6,6 +6,7 @@ import (
 
 	"cosmossdk.io/store/prefix"
 	"github.com/Canto-Network/Canto/v7/x/csr/types"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	ethermint "github.com/evmos/ethermint/types"
@@ -29,11 +30,12 @@ func (k Keeper) CSRs(c context.Context, request *types.QueryCSRsRequest) (*types
 	}
 
 	ctx := sdk.UnwrapSDKContext(c)
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixCSR)
+	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	prefixStore := prefix.NewStore(store, types.KeyPrefixCSR)
 
 	csrs := make([]types.CSR, 0)
 	pageRes, err := query.Paginate(
-		store,
+		prefixStore,
 		request.Pagination,
 		func(key, value []byte) error {
 			nft := BytesToUInt64(key)

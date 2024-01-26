@@ -3,8 +3,8 @@ package keeper
 import (
 	"fmt"
 
+	"cosmossdk.io/core/store"
 	"cosmossdk.io/log"
-	storetypes "cosmossdk.io/store/types"
 	"github.com/Canto-Network/Canto/v7/x/csr/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -13,9 +13,9 @@ import (
 
 type (
 	Keeper struct {
-		cdc        codec.BinaryCodec
-		storeKey   storetypes.StoreKey
-		paramstore paramtypes.Subspace
+		cdc          codec.BinaryCodec
+		storeService store.KVStoreService
+		paramstore   paramtypes.Subspace
 
 		accountKeeper    types.AccountKeeper
 		evmKeeper        types.EVMKeeper
@@ -26,7 +26,7 @@ type (
 
 func NewKeeper(
 	cdc codec.BinaryCodec,
-	storeKey storetypes.StoreKey,
+	storeService store.KVStoreService,
 	ps paramtypes.Subspace,
 	accountKeeper types.AccountKeeper,
 	evmKeeper types.EVMKeeper,
@@ -39,7 +39,7 @@ func NewKeeper(
 	}
 
 	return Keeper{
-		storeKey:         storeKey,
+		storeService:     storeService,
 		cdc:              cdc,
 		paramstore:       ps,
 		accountKeeper:    accountKeeper,
