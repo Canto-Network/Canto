@@ -251,7 +251,7 @@ func TestAppStateDeterminism(t *testing.T) {
 	appHashList := make([]json.RawMessage, numTimesToRunPerSeed)
 
 	// We will be overriding the random seed and just run a single simulation on the provided seed value
-	if config.Seed != simcli.DefaultSeedValue { // TODO(dudong2): check it
+	if config.Seed != simcli.DefaultSeedValue {
 		numSeeds = 1
 	}
 

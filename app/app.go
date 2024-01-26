@@ -74,6 +74,7 @@ import (
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	authzmodule "github.com/cosmos/cosmos-sdk/x/authz/module"
@@ -100,8 +101,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/group"
 	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
 	groupmodule "github.com/cosmos/cosmos-sdk/x/group/module"
-	// mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper" // TODO(dudong2): consider mint, vesting
-	// minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
@@ -181,6 +180,7 @@ import (
 	v5 "github.com/Canto-Network/Canto/v7/app/upgrades/v5"
 	v6 "github.com/Canto-Network/Canto/v7/app/upgrades/v6"
 	v7 "github.com/Canto-Network/Canto/v7/app/upgrades/v7"
+	v8 "github.com/Canto-Network/Canto/v7/app/upgrades/v8"
 )
 
 // Name defines the application binary name
@@ -236,11 +236,10 @@ type Canto struct {
 	memKeys map[string]*storetypes.MemoryStoreKey
 
 	// keepers
-	AccountKeeper  authkeeper.AccountKeeper
-	BankKeeper     bankkeeper.Keeper
-	StakingKeeper  *stakingkeeper.Keeper
-	SlashingKeeper slashingkeeper.Keeper
-	// MintKeeper            mintkeeper.Keeper
+	AccountKeeper         authkeeper.AccountKeeper
+	BankKeeper            bankkeeper.Keeper
+	StakingKeeper         *stakingkeeper.Keeper
+	SlashingKeeper        slashingkeeper.Keeper
 	DistrKeeper           distrkeeper.Keeper
 	GovKeeper             govkeeper.Keeper
 	CrisisKeeper          *crisiskeeper.Keeper
@@ -380,7 +379,7 @@ func NewCanto(
 	keys := storetypes.NewKVStoreKeys(
 		// SDK keys
 		authtypes.StoreKey, banktypes.StoreKey, stakingtypes.StoreKey, crisistypes.StoreKey,
-		/* minttypes.StoreKey, */ distrtypes.StoreKey, slashingtypes.StoreKey,
+		distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, consensusparamtypes.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
 		evidencetypes.StoreKey, circuittypes.StoreKey,
 		authzkeeper.StoreKey, nftkeeper.StoreKey, group.StoreKey,
@@ -483,15 +482,6 @@ func NewCanto(
 		authcodec.NewBech32Codec(sdk.GetConfig().GetBech32ValidatorAddrPrefix()),
 		authcodec.NewBech32Codec(sdk.GetConfig().GetBech32ConsensusAddrPrefix()),
 	)
-	// app.MintKeeper = mintkeeper.NewKeeper(
-	// 	appCodec,
-	// 	runtime.NewKVStoreService(keys[minttypes.StoreKey]),
-	// 	app.StakingKeeper,
-	// 	app.AccountKeeper,
-	// 	app.BankKeeper,
-	// 	authtypes.FeeCollectorName,
-	// 	authtypes.NewModuleAddress(govtypes.ModuleName).String(),
-	// )
 	app.DistrKeeper = distrkeeper.NewKeeper(
 		appCodec,
 		runtime.NewKVStoreService(keys[distrtypes.StoreKey]),
@@ -774,12 +764,10 @@ func NewCanto(
 			txConfig,
 		),
 		auth.NewAppModule(appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts, app.GetSubspace(authtypes.ModuleName)),
-		// vesting.NewAppModule(app.AccountKeeper, app.BankKeeper),
 		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper, app.GetSubspace(banktypes.ModuleName)),
 		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.GetSubspace(crisistypes.ModuleName)),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
 		gov.NewAppModule(appCodec, &app.GovKeeper, app.AccountKeeper, app.BankKeeper, app.GetSubspace(govtypes.ModuleName)),
-		// mint.NewAppModule(appCodec, app.MintKeeper, app.AccountKeeper, nil, app.GetSubspace(minttypes.ModuleName)),
 		slashing.NewAppModule(
 			appCodec,
 			app.SlashingKeeper,
@@ -854,7 +842,6 @@ func NewCanto(
 		distrtypes.ModuleName,
 		stakingtypes.ModuleName,
 		slashingtypes.ModuleName,
-		// minttypes.ModuleName,
 		ibcexported.ModuleName,
 		evmtypes.ModuleName,
 		feemarkettypes.ModuleName,
@@ -872,7 +859,6 @@ func NewCanto(
 		group.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
-		// vestingtypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		circuittypes.ModuleName,
 		crisistypes.ModuleName,
@@ -901,14 +887,12 @@ func NewCanto(
 		banktypes.ModuleName,
 		distrtypes.ModuleName,
 		slashingtypes.ModuleName,
-		// minttypes.ModuleName,
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		authz.ModuleName,
 		nft.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
-		// vestingtypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		circuittypes.ModuleName,
 		inflationtypes.ModuleName,
@@ -935,7 +919,6 @@ func NewCanto(
 		stakingtypes.ModuleName,
 		slashingtypes.ModuleName,
 		govtypes.ModuleName,
-		// minttypes.ModuleName,
 		ibcexported.ModuleName,
 		// evm module denomination is used by the feemarket module, in AnteHandle
 		evmtypes.ModuleName,
@@ -951,7 +934,6 @@ func NewCanto(
 		group.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
-		// vestingtypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		circuittypes.ModuleName,
 		// Canto modules
@@ -977,10 +959,6 @@ func NewCanto(
 	if err != nil {
 		panic(err)
 	}
-
-	// RegisterUpgradeHandlers is used for registering any on-chain upgrades.
-	// Make sure it's called after `app.mm` and `app.configurator` are set.
-	// app.RegisterUpgradeHandlers(app.appCodec, app.IBCKeeper.ClientKeeper, app.ConsensusParamsKeeper) // TODO(dudong2): consider it
 
 	autocliv1.RegisterQueryServer(app.GRPCQueryRouter(), runtimeservices.NewAutoCLIQueryService(app.ModuleManager.Modules))
 
@@ -1099,10 +1077,9 @@ func (app *Canto) setAnteHandler(txConfig client.TxConfig, maxGasWanted uint64) 
 			FeeMarketKeeper:        app.FeeMarketKeeper,
 			MaxTxGasWanted:         maxGasWanted,
 			ExtensionOptionChecker: ethermint.HasDynamicFeeExtensionOption,
-			// TxFeeChecker:           ethante.NewDynamicFeeChecker(app.EvmKeeper), // TODO(dudong2): consider it
 			DisabledAuthzMsgs: []string{
 				sdk.MsgTypeURL(&evmtypes.MsgEthereumTx{}),
-				// sdk.MsgTypeURL(&vestingtypes.MsgCreateVestingAccount{}),
+				sdk.MsgTypeURL(&vestingtypes.MsgCreateVestingAccount{}),
 			},
 		},
 	)
@@ -1444,6 +1421,12 @@ func (app *Canto) setupUpgradeHandlers() {
 		v7.CreateUpgradeHandler(app.ModuleManager, app.configurator, *app.OnboardingKeeper, app.CoinswapKeeper),
 	)
 
+	// v8 upgrade handler
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v8.UpgradeName,
+		v8.CreateUpgradeHandler(app.ModuleManager, app.configurator),
+	)
+
 	// When a planned update height is reached, the old binary will panic
 	// writing on disk the height and name of the update that triggered it
 	// This will read that value, and execute the preparations for the upgrade.
@@ -1478,7 +1461,8 @@ func (app *Canto) setupUpgradeHandlers() {
 		storeUpgrades = &storetypes.StoreUpgrades{
 			Added: []string{onboardingtypes.StoreKey, coinswaptypes.StoreKey},
 		}
-		// case v8.UpgradeName: // TODO(dudong2): maybe implement v8 upgrade
+	case v8.UpgradeName:
+		// no store upgrades in v8
 	}
 
 	if storeUpgrades != nil {
