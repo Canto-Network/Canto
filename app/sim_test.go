@@ -115,7 +115,9 @@ func TestFullAppSimulation(t *testing.T) {
 
 func TestAppImportExport(t *testing.T) {
 	config := simcli.NewConfigFromFlags()
-	config.ChainID = "canto_9000-1"
+	config.ChainID = types.TestnetChainID + "-1"
+
+	sdk.DefaultPowerReduction = sdkmath.NewIntFromUint64(1000000)
 
 	db, dir, logger, skip, err := simtestutil.SetupSimulation(config, "leveldb-app-sim", "Simulation", simcli.FlagVerboseValue, simcli.FlagEnabledValue)
 	if skip {
@@ -134,7 +136,7 @@ func TestAppImportExport(t *testing.T) {
 
 	sdk.DefaultPowerReduction = sdkmath.NewIntFromUint64(1000000)
 
-	app := NewCanto(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, simcli.FlagPeriodValue, true, appOptions, fauxMerkleModeOpt)
+	app := NewCanto(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, simcli.FlagPeriodValue, true, appOptions, fauxMerkleModeOpt, baseapp.SetChainID(types.TestnetChainID+"-1"))
 	require.Equal(t, cantoconfig.AppName, app.Name())
 
 	// run randomized simulation
@@ -174,7 +176,7 @@ func TestAppImportExport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(newDir))
 	}()
 
-	newApp := NewCanto(log.NewNopLogger(), newDB, nil, true, map[int64]bool{}, DefaultNodeHome, simcli.FlagPeriodValue, true, appOptions, fauxMerkleModeOpt)
+	newApp := NewCanto(log.NewNopLogger(), newDB, nil, true, map[int64]bool{}, DefaultNodeHome, simcli.FlagPeriodValue, true, appOptions, fauxMerkleModeOpt, baseapp.SetChainID(types.TestnetChainID+"-1"))
 	require.Equal(t, cantoconfig.AppName, newApp.Name())
 
 	var genesisState GenesisState
@@ -332,7 +334,7 @@ func TestAppStateDeterminism(t *testing.T) {
 
 func TestAppSimulationAfterImport(t *testing.T) {
 	config := simcli.NewConfigFromFlags()
-	config.ChainID = "canto_9000-1"
+	config.ChainID = types.TestnetChainID + "-1"
 
 	db, dir, logger, skip, err := simtestutil.SetupSimulation(config, "leveldb-app-sim", "Simulation", simcli.FlagVerboseValue, simcli.FlagEnabledValue)
 	if skip {
@@ -351,7 +353,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 
 	sdk.DefaultPowerReduction = sdkmath.NewIntFromUint64(1000000)
 
-	app := NewCanto(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, simcli.FlagPeriodValue, true, appOptions, fauxMerkleModeOpt)
+	app := NewCanto(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, simcli.FlagPeriodValue, true, appOptions, fauxMerkleModeOpt, baseapp.SetChainID(types.TestnetChainID+"-1"))
 	require.Equal(t, cantoconfig.AppName, app.Name())
 
 	// Run randomized simulation
