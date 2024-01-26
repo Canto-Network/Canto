@@ -675,7 +675,7 @@ func NewCanto(
 	)
 
 	app.GovshuttleKeeper = govshuttlekeeper.NewKeeper(
-		keys[govshuttletypes.StoreKey],
+		runtime.NewKVStoreService(keys[govshuttletypes.StoreKey]),
 		appCodec,
 		app.GetSubspace(govshuttletypes.ModuleName),
 		app.AccountKeeper,
