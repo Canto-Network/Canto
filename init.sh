@@ -16,8 +16,8 @@ rm -rf ~/.cantod*
 make install
 
 # Set client config
-cantod config keyring-backend $KEYRING
-cantod config chain-id $CHAINID
+cantod config set client chain-id $CHAINID
+cantod config set client keyring-backend $KEYRING
 
 # if $KEY exists it should be deleted
 cantod keys add $KEY --keyring-backend $KEYRING --algo $KEYALGO

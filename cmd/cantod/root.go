@@ -15,11 +15,14 @@ import (
 	tmcli "github.com/cometbft/cometbft/libs/cli"
 
 	"cosmossdk.io/log"
+	confixcmd "cosmossdk.io/tools/confix/cmd"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/client/pruning"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
+	"github.com/cosmos/cosmos-sdk/client/snapshot"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdkserver "github.com/cosmos/cosmos-sdk/server"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
@@ -118,6 +121,8 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	cfg := sdk.GetConfig()
 	cfg.Seal()
 
+	a := appCreator{encodingConfig}
+
 	rootCmd.AddCommand(
 		ethermintclient.ValidateChainID(
 			InitCmd(tempApp.BasicModuleManager, app.DefaultNodeHome),
@@ -141,9 +146,11 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		tmcli.NewCompletionCmd(rootCmd, true),
 		NewTestnetCmd(tempApp.BasicModuleManager, banktypes.GenesisBalancesIterator{}),
 		debug.Cmd(),
+		confixcmd.ConfigCommand(),
+		pruning.Cmd(a.newApp, app.DefaultNodeHome),
+		snapshot.Cmd(a.newApp),
 	)
 
-	a := appCreator{encodingConfig}
 	ethermintserver.AddCommands(rootCmd, app.DefaultNodeHome, a.newApp, a.appExport, addModuleInitFlags)
 
 	// add keybase, auxiliary RPC, query, and tx child commands

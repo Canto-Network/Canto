@@ -30,8 +30,8 @@ go build .\cmd\cantod
 @echo clear home folder
 del /s /q %HOME%
 
-cantod config keyring-backend %KEYRING%
-cantod config chain-id %CHAINID%
+cantod config set client chain-id %CHAINID%
+cantod config set client keyring-backend %KEYRING%
 
 cantod keys add %KEY% --keyring-backend %KEYRING% --algo %KEYALGO%
 
