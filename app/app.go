@@ -644,7 +644,7 @@ func NewCanto(
 	// Canto Keeper
 	app.CoinswapKeeper = coinswapkeeper.NewKeeper(
 		appCodec,
-		keys[coinswaptypes.ModuleName],
+		runtime.NewKVStoreService(keys[coinswaptypes.ModuleName]),
 		app.GetSubspace(coinswaptypes.ModuleName),
 		app.BankKeeper,
 		app.AccountKeeper,

@@ -8,6 +8,7 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/store/prefix"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 
@@ -68,7 +69,7 @@ func (k Keeper) LiquidityPools(c context.Context, req *types.QueryLiquidityPools
 
 	var pools []types.PoolInfo
 
-	store := ctx.KVStore(k.storeKey)
+	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	nftStore := prefix.NewStore(store, []byte(types.KeyPool))
 	pageRes, err := query.Paginate(nftStore, req.Pagination, func(key []byte, value []byte) error {
 		var pool types.Pool

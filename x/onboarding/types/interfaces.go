@@ -45,7 +45,7 @@ type Erc20Keeper interface {
 
 type CoinwapKeeper interface {
 	TradeInputForExactOutput(ctx sdk.Context, input coinswaptypes.Input, output coinswaptypes.Output) (sdkmath.Int, error)
-	GetStandardDenom(ctx sdk.Context) string
+	GetStandardDenom(ctx sdk.Context) (string, error)
 }
 
 // BankKeeper defines the banking keeper that must be fulfilled when

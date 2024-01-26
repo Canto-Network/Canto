@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strconv"
 
-	storetypes "cosmossdk.io/store/types"
 	gogotypes "github.com/gogo/protobuf/types"
 
+	"cosmossdk.io/core/store"
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/log"
 	sdkmath "cosmossdk.io/math"
@@ -20,7 +20,7 @@ import (
 // Keeper of the coinswap store
 type Keeper struct {
 	cdc              codec.BinaryCodec
-	storeKey         storetypes.StoreKey
+	storeService     store.KVStoreService
 	bk               types.BankKeeper
 	ak               types.AccountKeeper
 	paramSpace       paramstypes.Subspace
@@ -38,7 +38,7 @@ type Keeper struct {
 // - sending to and from ModuleAccounts
 func NewKeeper(
 	cdc codec.BinaryCodec,
-	key storetypes.StoreKey,
+	storeService store.KVStoreService,
 	paramSpace paramstypes.Subspace,
 	bk types.BankKeeper,
 	ak types.AccountKeeper,
@@ -57,7 +57,7 @@ func NewKeeper(
 	}
 
 	return Keeper{
-		storeKey:         key,
+		storeService:     storeService,
 		bk:               bk,
 		ak:               ak,
 		cdc:              cdc,
@@ -83,9 +83,12 @@ func (k Keeper) Swap(ctx sdk.Context, msg *types.MsgSwapOrder) error {
 	var amount sdkmath.Int
 	var err error
 
-	standardDenom := k.GetStandardDenom(ctx)
-	isDoubleSwap := (msg.Input.Coin.Denom != standardDenom) && (msg.Output.Coin.Denom != standardDenom)
+	standardDenom, err := k.GetStandardDenom(ctx)
+	if err != nil {
+		return err
+	}
 
+	isDoubleSwap := (msg.Input.Coin.Denom != standardDenom) && (msg.Output.Coin.Denom != standardDenom)
 	if isDoubleSwap {
 		return errorsmod.Wrapf(types.ErrNotContainStandardDenom, "unsupported swap: standard coin must be in either Input or Output")
 	}
@@ -114,14 +117,16 @@ func (k Keeper) Swap(ctx sdk.Context, msg *types.MsgSwapOrder) error {
 
 // AddLiquidity adds liquidity to the specified pool
 func (k Keeper) AddLiquidity(ctx sdk.Context, msg *types.MsgAddLiquidity) (sdk.Coin, error) {
-	standardDenom := k.GetStandardDenom(ctx)
+	standardDenom, err := k.GetStandardDenom(ctx)
+	if err != nil {
+		return sdk.Coin{}, err
+	}
 	if standardDenom == msg.MaxToken.Denom {
 		return sdk.Coin{}, errorsmod.Wrapf(types.ErrInvalidDenom,
 			"MaxToken: %s should not be StandardDenom", msg.MaxToken.String())
 	}
 
 	params := k.GetParams(ctx)
-
 	if !params.MaxSwapAmount.AmountOf(msg.MaxToken.Denom).IsPositive() {
 		return sdk.Coin{}, errorsmod.Wrapf(types.ErrInvalidDenom,
 			"MaxToken %s is not registered in max swap amount", msg.MaxToken.Denom)
@@ -246,7 +251,10 @@ func (k Keeper) addLiquidity(ctx sdk.Context,
 
 // RemoveLiquidity removes liquidity from the specified pool
 func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg *types.MsgRemoveLiquidity) (sdk.Coins, error) {
-	standardDenom := k.GetStandardDenom(ctx)
+	standardDenom, err := k.GetStandardDenom(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	pool, exists := k.GetPoolByLptDenom(ctx, msg.WithdrawLiquidity.Denom)
 	if !exists {
@@ -342,19 +350,26 @@ func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
 }
 
 // SetStandardDenom sets the standard denom for the coinswap module.
-func (k Keeper) SetStandardDenom(ctx sdk.Context, denom string) {
-	store := ctx.KVStore(k.storeKey)
+func (k Keeper) SetStandardDenom(ctx sdk.Context, denom string) error {
+	store := k.storeService.OpenKVStore(ctx)
 	denomWrap := gogotypes.StringValue{Value: denom}
 	bz := k.cdc.MustMarshal(&denomWrap)
-	store.Set(types.KeyStandardDenom, bz)
+	err := store.Set(types.KeyStandardDenom, bz)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // GetStandardDenom returns the standard denom of the coinswap module.
-func (k Keeper) GetStandardDenom(ctx sdk.Context) string {
-	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(types.KeyStandardDenom)
+func (k Keeper) GetStandardDenom(ctx sdk.Context) (string, error) {
+	store := k.storeService.OpenKVStore(ctx)
+	bz, err := store.Get(types.KeyStandardDenom)
+	if len(bz) == 0 {
+		return "", err
+	}
 
 	var denomWrap = gogotypes.StringValue{}
 	k.cdc.MustUnmarshal(bz, &denomWrap)
-	return denomWrap.Value
+	return denomWrap.Value, nil
 }

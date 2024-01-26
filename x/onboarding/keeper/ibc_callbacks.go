@@ -67,7 +67,10 @@ func (k Keeper) OnRecvPacket(
 		return ack
 	}
 
-	standardDenom := k.coinswapKeeper.GetStandardDenom(ctx)
+	standardDenom, err := k.coinswapKeeper.GetStandardDenom(ctx)
+	if err != nil {
+		return ack
+	}
 
 	var data transfertypes.FungibleTokenPacketData
 	if err = transfertypes.ModuleCdc.UnmarshalJSON(packet.GetData(), &data); err != nil {

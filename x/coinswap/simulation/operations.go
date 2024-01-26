@@ -92,10 +92,13 @@ func SimulateMsgAddLiquidity(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 			minLiquidity sdkmath.Int
 		)
 
-		standardDenom := k.GetStandardDenom(ctx)
+		standardDenom, err := k.GetStandardDenom(ctx)
+		if err != nil {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAddLiquidity, "failed to get standardDenom"), nil, nil
+		}
+
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
 		exactStandardAmt := simtypes.RandomAmount(r, spendable.AmountOf(standardDenom))
-
 		if !exactStandardAmt.IsPositive() {
 			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgAddLiquidity, "standardAmount should be positive"), nil, nil
 		}
@@ -206,10 +209,13 @@ func SimulateMsgSwapOrder(k keeper.Keeper, ak types.AccountKeeper, bk types.Bank
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		account := ak.GetAccount(ctx, simAccount.Address)
 		spendable := bk.SpendableCoins(ctx, account.GetAddress())
-		standardDenom := k.GetStandardDenom(ctx)
+		standardDenom, err := k.GetStandardDenom(ctx)
+		if err != nil {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgSwapOrder, "failed to get standardDenom"), nil, err
+		}
 
 		if spendable.IsZero() {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgSwapOrder, "spendable  is zero"), nil, err
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgSwapOrder, "spendable is zero"), nil, err
 		}
 
 		// sold coin
@@ -350,7 +356,10 @@ func SimulateMsgRemoveLiquidity(k keeper.Keeper, ak types.AccountKeeper, bk type
 	) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		account := ak.GetAccount(ctx, simAccount.Address)
-		standardDenom := k.GetStandardDenom(ctx)
+		standardDenom, err := k.GetStandardDenom(ctx)
+		if err != nil {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgSwapOrder, "failed to get standardDenom"), nil, err
+		}
 
 		var (
 			minToken          sdkmath.Int
@@ -469,7 +478,11 @@ func randBoolean(r *rand.Rand) bool {
 
 // Double swap bill
 func doubleSwapBill(inputCoin, outputCoin sdk.Coin, ctx sdk.Context, k keeper.Keeper) (sdk.Coin, sdk.Coin, error) {
-	standardDenom := k.GetStandardDenom(ctx)
+	standardDenom, err := k.GetStandardDenom(ctx)
+	if err != nil {
+		return sdk.Coin{}, sdk.Coin{}, err
+	}
+
 	param := k.GetParams(ctx)
 
 	// generate sold standard Coin
@@ -510,7 +523,10 @@ func singleSwapBill(inputCoin, outputCoin sdk.Coin, ctx sdk.Context, k keeper.Ke
 
 // Double swap sell orders
 func doubleSwapSellOrder(inputCoin, outputCoin sdk.Coin, ctx sdk.Context, k keeper.Keeper) (sdk.Coin, sdk.Coin, error) {
-	standardDenom := k.GetStandardDenom(ctx)
+	standardDenom, err := k.GetStandardDenom(ctx)
+	if err != nil {
+		return sdk.Coin{}, sdk.Coin{}, err
+	}
 
 	param := k.GetParams(ctx)
 

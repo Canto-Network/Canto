@@ -92,9 +92,12 @@ func (k Keeper) TradeExactInputForOutput(ctx sdk.Context, input types.Input, out
 		return sdkmath.ZeroInt(), err
 	}
 
-	standardDenom := k.GetStandardDenom(ctx)
-	var quoteCoinToSwap sdk.Coin
+	standardDenom, err := k.GetStandardDenom(ctx)
+	if err != nil {
+		return sdkmath.Int{}, err
+	}
 
+	var quoteCoinToSwap sdk.Coin
 	if boughtToken.Denom != standardDenom {
 		quoteCoinToSwap = boughtToken
 	} else {
@@ -184,9 +187,12 @@ func (k Keeper) TradeInputForExactOutput(ctx sdk.Context, input types.Input, out
 		return sdkmath.ZeroInt(), err
 	}
 
-	standardDenom := k.GetStandardDenom(ctx)
-	var quoteCoinToSwap sdk.Coin
+	standardDenom, err := k.GetStandardDenom(ctx)
+	if err != nil {
+		return sdkmath.Int{}, err
+	}
 
+	var quoteCoinToSwap sdk.Coin
 	if soldToken.Denom != standardDenom {
 		quoteCoinToSwap = soldToken
 	} else {
