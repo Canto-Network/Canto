@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/Canto-Network/Canto/v7/types"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 
@@ -244,7 +245,7 @@ func TestAppStateDeterminism(t *testing.T) {
 	config.ExportParamsPath = ""
 	config.OnOperation = false
 	config.AllInvariants = false
-	config.ChainID = "canto_9000-1"
+	config.ChainID = types.TestnetChainID + "-1"
 
 	numSeeds := config.NumBlocks / 10
 	numTimesToRunPerSeed := 2
@@ -265,6 +266,7 @@ func TestAppStateDeterminism(t *testing.T) {
 			appOptions.SetDefault(key, value)
 		}
 	}
+	appOptions.SetDefault(flags.FlagChainID, "canto_9000-1")
 	appOptions.SetDefault(flags.FlagHome, DefaultNodeHome)
 	appOptions.SetDefault(server.FlagInvCheckPeriod, simcli.FlagPeriodValue)
 	if simcli.FlagVerboseValue {
@@ -289,7 +291,7 @@ func TestAppStateDeterminism(t *testing.T) {
 			}
 
 			db := dbm.NewMemDB()
-			app := NewCanto(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, simcli.FlagPeriodValue, true, appOptions, fauxMerkleModeOpt)
+			app := NewCanto(logger, db, nil, true, map[int64]bool{}, DefaultNodeHome, simcli.FlagPeriodValue, true, appOptions, fauxMerkleModeOpt, baseapp.SetChainID(types.TestnetChainID+"-1"))
 
 			fmt.Printf(
 				"running non-determinism simulation; seed %d: %d/%d, attempt: %d/%d\n",
