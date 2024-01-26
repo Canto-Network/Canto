@@ -654,7 +654,7 @@ func NewCanto(
 	)
 
 	app.InflationKeeper = inflationkeeper.NewKeeper(
-		keys[inflationtypes.StoreKey],
+		runtime.NewKVStoreService(keys[inflationtypes.StoreKey]),
 		appCodec,
 		app.GetSubspace(inflationtypes.ModuleName),
 		app.AccountKeeper,

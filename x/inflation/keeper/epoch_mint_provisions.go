@@ -10,8 +10,8 @@ import (
 
 // GetEpochMintProvision gets the current EpochMintProvision
 func (k Keeper) GetEpochMintProvision(ctx sdk.Context) (sdkmath.LegacyDec, bool) {
-	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(types.KeyPrefixEpochMintProvision)
+	store := k.storeService.OpenKVStore(ctx)
+	bz, _ := store.Get(types.KeyPrefixEpochMintProvision)
 	if len(bz) == 0 {
 		return sdkmath.LegacyZeroDec(), false
 	}
@@ -32,6 +32,6 @@ func (k Keeper) SetEpochMintProvision(ctx sdk.Context, epochMintProvision sdkmat
 		panic(fmt.Errorf("unable to marshal amount value: %w", err))
 	}
 
-	store := ctx.KVStore(k.storeKey)
+	store := k.storeService.OpenKVStore(ctx)
 	store.Set(types.KeyPrefixEpochMintProvision, bz)
 }
