@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	"github.com/Canto-Network/Canto/v7/types"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
@@ -212,7 +213,8 @@ func TestAppImportExport(t *testing.T) {
 		feegrant.StoreKey:      {feegrant.FeeAllowanceQueueKeyPrefix},
 		slashingtypes.StoreKey: {slashingtypes.ValidatorMissedBlockBitmapKeyPrefix},
 		// In the case of epoch module, the value is updated when importing genesis, so the store consistency is broken
-		epochstypes.StoreKey: {epochstypes.KeyPrefixEpoch},
+		epochstypes.StoreKey:  {epochstypes.KeyPrefixEpoch},
+		upgradetypes.StoreKey: {[]byte{upgradetypes.VersionMapByte}},
 	}
 
 	storeKeys := app.GetStoreKeys()
@@ -226,9 +228,11 @@ func TestAppImportExport(t *testing.T) {
 
 		keyName := appKeyA.Name()
 		appKeyB := newApp.GetKey(keyName)
+		fmt.Println(appKeyA, appKeyB)
 
 		storeA := ctxA.KVStore(appKeyA)
 		storeB := ctxB.KVStore(appKeyB)
+		fmt.Println(storeA, storeB)
 
 		failedKVAs, failedKVBs := simtestutil.DiffKVStores(storeA, storeB, skipPrefixes[keyName])
 		require.Equal(t, len(failedKVAs), len(failedKVBs), "unequal sets of key-values to compare %s", keyName)
@@ -398,7 +402,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(newDir))
 	}()
 
-	newApp := NewCanto(log.NewNopLogger(), newDB, nil, true, map[int64]bool{}, DefaultNodeHome, simcli.FlagPeriodValue, true, appOptions, fauxMerkleModeOpt)
+	newApp := NewCanto(log.NewNopLogger(), newDB, nil, true, map[int64]bool{}, DefaultNodeHome, simcli.FlagPeriodValue, true, appOptions, fauxMerkleModeOpt, baseapp.SetChainID(types.TestnetChainID+"-1"))
 	require.Equal(t, cantoconfig.AppName, newApp.Name())
 
 	newApp.InitChain(&abci.RequestInitChain{
