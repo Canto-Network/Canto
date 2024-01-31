@@ -1406,7 +1406,11 @@ func (app *Canto) setupUpgradeHandlers() {
 	// v8 upgrade handler
 	app.UpgradeKeeper.SetUpgradeHandler(
 		v8.UpgradeName,
-		v8.CreateUpgradeHandler(app.ModuleManager, app.configurator),
+		v8.CreateUpgradeHandler(
+			app.ModuleManager,
+			app.ParamsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramstypes.ConsensusParamsKeyTable()),
+			app.ConsensusParamsKeeper.ParamsStore,
+			app.configurator),
 	)
 
 	// When a planned update height is reached, the old binary will panic
@@ -1445,6 +1449,9 @@ func (app *Canto) setupUpgradeHandlers() {
 		}
 	case v8.UpgradeName:
 		// no store upgrades in v8
+		storeUpgrades = &storetypes.StoreUpgrades{
+			Added: []string{crisistypes.StoreKey, circuittypes.StoreKey, consensusparamtypes.StoreKey, group.StoreKey, nft.StoreKey},
+		}
 	}
 
 	if storeUpgrades != nil {
