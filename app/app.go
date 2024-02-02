@@ -1515,7 +1515,10 @@ func setupLegacyKeyTables(k *paramskeeper.Keeper) {
 			keyTable = govv1.ParamKeyTable() //nolint:staticcheck
 		case crisistypes.ModuleName:
 			keyTable = crisistypes.ParamKeyTable() //nolint:staticcheck
-			// wasm
+		case evmtypes.ModuleName:
+			keyTable = evmtypes.ParamKeyTable() //nolint:staticcheck
+		case feemarkettypes.ModuleName:
+			keyTable = feemarkettypes.ParamKeyTable() //nolint:staticcheck
 		default:
 			continue
 		}
