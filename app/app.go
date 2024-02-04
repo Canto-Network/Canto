@@ -117,11 +117,13 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
 	"github.com/cosmos/ibc-go/modules/capability"
 	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
 	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
-
+	ibcfee "github.com/cosmos/ibc-go/v8/modules/apps/29-fee"
 	ibcfeekeeper "github.com/cosmos/ibc-go/v8/modules/apps/29-fee/keeper"
+	ibcfeetypes "github.com/cosmos/ibc-go/v8/modules/apps/29-fee/types"
 	"github.com/cosmos/ibc-go/v8/modules/apps/transfer"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
@@ -203,6 +205,7 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
+		ibcfeetypes.ModuleName:         nil,
 		evmtypes.ModuleName:            {authtypes.Minter, authtypes.Burner}, // used for secure addition and subtraction of balance using module account
 		inflationtypes.ModuleName:      {authtypes.Minter},
 		erc20types.ModuleName:          {authtypes.Minter, authtypes.Burner},
@@ -333,7 +336,7 @@ func NewCanto(
 		},
 	}
 
-	// evm/MsgEthereumTx, evm/MsgUpdateParams, feemarket/MsgUpdateParams
+	// evm/MsgEthereumTx, evm/MsgUpdateParams, feemarket/MsgUpdateParams, erc20/MsgConvertERC20
 	signingOptions.DefineCustomGetSigners(protov2.MessageName(&evmv1.MsgEthereumTx{}), evmtypes.GetSignersFromMsgEthereumTxV2)
 	signingOptions.DefineCustomGetSigners(protov2.MessageName(&evmv1.MsgUpdateParams{}), evmtypes.GetSignersFromMsgUpdateParamsV2)
 	signingOptions.DefineCustomGetSigners(protov2.MessageName(&feemarketv1.MsgUpdateParams{}), feemarkettypes.GetSignersFromMsgUpdateParamsV2)
@@ -390,7 +393,7 @@ func NewCanto(
 		evidencetypes.StoreKey, circuittypes.StoreKey,
 		authzkeeper.StoreKey, nftkeeper.StoreKey, group.StoreKey,
 		// ibc keys
-		ibcexported.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
+		ibcexported.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey, ibcfeetypes.StoreKey,
 		// ethermint keys
 		evmtypes.StoreKey, feemarkettypes.StoreKey,
 		// Canto keys
@@ -621,7 +624,19 @@ func NewCanto(
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
-	// Create Transfer Keepers
+	// IBC Fee Module keeper
+	app.IBCFeeKeeper = ibcfeekeeper.NewKeeper(
+		appCodec, keys[ibcfeetypes.StoreKey],
+		app.IBCKeeper.ChannelKeeper, // may be replaced with IBC middleware
+		app.IBCKeeper.ChannelKeeper,
+		app.IBCKeeper.PortKeeper, app.AccountKeeper, app.BankKeeper,
+	)
+
+	// Create IBC Router
+	ibcRouter := porttypes.NewRouter()
+
+	// Create Transfer Keeper and pass IBCFeeKeeper as expected Channel and PortKeeper
+	// since fee middleware will wrap the IBCKeeper for underlying application.
 	app.TransferKeeper = ibctransferkeeper.NewKeeper(
 		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName),
 		app.IBCFeeKeeper, // ISC4 Wrapper: fee IBC middleware
@@ -629,7 +644,6 @@ func NewCanto(
 		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
-	transferModule := transfer.NewAppModule(app.TransferKeeper)
 
 	// Create Ethermint keepers
 	feeMarketSs := app.GetSubspace(feemarkettypes.ModuleName)
@@ -717,14 +731,6 @@ func NewCanto(
 		),
 	)
 
-	// Create Transfer Stack
-
-	// SendPacket, since it is originating from the application to core IBC:
-	// transferKeeper.SendPacket -> onboarding.SendPacket -> channel.SendPacket
-
-	// RecvPacket, message that originates from core IBC and goes down to app, the flow is the otherway
-	// channel.RecvPacket -> onboarding.OnRecvPacket -> transfer.OnRecvPacket
-
 	app.OnboardingKeeper = onboardingkeeper.NewKeeper(
 		app.GetSubspace(onboardingtypes.ModuleName),
 		app.AccountKeeper,
@@ -740,19 +746,26 @@ func NewCanto(
 	app.OnboardingKeeper.SetICS4Wrapper(app.IBCKeeper.ChannelKeeper)
 	// NOTE: ICS4 wrapper for Transfer Keeper already set
 
+	// Create Transfer Stack
+	// SendPacket, since it is originating from the application to core IBC:
+	// transferKeeper.SendPacket -> onboarding.SendPacket -> channel.SendPacket
+
+	// RecvPacket, message that originates from core IBC and goes down to app, the flow is the otherway
+	// channel.RecvPacket -> onboarding.OnRecvPacket -> transfer.OnRecvPacket
+
 	// transfer stack contains (from top to bottom):
 	// - Onboarding Middleware
 	// - Transfer
 
 	// create IBC module from bottom to top of stack
 	var transferStack porttypes.IBCModule
-
 	transferStack = transfer.NewIBCModule(app.TransferKeeper)
 	transferStack = onboarding.NewIBCMiddleware(*app.OnboardingKeeper, transferStack)
 
-	// Create static IBC router, add transfer route, then set and seal it
-	ibcRouter := porttypes.NewRouter()
+	// Add transfer stack to IBC Router
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferStack)
+
+	// Seal the IBC Router
 	app.IBCKeeper.SetRouter(ibcRouter)
 
 	/****  Module Options ****/
@@ -796,7 +809,8 @@ func NewCanto(
 
 		// ibc modules
 		ibc.NewAppModule(app.IBCKeeper),
-		transferModule,
+		transfer.NewAppModule(app.TransferKeeper),
+		ibcfee.NewAppModule(app.IBCFeeKeeper),
 		capability.NewAppModule(appCodec, *app.CapabilityKeeper, false),
 		ibctm.NewAppModule(),
 
@@ -860,6 +874,7 @@ func NewCanto(
 		govtypes.ModuleName,
 		genutiltypes.ModuleName,
 		ibctransfertypes.ModuleName,
+		ibcfeetypes.ModuleName,
 		feegrant.ModuleName,
 		nft.ModuleName,
 		group.ModuleName,
@@ -888,6 +903,7 @@ func NewCanto(
 		stakingtypes.ModuleName,
 		ibcexported.ModuleName,
 		ibctransfertypes.ModuleName,
+		ibcfeetypes.ModuleName,
 		capabilitytypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
@@ -935,6 +951,7 @@ func NewCanto(
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		authz.ModuleName,
+		ibcfeetypes.ModuleName,
 		feegrant.ModuleName,
 		nft.ModuleName,
 		group.ModuleName,
