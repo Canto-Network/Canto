@@ -5,6 +5,8 @@ package types
 
 import (
 	fmt "fmt"
+	_ "github.com/cosmos/cosmos-proto"
+	types "github.com/cosmos/cosmos-sdk/x/bank/types"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	proto "github.com/cosmos/gogoproto/proto"
 	io "io"
@@ -130,36 +132,252 @@ func (m *TokenPair) GetContractOwner() Owner {
 	return OWNER_UNSPECIFIED
 }
 
+// RegisterCoinProposal is a gov Content type to register a token pair for a
+// native Cosmos coin.
+//
+// Deprecated: Do not use.
+type RegisterCoinProposal struct {
+	// title of the proposal
+	Title string `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	// proposal description
+	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	// metadata of the native Cosmos coin
+	Metadata types.Metadata `protobuf:"bytes,3,opt,name=metadata,proto3" json:"metadata"`
+}
+
+func (m *RegisterCoinProposal) Reset()         { *m = RegisterCoinProposal{} }
+func (m *RegisterCoinProposal) String() string { return proto.CompactTextString(m) }
+func (*RegisterCoinProposal) ProtoMessage()    {}
+func (*RegisterCoinProposal) Descriptor() ([]byte, []int) {
+	return fileDescriptor_5c364669f6882b8b, []int{1}
+}
+func (m *RegisterCoinProposal) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *RegisterCoinProposal) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_RegisterCoinProposal.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *RegisterCoinProposal) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RegisterCoinProposal.Merge(m, src)
+}
+func (m *RegisterCoinProposal) XXX_Size() int {
+	return m.Size()
+}
+func (m *RegisterCoinProposal) XXX_DiscardUnknown() {
+	xxx_messageInfo_RegisterCoinProposal.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RegisterCoinProposal proto.InternalMessageInfo
+
+func (m *RegisterCoinProposal) GetTitle() string {
+	if m != nil {
+		return m.Title
+	}
+	return ""
+}
+
+func (m *RegisterCoinProposal) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+func (m *RegisterCoinProposal) GetMetadata() types.Metadata {
+	if m != nil {
+		return m.Metadata
+	}
+	return types.Metadata{}
+}
+
+// RegisterERC20Proposal is a gov Content type to register a token pair for an
+// ERC20 token
+//
+// Deprecated: Do not use.
+type RegisterERC20Proposal struct {
+	// title of the proposa  string title = 1;
+	Title string `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	// proposal description
+	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	// contract address of ERC20 token
+	Erc20Address string `protobuf:"bytes,3,opt,name=erc20address,proto3" json:"erc20address,omitempty"`
+}
+
+func (m *RegisterERC20Proposal) Reset()         { *m = RegisterERC20Proposal{} }
+func (m *RegisterERC20Proposal) String() string { return proto.CompactTextString(m) }
+func (*RegisterERC20Proposal) ProtoMessage()    {}
+func (*RegisterERC20Proposal) Descriptor() ([]byte, []int) {
+	return fileDescriptor_5c364669f6882b8b, []int{2}
+}
+func (m *RegisterERC20Proposal) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *RegisterERC20Proposal) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_RegisterERC20Proposal.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *RegisterERC20Proposal) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RegisterERC20Proposal.Merge(m, src)
+}
+func (m *RegisterERC20Proposal) XXX_Size() int {
+	return m.Size()
+}
+func (m *RegisterERC20Proposal) XXX_DiscardUnknown() {
+	xxx_messageInfo_RegisterERC20Proposal.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RegisterERC20Proposal proto.InternalMessageInfo
+
+func (m *RegisterERC20Proposal) GetTitle() string {
+	if m != nil {
+		return m.Title
+	}
+	return ""
+}
+
+func (m *RegisterERC20Proposal) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+func (m *RegisterERC20Proposal) GetErc20Address() string {
+	if m != nil {
+		return m.Erc20Address
+	}
+	return ""
+}
+
+// ToggleTokenConversionProposal is a gov Content type to toggle the conversion
+// of a token pair.
+//
+// Deprecated: Do not use.
+type ToggleTokenConversionProposal struct {
+	// title of the proposal
+	Title string `protobuf:"bytes,1,opt,name=Title,proto3" json:"Title,omitempty"`
+	// proposal description
+	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	// token identifier can be either the hex contract address of the ERC20 or the
+	// Cosmos base denomination
+	Token string `protobuf:"bytes,3,opt,name=token,proto3" json:"token,omitempty"`
+}
+
+func (m *ToggleTokenConversionProposal) Reset()         { *m = ToggleTokenConversionProposal{} }
+func (m *ToggleTokenConversionProposal) String() string { return proto.CompactTextString(m) }
+func (*ToggleTokenConversionProposal) ProtoMessage()    {}
+func (*ToggleTokenConversionProposal) Descriptor() ([]byte, []int) {
+	return fileDescriptor_5c364669f6882b8b, []int{3}
+}
+func (m *ToggleTokenConversionProposal) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ToggleTokenConversionProposal) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ToggleTokenConversionProposal.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ToggleTokenConversionProposal) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ToggleTokenConversionProposal.Merge(m, src)
+}
+func (m *ToggleTokenConversionProposal) XXX_Size() int {
+	return m.Size()
+}
+func (m *ToggleTokenConversionProposal) XXX_DiscardUnknown() {
+	xxx_messageInfo_ToggleTokenConversionProposal.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ToggleTokenConversionProposal proto.InternalMessageInfo
+
+func (m *ToggleTokenConversionProposal) GetTitle() string {
+	if m != nil {
+		return m.Title
+	}
+	return ""
+}
+
+func (m *ToggleTokenConversionProposal) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+func (m *ToggleTokenConversionProposal) GetToken() string {
+	if m != nil {
+		return m.Token
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterEnum("canto.erc20.v1.Owner", Owner_name, Owner_value)
 	proto.RegisterType((*TokenPair)(nil), "canto.erc20.v1.TokenPair")
+	proto.RegisterType((*RegisterCoinProposal)(nil), "canto.erc20.v1.RegisterCoinProposal")
+	proto.RegisterType((*RegisterERC20Proposal)(nil), "canto.erc20.v1.RegisterERC20Proposal")
+	proto.RegisterType((*ToggleTokenConversionProposal)(nil), "canto.erc20.v1.ToggleTokenConversionProposal")
 }
 
 func init() { proto.RegisterFile("canto/erc20/v1/erc20.proto", fileDescriptor_5c364669f6882b8b) }
 
 var fileDescriptor_5c364669f6882b8b = []byte{
-	// 326 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x4a, 0x4e, 0xcc, 0x2b,
-	0xc9, 0xd7, 0x4f, 0x2d, 0x4a, 0x36, 0x32, 0xd0, 0x2f, 0x33, 0x84, 0x30, 0xf4, 0x0a, 0x8a, 0xf2,
-	0x4b, 0xf2, 0x85, 0xf8, 0xc0, 0x72, 0x7a, 0x10, 0xa1, 0x32, 0x43, 0x29, 0x91, 0xf4, 0xfc, 0xf4,
-	0x7c, 0xb0, 0x94, 0x3e, 0x88, 0x05, 0x51, 0xa5, 0xb4, 0x84, 0x91, 0x8b, 0x33, 0x24, 0x3f, 0x3b,
-	0x35, 0x2f, 0x20, 0x31, 0xb3, 0x48, 0x48, 0x99, 0x8b, 0x17, 0xac, 0x3e, 0x3e, 0x31, 0x25, 0xa5,
-	0x28, 0xb5, 0xb8, 0x58, 0x82, 0x51, 0x81, 0x51, 0x83, 0x33, 0x88, 0x07, 0x2c, 0xe8, 0x08, 0x11,
-	0x13, 0x12, 0xe1, 0x62, 0x4d, 0x49, 0xcd, 0xcb, 0xcf, 0x95, 0x60, 0x02, 0x4b, 0x42, 0x38, 0x42,
-	0x12, 0x5c, 0xec, 0xa9, 0x79, 0x89, 0x49, 0x39, 0xa9, 0x29, 0x12, 0xcc, 0x0a, 0x8c, 0x1a, 0x1c,
-	0x41, 0x30, 0xae, 0x90, 0x0d, 0x17, 0x5f, 0x72, 0x7e, 0x5e, 0x49, 0x51, 0x62, 0x72, 0x49, 0x7c,
-	0x7e, 0x79, 0x5e, 0x6a, 0x91, 0x04, 0x8b, 0x02, 0xa3, 0x06, 0x9f, 0x91, 0xa8, 0x1e, 0xaa, 0x0b,
-	0xf5, 0xfc, 0x41, 0x92, 0x41, 0xbc, 0x30, 0xc5, 0x60, 0xae, 0x15, 0xcb, 0x8b, 0x05, 0xf2, 0x8c,
-	0x5a, 0x5e, 0x5c, 0xac, 0x60, 0xae, 0x90, 0x28, 0x97, 0xa0, 0x7f, 0xb8, 0x9f, 0x6b, 0x50, 0x7c,
-	0xa8, 0x5f, 0x70, 0x80, 0xab, 0xb3, 0xa7, 0x9b, 0xa7, 0xab, 0x8b, 0x00, 0x83, 0x90, 0x00, 0x17,
-	0x0f, 0x44, 0xd8, 0xd7, 0xdf, 0x25, 0xd4, 0xc7, 0x55, 0x80, 0x51, 0x48, 0x88, 0x8b, 0x0f, 0x22,
-	0xe2, 0x1a, 0x11, 0xe2, 0x1a, 0xe4, 0xe7, 0xe8, 0x23, 0xc0, 0x24, 0xc5, 0xd2, 0xb1, 0x58, 0x8e,
-	0xc1, 0xc9, 0xf3, 0xc4, 0x23, 0x39, 0xc6, 0x0b, 0x8f, 0xe4, 0x18, 0x1f, 0x3c, 0x92, 0x63, 0x9c,
-	0xf0, 0x58, 0x8e, 0xe1, 0xc2, 0x63, 0x39, 0x86, 0x1b, 0x8f, 0xe5, 0x18, 0xa2, 0xf4, 0xd3, 0x33,
-	0x4b, 0x32, 0x4a, 0x93, 0xf4, 0x92, 0xf3, 0x73, 0xf5, 0x9d, 0x41, 0x6e, 0xd3, 0xf5, 0x4b, 0x2d,
-	0x29, 0xcf, 0x2f, 0xca, 0x86, 0xf0, 0xf4, 0xcb, 0xcc, 0xf5, 0x2b, 0xa0, 0x81, 0x5d, 0x52, 0x59,
-	0x90, 0x5a, 0x9c, 0xc4, 0x06, 0x0e, 0x44, 0x63, 0x40, 0x00, 0x00, 0x00, 0xff, 0xff, 0x53, 0x14,
-	0x1c, 0x4b, 0x88, 0x01, 0x00, 0x00,
+	// 512 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x93, 0x31, 0x6b, 0xdb, 0x40,
+	0x14, 0xc7, 0x75, 0x89, 0x93, 0x26, 0x97, 0xc4, 0xb8, 0x87, 0x0d, 0xaa, 0x21, 0xb2, 0x71, 0x17,
+	0x53, 0xa8, 0x14, 0xbb, 0x43, 0x21, 0x14, 0x4a, 0xe2, 0xa8, 0xe0, 0x92, 0xd8, 0x46, 0x75, 0x68,
+	0xe9, 0x62, 0xce, 0xd2, 0xa1, 0x0a, 0xdb, 0xf7, 0xcc, 0xe9, 0xa2, 0xb4, 0xf4, 0x0b, 0x74, 0xec,
+	0xd6, 0x35, 0xd0, 0x7e, 0x98, 0x8c, 0x19, 0x3b, 0x95, 0x62, 0x2f, 0xf9, 0x18, 0x45, 0x77, 0x52,
+	0x70, 0xb6, 0x42, 0xb6, 0xfb, 0xff, 0xff, 0x4f, 0x7a, 0x3f, 0xbd, 0x77, 0xc2, 0x55, 0x9f, 0x72,
+	0x09, 0x0e, 0x13, 0x7e, 0xfb, 0xc0, 0x49, 0x5a, 0xfa, 0x60, 0xcf, 0x05, 0x48, 0x20, 0x45, 0x95,
+	0xd9, 0xda, 0x4a, 0x5a, 0xd5, 0x72, 0x08, 0x21, 0xa8, 0xc8, 0x49, 0x4f, 0xba, 0xaa, 0xfa, 0xc4,
+	0x87, 0x78, 0x06, 0xf1, 0x48, 0x07, 0x5a, 0x64, 0x91, 0xa5, 0x95, 0x33, 0xa6, 0x7c, 0xe2, 0x24,
+	0xad, 0x31, 0x93, 0xb4, 0xa5, 0x84, 0xce, 0x1b, 0xbf, 0x10, 0xde, 0x1e, 0xc2, 0x84, 0xf1, 0x01,
+	0x8d, 0x04, 0x79, 0x8a, 0xf7, 0x54, 0xab, 0x11, 0x0d, 0x02, 0xc1, 0xe2, 0xd8, 0x44, 0x75, 0xd4,
+	0xdc, 0xf6, 0x76, 0x95, 0x79, 0xa4, 0x3d, 0x52, 0xc6, 0x1b, 0x01, 0xe3, 0x30, 0x33, 0xd7, 0x54,
+	0xa8, 0x05, 0x31, 0xf1, 0x23, 0xc6, 0xe9, 0x78, 0xca, 0x02, 0x73, 0xbd, 0x8e, 0x9a, 0x5b, 0x5e,
+	0x2e, 0xc9, 0x2b, 0x5c, 0xf4, 0x81, 0x4b, 0x41, 0x7d, 0x39, 0x82, 0x4b, 0xce, 0x84, 0x59, 0xa8,
+	0xa3, 0x66, 0xb1, 0x5d, 0xb1, 0xef, 0x7f, 0x9c, 0xdd, 0x4f, 0x43, 0x6f, 0x2f, 0x2f, 0x56, 0xf2,
+	0xb0, 0x70, 0x7b, 0x55, 0x43, 0x8d, 0x1f, 0x08, 0x97, 0x3d, 0x16, 0x46, 0xb1, 0x64, 0xa2, 0x03,
+	0x11, 0x1f, 0x08, 0x98, 0x43, 0x4c, 0xa7, 0x29, 0x8c, 0x8c, 0xe4, 0x94, 0x65, 0xa4, 0x5a, 0x90,
+	0x3a, 0xde, 0x09, 0x58, 0xec, 0x8b, 0x68, 0x2e, 0x23, 0xe0, 0x19, 0xe8, 0xaa, 0x45, 0x5e, 0xe3,
+	0xad, 0x19, 0x93, 0x34, 0xa0, 0x92, 0x2a, 0xde, 0x9d, 0xf6, 0xbe, 0x9d, 0x0d, 0x4e, 0x4d, 0x27,
+	0x1b, 0x95, 0x7d, 0x96, 0x15, 0x1d, 0x17, 0xae, 0xff, 0xd4, 0x0c, 0xef, 0xee, 0xa1, 0xc3, 0xcd,
+	0xdb, 0xab, 0x9a, 0x61, 0xa2, 0xc6, 0x57, 0x5c, 0xc9, 0xc1, 0x5c, 0xaf, 0xd3, 0x3e, 0x78, 0x30,
+	0x59, 0x03, 0xeb, 0x71, 0xe7, 0x2b, 0x58, 0x5f, 0x59, 0x41, 0xe6, 0xdd, 0x35, 0xbf, 0xc0, 0xfb,
+	0x43, 0x08, 0xc3, 0x29, 0x53, 0x2b, 0xec, 0x00, 0x4f, 0x98, 0x88, 0x23, 0xb8, 0x37, 0x9e, 0xe1,
+	0x2a, 0xc4, 0xf0, 0x3f, 0x21, 0x52, 0xf8, 0xf4, 0x95, 0x59, 0x77, 0x2d, 0xf2, 0xb6, 0xcf, 0xde,
+	0xe2, 0x0d, 0xb5, 0x1c, 0x52, 0xc1, 0x8f, 0xfb, 0xef, 0x7b, 0xae, 0x37, 0x3a, 0xef, 0xbd, 0x1b,
+	0xb8, 0x9d, 0xee, 0x9b, 0xae, 0x7b, 0x52, 0x32, 0x48, 0x09, 0xef, 0x6a, 0xfb, 0xac, 0x7f, 0x72,
+	0x7e, 0xea, 0x96, 0x10, 0x21, 0xb8, 0xa8, 0x1d, 0xf7, 0xc3, 0xd0, 0xf5, 0x7a, 0x47, 0xa7, 0xa5,
+	0xb5, 0x6a, 0xe1, 0xdb, 0x4f, 0xcb, 0x38, 0xee, 0x5e, 0x2f, 0x2c, 0x74, 0xb3, 0xb0, 0xd0, 0xdf,
+	0x85, 0x85, 0xbe, 0x2f, 0x2d, 0xe3, 0x66, 0x69, 0x19, 0xbf, 0x97, 0x96, 0xf1, 0xd1, 0x09, 0x23,
+	0xf9, 0xe9, 0x62, 0x6c, 0xfb, 0x30, 0x73, 0x3a, 0xe9, 0x4d, 0x79, 0xde, 0x63, 0xf2, 0x12, 0xc4,
+	0x44, 0x2b, 0x27, 0x79, 0xe9, 0x7c, 0xce, 0xfe, 0x1a, 0xf9, 0x65, 0xce, 0xe2, 0xf1, 0xa6, 0xba,
+	0xd2, 0x2f, 0xfe, 0x05, 0x00, 0x00, 0xff, 0xff, 0xeb, 0x27, 0x63, 0x4b, 0x51, 0x03, 0x00, 0x00,
 }
 
 func (this *TokenPair) Equal(that interface{}) bool {
@@ -247,6 +465,141 @@ func (m *TokenPair) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *RegisterCoinProposal) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RegisterCoinProposal) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *RegisterCoinProposal) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size, err := m.Metadata.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintErc20(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x1a
+	if len(m.Description) > 0 {
+		i -= len(m.Description)
+		copy(dAtA[i:], m.Description)
+		i = encodeVarintErc20(dAtA, i, uint64(len(m.Description)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Title) > 0 {
+		i -= len(m.Title)
+		copy(dAtA[i:], m.Title)
+		i = encodeVarintErc20(dAtA, i, uint64(len(m.Title)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *RegisterERC20Proposal) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RegisterERC20Proposal) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *RegisterERC20Proposal) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Erc20Address) > 0 {
+		i -= len(m.Erc20Address)
+		copy(dAtA[i:], m.Erc20Address)
+		i = encodeVarintErc20(dAtA, i, uint64(len(m.Erc20Address)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Description) > 0 {
+		i -= len(m.Description)
+		copy(dAtA[i:], m.Description)
+		i = encodeVarintErc20(dAtA, i, uint64(len(m.Description)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Title) > 0 {
+		i -= len(m.Title)
+		copy(dAtA[i:], m.Title)
+		i = encodeVarintErc20(dAtA, i, uint64(len(m.Title)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ToggleTokenConversionProposal) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ToggleTokenConversionProposal) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ToggleTokenConversionProposal) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Token) > 0 {
+		i -= len(m.Token)
+		copy(dAtA[i:], m.Token)
+		i = encodeVarintErc20(dAtA, i, uint64(len(m.Token)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Description) > 0 {
+		i -= len(m.Description)
+		copy(dAtA[i:], m.Description)
+		i = encodeVarintErc20(dAtA, i, uint64(len(m.Description)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Title) > 0 {
+		i -= len(m.Title)
+		copy(dAtA[i:], m.Title)
+		i = encodeVarintErc20(dAtA, i, uint64(len(m.Title)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintErc20(dAtA []byte, offset int, v uint64) int {
 	offset -= sovErc20(v)
 	base := offset
@@ -277,6 +630,67 @@ func (m *TokenPair) Size() (n int) {
 	}
 	if m.ContractOwner != 0 {
 		n += 1 + sovErc20(uint64(m.ContractOwner))
+	}
+	return n
+}
+
+func (m *RegisterCoinProposal) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Title)
+	if l > 0 {
+		n += 1 + l + sovErc20(uint64(l))
+	}
+	l = len(m.Description)
+	if l > 0 {
+		n += 1 + l + sovErc20(uint64(l))
+	}
+	l = m.Metadata.Size()
+	n += 1 + l + sovErc20(uint64(l))
+	return n
+}
+
+func (m *RegisterERC20Proposal) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Title)
+	if l > 0 {
+		n += 1 + l + sovErc20(uint64(l))
+	}
+	l = len(m.Description)
+	if l > 0 {
+		n += 1 + l + sovErc20(uint64(l))
+	}
+	l = len(m.Erc20Address)
+	if l > 0 {
+		n += 1 + l + sovErc20(uint64(l))
+	}
+	return n
+}
+
+func (m *ToggleTokenConversionProposal) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Title)
+	if l > 0 {
+		n += 1 + l + sovErc20(uint64(l))
+	}
+	l = len(m.Description)
+	if l > 0 {
+		n += 1 + l + sovErc20(uint64(l))
+	}
+	l = len(m.Token)
+	if l > 0 {
+		n += 1 + l + sovErc20(uint64(l))
 	}
 	return n
 }
@@ -419,6 +833,445 @@ func (m *TokenPair) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipErc20(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthErc20
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RegisterCoinProposal) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowErc20
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RegisterCoinProposal: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RegisterCoinProposal: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Title", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowErc20
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthErc20
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthErc20
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Title = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowErc20
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthErc20
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthErc20
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Description = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Metadata", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowErc20
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthErc20
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthErc20
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Metadata.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipErc20(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthErc20
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RegisterERC20Proposal) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowErc20
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RegisterERC20Proposal: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RegisterERC20Proposal: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Title", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowErc20
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthErc20
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthErc20
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Title = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowErc20
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthErc20
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthErc20
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Description = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Erc20Address", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowErc20
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthErc20
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthErc20
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Erc20Address = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipErc20(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthErc20
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ToggleTokenConversionProposal) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowErc20
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ToggleTokenConversionProposal: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ToggleTokenConversionProposal: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Title", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowErc20
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthErc20
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthErc20
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Title = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowErc20
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthErc20
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthErc20
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Description = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Token", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowErc20
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthErc20
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthErc20
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Token = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipErc20(dAtA[iNdEx:])

@@ -41,13 +41,13 @@ type MsgClient interface {
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
 	// RegisterCoinProposal defines a method to create a proposal to register a
 	// token pair for a native Cosmos coin.
-	RegisterCoinProposal(ctx context.Context, in *MsgRegisterCoinProposal, opts ...grpc.CallOption) (*MsgRegisterCoinProposalResponse, error)
+	RegisterCoinProposal(ctx context.Context, in *MsgRegisterCoin, opts ...grpc.CallOption) (*MsgRegisterCoinResponse, error)
 	// RegisterERC20Proposal defines a method to create a proposal to register a
 	// token pair for an ERC20 token.
-	RegisterERC20Proposal(ctx context.Context, in *MsgRegisterERC20Proposal, opts ...grpc.CallOption) (*MsgRegisterERC20ProposalResponse, error)
+	RegisterERC20Proposal(ctx context.Context, in *MsgRegisterERC20, opts ...grpc.CallOption) (*MsgRegisterERC20Response, error)
 	// ToggleTokenConversionProposal defines a method to create a proposal to
 	// toggle the conversion of a token pair.
-	ToggleTokenConversionProposal(ctx context.Context, in *MsgToggleTokenConversionProposal, opts ...grpc.CallOption) (*MsgToggleTokenConversionProposalResponse, error)
+	ToggleTokenConversionProposal(ctx context.Context, in *MsgToggleTokenConversion, opts ...grpc.CallOption) (*MsgToggleTokenConversionResponse, error)
 }
 
 type msgClient struct {
@@ -85,8 +85,8 @@ func (c *msgClient) UpdateParams(ctx context.Context, in *MsgUpdateParams, opts 
 	return out, nil
 }
 
-func (c *msgClient) RegisterCoinProposal(ctx context.Context, in *MsgRegisterCoinProposal, opts ...grpc.CallOption) (*MsgRegisterCoinProposalResponse, error) {
-	out := new(MsgRegisterCoinProposalResponse)
+func (c *msgClient) RegisterCoinProposal(ctx context.Context, in *MsgRegisterCoin, opts ...grpc.CallOption) (*MsgRegisterCoinResponse, error) {
+	out := new(MsgRegisterCoinResponse)
 	err := c.cc.Invoke(ctx, Msg_RegisterCoinProposal_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -94,8 +94,8 @@ func (c *msgClient) RegisterCoinProposal(ctx context.Context, in *MsgRegisterCoi
 	return out, nil
 }
 
-func (c *msgClient) RegisterERC20Proposal(ctx context.Context, in *MsgRegisterERC20Proposal, opts ...grpc.CallOption) (*MsgRegisterERC20ProposalResponse, error) {
-	out := new(MsgRegisterERC20ProposalResponse)
+func (c *msgClient) RegisterERC20Proposal(ctx context.Context, in *MsgRegisterERC20, opts ...grpc.CallOption) (*MsgRegisterERC20Response, error) {
+	out := new(MsgRegisterERC20Response)
 	err := c.cc.Invoke(ctx, Msg_RegisterERC20Proposal_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -103,8 +103,8 @@ func (c *msgClient) RegisterERC20Proposal(ctx context.Context, in *MsgRegisterER
 	return out, nil
 }
 
-func (c *msgClient) ToggleTokenConversionProposal(ctx context.Context, in *MsgToggleTokenConversionProposal, opts ...grpc.CallOption) (*MsgToggleTokenConversionProposalResponse, error) {
-	out := new(MsgToggleTokenConversionProposalResponse)
+func (c *msgClient) ToggleTokenConversionProposal(ctx context.Context, in *MsgToggleTokenConversion, opts ...grpc.CallOption) (*MsgToggleTokenConversionResponse, error) {
+	out := new(MsgToggleTokenConversionResponse)
 	err := c.cc.Invoke(ctx, Msg_ToggleTokenConversionProposal_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -126,13 +126,13 @@ type MsgServer interface {
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
 	// RegisterCoinProposal defines a method to create a proposal to register a
 	// token pair for a native Cosmos coin.
-	RegisterCoinProposal(context.Context, *MsgRegisterCoinProposal) (*MsgRegisterCoinProposalResponse, error)
+	RegisterCoinProposal(context.Context, *MsgRegisterCoin) (*MsgRegisterCoinResponse, error)
 	// RegisterERC20Proposal defines a method to create a proposal to register a
 	// token pair for an ERC20 token.
-	RegisterERC20Proposal(context.Context, *MsgRegisterERC20Proposal) (*MsgRegisterERC20ProposalResponse, error)
+	RegisterERC20Proposal(context.Context, *MsgRegisterERC20) (*MsgRegisterERC20Response, error)
 	// ToggleTokenConversionProposal defines a method to create a proposal to
 	// toggle the conversion of a token pair.
-	ToggleTokenConversionProposal(context.Context, *MsgToggleTokenConversionProposal) (*MsgToggleTokenConversionProposalResponse, error)
+	ToggleTokenConversionProposal(context.Context, *MsgToggleTokenConversion) (*MsgToggleTokenConversionResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }
 
@@ -149,13 +149,13 @@ func (UnimplementedMsgServer) ConvertERC20(context.Context, *MsgConvertERC20) (*
 func (UnimplementedMsgServer) UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateParams not implemented")
 }
-func (UnimplementedMsgServer) RegisterCoinProposal(context.Context, *MsgRegisterCoinProposal) (*MsgRegisterCoinProposalResponse, error) {
+func (UnimplementedMsgServer) RegisterCoinProposal(context.Context, *MsgRegisterCoin) (*MsgRegisterCoinResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterCoinProposal not implemented")
 }
-func (UnimplementedMsgServer) RegisterERC20Proposal(context.Context, *MsgRegisterERC20Proposal) (*MsgRegisterERC20ProposalResponse, error) {
+func (UnimplementedMsgServer) RegisterERC20Proposal(context.Context, *MsgRegisterERC20) (*MsgRegisterERC20Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterERC20Proposal not implemented")
 }
-func (UnimplementedMsgServer) ToggleTokenConversionProposal(context.Context, *MsgToggleTokenConversionProposal) (*MsgToggleTokenConversionProposalResponse, error) {
+func (UnimplementedMsgServer) ToggleTokenConversionProposal(context.Context, *MsgToggleTokenConversion) (*MsgToggleTokenConversionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ToggleTokenConversionProposal not implemented")
 }
 func (UnimplementedMsgServer) mustEmbedUnimplementedMsgServer() {}
@@ -226,7 +226,7 @@ func _Msg_UpdateParams_Handler(srv interface{}, ctx context.Context, dec func(in
 }
 
 func _Msg_RegisterCoinProposal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgRegisterCoinProposal)
+	in := new(MsgRegisterCoin)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -238,13 +238,13 @@ func _Msg_RegisterCoinProposal_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: Msg_RegisterCoinProposal_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).RegisterCoinProposal(ctx, req.(*MsgRegisterCoinProposal))
+		return srv.(MsgServer).RegisterCoinProposal(ctx, req.(*MsgRegisterCoin))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Msg_RegisterERC20Proposal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgRegisterERC20Proposal)
+	in := new(MsgRegisterERC20)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -256,13 +256,13 @@ func _Msg_RegisterERC20Proposal_Handler(srv interface{}, ctx context.Context, de
 		FullMethod: Msg_RegisterERC20Proposal_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).RegisterERC20Proposal(ctx, req.(*MsgRegisterERC20Proposal))
+		return srv.(MsgServer).RegisterERC20Proposal(ctx, req.(*MsgRegisterERC20))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Msg_ToggleTokenConversionProposal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgToggleTokenConversionProposal)
+	in := new(MsgToggleTokenConversion)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -274,7 +274,7 @@ func _Msg_ToggleTokenConversionProposal_Handler(srv interface{}, ctx context.Con
 		FullMethod: Msg_ToggleTokenConversionProposal_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).ToggleTokenConversionProposal(ctx, req.(*MsgToggleTokenConversionProposal))
+		return srv.(MsgServer).ToggleTokenConversionProposal(ctx, req.(*MsgToggleTokenConversion))
 	}
 	return interceptor(ctx, in, info, handler)
 }

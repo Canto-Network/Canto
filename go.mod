@@ -16,7 +16,6 @@ require (
 	cosmossdk.io/x/circuit v0.1.0
 	cosmossdk.io/x/evidence v0.1.0
 	cosmossdk.io/x/feegrant v0.1.0
-	cosmossdk.io/x/nft v0.0.0-20231023160833-026631cd833c
 	cosmossdk.io/x/tx v0.13.0
 	cosmossdk.io/x/upgrade v0.1.0
 	github.com/cometbft/cometbft v0.38.2
@@ -56,6 +55,7 @@ require (
 	cloud.google.com/go/iam v1.1.5 // indirect
 	cloud.google.com/go/storage v1.30.1 // indirect
 	cosmossdk.io/depinject v1.0.0-alpha.4 // indirect
+	cosmossdk.io/x/nft v0.0.0-20231023160833-026631cd833c // indirect
 	github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4 // indirect
 	github.com/DataDog/datadog-go v3.2.0+incompatible // indirect
 	github.com/aws/aws-sdk-go v1.44.224 // indirect

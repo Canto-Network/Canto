@@ -922,7 +922,7 @@ func (suite *KeeperTestSuite) TestConvertCoinNativeERC20() {
 			id := suite.app.Erc20Keeper.GetTokenPairID(suite.ctx, contractAddr.String())
 			pair, _ := suite.app.Erc20Keeper.GetTokenPair(suite.ctx, id)
 			coins := sdk.NewCoins(sdk.NewCoin(pair.Denom, sdkmath.NewInt(tc.mint)))
-			coinName := keeper.CreateDenom(contractAddr.String())
+			coinName := types.CreateDenom(contractAddr.String())
 			sender := sdk.AccAddress(suite.address.Bytes())
 
 			// Precondition: Mint Coins to convert on sender account

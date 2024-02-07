@@ -146,7 +146,7 @@ var (
 )
 
 func request_Msg_RegisterCoinProposal_0(ctx context.Context, marshaler runtime.Marshaler, client MsgClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq MsgRegisterCoinProposal
+	var protoReq MsgRegisterCoin
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
@@ -162,7 +162,7 @@ func request_Msg_RegisterCoinProposal_0(ctx context.Context, marshaler runtime.M
 }
 
 func local_request_Msg_RegisterCoinProposal_0(ctx context.Context, marshaler runtime.Marshaler, server MsgServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq MsgRegisterCoinProposal
+	var protoReq MsgRegisterCoin
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
@@ -182,7 +182,7 @@ var (
 )
 
 func request_Msg_RegisterERC20Proposal_0(ctx context.Context, marshaler runtime.Marshaler, client MsgClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq MsgRegisterERC20Proposal
+	var protoReq MsgRegisterERC20
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
@@ -198,7 +198,7 @@ func request_Msg_RegisterERC20Proposal_0(ctx context.Context, marshaler runtime.
 }
 
 func local_request_Msg_RegisterERC20Proposal_0(ctx context.Context, marshaler runtime.Marshaler, server MsgServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq MsgRegisterERC20Proposal
+	var protoReq MsgRegisterERC20
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
@@ -218,7 +218,7 @@ var (
 )
 
 func request_Msg_ToggleTokenConversionProposal_0(ctx context.Context, marshaler runtime.Marshaler, client MsgClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq MsgToggleTokenConversionProposal
+	var protoReq MsgToggleTokenConversion
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
@@ -234,7 +234,7 @@ func request_Msg_ToggleTokenConversionProposal_0(ctx context.Context, marshaler 
 }
 
 func local_request_Msg_ToggleTokenConversionProposal_0(ctx context.Context, marshaler runtime.Marshaler, server MsgServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq MsgToggleTokenConversionProposal
+	var protoReq MsgToggleTokenConversion
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
@@ -564,11 +564,11 @@ var (
 
 	pattern_Msg_UpdateParams_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"canto", "erc20", "v1", "tx", "update_params"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Msg_RegisterCoinProposal_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"canto", "erc20", "v1", "tx", "register_coin_proposal"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Msg_RegisterCoinProposal_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"canto", "erc20", "v1", "tx", "register_coin"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Msg_RegisterERC20Proposal_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"canto", "erc20", "v1", "tx", "register_erc20_proposal"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Msg_RegisterERC20Proposal_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"canto", "erc20", "v1", "tx", "register_erc20"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Msg_ToggleTokenConversionProposal_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"canto", "erc20", "v1", "tx", "toggle_token_conversion_proposal"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Msg_ToggleTokenConversionProposal_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"canto", "erc20", "v1", "tx", "toggle_token_conversion"}, "", runtime.AssumeColonVerbOpt(false)))
 )
 
 var (

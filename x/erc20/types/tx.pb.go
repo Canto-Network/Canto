@@ -340,7 +340,7 @@ var xxx_messageInfo_MsgUpdateParamsResponse proto.InternalMessageInfo
 
 // MsgRegisterCoinProposal is a gov Content type to register a token pair for a
 // native Cosmos coin.
-type MsgRegisterCoinProposal struct {
+type MsgRegisterCoin struct {
 	// authority is the address that controls the module (defaults to x/gov unless
 	// overwritten).
 	Authority string `protobuf:"bytes,1,opt,name=authority,proto3" json:"authority,omitempty"`
@@ -352,18 +352,18 @@ type MsgRegisterCoinProposal struct {
 	Metadata types1.Metadata `protobuf:"bytes,4,opt,name=metadata,proto3" json:"metadata"`
 }
 
-func (m *MsgRegisterCoinProposal) Reset()         { *m = MsgRegisterCoinProposal{} }
-func (m *MsgRegisterCoinProposal) String() string { return proto.CompactTextString(m) }
-func (*MsgRegisterCoinProposal) ProtoMessage()    {}
-func (*MsgRegisterCoinProposal) Descriptor() ([]byte, []int) {
+func (m *MsgRegisterCoin) Reset()         { *m = MsgRegisterCoin{} }
+func (m *MsgRegisterCoin) String() string { return proto.CompactTextString(m) }
+func (*MsgRegisterCoin) ProtoMessage()    {}
+func (*MsgRegisterCoin) Descriptor() ([]byte, []int) {
 	return fileDescriptor_3cff33f93a8dd3e5, []int{6}
 }
-func (m *MsgRegisterCoinProposal) XXX_Unmarshal(b []byte) error {
+func (m *MsgRegisterCoin) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgRegisterCoinProposal) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgRegisterCoin) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgRegisterCoinProposal.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgRegisterCoin.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -373,61 +373,61 @@ func (m *MsgRegisterCoinProposal) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return b[:n], nil
 	}
 }
-func (m *MsgRegisterCoinProposal) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgRegisterCoinProposal.Merge(m, src)
+func (m *MsgRegisterCoin) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRegisterCoin.Merge(m, src)
 }
-func (m *MsgRegisterCoinProposal) XXX_Size() int {
+func (m *MsgRegisterCoin) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgRegisterCoinProposal) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgRegisterCoinProposal.DiscardUnknown(m)
+func (m *MsgRegisterCoin) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRegisterCoin.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgRegisterCoinProposal proto.InternalMessageInfo
+var xxx_messageInfo_MsgRegisterCoin proto.InternalMessageInfo
 
-func (m *MsgRegisterCoinProposal) GetAuthority() string {
+func (m *MsgRegisterCoin) GetAuthority() string {
 	if m != nil {
 		return m.Authority
 	}
 	return ""
 }
 
-func (m *MsgRegisterCoinProposal) GetTitle() string {
+func (m *MsgRegisterCoin) GetTitle() string {
 	if m != nil {
 		return m.Title
 	}
 	return ""
 }
 
-func (m *MsgRegisterCoinProposal) GetDescription() string {
+func (m *MsgRegisterCoin) GetDescription() string {
 	if m != nil {
 		return m.Description
 	}
 	return ""
 }
 
-func (m *MsgRegisterCoinProposal) GetMetadata() types1.Metadata {
+func (m *MsgRegisterCoin) GetMetadata() types1.Metadata {
 	if m != nil {
 		return m.Metadata
 	}
 	return types1.Metadata{}
 }
 
-type MsgRegisterCoinProposalResponse struct {
+type MsgRegisterCoinResponse struct {
 }
 
-func (m *MsgRegisterCoinProposalResponse) Reset()         { *m = MsgRegisterCoinProposalResponse{} }
-func (m *MsgRegisterCoinProposalResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgRegisterCoinProposalResponse) ProtoMessage()    {}
-func (*MsgRegisterCoinProposalResponse) Descriptor() ([]byte, []int) {
+func (m *MsgRegisterCoinResponse) Reset()         { *m = MsgRegisterCoinResponse{} }
+func (m *MsgRegisterCoinResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgRegisterCoinResponse) ProtoMessage()    {}
+func (*MsgRegisterCoinResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_3cff33f93a8dd3e5, []int{7}
 }
-func (m *MsgRegisterCoinProposalResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgRegisterCoinResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgRegisterCoinProposalResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgRegisterCoinResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgRegisterCoinProposalResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgRegisterCoinResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -437,21 +437,21 @@ func (m *MsgRegisterCoinProposalResponse) XXX_Marshal(b []byte, deterministic bo
 		return b[:n], nil
 	}
 }
-func (m *MsgRegisterCoinProposalResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgRegisterCoinProposalResponse.Merge(m, src)
+func (m *MsgRegisterCoinResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRegisterCoinResponse.Merge(m, src)
 }
-func (m *MsgRegisterCoinProposalResponse) XXX_Size() int {
+func (m *MsgRegisterCoinResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgRegisterCoinProposalResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgRegisterCoinProposalResponse.DiscardUnknown(m)
+func (m *MsgRegisterCoinResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRegisterCoinResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgRegisterCoinProposalResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgRegisterCoinResponse proto.InternalMessageInfo
 
 // MsgRegisterERC20Proposal is a gov Content type to register a token pair for
 // an ERC20 token
-type MsgRegisterERC20Proposal struct {
+type MsgRegisterERC20 struct {
 	// authority is the address that controls the module (defaults to x/gov unless
 	// overwritten).
 	Authority string `protobuf:"bytes,1,opt,name=authority,proto3" json:"authority,omitempty"`
@@ -463,18 +463,18 @@ type MsgRegisterERC20Proposal struct {
 	Erc20Address string `protobuf:"bytes,4,opt,name=erc20address,proto3" json:"erc20address,omitempty"`
 }
 
-func (m *MsgRegisterERC20Proposal) Reset()         { *m = MsgRegisterERC20Proposal{} }
-func (m *MsgRegisterERC20Proposal) String() string { return proto.CompactTextString(m) }
-func (*MsgRegisterERC20Proposal) ProtoMessage()    {}
-func (*MsgRegisterERC20Proposal) Descriptor() ([]byte, []int) {
+func (m *MsgRegisterERC20) Reset()         { *m = MsgRegisterERC20{} }
+func (m *MsgRegisterERC20) String() string { return proto.CompactTextString(m) }
+func (*MsgRegisterERC20) ProtoMessage()    {}
+func (*MsgRegisterERC20) Descriptor() ([]byte, []int) {
 	return fileDescriptor_3cff33f93a8dd3e5, []int{8}
 }
-func (m *MsgRegisterERC20Proposal) XXX_Unmarshal(b []byte) error {
+func (m *MsgRegisterERC20) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgRegisterERC20Proposal) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgRegisterERC20) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgRegisterERC20Proposal.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgRegisterERC20.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -484,61 +484,61 @@ func (m *MsgRegisterERC20Proposal) XXX_Marshal(b []byte, deterministic bool) ([]
 		return b[:n], nil
 	}
 }
-func (m *MsgRegisterERC20Proposal) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgRegisterERC20Proposal.Merge(m, src)
+func (m *MsgRegisterERC20) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRegisterERC20.Merge(m, src)
 }
-func (m *MsgRegisterERC20Proposal) XXX_Size() int {
+func (m *MsgRegisterERC20) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgRegisterERC20Proposal) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgRegisterERC20Proposal.DiscardUnknown(m)
+func (m *MsgRegisterERC20) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRegisterERC20.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgRegisterERC20Proposal proto.InternalMessageInfo
+var xxx_messageInfo_MsgRegisterERC20 proto.InternalMessageInfo
 
-func (m *MsgRegisterERC20Proposal) GetAuthority() string {
+func (m *MsgRegisterERC20) GetAuthority() string {
 	if m != nil {
 		return m.Authority
 	}
 	return ""
 }
 
-func (m *MsgRegisterERC20Proposal) GetTitle() string {
+func (m *MsgRegisterERC20) GetTitle() string {
 	if m != nil {
 		return m.Title
 	}
 	return ""
 }
 
-func (m *MsgRegisterERC20Proposal) GetDescription() string {
+func (m *MsgRegisterERC20) GetDescription() string {
 	if m != nil {
 		return m.Description
 	}
 	return ""
 }
 
-func (m *MsgRegisterERC20Proposal) GetErc20Address() string {
+func (m *MsgRegisterERC20) GetErc20Address() string {
 	if m != nil {
 		return m.Erc20Address
 	}
 	return ""
 }
 
-type MsgRegisterERC20ProposalResponse struct {
+type MsgRegisterERC20Response struct {
 }
 
-func (m *MsgRegisterERC20ProposalResponse) Reset()         { *m = MsgRegisterERC20ProposalResponse{} }
-func (m *MsgRegisterERC20ProposalResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgRegisterERC20ProposalResponse) ProtoMessage()    {}
-func (*MsgRegisterERC20ProposalResponse) Descriptor() ([]byte, []int) {
+func (m *MsgRegisterERC20Response) Reset()         { *m = MsgRegisterERC20Response{} }
+func (m *MsgRegisterERC20Response) String() string { return proto.CompactTextString(m) }
+func (*MsgRegisterERC20Response) ProtoMessage()    {}
+func (*MsgRegisterERC20Response) Descriptor() ([]byte, []int) {
 	return fileDescriptor_3cff33f93a8dd3e5, []int{9}
 }
-func (m *MsgRegisterERC20ProposalResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgRegisterERC20Response) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgRegisterERC20ProposalResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgRegisterERC20Response) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgRegisterERC20ProposalResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgRegisterERC20Response.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -548,21 +548,21 @@ func (m *MsgRegisterERC20ProposalResponse) XXX_Marshal(b []byte, deterministic b
 		return b[:n], nil
 	}
 }
-func (m *MsgRegisterERC20ProposalResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgRegisterERC20ProposalResponse.Merge(m, src)
+func (m *MsgRegisterERC20Response) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRegisterERC20Response.Merge(m, src)
 }
-func (m *MsgRegisterERC20ProposalResponse) XXX_Size() int {
+func (m *MsgRegisterERC20Response) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgRegisterERC20ProposalResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgRegisterERC20ProposalResponse.DiscardUnknown(m)
+func (m *MsgRegisterERC20Response) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRegisterERC20Response.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgRegisterERC20ProposalResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgRegisterERC20Response proto.InternalMessageInfo
 
 // MsgToggleTokenConversionProposal is a gov Content type to toggle the
 // conversion of a token pair.
-type MsgToggleTokenConversionProposal struct {
+type MsgToggleTokenConversion struct {
 	// authority is the address that controls the module (defaults to x/gov unless
 	// overwritten).
 	Authority string `protobuf:"bytes,1,opt,name=authority,proto3" json:"authority,omitempty"`
@@ -575,18 +575,18 @@ type MsgToggleTokenConversionProposal struct {
 	Token string `protobuf:"bytes,4,opt,name=token,proto3" json:"token,omitempty"`
 }
 
-func (m *MsgToggleTokenConversionProposal) Reset()         { *m = MsgToggleTokenConversionProposal{} }
-func (m *MsgToggleTokenConversionProposal) String() string { return proto.CompactTextString(m) }
-func (*MsgToggleTokenConversionProposal) ProtoMessage()    {}
-func (*MsgToggleTokenConversionProposal) Descriptor() ([]byte, []int) {
+func (m *MsgToggleTokenConversion) Reset()         { *m = MsgToggleTokenConversion{} }
+func (m *MsgToggleTokenConversion) String() string { return proto.CompactTextString(m) }
+func (*MsgToggleTokenConversion) ProtoMessage()    {}
+func (*MsgToggleTokenConversion) Descriptor() ([]byte, []int) {
 	return fileDescriptor_3cff33f93a8dd3e5, []int{10}
 }
-func (m *MsgToggleTokenConversionProposal) XXX_Unmarshal(b []byte) error {
+func (m *MsgToggleTokenConversion) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgToggleTokenConversionProposal) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgToggleTokenConversion) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgToggleTokenConversionProposal.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgToggleTokenConversion.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -596,63 +596,61 @@ func (m *MsgToggleTokenConversionProposal) XXX_Marshal(b []byte, deterministic b
 		return b[:n], nil
 	}
 }
-func (m *MsgToggleTokenConversionProposal) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgToggleTokenConversionProposal.Merge(m, src)
+func (m *MsgToggleTokenConversion) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgToggleTokenConversion.Merge(m, src)
 }
-func (m *MsgToggleTokenConversionProposal) XXX_Size() int {
+func (m *MsgToggleTokenConversion) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgToggleTokenConversionProposal) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgToggleTokenConversionProposal.DiscardUnknown(m)
+func (m *MsgToggleTokenConversion) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgToggleTokenConversion.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgToggleTokenConversionProposal proto.InternalMessageInfo
+var xxx_messageInfo_MsgToggleTokenConversion proto.InternalMessageInfo
 
-func (m *MsgToggleTokenConversionProposal) GetAuthority() string {
+func (m *MsgToggleTokenConversion) GetAuthority() string {
 	if m != nil {
 		return m.Authority
 	}
 	return ""
 }
 
-func (m *MsgToggleTokenConversionProposal) GetTitle() string {
+func (m *MsgToggleTokenConversion) GetTitle() string {
 	if m != nil {
 		return m.Title
 	}
 	return ""
 }
 
-func (m *MsgToggleTokenConversionProposal) GetDescription() string {
+func (m *MsgToggleTokenConversion) GetDescription() string {
 	if m != nil {
 		return m.Description
 	}
 	return ""
 }
 
-func (m *MsgToggleTokenConversionProposal) GetToken() string {
+func (m *MsgToggleTokenConversion) GetToken() string {
 	if m != nil {
 		return m.Token
 	}
 	return ""
 }
 
-type MsgToggleTokenConversionProposalResponse struct {
+type MsgToggleTokenConversionResponse struct {
 }
 
-func (m *MsgToggleTokenConversionProposalResponse) Reset() {
-	*m = MsgToggleTokenConversionProposalResponse{}
-}
-func (m *MsgToggleTokenConversionProposalResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgToggleTokenConversionProposalResponse) ProtoMessage()    {}
-func (*MsgToggleTokenConversionProposalResponse) Descriptor() ([]byte, []int) {
+func (m *MsgToggleTokenConversionResponse) Reset()         { *m = MsgToggleTokenConversionResponse{} }
+func (m *MsgToggleTokenConversionResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgToggleTokenConversionResponse) ProtoMessage()    {}
+func (*MsgToggleTokenConversionResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_3cff33f93a8dd3e5, []int{11}
 }
-func (m *MsgToggleTokenConversionProposalResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgToggleTokenConversionResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgToggleTokenConversionProposalResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgToggleTokenConversionResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgToggleTokenConversionProposalResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgToggleTokenConversionResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -662,17 +660,17 @@ func (m *MsgToggleTokenConversionProposalResponse) XXX_Marshal(b []byte, determi
 		return b[:n], nil
 	}
 }
-func (m *MsgToggleTokenConversionProposalResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgToggleTokenConversionProposalResponse.Merge(m, src)
+func (m *MsgToggleTokenConversionResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgToggleTokenConversionResponse.Merge(m, src)
 }
-func (m *MsgToggleTokenConversionProposalResponse) XXX_Size() int {
+func (m *MsgToggleTokenConversionResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgToggleTokenConversionProposalResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgToggleTokenConversionProposalResponse.DiscardUnknown(m)
+func (m *MsgToggleTokenConversionResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgToggleTokenConversionResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgToggleTokenConversionProposalResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgToggleTokenConversionResponse proto.InternalMessageInfo
 
 func init() {
 	proto.RegisterType((*MsgConvertCoin)(nil), "canto.erc20.v1.MsgConvertCoin")
@@ -681,89 +679,87 @@ func init() {
 	proto.RegisterType((*MsgConvertERC20Response)(nil), "canto.erc20.v1.MsgConvertERC20Response")
 	proto.RegisterType((*MsgUpdateParams)(nil), "canto.erc20.v1.MsgUpdateParams")
 	proto.RegisterType((*MsgUpdateParamsResponse)(nil), "canto.erc20.v1.MsgUpdateParamsResponse")
-	proto.RegisterType((*MsgRegisterCoinProposal)(nil), "canto.erc20.v1.MsgRegisterCoinProposal")
-	proto.RegisterType((*MsgRegisterCoinProposalResponse)(nil), "canto.erc20.v1.MsgRegisterCoinProposalResponse")
-	proto.RegisterType((*MsgRegisterERC20Proposal)(nil), "canto.erc20.v1.MsgRegisterERC20Proposal")
-	proto.RegisterType((*MsgRegisterERC20ProposalResponse)(nil), "canto.erc20.v1.MsgRegisterERC20ProposalResponse")
-	proto.RegisterType((*MsgToggleTokenConversionProposal)(nil), "canto.erc20.v1.MsgToggleTokenConversionProposal")
-	proto.RegisterType((*MsgToggleTokenConversionProposalResponse)(nil), "canto.erc20.v1.MsgToggleTokenConversionProposalResponse")
+	proto.RegisterType((*MsgRegisterCoin)(nil), "canto.erc20.v1.MsgRegisterCoin")
+	proto.RegisterType((*MsgRegisterCoinResponse)(nil), "canto.erc20.v1.MsgRegisterCoinResponse")
+	proto.RegisterType((*MsgRegisterERC20)(nil), "canto.erc20.v1.MsgRegisterERC20")
+	proto.RegisterType((*MsgRegisterERC20Response)(nil), "canto.erc20.v1.MsgRegisterERC20Response")
+	proto.RegisterType((*MsgToggleTokenConversion)(nil), "canto.erc20.v1.MsgToggleTokenConversion")
+	proto.RegisterType((*MsgToggleTokenConversionResponse)(nil), "canto.erc20.v1.MsgToggleTokenConversionResponse")
 }
 
 func init() { proto.RegisterFile("canto/erc20/v1/tx.proto", fileDescriptor_3cff33f93a8dd3e5) }
 
 var fileDescriptor_3cff33f93a8dd3e5 = []byte{
-	// 962 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x56, 0xcf, 0x6f, 0x1b, 0x45,
-	0x14, 0xf6, 0x26, 0x69, 0x68, 0xc6, 0x55, 0x0b, 0x2b, 0x27, 0x71, 0x56, 0xcd, 0xda, 0x5d, 0xa1,
-	0xd6, 0x75, 0xc9, 0x4e, 0xec, 0x50, 0x7e, 0x18, 0x21, 0x84, 0x2d, 0x0e, 0x39, 0x04, 0x55, 0x4b,
-	0xb8, 0x70, 0xb1, 0x26, 0xeb, 0xd1, 0x66, 0xe5, 0xec, 0x8c, 0xb5, 0x33, 0x31, 0xed, 0x05, 0x55,
-	0x39, 0x72, 0x42, 0xe2, 0x0f, 0xa0, 0x12, 0x07, 0x38, 0xa1, 0x20, 0xf5, 0x8f, 0xc8, 0xb1, 0x94,
-	0x0b, 0xe2, 0x50, 0xa1, 0x04, 0x94, 0xfe, 0x19, 0x68, 0x7e, 0x64, 0xec, 0x8d, 0x37, 0x6e, 0x40,
-	0x48, 0x5c, 0x2c, 0xcf, 0x7b, 0xdf, 0xbc, 0xf9, 0xbe, 0x6f, 0xde, 0x3c, 0x1b, 0x2c, 0x87, 0x88,
-	0x70, 0x0a, 0x71, 0x1a, 0x36, 0xd7, 0xe1, 0xb0, 0x01, 0xf9, 0x43, 0x7f, 0x90, 0x52, 0x4e, 0xed,
-	0xeb, 0x32, 0xe1, 0xcb, 0x84, 0x3f, 0x6c, 0x38, 0x37, 0x23, 0x4a, 0xa3, 0x3d, 0x0c, 0xd1, 0x20,
-	0x86, 0x88, 0x10, 0xca, 0x11, 0x8f, 0x29, 0x61, 0x0a, 0xed, 0x94, 0x22, 0x1a, 0x51, 0xf9, 0x15,
-	0x8a, 0x6f, 0x3a, 0xea, 0x86, 0x94, 0x25, 0x94, 0xc1, 0x1d, 0xc4, 0x30, 0x1c, 0x36, 0x76, 0x30,
-	0x47, 0x0d, 0x18, 0xd2, 0x98, 0x4c, 0xe4, 0x49, 0xdf, 0xe4, 0xc5, 0x42, 0xe7, 0x57, 0x54, 0xbe,
-	0xab, 0x0a, 0xab, 0x85, 0x4e, 0x2d, 0xeb, 0xad, 0x09, 0x8b, 0x04, 0xed, 0x84, 0x45, 0x3a, 0xf1,
-	0x06, 0x4a, 0x62, 0x42, 0xa1, 0xfc, 0xd4, 0xa1, 0x9b, 0xe7, 0x34, 0x46, 0x98, 0x60, 0x16, 0xeb,
-	0x4a, 0xde, 0x77, 0x16, 0xb8, 0xbe, 0xc5, 0xa2, 0x0e, 0x25, 0x43, 0x9c, 0xf2, 0x0e, 0x8d, 0x89,
-	0xbd, 0x01, 0xe6, 0x04, 0xcb, 0xb2, 0x55, 0xb5, 0x6a, 0xc5, 0xe6, 0x8a, 0xaf, 0x4f, 0x16, 0x32,
-	0x7c, 0x4d, 0xd3, 0x17, 0xc0, 0xf6, 0xdc, 0xd1, 0x8b, 0x4a, 0x21, 0x90, 0x60, 0xdb, 0x01, 0x57,
-	0x53, 0x1c, 0xe2, 0x78, 0x88, 0xd3, 0xf2, 0x4c, 0xd5, 0xaa, 0x2d, 0x04, 0x66, 0x6d, 0x2f, 0x81,
-	0x79, 0x86, 0x49, 0x0f, 0xa7, 0xe5, 0x59, 0x99, 0xd1, 0xab, 0xd6, 0x9b, 0x07, 0xa7, 0x87, 0x75,
-	0xbd, 0xf8, 0xfa, 0xf4, 0xb0, 0x5e, 0x52, 0x4c, 0xb3, 0x74, 0xbc, 0x32, 0x58, 0xca, 0x46, 0x02,
-	0xcc, 0x06, 0x94, 0x30, 0xec, 0xfd, 0x62, 0x81, 0x1b, 0xa3, 0xd4, 0x27, 0x41, 0xa7, 0xb9, 0x6e,
-	0xdf, 0x05, 0xaf, 0x87, 0x94, 0xf0, 0x14, 0x85, 0xbc, 0x8b, 0x7a, 0xbd, 0x14, 0x33, 0x26, 0x85,
-	0x2c, 0x04, 0x37, 0xce, 0xe2, 0x1f, 0xab, 0xb0, 0xdd, 0x01, 0xf3, 0x28, 0xa1, 0xfb, 0x84, 0x2b,
-	0xc2, 0xed, 0x7b, 0x42, 0xce, 0xef, 0x2f, 0x2a, 0x8b, 0x4a, 0x30, 0xeb, 0xf5, 0xfd, 0x98, 0xc2,
-	0x04, 0xf1, 0x5d, 0x7f, 0x93, 0xf0, 0xe7, 0x4f, 0xd7, 0x80, 0x76, 0x62, 0x93, 0xf0, 0x40, 0x6f,
-	0xcd, 0xe8, 0x9e, 0xbd, 0x50, 0xf7, 0x5c, 0x46, 0xb7, 0x23, 0xc4, 0x2e, 0x9e, 0x17, 0x2b, 0xf9,
-	0x7b, 0x2b, 0x60, 0xf9, 0x5c, 0xc8, 0xc8, 0xfd, 0x49, 0xc9, 0xfd, 0x7c, 0xd0, 0x43, 0x1c, 0x3f,
-	0x40, 0x29, 0x4a, 0x98, 0xfd, 0x0e, 0x58, 0x40, 0xfb, 0x7c, 0x97, 0xa6, 0x31, 0x7f, 0xa4, 0x74,
-	0xb6, 0xcb, 0xcf, 0x9f, 0xae, 0x95, 0x34, 0x53, 0x2d, 0xf5, 0x33, 0x9e, 0xc6, 0x24, 0x0a, 0x46,
-	0x50, 0xfb, 0x7d, 0x30, 0x3f, 0x90, 0x15, 0xa4, 0xf6, 0x62, 0x73, 0xc9, 0xcf, 0x36, 0xbc, 0xaf,
-	0xea, 0xb7, 0x17, 0x84, 0x27, 0x3f, 0x9e, 0x1e, 0xd6, 0xad, 0x40, 0x6f, 0x68, 0xd5, 0xc4, 0xad,
-	0x8d, 0x4a, 0x65, 0xb5, 0x8c, 0x93, 0xd3, 0x5a, 0xc6, 0x43, 0x46, 0xcb, 0xe3, 0x19, 0x99, 0x0b,
-	0x70, 0x14, 0x33, 0x8e, 0x53, 0x71, 0xad, 0x0f, 0x52, 0x3a, 0xa0, 0x0c, 0xed, 0xfd, 0x6b, 0x4d,
-	0x25, 0x70, 0x85, 0xc7, 0x7c, 0x0f, 0xeb, 0xfe, 0x53, 0x0b, 0xbb, 0x0a, 0x8a, 0x3d, 0xcc, 0xc2,
-	0x34, 0x1e, 0x88, 0x17, 0xab, 0xef, 0x68, 0x3c, 0x64, 0x7f, 0x04, 0xae, 0x26, 0x98, 0xa3, 0x1e,
-	0xe2, 0x48, 0x5e, 0x54, 0xb1, 0xb9, 0x3a, 0xea, 0x79, 0xd2, 0x37, 0x3d, 0xbf, 0xa5, 0x41, 0xba,
-	0xef, 0xcd, 0xa6, 0xd6, 0xdb, 0x2f, 0x9f, 0x54, 0x0a, 0x93, 0xae, 0xac, 0x1a, 0x57, 0xf2, 0x64,
-	0x7a, 0xb7, 0x40, 0xe5, 0x82, 0x94, 0x71, 0xe9, 0x2f, 0x0b, 0x94, 0xc7, 0x30, 0xb2, 0x1d, 0xfe,
-	0x37, 0x9b, 0x3c, 0x70, 0x4d, 0x76, 0xc7, 0xd9, 0xab, 0x52, 0x3d, 0x9d, 0x89, 0xb5, 0xee, 0xe7,
-	0x3b, 0xe1, 0x4e, 0x38, 0x91, 0x91, 0xe2, 0x79, 0xa0, 0x7a, 0x51, 0xce, 0x78, 0x71, 0x6a, 0x49,
-	0xd0, 0x36, 0x8d, 0xa2, 0x3d, 0xbc, 0x4d, 0xfb, 0x98, 0xa8, 0x47, 0xc2, 0x62, 0xfa, 0x9f, 0xb4,
-	0xce, 0xf6, 0xb8, 0x27, 0xdb, 0x97, 0xf4, 0x44, 0x78, 0x29, 0xa8, 0x68, 0x33, 0xd4, 0xa2, 0xf5,
-	0xe1, 0xcb, 0x27, 0x15, 0x6b, 0xd2, 0x85, 0xdb, 0xc6, 0x85, 0xa9, 0x22, 0xbc, 0x3a, 0xa8, 0xbd,
-	0x0a, 0x73, 0xe6, 0x4a, 0xf3, 0xe7, 0xd7, 0xc0, 0xec, 0x16, 0x8b, 0xec, 0xaf, 0x40, 0x71, 0x7c,
-	0x84, 0xbb, 0xe7, 0x9f, 0x73, 0x76, 0x82, 0x3a, 0xb7, 0xa7, 0xe7, 0x8d, 0xe9, 0x77, 0x0e, 0x7e,
-	0xfd, 0xf3, 0xdb, 0x99, 0x5b, 0x76, 0x05, 0x4e, 0xfc, 0x50, 0xc2, 0x50, 0xe1, 0xbb, 0x72, 0xfc,
-	0x1f, 0x58, 0xe0, 0x5a, 0x66, 0x0e, 0x57, 0x2e, 0x3e, 0x41, 0x02, 0x9c, 0x3b, 0xaf, 0x00, 0x18,
-	0x0e, 0x35, 0xc9, 0xc1, 0xb3, 0xab, 0x53, 0x38, 0xc8, 0x98, 0x24, 0x91, 0x99, 0x8e, 0x79, 0x24,
-	0xc6, 0x01, 0xb9, 0x24, 0x72, 0xe7, 0xd5, 0x34, 0x12, 0xfb, 0x72, 0x43, 0x57, 0x8d, 0x47, 0xfb,
-	0x7b, 0x0b, 0x94, 0x72, 0xc7, 0x5a, 0xde, 0x59, 0x79, 0x40, 0x07, 0x5e, 0x12, 0x68, 0xc8, 0x35,
-	0x24, 0xb9, 0x7b, 0xf6, 0xdd, 0x1c, 0x72, 0xa9, 0xde, 0x28, 0xaf, 0x49, 0xfc, 0x95, 0x50, 0x64,
-	0x7e, 0xb0, 0xc0, 0x62, 0xfe, 0x58, 0xa9, 0x4d, 0x39, 0x3d, 0x83, 0x74, 0xd6, 0x2f, 0x8b, 0x34,
-	0x44, 0x9b, 0x92, 0xe8, 0x5b, 0x76, 0x7d, 0x1a, 0x51, 0x19, 0x1c, 0x31, 0x3d, 0xb2, 0xc0, 0xea,
-	0xf4, 0x47, 0x9f, 0xc7, 0x63, 0xea, 0x0e, 0xe7, 0xbd, 0x7f, 0xba, 0xc3, 0x28, 0xf8, 0x40, 0x2a,
-	0xb8, 0x6f, 0x6f, 0xe4, 0x28, 0xe0, 0xb2, 0x42, 0x57, 0xce, 0x80, 0x6e, 0x68, 0x6a, 0x18, 0x29,
-	0xce, 0x95, 0xc7, 0xe2, 0x87, 0xb4, 0xbd, 0x79, 0x74, 0xec, 0x5a, 0xcf, 0x8e, 0x5d, 0xeb, 0x8f,
-	0x63, 0xd7, 0xfa, 0xe6, 0xc4, 0x2d, 0x3c, 0x3b, 0x71, 0x0b, 0xbf, 0x9d, 0xb8, 0x85, 0x2f, 0x60,
-	0x14, 0xf3, 0xdd, 0xfd, 0x1d, 0x3f, 0xa4, 0x09, 0xec, 0x88, 0xfa, 0x6b, 0x9f, 0x62, 0xfe, 0x25,
-	0x4d, 0xfb, 0x6a, 0x05, 0x87, 0xef, 0xc2, 0x87, 0xfa, 0x48, 0xfe, 0x68, 0x80, 0xd9, 0xce, 0xbc,
-	0xfc, 0x13, 0xb7, 0xf1, 0x77, 0x00, 0x00, 0x00, 0xff, 0xff, 0x30, 0xf8, 0xee, 0x61, 0xc8, 0x0a,
-	0x00, 0x00,
+	// 938 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x96, 0x4d, 0x6f, 0x1b, 0x45,
+	0x18, 0xc7, 0xbd, 0x4d, 0x6a, 0x35, 0xe3, 0xaa, 0x2d, 0x23, 0x27, 0x71, 0xac, 0x76, 0xed, 0x1a,
+	0x44, 0xdd, 0xd0, 0xec, 0x24, 0xae, 0x00, 0xe1, 0x0b, 0xc2, 0x16, 0x87, 0x1c, 0x82, 0xaa, 0x25,
+	0x5c, 0xb8, 0x58, 0x93, 0xf5, 0x68, 0xb3, 0x72, 0x76, 0x66, 0x35, 0x33, 0x31, 0xed, 0x05, 0xa1,
+	0x1c, 0x7b, 0x40, 0x48, 0x7c, 0x00, 0x7a, 0xe4, 0x04, 0x39, 0xf4, 0x43, 0xf4, 0x58, 0x8a, 0x10,
+	0x88, 0x43, 0x85, 0x12, 0x44, 0x7a, 0xe4, 0x23, 0xa0, 0x79, 0xc9, 0x7a, 0xd7, 0xd9, 0xb8, 0x11,
+	0x48, 0x5c, 0x22, 0x3f, 0x6f, 0x33, 0xff, 0xdf, 0x33, 0xcf, 0xcc, 0x06, 0x2c, 0x07, 0x98, 0x4a,
+	0x86, 0x08, 0x0f, 0x3a, 0xeb, 0x68, 0xbc, 0x81, 0xe4, 0x43, 0x2f, 0xe1, 0x4c, 0x32, 0x78, 0x4d,
+	0x07, 0x3c, 0x1d, 0xf0, 0xc6, 0x1b, 0xf5, 0x9b, 0x21, 0x63, 0xe1, 0x1e, 0x41, 0x38, 0x89, 0x10,
+	0xa6, 0x94, 0x49, 0x2c, 0x23, 0x46, 0x85, 0xc9, 0xae, 0x57, 0x43, 0x16, 0x32, 0xfd, 0x13, 0xa9,
+	0x5f, 0xd6, 0xeb, 0x06, 0x4c, 0xc4, 0x4c, 0xa0, 0x1d, 0x2c, 0x08, 0x1a, 0x6f, 0xec, 0x10, 0x89,
+	0x37, 0x50, 0xc0, 0x22, 0x7a, 0x26, 0x4e, 0x47, 0x69, 0x5c, 0x19, 0x36, 0xbe, 0x62, 0xe2, 0x03,
+	0xb3, 0xb0, 0x31, 0x6c, 0x68, 0xd9, 0x96, 0xc6, 0x22, 0x54, 0xb2, 0x63, 0x11, 0xda, 0xc0, 0x1b,
+	0x38, 0x8e, 0x28, 0x43, 0xfa, 0xaf, 0x75, 0xdd, 0x9c, 0x62, 0x0c, 0x09, 0x25, 0x22, 0xb2, 0x2b,
+	0xb5, 0xbe, 0x73, 0xc0, 0xb5, 0x2d, 0x11, 0xf6, 0x19, 0x1d, 0x13, 0x2e, 0xfb, 0x2c, 0xa2, 0xf0,
+	0x3e, 0x98, 0x57, 0x2a, 0x6b, 0x4e, 0xd3, 0x69, 0x57, 0x3a, 0x2b, 0x9e, 0xdd, 0x59, 0x61, 0x78,
+	0x56, 0xa6, 0xa7, 0x12, 0x7b, 0xf3, 0xcf, 0x5e, 0x36, 0x4a, 0xbe, 0x4e, 0x86, 0x75, 0x70, 0x85,
+	0x93, 0x80, 0x44, 0x63, 0xc2, 0x6b, 0x97, 0x9a, 0x4e, 0x7b, 0xc1, 0x4f, 0x6d, 0xb8, 0x04, 0xca,
+	0x82, 0xd0, 0x21, 0xe1, 0xb5, 0x39, 0x1d, 0xb1, 0x56, 0xf7, 0xad, 0x83, 0x93, 0xc3, 0x55, 0x6b,
+	0x3c, 0x3e, 0x39, 0x5c, 0xad, 0x1a, 0xa5, 0x79, 0x39, 0xad, 0x1a, 0x58, 0xca, 0x7b, 0x7c, 0x22,
+	0x12, 0x46, 0x05, 0x69, 0xfd, 0xe4, 0x80, 0xeb, 0x93, 0xd0, 0xc7, 0x7e, 0xbf, 0xb3, 0x0e, 0xef,
+	0x82, 0x1b, 0x01, 0xa3, 0x92, 0xe3, 0x40, 0x0e, 0xf0, 0x70, 0xc8, 0x89, 0x10, 0x1a, 0x64, 0xc1,
+	0xbf, 0x7e, 0xea, 0xff, 0xc8, 0xb8, 0x61, 0x1f, 0x94, 0x71, 0xcc, 0xf6, 0xa9, 0x34, 0x82, 0x7b,
+	0xef, 0x28, 0x9c, 0xdf, 0x5f, 0x36, 0x16, 0x0d, 0xb0, 0x18, 0x8e, 0xbc, 0x88, 0xa1, 0x18, 0xcb,
+	0x5d, 0x6f, 0x93, 0xca, 0x17, 0x4f, 0xd7, 0x80, 0xed, 0xc4, 0x26, 0x95, 0xbe, 0x2d, 0xcd, 0x71,
+	0xcf, 0x9d, 0xcb, 0x3d, 0x9f, 0xe3, 0xae, 0x2b, 0xd8, 0xc5, 0x69, 0x58, 0xad, 0xbf, 0xb5, 0x02,
+	0x96, 0xa7, 0x5c, 0x29, 0xee, 0x0f, 0x06, 0xf7, 0xb3, 0x64, 0x88, 0x25, 0x79, 0x80, 0x39, 0x8e,
+	0x05, 0x7c, 0x0f, 0x2c, 0xe0, 0x7d, 0xb9, 0xcb, 0x78, 0x24, 0x1f, 0x19, 0xce, 0x5e, 0xed, 0xc5,
+	0xd3, 0xb5, 0xaa, 0x55, 0x6a, 0x51, 0x3f, 0x95, 0x3c, 0xa2, 0xa1, 0x3f, 0x49, 0x85, 0x1f, 0x80,
+	0x72, 0xa2, 0x57, 0xd0, 0xec, 0x95, 0xce, 0x92, 0x97, 0x1f, 0x78, 0xcf, 0xac, 0xdf, 0x5b, 0x50,
+	0x3d, 0xf9, 0xfe, 0xe4, 0x70, 0xd5, 0xf1, 0x6d, 0x41, 0xb7, 0xad, 0x4e, 0x6d, 0xb2, 0x54, 0x9e,
+	0x25, 0x2b, 0xce, 0xb2, 0x64, 0x5d, 0x29, 0xcb, 0xdf, 0x86, 0xc5, 0x27, 0x61, 0x24, 0x24, 0xe1,
+	0x7a, 0xee, 0xfe, 0x2d, 0x4b, 0x15, 0x5c, 0x96, 0x91, 0xdc, 0x23, 0x76, 0xee, 0x8c, 0x01, 0x9b,
+	0xa0, 0x32, 0x24, 0x22, 0xe0, 0x51, 0xa2, 0x6e, 0xaa, 0x3d, 0x9b, 0xac, 0x0b, 0x7e, 0x08, 0xae,
+	0xc4, 0x44, 0xe2, 0x21, 0x96, 0x58, 0x1f, 0x50, 0xa5, 0x73, 0x6b, 0x32, 0xeb, 0x74, 0x94, 0xce,
+	0xfa, 0x96, 0x4d, 0xb2, 0xf3, 0x9e, 0x16, 0x75, 0xef, 0xbd, 0x7a, 0xd2, 0x28, 0xcd, 0xea, 0x46,
+	0x16, 0xcf, 0x76, 0x23, 0xeb, 0x4a, 0xbb, 0xf1, 0x8b, 0x03, 0x6e, 0x64, 0x62, 0x66, 0x92, 0xff,
+	0xef, 0x76, 0xb4, 0xc0, 0x55, 0x7d, 0xfa, 0xa7, 0xb7, 0xc6, 0xcc, 0x6c, 0xce, 0xd7, 0x5d, 0x2b,
+	0x26, 0x5e, 0x3a, 0x43, 0x6c, 0x86, 0xb9, 0x0e, 0x6a, 0xd3, 0xbe, 0x94, 0xf9, 0x57, 0x47, 0x07,
+	0xb7, 0x59, 0x18, 0xee, 0x91, 0x6d, 0x36, 0x22, 0xd4, 0x0c, 0xbd, 0x50, 0x5a, 0xfe, 0x03, 0xfb,
+	0x76, 0x96, 0x7d, 0xfb, 0x82, 0xec, 0xaa, 0x67, 0x4a, 0x82, 0x85, 0x36, 0x46, 0xf7, 0xdd, 0x57,
+	0x4f, 0x1a, 0xce, 0x59, 0x5a, 0x37, 0xa5, 0x2d, 0x14, 0xdf, 0x6a, 0x81, 0xe6, 0x79, 0xb1, 0x53,
+	0xfa, 0xce, 0x5f, 0x65, 0x30, 0xb7, 0x25, 0x42, 0xf8, 0x25, 0xa8, 0x64, 0x9f, 0x5e, 0x77, 0xfa,
+	0x1a, 0xe6, 0x5f, 0xbe, 0xfa, 0xdb, 0xb3, 0xe3, 0x69, 0x73, 0xef, 0x1c, 0xfc, 0xfc, 0xe7, 0xb7,
+	0x97, 0x6e, 0xc3, 0x06, 0x3a, 0xf3, 0x81, 0x43, 0x81, 0xc9, 0x1f, 0xe8, 0x67, 0xfb, 0xc0, 0x01,
+	0x57, 0x73, 0xef, 0x67, 0xe3, 0xfc, 0x1d, 0x74, 0x42, 0xfd, 0xce, 0x6b, 0x12, 0x52, 0x0d, 0x6d,
+	0xad, 0xa1, 0x05, 0x9b, 0x33, 0x34, 0x68, 0x9f, 0x16, 0x91, 0x7b, 0xd5, 0x8a, 0x44, 0x64, 0x13,
+	0x0a, 0x45, 0x14, 0xbe, 0x33, 0xb3, 0x44, 0xec, 0xeb, 0x82, 0x81, 0x79, 0xd6, 0xe0, 0x63, 0x07,
+	0x54, 0xb3, 0x97, 0xf3, 0x01, 0x67, 0x09, 0x13, 0x78, 0xaf, 0x50, 0x4c, 0x36, 0xb1, 0x50, 0x4c,
+	0xe1, 0x35, 0x9f, 0x25, 0x86, 0xdb, 0x02, 0x73, 0x2c, 0x5f, 0x3b, 0x60, 0x31, 0x77, 0x6d, 0x52,
+	0x35, 0xcd, 0x19, 0x9b, 0x99, 0x03, 0x6a, 0xbf, 0x2e, 0x23, 0xd5, 0x73, 0x57, 0xeb, 0x79, 0x13,
+	0xde, 0x9e, 0xa5, 0xc7, 0x1c, 0xd1, 0x8f, 0x0e, 0xb8, 0x55, 0x38, 0xd1, 0xa9, 0xb0, 0xa2, 0x6d,
+	0x0b, 0x2b, 0xea, 0xeb, 0x17, 0xcd, 0x4c, 0x85, 0x76, 0xb4, 0xd0, 0x7b, 0x70, 0xb5, 0x40, 0xa8,
+	0xd4, 0x95, 0x03, 0x7d, 0x63, 0x07, 0xc1, 0x64, 0x97, 0xcb, 0x5f, 0xa9, 0xaf, 0x56, 0x6f, 0xf3,
+	0xd9, 0x91, 0xeb, 0x3c, 0x3f, 0x72, 0x9d, 0x3f, 0x8e, 0x5c, 0xe7, 0x9b, 0x63, 0xb7, 0xf4, 0xfc,
+	0xd8, 0x2d, 0xfd, 0x76, 0xec, 0x96, 0x3e, 0x47, 0x61, 0x24, 0x77, 0xf7, 0x77, 0xbc, 0x80, 0xc5,
+	0xa8, 0xaf, 0x96, 0x5d, 0xfb, 0x84, 0xc8, 0x2f, 0x18, 0x1f, 0x19, 0x0b, 0x8d, 0xdf, 0x47, 0x0f,
+	0xed, 0x4e, 0xf2, 0x51, 0x42, 0xc4, 0x4e, 0x59, 0xff, 0xc7, 0x74, 0xff, 0x9f, 0x00, 0x00, 0x00,
+	0xff, 0xff, 0x3f, 0x22, 0xfa, 0xaa, 0x35, 0x0a, 0x00, 0x00,
 }
 
-func (this *MsgToggleTokenConversionProposal) Equal(that interface{}) bool {
+func (this *MsgToggleTokenConversion) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
 	}
 
-	that1, ok := that.(*MsgToggleTokenConversionProposal)
+	that1, ok := that.(*MsgToggleTokenConversion)
 	if !ok {
-		that2, ok := that.(MsgToggleTokenConversionProposal)
+		that2, ok := that.(MsgToggleTokenConversion)
 		if ok {
 			that1 = &that2
 		} else {
@@ -812,13 +808,13 @@ type MsgClient interface {
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
 	// RegisterCoinProposal defines a method to create a proposal to register a
 	// token pair for a native Cosmos coin.
-	RegisterCoinProposal(ctx context.Context, in *MsgRegisterCoinProposal, opts ...grpc.CallOption) (*MsgRegisterCoinProposalResponse, error)
+	RegisterCoinProposal(ctx context.Context, in *MsgRegisterCoin, opts ...grpc.CallOption) (*MsgRegisterCoinResponse, error)
 	// RegisterERC20Proposal defines a method to create a proposal to register a
 	// token pair for an ERC20 token.
-	RegisterERC20Proposal(ctx context.Context, in *MsgRegisterERC20Proposal, opts ...grpc.CallOption) (*MsgRegisterERC20ProposalResponse, error)
+	RegisterERC20Proposal(ctx context.Context, in *MsgRegisterERC20, opts ...grpc.CallOption) (*MsgRegisterERC20Response, error)
 	// ToggleTokenConversionProposal defines a method to create a proposal to
 	// toggle the conversion of a token pair.
-	ToggleTokenConversionProposal(ctx context.Context, in *MsgToggleTokenConversionProposal, opts ...grpc.CallOption) (*MsgToggleTokenConversionProposalResponse, error)
+	ToggleTokenConversionProposal(ctx context.Context, in *MsgToggleTokenConversion, opts ...grpc.CallOption) (*MsgToggleTokenConversionResponse, error)
 }
 
 type msgClient struct {
@@ -856,8 +852,8 @@ func (c *msgClient) UpdateParams(ctx context.Context, in *MsgUpdateParams, opts 
 	return out, nil
 }
 
-func (c *msgClient) RegisterCoinProposal(ctx context.Context, in *MsgRegisterCoinProposal, opts ...grpc.CallOption) (*MsgRegisterCoinProposalResponse, error) {
-	out := new(MsgRegisterCoinProposalResponse)
+func (c *msgClient) RegisterCoinProposal(ctx context.Context, in *MsgRegisterCoin, opts ...grpc.CallOption) (*MsgRegisterCoinResponse, error) {
+	out := new(MsgRegisterCoinResponse)
 	err := c.cc.Invoke(ctx, "/canto.erc20.v1.Msg/RegisterCoinProposal", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -865,8 +861,8 @@ func (c *msgClient) RegisterCoinProposal(ctx context.Context, in *MsgRegisterCoi
 	return out, nil
 }
 
-func (c *msgClient) RegisterERC20Proposal(ctx context.Context, in *MsgRegisterERC20Proposal, opts ...grpc.CallOption) (*MsgRegisterERC20ProposalResponse, error) {
-	out := new(MsgRegisterERC20ProposalResponse)
+func (c *msgClient) RegisterERC20Proposal(ctx context.Context, in *MsgRegisterERC20, opts ...grpc.CallOption) (*MsgRegisterERC20Response, error) {
+	out := new(MsgRegisterERC20Response)
 	err := c.cc.Invoke(ctx, "/canto.erc20.v1.Msg/RegisterERC20Proposal", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -874,8 +870,8 @@ func (c *msgClient) RegisterERC20Proposal(ctx context.Context, in *MsgRegisterER
 	return out, nil
 }
 
-func (c *msgClient) ToggleTokenConversionProposal(ctx context.Context, in *MsgToggleTokenConversionProposal, opts ...grpc.CallOption) (*MsgToggleTokenConversionProposalResponse, error) {
-	out := new(MsgToggleTokenConversionProposalResponse)
+func (c *msgClient) ToggleTokenConversionProposal(ctx context.Context, in *MsgToggleTokenConversion, opts ...grpc.CallOption) (*MsgToggleTokenConversionResponse, error) {
+	out := new(MsgToggleTokenConversionResponse)
 	err := c.cc.Invoke(ctx, "/canto.erc20.v1.Msg/ToggleTokenConversionProposal", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -895,13 +891,13 @@ type MsgServer interface {
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
 	// RegisterCoinProposal defines a method to create a proposal to register a
 	// token pair for a native Cosmos coin.
-	RegisterCoinProposal(context.Context, *MsgRegisterCoinProposal) (*MsgRegisterCoinProposalResponse, error)
+	RegisterCoinProposal(context.Context, *MsgRegisterCoin) (*MsgRegisterCoinResponse, error)
 	// RegisterERC20Proposal defines a method to create a proposal to register a
 	// token pair for an ERC20 token.
-	RegisterERC20Proposal(context.Context, *MsgRegisterERC20Proposal) (*MsgRegisterERC20ProposalResponse, error)
+	RegisterERC20Proposal(context.Context, *MsgRegisterERC20) (*MsgRegisterERC20Response, error)
 	// ToggleTokenConversionProposal defines a method to create a proposal to
 	// toggle the conversion of a token pair.
-	ToggleTokenConversionProposal(context.Context, *MsgToggleTokenConversionProposal) (*MsgToggleTokenConversionProposalResponse, error)
+	ToggleTokenConversionProposal(context.Context, *MsgToggleTokenConversion) (*MsgToggleTokenConversionResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -917,13 +913,13 @@ func (*UnimplementedMsgServer) ConvertERC20(ctx context.Context, req *MsgConvert
 func (*UnimplementedMsgServer) UpdateParams(ctx context.Context, req *MsgUpdateParams) (*MsgUpdateParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateParams not implemented")
 }
-func (*UnimplementedMsgServer) RegisterCoinProposal(ctx context.Context, req *MsgRegisterCoinProposal) (*MsgRegisterCoinProposalResponse, error) {
+func (*UnimplementedMsgServer) RegisterCoinProposal(ctx context.Context, req *MsgRegisterCoin) (*MsgRegisterCoinResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterCoinProposal not implemented")
 }
-func (*UnimplementedMsgServer) RegisterERC20Proposal(ctx context.Context, req *MsgRegisterERC20Proposal) (*MsgRegisterERC20ProposalResponse, error) {
+func (*UnimplementedMsgServer) RegisterERC20Proposal(ctx context.Context, req *MsgRegisterERC20) (*MsgRegisterERC20Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterERC20Proposal not implemented")
 }
-func (*UnimplementedMsgServer) ToggleTokenConversionProposal(ctx context.Context, req *MsgToggleTokenConversionProposal) (*MsgToggleTokenConversionProposalResponse, error) {
+func (*UnimplementedMsgServer) ToggleTokenConversionProposal(ctx context.Context, req *MsgToggleTokenConversion) (*MsgToggleTokenConversionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ToggleTokenConversionProposal not implemented")
 }
 
@@ -986,7 +982,7 @@ func _Msg_UpdateParams_Handler(srv interface{}, ctx context.Context, dec func(in
 }
 
 func _Msg_RegisterCoinProposal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgRegisterCoinProposal)
+	in := new(MsgRegisterCoin)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -998,13 +994,13 @@ func _Msg_RegisterCoinProposal_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: "/canto.erc20.v1.Msg/RegisterCoinProposal",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).RegisterCoinProposal(ctx, req.(*MsgRegisterCoinProposal))
+		return srv.(MsgServer).RegisterCoinProposal(ctx, req.(*MsgRegisterCoin))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Msg_RegisterERC20Proposal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgRegisterERC20Proposal)
+	in := new(MsgRegisterERC20)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -1016,13 +1012,13 @@ func _Msg_RegisterERC20Proposal_Handler(srv interface{}, ctx context.Context, de
 		FullMethod: "/canto.erc20.v1.Msg/RegisterERC20Proposal",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).RegisterERC20Proposal(ctx, req.(*MsgRegisterERC20Proposal))
+		return srv.(MsgServer).RegisterERC20Proposal(ctx, req.(*MsgRegisterERC20))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Msg_ToggleTokenConversionProposal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgToggleTokenConversionProposal)
+	in := new(MsgToggleTokenConversion)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -1034,7 +1030,7 @@ func _Msg_ToggleTokenConversionProposal_Handler(srv interface{}, ctx context.Con
 		FullMethod: "/canto.erc20.v1.Msg/ToggleTokenConversionProposal",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).ToggleTokenConversionProposal(ctx, req.(*MsgToggleTokenConversionProposal))
+		return srv.(MsgServer).ToggleTokenConversionProposal(ctx, req.(*MsgToggleTokenConversion))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1282,7 +1278,7 @@ func (m *MsgUpdateParamsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgRegisterCoinProposal) Marshal() (dAtA []byte, err error) {
+func (m *MsgRegisterCoin) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1292,12 +1288,12 @@ func (m *MsgRegisterCoinProposal) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgRegisterCoinProposal) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgRegisterCoin) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgRegisterCoinProposal) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgRegisterCoin) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1336,7 +1332,7 @@ func (m *MsgRegisterCoinProposal) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgRegisterCoinProposalResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgRegisterCoinResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1346,12 +1342,12 @@ func (m *MsgRegisterCoinProposalResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgRegisterCoinProposalResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgRegisterCoinResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgRegisterCoinProposalResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgRegisterCoinResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1359,7 +1355,7 @@ func (m *MsgRegisterCoinProposalResponse) MarshalToSizedBuffer(dAtA []byte) (int
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgRegisterERC20Proposal) Marshal() (dAtA []byte, err error) {
+func (m *MsgRegisterERC20) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1369,12 +1365,12 @@ func (m *MsgRegisterERC20Proposal) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgRegisterERC20Proposal) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgRegisterERC20) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgRegisterERC20Proposal) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgRegisterERC20) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1410,7 +1406,7 @@ func (m *MsgRegisterERC20Proposal) MarshalToSizedBuffer(dAtA []byte) (int, error
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgRegisterERC20ProposalResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgRegisterERC20Response) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1420,12 +1416,12 @@ func (m *MsgRegisterERC20ProposalResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgRegisterERC20ProposalResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgRegisterERC20Response) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgRegisterERC20ProposalResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgRegisterERC20Response) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1433,7 +1429,7 @@ func (m *MsgRegisterERC20ProposalResponse) MarshalToSizedBuffer(dAtA []byte) (in
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgToggleTokenConversionProposal) Marshal() (dAtA []byte, err error) {
+func (m *MsgToggleTokenConversion) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1443,12 +1439,12 @@ func (m *MsgToggleTokenConversionProposal) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgToggleTokenConversionProposal) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgToggleTokenConversion) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgToggleTokenConversionProposal) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgToggleTokenConversion) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1484,7 +1480,7 @@ func (m *MsgToggleTokenConversionProposal) MarshalToSizedBuffer(dAtA []byte) (in
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgToggleTokenConversionProposalResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgToggleTokenConversionResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1494,12 +1490,12 @@ func (m *MsgToggleTokenConversionProposalResponse) Marshal() (dAtA []byte, err e
 	return dAtA[:n], nil
 }
 
-func (m *MsgToggleTokenConversionProposalResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgToggleTokenConversionResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgToggleTokenConversionProposalResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgToggleTokenConversionResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1602,7 +1598,7 @@ func (m *MsgUpdateParamsResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgRegisterCoinProposal) Size() (n int) {
+func (m *MsgRegisterCoin) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1625,7 +1621,7 @@ func (m *MsgRegisterCoinProposal) Size() (n int) {
 	return n
 }
 
-func (m *MsgRegisterCoinProposalResponse) Size() (n int) {
+func (m *MsgRegisterCoinResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1634,7 +1630,7 @@ func (m *MsgRegisterCoinProposalResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgRegisterERC20Proposal) Size() (n int) {
+func (m *MsgRegisterERC20) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1659,7 +1655,7 @@ func (m *MsgRegisterERC20Proposal) Size() (n int) {
 	return n
 }
 
-func (m *MsgRegisterERC20ProposalResponse) Size() (n int) {
+func (m *MsgRegisterERC20Response) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1668,7 +1664,7 @@ func (m *MsgRegisterERC20ProposalResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgToggleTokenConversionProposal) Size() (n int) {
+func (m *MsgToggleTokenConversion) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1693,7 +1689,7 @@ func (m *MsgToggleTokenConversionProposal) Size() (n int) {
 	return n
 }
 
-func (m *MsgToggleTokenConversionProposalResponse) Size() (n int) {
+func (m *MsgToggleTokenConversionResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -2300,7 +2296,7 @@ func (m *MsgUpdateParamsResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgRegisterCoinProposal) Unmarshal(dAtA []byte) error {
+func (m *MsgRegisterCoin) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2323,10 +2319,10 @@ func (m *MsgRegisterCoinProposal) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgRegisterCoinProposal: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgRegisterCoin: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgRegisterCoinProposal: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgRegisterCoin: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2479,7 +2475,7 @@ func (m *MsgRegisterCoinProposal) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgRegisterCoinProposalResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgRegisterCoinResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2502,10 +2498,10 @@ func (m *MsgRegisterCoinProposalResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgRegisterCoinProposalResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgRegisterCoinResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgRegisterCoinProposalResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgRegisterCoinResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -2529,7 +2525,7 @@ func (m *MsgRegisterCoinProposalResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgRegisterERC20Proposal) Unmarshal(dAtA []byte) error {
+func (m *MsgRegisterERC20) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2552,10 +2548,10 @@ func (m *MsgRegisterERC20Proposal) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgRegisterERC20Proposal: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgRegisterERC20: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgRegisterERC20Proposal: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgRegisterERC20: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2707,7 +2703,7 @@ func (m *MsgRegisterERC20Proposal) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgRegisterERC20ProposalResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgRegisterERC20Response) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2730,10 +2726,10 @@ func (m *MsgRegisterERC20ProposalResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgRegisterERC20ProposalResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgRegisterERC20Response: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgRegisterERC20ProposalResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgRegisterERC20Response: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -2757,7 +2753,7 @@ func (m *MsgRegisterERC20ProposalResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgToggleTokenConversionProposal) Unmarshal(dAtA []byte) error {
+func (m *MsgToggleTokenConversion) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2780,10 +2776,10 @@ func (m *MsgToggleTokenConversionProposal) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgToggleTokenConversionProposal: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgToggleTokenConversion: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgToggleTokenConversionProposal: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgToggleTokenConversion: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2935,7 +2931,7 @@ func (m *MsgToggleTokenConversionProposal) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgToggleTokenConversionProposalResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgToggleTokenConversionResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2958,10 +2954,10 @@ func (m *MsgToggleTokenConversionProposalResponse) Unmarshal(dAtA []byte) error 
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgToggleTokenConversionProposalResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgToggleTokenConversionResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgToggleTokenConversionProposalResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgToggleTokenConversionResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

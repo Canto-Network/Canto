@@ -6,6 +6,7 @@ import (
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 )
 
 var (
@@ -43,9 +44,16 @@ func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 		&MsgConvertCoin{},
 		&MsgConvertERC20{},
 		&MsgUpdateParams{},
-		&MsgRegisterCoinProposal{},
-		&MsgRegisterERC20Proposal{},
-		&MsgToggleTokenConversionProposal{},
+		&MsgRegisterCoin{},
+		&MsgRegisterERC20{},
+		&MsgToggleTokenConversion{},
+	)
+
+	registry.RegisterImplementations(
+		(*govtypes.Content)(nil),
+		&RegisterCoinProposal{},
+		&RegisterERC20Proposal{},
+		&ToggleTokenConversionProposal{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
@@ -55,8 +63,8 @@ func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 // concrete types on the provided LegacyAmino codec. These types are used for
 // Amino JSON serialization and EIP-712 compatibility.
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&MsgRegisterCoinProposal{}, "canto/RegisterCoinProposal", nil)
-	cdc.RegisterConcrete(&MsgRegisterERC20Proposal{}, "canto/RegisterERC20Proposal", nil)
+	cdc.RegisterConcrete(&MsgRegisterCoin{}, "canto/RegisterCoinProposal", nil)
+	cdc.RegisterConcrete(&MsgRegisterERC20{}, "canto/RegisterERC20Proposal", nil)
 	cdc.RegisterConcrete(&MsgConvertERC20{}, convertERC20Name, nil)
 	cdc.RegisterConcrete(&MsgConvertCoin{}, convertCoinName, nil)
 	cdc.RegisterConcrete(&MsgUpdateParams{}, msgUpdateParams, nil)

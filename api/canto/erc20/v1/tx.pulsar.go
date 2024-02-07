@@ -2762,31 +2762,31 @@ func (x *fastReflection_MsgUpdateParamsResponse) ProtoMethods() *protoiface.Meth
 }
 
 var (
-	md_MsgRegisterCoinProposal             protoreflect.MessageDescriptor
-	fd_MsgRegisterCoinProposal_authority   protoreflect.FieldDescriptor
-	fd_MsgRegisterCoinProposal_title       protoreflect.FieldDescriptor
-	fd_MsgRegisterCoinProposal_description protoreflect.FieldDescriptor
-	fd_MsgRegisterCoinProposal_metadata    protoreflect.FieldDescriptor
+	md_MsgRegisterCoin             protoreflect.MessageDescriptor
+	fd_MsgRegisterCoin_authority   protoreflect.FieldDescriptor
+	fd_MsgRegisterCoin_title       protoreflect.FieldDescriptor
+	fd_MsgRegisterCoin_description protoreflect.FieldDescriptor
+	fd_MsgRegisterCoin_metadata    protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_canto_erc20_v1_tx_proto_init()
-	md_MsgRegisterCoinProposal = File_canto_erc20_v1_tx_proto.Messages().ByName("MsgRegisterCoinProposal")
-	fd_MsgRegisterCoinProposal_authority = md_MsgRegisterCoinProposal.Fields().ByName("authority")
-	fd_MsgRegisterCoinProposal_title = md_MsgRegisterCoinProposal.Fields().ByName("title")
-	fd_MsgRegisterCoinProposal_description = md_MsgRegisterCoinProposal.Fields().ByName("description")
-	fd_MsgRegisterCoinProposal_metadata = md_MsgRegisterCoinProposal.Fields().ByName("metadata")
+	md_MsgRegisterCoin = File_canto_erc20_v1_tx_proto.Messages().ByName("MsgRegisterCoin")
+	fd_MsgRegisterCoin_authority = md_MsgRegisterCoin.Fields().ByName("authority")
+	fd_MsgRegisterCoin_title = md_MsgRegisterCoin.Fields().ByName("title")
+	fd_MsgRegisterCoin_description = md_MsgRegisterCoin.Fields().ByName("description")
+	fd_MsgRegisterCoin_metadata = md_MsgRegisterCoin.Fields().ByName("metadata")
 }
 
-var _ protoreflect.Message = (*fastReflection_MsgRegisterCoinProposal)(nil)
+var _ protoreflect.Message = (*fastReflection_MsgRegisterCoin)(nil)
 
-type fastReflection_MsgRegisterCoinProposal MsgRegisterCoinProposal
+type fastReflection_MsgRegisterCoin MsgRegisterCoin
 
-func (x *MsgRegisterCoinProposal) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_MsgRegisterCoinProposal)(x)
+func (x *MsgRegisterCoin) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_MsgRegisterCoin)(x)
 }
 
-func (x *MsgRegisterCoinProposal) slowProtoReflect() protoreflect.Message {
+func (x *MsgRegisterCoin) slowProtoReflect() protoreflect.Message {
 	mi := &file_canto_erc20_v1_tx_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -2798,43 +2798,43 @@ func (x *MsgRegisterCoinProposal) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_MsgRegisterCoinProposal_messageType fastReflection_MsgRegisterCoinProposal_messageType
-var _ protoreflect.MessageType = fastReflection_MsgRegisterCoinProposal_messageType{}
+var _fastReflection_MsgRegisterCoin_messageType fastReflection_MsgRegisterCoin_messageType
+var _ protoreflect.MessageType = fastReflection_MsgRegisterCoin_messageType{}
 
-type fastReflection_MsgRegisterCoinProposal_messageType struct{}
+type fastReflection_MsgRegisterCoin_messageType struct{}
 
-func (x fastReflection_MsgRegisterCoinProposal_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_MsgRegisterCoinProposal)(nil)
+func (x fastReflection_MsgRegisterCoin_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_MsgRegisterCoin)(nil)
 }
-func (x fastReflection_MsgRegisterCoinProposal_messageType) New() protoreflect.Message {
-	return new(fastReflection_MsgRegisterCoinProposal)
+func (x fastReflection_MsgRegisterCoin_messageType) New() protoreflect.Message {
+	return new(fastReflection_MsgRegisterCoin)
 }
-func (x fastReflection_MsgRegisterCoinProposal_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgRegisterCoinProposal
+func (x fastReflection_MsgRegisterCoin_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgRegisterCoin
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_MsgRegisterCoinProposal) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgRegisterCoinProposal
+func (x *fastReflection_MsgRegisterCoin) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgRegisterCoin
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_MsgRegisterCoinProposal) Type() protoreflect.MessageType {
-	return _fastReflection_MsgRegisterCoinProposal_messageType
+func (x *fastReflection_MsgRegisterCoin) Type() protoreflect.MessageType {
+	return _fastReflection_MsgRegisterCoin_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_MsgRegisterCoinProposal) New() protoreflect.Message {
-	return new(fastReflection_MsgRegisterCoinProposal)
+func (x *fastReflection_MsgRegisterCoin) New() protoreflect.Message {
+	return new(fastReflection_MsgRegisterCoin)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_MsgRegisterCoinProposal) Interface() protoreflect.ProtoMessage {
-	return (*MsgRegisterCoinProposal)(x)
+func (x *fastReflection_MsgRegisterCoin) Interface() protoreflect.ProtoMessage {
+	return (*MsgRegisterCoin)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -2842,28 +2842,28 @@ func (x *fastReflection_MsgRegisterCoinProposal) Interface() protoreflect.ProtoM
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_MsgRegisterCoinProposal) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_MsgRegisterCoin) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 	if x.Authority != "" {
 		value := protoreflect.ValueOfString(x.Authority)
-		if !f(fd_MsgRegisterCoinProposal_authority, value) {
+		if !f(fd_MsgRegisterCoin_authority, value) {
 			return
 		}
 	}
 	if x.Title != "" {
 		value := protoreflect.ValueOfString(x.Title)
-		if !f(fd_MsgRegisterCoinProposal_title, value) {
+		if !f(fd_MsgRegisterCoin_title, value) {
 			return
 		}
 	}
 	if x.Description != "" {
 		value := protoreflect.ValueOfString(x.Description)
-		if !f(fd_MsgRegisterCoinProposal_description, value) {
+		if !f(fd_MsgRegisterCoin_description, value) {
 			return
 		}
 	}
 	if x.Metadata != nil {
 		value := protoreflect.ValueOfMessage(x.Metadata.ProtoReflect())
-		if !f(fd_MsgRegisterCoinProposal_metadata, value) {
+		if !f(fd_MsgRegisterCoin_metadata, value) {
 			return
 		}
 	}
@@ -2880,21 +2880,21 @@ func (x *fastReflection_MsgRegisterCoinProposal) Range(f func(protoreflect.Field
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_MsgRegisterCoinProposal) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_MsgRegisterCoin) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "canto.erc20.v1.MsgRegisterCoinProposal.authority":
+	case "canto.erc20.v1.MsgRegisterCoin.authority":
 		return x.Authority != ""
-	case "canto.erc20.v1.MsgRegisterCoinProposal.title":
+	case "canto.erc20.v1.MsgRegisterCoin.title":
 		return x.Title != ""
-	case "canto.erc20.v1.MsgRegisterCoinProposal.description":
+	case "canto.erc20.v1.MsgRegisterCoin.description":
 		return x.Description != ""
-	case "canto.erc20.v1.MsgRegisterCoinProposal.metadata":
+	case "canto.erc20.v1.MsgRegisterCoin.metadata":
 		return x.Metadata != nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterCoinProposal"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterCoin"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterCoinProposal does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterCoin does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2904,21 +2904,21 @@ func (x *fastReflection_MsgRegisterCoinProposal) Has(fd protoreflect.FieldDescri
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgRegisterCoinProposal) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_MsgRegisterCoin) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "canto.erc20.v1.MsgRegisterCoinProposal.authority":
+	case "canto.erc20.v1.MsgRegisterCoin.authority":
 		x.Authority = ""
-	case "canto.erc20.v1.MsgRegisterCoinProposal.title":
+	case "canto.erc20.v1.MsgRegisterCoin.title":
 		x.Title = ""
-	case "canto.erc20.v1.MsgRegisterCoinProposal.description":
+	case "canto.erc20.v1.MsgRegisterCoin.description":
 		x.Description = ""
-	case "canto.erc20.v1.MsgRegisterCoinProposal.metadata":
+	case "canto.erc20.v1.MsgRegisterCoin.metadata":
 		x.Metadata = nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterCoinProposal"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterCoin"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterCoinProposal does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterCoin does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2928,25 +2928,25 @@ func (x *fastReflection_MsgRegisterCoinProposal) Clear(fd protoreflect.FieldDesc
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_MsgRegisterCoinProposal) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgRegisterCoin) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "canto.erc20.v1.MsgRegisterCoinProposal.authority":
+	case "canto.erc20.v1.MsgRegisterCoin.authority":
 		value := x.Authority
 		return protoreflect.ValueOfString(value)
-	case "canto.erc20.v1.MsgRegisterCoinProposal.title":
+	case "canto.erc20.v1.MsgRegisterCoin.title":
 		value := x.Title
 		return protoreflect.ValueOfString(value)
-	case "canto.erc20.v1.MsgRegisterCoinProposal.description":
+	case "canto.erc20.v1.MsgRegisterCoin.description":
 		value := x.Description
 		return protoreflect.ValueOfString(value)
-	case "canto.erc20.v1.MsgRegisterCoinProposal.metadata":
+	case "canto.erc20.v1.MsgRegisterCoin.metadata":
 		value := x.Metadata
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterCoinProposal"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterCoin"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterCoinProposal does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterCoin does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -2960,21 +2960,21 @@ func (x *fastReflection_MsgRegisterCoinProposal) Get(descriptor protoreflect.Fie
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgRegisterCoinProposal) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_MsgRegisterCoin) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "canto.erc20.v1.MsgRegisterCoinProposal.authority":
+	case "canto.erc20.v1.MsgRegisterCoin.authority":
 		x.Authority = value.Interface().(string)
-	case "canto.erc20.v1.MsgRegisterCoinProposal.title":
+	case "canto.erc20.v1.MsgRegisterCoin.title":
 		x.Title = value.Interface().(string)
-	case "canto.erc20.v1.MsgRegisterCoinProposal.description":
+	case "canto.erc20.v1.MsgRegisterCoin.description":
 		x.Description = value.Interface().(string)
-	case "canto.erc20.v1.MsgRegisterCoinProposal.metadata":
+	case "canto.erc20.v1.MsgRegisterCoin.metadata":
 		x.Metadata = value.Message().Interface().(*v1beta11.Metadata)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterCoinProposal"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterCoin"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterCoinProposal does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterCoin does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2988,56 +2988,56 @@ func (x *fastReflection_MsgRegisterCoinProposal) Set(fd protoreflect.FieldDescri
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgRegisterCoinProposal) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgRegisterCoin) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "canto.erc20.v1.MsgRegisterCoinProposal.metadata":
+	case "canto.erc20.v1.MsgRegisterCoin.metadata":
 		if x.Metadata == nil {
 			x.Metadata = new(v1beta11.Metadata)
 		}
 		return protoreflect.ValueOfMessage(x.Metadata.ProtoReflect())
-	case "canto.erc20.v1.MsgRegisterCoinProposal.authority":
-		panic(fmt.Errorf("field authority of message canto.erc20.v1.MsgRegisterCoinProposal is not mutable"))
-	case "canto.erc20.v1.MsgRegisterCoinProposal.title":
-		panic(fmt.Errorf("field title of message canto.erc20.v1.MsgRegisterCoinProposal is not mutable"))
-	case "canto.erc20.v1.MsgRegisterCoinProposal.description":
-		panic(fmt.Errorf("field description of message canto.erc20.v1.MsgRegisterCoinProposal is not mutable"))
+	case "canto.erc20.v1.MsgRegisterCoin.authority":
+		panic(fmt.Errorf("field authority of message canto.erc20.v1.MsgRegisterCoin is not mutable"))
+	case "canto.erc20.v1.MsgRegisterCoin.title":
+		panic(fmt.Errorf("field title of message canto.erc20.v1.MsgRegisterCoin is not mutable"))
+	case "canto.erc20.v1.MsgRegisterCoin.description":
+		panic(fmt.Errorf("field description of message canto.erc20.v1.MsgRegisterCoin is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterCoinProposal"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterCoin"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterCoinProposal does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterCoin does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_MsgRegisterCoinProposal) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgRegisterCoin) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "canto.erc20.v1.MsgRegisterCoinProposal.authority":
+	case "canto.erc20.v1.MsgRegisterCoin.authority":
 		return protoreflect.ValueOfString("")
-	case "canto.erc20.v1.MsgRegisterCoinProposal.title":
+	case "canto.erc20.v1.MsgRegisterCoin.title":
 		return protoreflect.ValueOfString("")
-	case "canto.erc20.v1.MsgRegisterCoinProposal.description":
+	case "canto.erc20.v1.MsgRegisterCoin.description":
 		return protoreflect.ValueOfString("")
-	case "canto.erc20.v1.MsgRegisterCoinProposal.metadata":
+	case "canto.erc20.v1.MsgRegisterCoin.metadata":
 		m := new(v1beta11.Metadata)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterCoinProposal"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterCoin"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterCoinProposal does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterCoin does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_MsgRegisterCoinProposal) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_MsgRegisterCoin) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in canto.erc20.v1.MsgRegisterCoinProposal", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in canto.erc20.v1.MsgRegisterCoin", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -3045,7 +3045,7 @@ func (x *fastReflection_MsgRegisterCoinProposal) WhichOneof(d protoreflect.Oneof
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_MsgRegisterCoinProposal) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_MsgRegisterCoin) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -3056,7 +3056,7 @@ func (x *fastReflection_MsgRegisterCoinProposal) GetUnknown() protoreflect.RawFi
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgRegisterCoinProposal) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_MsgRegisterCoin) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -3068,7 +3068,7 @@ func (x *fastReflection_MsgRegisterCoinProposal) SetUnknown(fields protoreflect.
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_MsgRegisterCoinProposal) IsValid() bool {
+func (x *fastReflection_MsgRegisterCoin) IsValid() bool {
 	return x != nil
 }
 
@@ -3078,9 +3078,9 @@ func (x *fastReflection_MsgRegisterCoinProposal) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_MsgRegisterCoinProposal) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_MsgRegisterCoin) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*MsgRegisterCoinProposal)
+		x := input.Message.Interface().(*MsgRegisterCoin)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -3118,7 +3118,7 @@ func (x *fastReflection_MsgRegisterCoinProposal) ProtoMethods() *protoiface.Meth
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*MsgRegisterCoinProposal)
+		x := input.Message.Interface().(*MsgRegisterCoin)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -3183,7 +3183,7 @@ func (x *fastReflection_MsgRegisterCoinProposal) ProtoMethods() *protoiface.Meth
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*MsgRegisterCoinProposal)
+		x := input.Message.Interface().(*MsgRegisterCoin)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -3215,10 +3215,10 @@ func (x *fastReflection_MsgRegisterCoinProposal) ProtoMethods() *protoiface.Meth
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgRegisterCoinProposal: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgRegisterCoin: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgRegisterCoinProposal: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgRegisterCoin: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
@@ -3389,23 +3389,23 @@ func (x *fastReflection_MsgRegisterCoinProposal) ProtoMethods() *protoiface.Meth
 }
 
 var (
-	md_MsgRegisterCoinProposalResponse protoreflect.MessageDescriptor
+	md_MsgRegisterCoinResponse protoreflect.MessageDescriptor
 )
 
 func init() {
 	file_canto_erc20_v1_tx_proto_init()
-	md_MsgRegisterCoinProposalResponse = File_canto_erc20_v1_tx_proto.Messages().ByName("MsgRegisterCoinProposalResponse")
+	md_MsgRegisterCoinResponse = File_canto_erc20_v1_tx_proto.Messages().ByName("MsgRegisterCoinResponse")
 }
 
-var _ protoreflect.Message = (*fastReflection_MsgRegisterCoinProposalResponse)(nil)
+var _ protoreflect.Message = (*fastReflection_MsgRegisterCoinResponse)(nil)
 
-type fastReflection_MsgRegisterCoinProposalResponse MsgRegisterCoinProposalResponse
+type fastReflection_MsgRegisterCoinResponse MsgRegisterCoinResponse
 
-func (x *MsgRegisterCoinProposalResponse) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_MsgRegisterCoinProposalResponse)(x)
+func (x *MsgRegisterCoinResponse) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_MsgRegisterCoinResponse)(x)
 }
 
-func (x *MsgRegisterCoinProposalResponse) slowProtoReflect() protoreflect.Message {
+func (x *MsgRegisterCoinResponse) slowProtoReflect() protoreflect.Message {
 	mi := &file_canto_erc20_v1_tx_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -3417,43 +3417,43 @@ func (x *MsgRegisterCoinProposalResponse) slowProtoReflect() protoreflect.Messag
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_MsgRegisterCoinProposalResponse_messageType fastReflection_MsgRegisterCoinProposalResponse_messageType
-var _ protoreflect.MessageType = fastReflection_MsgRegisterCoinProposalResponse_messageType{}
+var _fastReflection_MsgRegisterCoinResponse_messageType fastReflection_MsgRegisterCoinResponse_messageType
+var _ protoreflect.MessageType = fastReflection_MsgRegisterCoinResponse_messageType{}
 
-type fastReflection_MsgRegisterCoinProposalResponse_messageType struct{}
+type fastReflection_MsgRegisterCoinResponse_messageType struct{}
 
-func (x fastReflection_MsgRegisterCoinProposalResponse_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_MsgRegisterCoinProposalResponse)(nil)
+func (x fastReflection_MsgRegisterCoinResponse_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_MsgRegisterCoinResponse)(nil)
 }
-func (x fastReflection_MsgRegisterCoinProposalResponse_messageType) New() protoreflect.Message {
-	return new(fastReflection_MsgRegisterCoinProposalResponse)
+func (x fastReflection_MsgRegisterCoinResponse_messageType) New() protoreflect.Message {
+	return new(fastReflection_MsgRegisterCoinResponse)
 }
-func (x fastReflection_MsgRegisterCoinProposalResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgRegisterCoinProposalResponse
+func (x fastReflection_MsgRegisterCoinResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgRegisterCoinResponse
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_MsgRegisterCoinProposalResponse) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgRegisterCoinProposalResponse
+func (x *fastReflection_MsgRegisterCoinResponse) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgRegisterCoinResponse
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_MsgRegisterCoinProposalResponse) Type() protoreflect.MessageType {
-	return _fastReflection_MsgRegisterCoinProposalResponse_messageType
+func (x *fastReflection_MsgRegisterCoinResponse) Type() protoreflect.MessageType {
+	return _fastReflection_MsgRegisterCoinResponse_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_MsgRegisterCoinProposalResponse) New() protoreflect.Message {
-	return new(fastReflection_MsgRegisterCoinProposalResponse)
+func (x *fastReflection_MsgRegisterCoinResponse) New() protoreflect.Message {
+	return new(fastReflection_MsgRegisterCoinResponse)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_MsgRegisterCoinProposalResponse) Interface() protoreflect.ProtoMessage {
-	return (*MsgRegisterCoinProposalResponse)(x)
+func (x *fastReflection_MsgRegisterCoinResponse) Interface() protoreflect.ProtoMessage {
+	return (*MsgRegisterCoinResponse)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -3461,7 +3461,7 @@ func (x *fastReflection_MsgRegisterCoinProposalResponse) Interface() protoreflec
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_MsgRegisterCoinProposalResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_MsgRegisterCoinResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 }
 
 // Has reports whether a field is populated.
@@ -3475,13 +3475,13 @@ func (x *fastReflection_MsgRegisterCoinProposalResponse) Range(f func(protorefle
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_MsgRegisterCoinProposalResponse) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_MsgRegisterCoinResponse) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterCoinProposalResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterCoinResponse"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterCoinProposalResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterCoinResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3491,13 +3491,13 @@ func (x *fastReflection_MsgRegisterCoinProposalResponse) Has(fd protoreflect.Fie
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgRegisterCoinProposalResponse) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_MsgRegisterCoinResponse) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterCoinProposalResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterCoinResponse"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterCoinProposalResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterCoinResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3507,13 +3507,13 @@ func (x *fastReflection_MsgRegisterCoinProposalResponse) Clear(fd protoreflect.F
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_MsgRegisterCoinProposalResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgRegisterCoinResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterCoinProposalResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterCoinResponse"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterCoinProposalResponse does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterCoinResponse does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -3527,13 +3527,13 @@ func (x *fastReflection_MsgRegisterCoinProposalResponse) Get(descriptor protoref
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgRegisterCoinProposalResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_MsgRegisterCoinResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterCoinProposalResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterCoinResponse"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterCoinProposalResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterCoinResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3547,36 +3547,36 @@ func (x *fastReflection_MsgRegisterCoinProposalResponse) Set(fd protoreflect.Fie
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgRegisterCoinProposalResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgRegisterCoinResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterCoinProposalResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterCoinResponse"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterCoinProposalResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterCoinResponse does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_MsgRegisterCoinProposalResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgRegisterCoinResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterCoinProposalResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterCoinResponse"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterCoinProposalResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterCoinResponse does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_MsgRegisterCoinProposalResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_MsgRegisterCoinResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in canto.erc20.v1.MsgRegisterCoinProposalResponse", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in canto.erc20.v1.MsgRegisterCoinResponse", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -3584,7 +3584,7 @@ func (x *fastReflection_MsgRegisterCoinProposalResponse) WhichOneof(d protorefle
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_MsgRegisterCoinProposalResponse) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_MsgRegisterCoinResponse) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -3595,7 +3595,7 @@ func (x *fastReflection_MsgRegisterCoinProposalResponse) GetUnknown() protorefle
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgRegisterCoinProposalResponse) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_MsgRegisterCoinResponse) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -3607,7 +3607,7 @@ func (x *fastReflection_MsgRegisterCoinProposalResponse) SetUnknown(fields proto
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_MsgRegisterCoinProposalResponse) IsValid() bool {
+func (x *fastReflection_MsgRegisterCoinResponse) IsValid() bool {
 	return x != nil
 }
 
@@ -3617,9 +3617,9 @@ func (x *fastReflection_MsgRegisterCoinProposalResponse) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_MsgRegisterCoinProposalResponse) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_MsgRegisterCoinResponse) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*MsgRegisterCoinProposalResponse)
+		x := input.Message.Interface().(*MsgRegisterCoinResponse)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -3641,7 +3641,7 @@ func (x *fastReflection_MsgRegisterCoinProposalResponse) ProtoMethods() *protoif
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*MsgRegisterCoinProposalResponse)
+		x := input.Message.Interface().(*MsgRegisterCoinResponse)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -3671,7 +3671,7 @@ func (x *fastReflection_MsgRegisterCoinProposalResponse) ProtoMethods() *protoif
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*MsgRegisterCoinProposalResponse)
+		x := input.Message.Interface().(*MsgRegisterCoinResponse)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -3703,10 +3703,10 @@ func (x *fastReflection_MsgRegisterCoinProposalResponse) ProtoMethods() *protoif
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgRegisterCoinProposalResponse: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgRegisterCoinResponse: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgRegisterCoinProposalResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgRegisterCoinResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			default:
@@ -3745,31 +3745,31 @@ func (x *fastReflection_MsgRegisterCoinProposalResponse) ProtoMethods() *protoif
 }
 
 var (
-	md_MsgRegisterERC20Proposal              protoreflect.MessageDescriptor
-	fd_MsgRegisterERC20Proposal_authority    protoreflect.FieldDescriptor
-	fd_MsgRegisterERC20Proposal_title        protoreflect.FieldDescriptor
-	fd_MsgRegisterERC20Proposal_description  protoreflect.FieldDescriptor
-	fd_MsgRegisterERC20Proposal_erc20address protoreflect.FieldDescriptor
+	md_MsgRegisterERC20              protoreflect.MessageDescriptor
+	fd_MsgRegisterERC20_authority    protoreflect.FieldDescriptor
+	fd_MsgRegisterERC20_title        protoreflect.FieldDescriptor
+	fd_MsgRegisterERC20_description  protoreflect.FieldDescriptor
+	fd_MsgRegisterERC20_erc20address protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_canto_erc20_v1_tx_proto_init()
-	md_MsgRegisterERC20Proposal = File_canto_erc20_v1_tx_proto.Messages().ByName("MsgRegisterERC20Proposal")
-	fd_MsgRegisterERC20Proposal_authority = md_MsgRegisterERC20Proposal.Fields().ByName("authority")
-	fd_MsgRegisterERC20Proposal_title = md_MsgRegisterERC20Proposal.Fields().ByName("title")
-	fd_MsgRegisterERC20Proposal_description = md_MsgRegisterERC20Proposal.Fields().ByName("description")
-	fd_MsgRegisterERC20Proposal_erc20address = md_MsgRegisterERC20Proposal.Fields().ByName("erc20address")
+	md_MsgRegisterERC20 = File_canto_erc20_v1_tx_proto.Messages().ByName("MsgRegisterERC20")
+	fd_MsgRegisterERC20_authority = md_MsgRegisterERC20.Fields().ByName("authority")
+	fd_MsgRegisterERC20_title = md_MsgRegisterERC20.Fields().ByName("title")
+	fd_MsgRegisterERC20_description = md_MsgRegisterERC20.Fields().ByName("description")
+	fd_MsgRegisterERC20_erc20address = md_MsgRegisterERC20.Fields().ByName("erc20address")
 }
 
-var _ protoreflect.Message = (*fastReflection_MsgRegisterERC20Proposal)(nil)
+var _ protoreflect.Message = (*fastReflection_MsgRegisterERC20)(nil)
 
-type fastReflection_MsgRegisterERC20Proposal MsgRegisterERC20Proposal
+type fastReflection_MsgRegisterERC20 MsgRegisterERC20
 
-func (x *MsgRegisterERC20Proposal) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_MsgRegisterERC20Proposal)(x)
+func (x *MsgRegisterERC20) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_MsgRegisterERC20)(x)
 }
 
-func (x *MsgRegisterERC20Proposal) slowProtoReflect() protoreflect.Message {
+func (x *MsgRegisterERC20) slowProtoReflect() protoreflect.Message {
 	mi := &file_canto_erc20_v1_tx_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -3781,43 +3781,43 @@ func (x *MsgRegisterERC20Proposal) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_MsgRegisterERC20Proposal_messageType fastReflection_MsgRegisterERC20Proposal_messageType
-var _ protoreflect.MessageType = fastReflection_MsgRegisterERC20Proposal_messageType{}
+var _fastReflection_MsgRegisterERC20_messageType fastReflection_MsgRegisterERC20_messageType
+var _ protoreflect.MessageType = fastReflection_MsgRegisterERC20_messageType{}
 
-type fastReflection_MsgRegisterERC20Proposal_messageType struct{}
+type fastReflection_MsgRegisterERC20_messageType struct{}
 
-func (x fastReflection_MsgRegisterERC20Proposal_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_MsgRegisterERC20Proposal)(nil)
+func (x fastReflection_MsgRegisterERC20_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_MsgRegisterERC20)(nil)
 }
-func (x fastReflection_MsgRegisterERC20Proposal_messageType) New() protoreflect.Message {
-	return new(fastReflection_MsgRegisterERC20Proposal)
+func (x fastReflection_MsgRegisterERC20_messageType) New() protoreflect.Message {
+	return new(fastReflection_MsgRegisterERC20)
 }
-func (x fastReflection_MsgRegisterERC20Proposal_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgRegisterERC20Proposal
+func (x fastReflection_MsgRegisterERC20_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgRegisterERC20
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_MsgRegisterERC20Proposal) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgRegisterERC20Proposal
+func (x *fastReflection_MsgRegisterERC20) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgRegisterERC20
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_MsgRegisterERC20Proposal) Type() protoreflect.MessageType {
-	return _fastReflection_MsgRegisterERC20Proposal_messageType
+func (x *fastReflection_MsgRegisterERC20) Type() protoreflect.MessageType {
+	return _fastReflection_MsgRegisterERC20_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_MsgRegisterERC20Proposal) New() protoreflect.Message {
-	return new(fastReflection_MsgRegisterERC20Proposal)
+func (x *fastReflection_MsgRegisterERC20) New() protoreflect.Message {
+	return new(fastReflection_MsgRegisterERC20)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_MsgRegisterERC20Proposal) Interface() protoreflect.ProtoMessage {
-	return (*MsgRegisterERC20Proposal)(x)
+func (x *fastReflection_MsgRegisterERC20) Interface() protoreflect.ProtoMessage {
+	return (*MsgRegisterERC20)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -3825,28 +3825,28 @@ func (x *fastReflection_MsgRegisterERC20Proposal) Interface() protoreflect.Proto
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_MsgRegisterERC20Proposal) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_MsgRegisterERC20) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 	if x.Authority != "" {
 		value := protoreflect.ValueOfString(x.Authority)
-		if !f(fd_MsgRegisterERC20Proposal_authority, value) {
+		if !f(fd_MsgRegisterERC20_authority, value) {
 			return
 		}
 	}
 	if x.Title != "" {
 		value := protoreflect.ValueOfString(x.Title)
-		if !f(fd_MsgRegisterERC20Proposal_title, value) {
+		if !f(fd_MsgRegisterERC20_title, value) {
 			return
 		}
 	}
 	if x.Description != "" {
 		value := protoreflect.ValueOfString(x.Description)
-		if !f(fd_MsgRegisterERC20Proposal_description, value) {
+		if !f(fd_MsgRegisterERC20_description, value) {
 			return
 		}
 	}
 	if x.Erc20Address != "" {
 		value := protoreflect.ValueOfString(x.Erc20Address)
-		if !f(fd_MsgRegisterERC20Proposal_erc20address, value) {
+		if !f(fd_MsgRegisterERC20_erc20address, value) {
 			return
 		}
 	}
@@ -3863,21 +3863,21 @@ func (x *fastReflection_MsgRegisterERC20Proposal) Range(f func(protoreflect.Fiel
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_MsgRegisterERC20Proposal) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_MsgRegisterERC20) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "canto.erc20.v1.MsgRegisterERC20Proposal.authority":
+	case "canto.erc20.v1.MsgRegisterERC20.authority":
 		return x.Authority != ""
-	case "canto.erc20.v1.MsgRegisterERC20Proposal.title":
+	case "canto.erc20.v1.MsgRegisterERC20.title":
 		return x.Title != ""
-	case "canto.erc20.v1.MsgRegisterERC20Proposal.description":
+	case "canto.erc20.v1.MsgRegisterERC20.description":
 		return x.Description != ""
-	case "canto.erc20.v1.MsgRegisterERC20Proposal.erc20address":
+	case "canto.erc20.v1.MsgRegisterERC20.erc20address":
 		return x.Erc20Address != ""
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterERC20Proposal"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterERC20"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterERC20Proposal does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterERC20 does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3887,21 +3887,21 @@ func (x *fastReflection_MsgRegisterERC20Proposal) Has(fd protoreflect.FieldDescr
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgRegisterERC20Proposal) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_MsgRegisterERC20) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "canto.erc20.v1.MsgRegisterERC20Proposal.authority":
+	case "canto.erc20.v1.MsgRegisterERC20.authority":
 		x.Authority = ""
-	case "canto.erc20.v1.MsgRegisterERC20Proposal.title":
+	case "canto.erc20.v1.MsgRegisterERC20.title":
 		x.Title = ""
-	case "canto.erc20.v1.MsgRegisterERC20Proposal.description":
+	case "canto.erc20.v1.MsgRegisterERC20.description":
 		x.Description = ""
-	case "canto.erc20.v1.MsgRegisterERC20Proposal.erc20address":
+	case "canto.erc20.v1.MsgRegisterERC20.erc20address":
 		x.Erc20Address = ""
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterERC20Proposal"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterERC20"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterERC20Proposal does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterERC20 does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3911,25 +3911,25 @@ func (x *fastReflection_MsgRegisterERC20Proposal) Clear(fd protoreflect.FieldDes
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_MsgRegisterERC20Proposal) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgRegisterERC20) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "canto.erc20.v1.MsgRegisterERC20Proposal.authority":
+	case "canto.erc20.v1.MsgRegisterERC20.authority":
 		value := x.Authority
 		return protoreflect.ValueOfString(value)
-	case "canto.erc20.v1.MsgRegisterERC20Proposal.title":
+	case "canto.erc20.v1.MsgRegisterERC20.title":
 		value := x.Title
 		return protoreflect.ValueOfString(value)
-	case "canto.erc20.v1.MsgRegisterERC20Proposal.description":
+	case "canto.erc20.v1.MsgRegisterERC20.description":
 		value := x.Description
 		return protoreflect.ValueOfString(value)
-	case "canto.erc20.v1.MsgRegisterERC20Proposal.erc20address":
+	case "canto.erc20.v1.MsgRegisterERC20.erc20address":
 		value := x.Erc20Address
 		return protoreflect.ValueOfString(value)
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterERC20Proposal"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterERC20"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterERC20Proposal does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterERC20 does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -3943,21 +3943,21 @@ func (x *fastReflection_MsgRegisterERC20Proposal) Get(descriptor protoreflect.Fi
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgRegisterERC20Proposal) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_MsgRegisterERC20) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "canto.erc20.v1.MsgRegisterERC20Proposal.authority":
+	case "canto.erc20.v1.MsgRegisterERC20.authority":
 		x.Authority = value.Interface().(string)
-	case "canto.erc20.v1.MsgRegisterERC20Proposal.title":
+	case "canto.erc20.v1.MsgRegisterERC20.title":
 		x.Title = value.Interface().(string)
-	case "canto.erc20.v1.MsgRegisterERC20Proposal.description":
+	case "canto.erc20.v1.MsgRegisterERC20.description":
 		x.Description = value.Interface().(string)
-	case "canto.erc20.v1.MsgRegisterERC20Proposal.erc20address":
+	case "canto.erc20.v1.MsgRegisterERC20.erc20address":
 		x.Erc20Address = value.Interface().(string)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterERC20Proposal"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterERC20"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterERC20Proposal does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterERC20 does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3971,52 +3971,52 @@ func (x *fastReflection_MsgRegisterERC20Proposal) Set(fd protoreflect.FieldDescr
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgRegisterERC20Proposal) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgRegisterERC20) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "canto.erc20.v1.MsgRegisterERC20Proposal.authority":
-		panic(fmt.Errorf("field authority of message canto.erc20.v1.MsgRegisterERC20Proposal is not mutable"))
-	case "canto.erc20.v1.MsgRegisterERC20Proposal.title":
-		panic(fmt.Errorf("field title of message canto.erc20.v1.MsgRegisterERC20Proposal is not mutable"))
-	case "canto.erc20.v1.MsgRegisterERC20Proposal.description":
-		panic(fmt.Errorf("field description of message canto.erc20.v1.MsgRegisterERC20Proposal is not mutable"))
-	case "canto.erc20.v1.MsgRegisterERC20Proposal.erc20address":
-		panic(fmt.Errorf("field erc20address of message canto.erc20.v1.MsgRegisterERC20Proposal is not mutable"))
+	case "canto.erc20.v1.MsgRegisterERC20.authority":
+		panic(fmt.Errorf("field authority of message canto.erc20.v1.MsgRegisterERC20 is not mutable"))
+	case "canto.erc20.v1.MsgRegisterERC20.title":
+		panic(fmt.Errorf("field title of message canto.erc20.v1.MsgRegisterERC20 is not mutable"))
+	case "canto.erc20.v1.MsgRegisterERC20.description":
+		panic(fmt.Errorf("field description of message canto.erc20.v1.MsgRegisterERC20 is not mutable"))
+	case "canto.erc20.v1.MsgRegisterERC20.erc20address":
+		panic(fmt.Errorf("field erc20address of message canto.erc20.v1.MsgRegisterERC20 is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterERC20Proposal"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterERC20"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterERC20Proposal does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterERC20 does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_MsgRegisterERC20Proposal) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgRegisterERC20) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "canto.erc20.v1.MsgRegisterERC20Proposal.authority":
+	case "canto.erc20.v1.MsgRegisterERC20.authority":
 		return protoreflect.ValueOfString("")
-	case "canto.erc20.v1.MsgRegisterERC20Proposal.title":
+	case "canto.erc20.v1.MsgRegisterERC20.title":
 		return protoreflect.ValueOfString("")
-	case "canto.erc20.v1.MsgRegisterERC20Proposal.description":
+	case "canto.erc20.v1.MsgRegisterERC20.description":
 		return protoreflect.ValueOfString("")
-	case "canto.erc20.v1.MsgRegisterERC20Proposal.erc20address":
+	case "canto.erc20.v1.MsgRegisterERC20.erc20address":
 		return protoreflect.ValueOfString("")
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterERC20Proposal"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterERC20"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterERC20Proposal does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterERC20 does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_MsgRegisterERC20Proposal) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_MsgRegisterERC20) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in canto.erc20.v1.MsgRegisterERC20Proposal", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in canto.erc20.v1.MsgRegisterERC20", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -4024,7 +4024,7 @@ func (x *fastReflection_MsgRegisterERC20Proposal) WhichOneof(d protoreflect.Oneo
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_MsgRegisterERC20Proposal) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_MsgRegisterERC20) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -4035,7 +4035,7 @@ func (x *fastReflection_MsgRegisterERC20Proposal) GetUnknown() protoreflect.RawF
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgRegisterERC20Proposal) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_MsgRegisterERC20) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -4047,7 +4047,7 @@ func (x *fastReflection_MsgRegisterERC20Proposal) SetUnknown(fields protoreflect
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_MsgRegisterERC20Proposal) IsValid() bool {
+func (x *fastReflection_MsgRegisterERC20) IsValid() bool {
 	return x != nil
 }
 
@@ -4057,9 +4057,9 @@ func (x *fastReflection_MsgRegisterERC20Proposal) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_MsgRegisterERC20Proposal) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_MsgRegisterERC20) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*MsgRegisterERC20Proposal)
+		x := input.Message.Interface().(*MsgRegisterERC20)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -4097,7 +4097,7 @@ func (x *fastReflection_MsgRegisterERC20Proposal) ProtoMethods() *protoiface.Met
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*MsgRegisterERC20Proposal)
+		x := input.Message.Interface().(*MsgRegisterERC20)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -4155,7 +4155,7 @@ func (x *fastReflection_MsgRegisterERC20Proposal) ProtoMethods() *protoiface.Met
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*MsgRegisterERC20Proposal)
+		x := input.Message.Interface().(*MsgRegisterERC20)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -4187,10 +4187,10 @@ func (x *fastReflection_MsgRegisterERC20Proposal) ProtoMethods() *protoiface.Met
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgRegisterERC20Proposal: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgRegisterERC20: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgRegisterERC20Proposal: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgRegisterERC20: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
@@ -4357,23 +4357,23 @@ func (x *fastReflection_MsgRegisterERC20Proposal) ProtoMethods() *protoiface.Met
 }
 
 var (
-	md_MsgRegisterERC20ProposalResponse protoreflect.MessageDescriptor
+	md_MsgRegisterERC20Response protoreflect.MessageDescriptor
 )
 
 func init() {
 	file_canto_erc20_v1_tx_proto_init()
-	md_MsgRegisterERC20ProposalResponse = File_canto_erc20_v1_tx_proto.Messages().ByName("MsgRegisterERC20ProposalResponse")
+	md_MsgRegisterERC20Response = File_canto_erc20_v1_tx_proto.Messages().ByName("MsgRegisterERC20Response")
 }
 
-var _ protoreflect.Message = (*fastReflection_MsgRegisterERC20ProposalResponse)(nil)
+var _ protoreflect.Message = (*fastReflection_MsgRegisterERC20Response)(nil)
 
-type fastReflection_MsgRegisterERC20ProposalResponse MsgRegisterERC20ProposalResponse
+type fastReflection_MsgRegisterERC20Response MsgRegisterERC20Response
 
-func (x *MsgRegisterERC20ProposalResponse) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_MsgRegisterERC20ProposalResponse)(x)
+func (x *MsgRegisterERC20Response) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_MsgRegisterERC20Response)(x)
 }
 
-func (x *MsgRegisterERC20ProposalResponse) slowProtoReflect() protoreflect.Message {
+func (x *MsgRegisterERC20Response) slowProtoReflect() protoreflect.Message {
 	mi := &file_canto_erc20_v1_tx_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -4385,43 +4385,43 @@ func (x *MsgRegisterERC20ProposalResponse) slowProtoReflect() protoreflect.Messa
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_MsgRegisterERC20ProposalResponse_messageType fastReflection_MsgRegisterERC20ProposalResponse_messageType
-var _ protoreflect.MessageType = fastReflection_MsgRegisterERC20ProposalResponse_messageType{}
+var _fastReflection_MsgRegisterERC20Response_messageType fastReflection_MsgRegisterERC20Response_messageType
+var _ protoreflect.MessageType = fastReflection_MsgRegisterERC20Response_messageType{}
 
-type fastReflection_MsgRegisterERC20ProposalResponse_messageType struct{}
+type fastReflection_MsgRegisterERC20Response_messageType struct{}
 
-func (x fastReflection_MsgRegisterERC20ProposalResponse_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_MsgRegisterERC20ProposalResponse)(nil)
+func (x fastReflection_MsgRegisterERC20Response_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_MsgRegisterERC20Response)(nil)
 }
-func (x fastReflection_MsgRegisterERC20ProposalResponse_messageType) New() protoreflect.Message {
-	return new(fastReflection_MsgRegisterERC20ProposalResponse)
+func (x fastReflection_MsgRegisterERC20Response_messageType) New() protoreflect.Message {
+	return new(fastReflection_MsgRegisterERC20Response)
 }
-func (x fastReflection_MsgRegisterERC20ProposalResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgRegisterERC20ProposalResponse
+func (x fastReflection_MsgRegisterERC20Response_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgRegisterERC20Response
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_MsgRegisterERC20ProposalResponse) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgRegisterERC20ProposalResponse
+func (x *fastReflection_MsgRegisterERC20Response) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgRegisterERC20Response
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_MsgRegisterERC20ProposalResponse) Type() protoreflect.MessageType {
-	return _fastReflection_MsgRegisterERC20ProposalResponse_messageType
+func (x *fastReflection_MsgRegisterERC20Response) Type() protoreflect.MessageType {
+	return _fastReflection_MsgRegisterERC20Response_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_MsgRegisterERC20ProposalResponse) New() protoreflect.Message {
-	return new(fastReflection_MsgRegisterERC20ProposalResponse)
+func (x *fastReflection_MsgRegisterERC20Response) New() protoreflect.Message {
+	return new(fastReflection_MsgRegisterERC20Response)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_MsgRegisterERC20ProposalResponse) Interface() protoreflect.ProtoMessage {
-	return (*MsgRegisterERC20ProposalResponse)(x)
+func (x *fastReflection_MsgRegisterERC20Response) Interface() protoreflect.ProtoMessage {
+	return (*MsgRegisterERC20Response)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -4429,7 +4429,7 @@ func (x *fastReflection_MsgRegisterERC20ProposalResponse) Interface() protorefle
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_MsgRegisterERC20ProposalResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_MsgRegisterERC20Response) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 }
 
 // Has reports whether a field is populated.
@@ -4443,13 +4443,13 @@ func (x *fastReflection_MsgRegisterERC20ProposalResponse) Range(f func(protorefl
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_MsgRegisterERC20ProposalResponse) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_MsgRegisterERC20Response) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterERC20ProposalResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterERC20Response"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterERC20ProposalResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterERC20Response does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -4459,13 +4459,13 @@ func (x *fastReflection_MsgRegisterERC20ProposalResponse) Has(fd protoreflect.Fi
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgRegisterERC20ProposalResponse) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_MsgRegisterERC20Response) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterERC20ProposalResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterERC20Response"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterERC20ProposalResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterERC20Response does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -4475,13 +4475,13 @@ func (x *fastReflection_MsgRegisterERC20ProposalResponse) Clear(fd protoreflect.
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_MsgRegisterERC20ProposalResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgRegisterERC20Response) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterERC20ProposalResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterERC20Response"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterERC20ProposalResponse does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterERC20Response does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -4495,13 +4495,13 @@ func (x *fastReflection_MsgRegisterERC20ProposalResponse) Get(descriptor protore
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgRegisterERC20ProposalResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_MsgRegisterERC20Response) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterERC20ProposalResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterERC20Response"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterERC20ProposalResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterERC20Response does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -4515,36 +4515,36 @@ func (x *fastReflection_MsgRegisterERC20ProposalResponse) Set(fd protoreflect.Fi
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgRegisterERC20ProposalResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgRegisterERC20Response) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterERC20ProposalResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterERC20Response"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterERC20ProposalResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterERC20Response does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_MsgRegisterERC20ProposalResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgRegisterERC20Response) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterERC20ProposalResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgRegisterERC20Response"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterERC20ProposalResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgRegisterERC20Response does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_MsgRegisterERC20ProposalResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_MsgRegisterERC20Response) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in canto.erc20.v1.MsgRegisterERC20ProposalResponse", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in canto.erc20.v1.MsgRegisterERC20Response", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -4552,7 +4552,7 @@ func (x *fastReflection_MsgRegisterERC20ProposalResponse) WhichOneof(d protorefl
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_MsgRegisterERC20ProposalResponse) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_MsgRegisterERC20Response) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -4563,7 +4563,7 @@ func (x *fastReflection_MsgRegisterERC20ProposalResponse) GetUnknown() protorefl
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgRegisterERC20ProposalResponse) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_MsgRegisterERC20Response) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -4575,7 +4575,7 @@ func (x *fastReflection_MsgRegisterERC20ProposalResponse) SetUnknown(fields prot
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_MsgRegisterERC20ProposalResponse) IsValid() bool {
+func (x *fastReflection_MsgRegisterERC20Response) IsValid() bool {
 	return x != nil
 }
 
@@ -4585,9 +4585,9 @@ func (x *fastReflection_MsgRegisterERC20ProposalResponse) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_MsgRegisterERC20ProposalResponse) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_MsgRegisterERC20Response) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*MsgRegisterERC20ProposalResponse)
+		x := input.Message.Interface().(*MsgRegisterERC20Response)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -4609,7 +4609,7 @@ func (x *fastReflection_MsgRegisterERC20ProposalResponse) ProtoMethods() *protoi
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*MsgRegisterERC20ProposalResponse)
+		x := input.Message.Interface().(*MsgRegisterERC20Response)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -4639,7 +4639,7 @@ func (x *fastReflection_MsgRegisterERC20ProposalResponse) ProtoMethods() *protoi
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*MsgRegisterERC20ProposalResponse)
+		x := input.Message.Interface().(*MsgRegisterERC20Response)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -4671,10 +4671,10 @@ func (x *fastReflection_MsgRegisterERC20ProposalResponse) ProtoMethods() *protoi
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgRegisterERC20ProposalResponse: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgRegisterERC20Response: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgRegisterERC20ProposalResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgRegisterERC20Response: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			default:
@@ -4713,31 +4713,31 @@ func (x *fastReflection_MsgRegisterERC20ProposalResponse) ProtoMethods() *protoi
 }
 
 var (
-	md_MsgToggleTokenConversionProposal             protoreflect.MessageDescriptor
-	fd_MsgToggleTokenConversionProposal_authority   protoreflect.FieldDescriptor
-	fd_MsgToggleTokenConversionProposal_Title       protoreflect.FieldDescriptor
-	fd_MsgToggleTokenConversionProposal_description protoreflect.FieldDescriptor
-	fd_MsgToggleTokenConversionProposal_token       protoreflect.FieldDescriptor
+	md_MsgToggleTokenConversion             protoreflect.MessageDescriptor
+	fd_MsgToggleTokenConversion_authority   protoreflect.FieldDescriptor
+	fd_MsgToggleTokenConversion_Title       protoreflect.FieldDescriptor
+	fd_MsgToggleTokenConversion_description protoreflect.FieldDescriptor
+	fd_MsgToggleTokenConversion_token       protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_canto_erc20_v1_tx_proto_init()
-	md_MsgToggleTokenConversionProposal = File_canto_erc20_v1_tx_proto.Messages().ByName("MsgToggleTokenConversionProposal")
-	fd_MsgToggleTokenConversionProposal_authority = md_MsgToggleTokenConversionProposal.Fields().ByName("authority")
-	fd_MsgToggleTokenConversionProposal_Title = md_MsgToggleTokenConversionProposal.Fields().ByName("Title")
-	fd_MsgToggleTokenConversionProposal_description = md_MsgToggleTokenConversionProposal.Fields().ByName("description")
-	fd_MsgToggleTokenConversionProposal_token = md_MsgToggleTokenConversionProposal.Fields().ByName("token")
+	md_MsgToggleTokenConversion = File_canto_erc20_v1_tx_proto.Messages().ByName("MsgToggleTokenConversion")
+	fd_MsgToggleTokenConversion_authority = md_MsgToggleTokenConversion.Fields().ByName("authority")
+	fd_MsgToggleTokenConversion_Title = md_MsgToggleTokenConversion.Fields().ByName("Title")
+	fd_MsgToggleTokenConversion_description = md_MsgToggleTokenConversion.Fields().ByName("description")
+	fd_MsgToggleTokenConversion_token = md_MsgToggleTokenConversion.Fields().ByName("token")
 }
 
-var _ protoreflect.Message = (*fastReflection_MsgToggleTokenConversionProposal)(nil)
+var _ protoreflect.Message = (*fastReflection_MsgToggleTokenConversion)(nil)
 
-type fastReflection_MsgToggleTokenConversionProposal MsgToggleTokenConversionProposal
+type fastReflection_MsgToggleTokenConversion MsgToggleTokenConversion
 
-func (x *MsgToggleTokenConversionProposal) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_MsgToggleTokenConversionProposal)(x)
+func (x *MsgToggleTokenConversion) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_MsgToggleTokenConversion)(x)
 }
 
-func (x *MsgToggleTokenConversionProposal) slowProtoReflect() protoreflect.Message {
+func (x *MsgToggleTokenConversion) slowProtoReflect() protoreflect.Message {
 	mi := &file_canto_erc20_v1_tx_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -4749,43 +4749,43 @@ func (x *MsgToggleTokenConversionProposal) slowProtoReflect() protoreflect.Messa
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_MsgToggleTokenConversionProposal_messageType fastReflection_MsgToggleTokenConversionProposal_messageType
-var _ protoreflect.MessageType = fastReflection_MsgToggleTokenConversionProposal_messageType{}
+var _fastReflection_MsgToggleTokenConversion_messageType fastReflection_MsgToggleTokenConversion_messageType
+var _ protoreflect.MessageType = fastReflection_MsgToggleTokenConversion_messageType{}
 
-type fastReflection_MsgToggleTokenConversionProposal_messageType struct{}
+type fastReflection_MsgToggleTokenConversion_messageType struct{}
 
-func (x fastReflection_MsgToggleTokenConversionProposal_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_MsgToggleTokenConversionProposal)(nil)
+func (x fastReflection_MsgToggleTokenConversion_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_MsgToggleTokenConversion)(nil)
 }
-func (x fastReflection_MsgToggleTokenConversionProposal_messageType) New() protoreflect.Message {
-	return new(fastReflection_MsgToggleTokenConversionProposal)
+func (x fastReflection_MsgToggleTokenConversion_messageType) New() protoreflect.Message {
+	return new(fastReflection_MsgToggleTokenConversion)
 }
-func (x fastReflection_MsgToggleTokenConversionProposal_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgToggleTokenConversionProposal
+func (x fastReflection_MsgToggleTokenConversion_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgToggleTokenConversion
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_MsgToggleTokenConversionProposal) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgToggleTokenConversionProposal
+func (x *fastReflection_MsgToggleTokenConversion) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgToggleTokenConversion
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_MsgToggleTokenConversionProposal) Type() protoreflect.MessageType {
-	return _fastReflection_MsgToggleTokenConversionProposal_messageType
+func (x *fastReflection_MsgToggleTokenConversion) Type() protoreflect.MessageType {
+	return _fastReflection_MsgToggleTokenConversion_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_MsgToggleTokenConversionProposal) New() protoreflect.Message {
-	return new(fastReflection_MsgToggleTokenConversionProposal)
+func (x *fastReflection_MsgToggleTokenConversion) New() protoreflect.Message {
+	return new(fastReflection_MsgToggleTokenConversion)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_MsgToggleTokenConversionProposal) Interface() protoreflect.ProtoMessage {
-	return (*MsgToggleTokenConversionProposal)(x)
+func (x *fastReflection_MsgToggleTokenConversion) Interface() protoreflect.ProtoMessage {
+	return (*MsgToggleTokenConversion)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -4793,28 +4793,28 @@ func (x *fastReflection_MsgToggleTokenConversionProposal) Interface() protorefle
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_MsgToggleTokenConversionProposal) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_MsgToggleTokenConversion) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 	if x.Authority != "" {
 		value := protoreflect.ValueOfString(x.Authority)
-		if !f(fd_MsgToggleTokenConversionProposal_authority, value) {
+		if !f(fd_MsgToggleTokenConversion_authority, value) {
 			return
 		}
 	}
 	if x.Title != "" {
 		value := protoreflect.ValueOfString(x.Title)
-		if !f(fd_MsgToggleTokenConversionProposal_Title, value) {
+		if !f(fd_MsgToggleTokenConversion_Title, value) {
 			return
 		}
 	}
 	if x.Description != "" {
 		value := protoreflect.ValueOfString(x.Description)
-		if !f(fd_MsgToggleTokenConversionProposal_description, value) {
+		if !f(fd_MsgToggleTokenConversion_description, value) {
 			return
 		}
 	}
 	if x.Token != "" {
 		value := protoreflect.ValueOfString(x.Token)
-		if !f(fd_MsgToggleTokenConversionProposal_token, value) {
+		if !f(fd_MsgToggleTokenConversion_token, value) {
 			return
 		}
 	}
@@ -4831,21 +4831,21 @@ func (x *fastReflection_MsgToggleTokenConversionProposal) Range(f func(protorefl
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_MsgToggleTokenConversionProposal) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_MsgToggleTokenConversion) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "canto.erc20.v1.MsgToggleTokenConversionProposal.authority":
+	case "canto.erc20.v1.MsgToggleTokenConversion.authority":
 		return x.Authority != ""
-	case "canto.erc20.v1.MsgToggleTokenConversionProposal.Title":
+	case "canto.erc20.v1.MsgToggleTokenConversion.Title":
 		return x.Title != ""
-	case "canto.erc20.v1.MsgToggleTokenConversionProposal.description":
+	case "canto.erc20.v1.MsgToggleTokenConversion.description":
 		return x.Description != ""
-	case "canto.erc20.v1.MsgToggleTokenConversionProposal.token":
+	case "canto.erc20.v1.MsgToggleTokenConversion.token":
 		return x.Token != ""
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgToggleTokenConversionProposal"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgToggleTokenConversion"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgToggleTokenConversionProposal does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgToggleTokenConversion does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -4855,21 +4855,21 @@ func (x *fastReflection_MsgToggleTokenConversionProposal) Has(fd protoreflect.Fi
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgToggleTokenConversionProposal) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_MsgToggleTokenConversion) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "canto.erc20.v1.MsgToggleTokenConversionProposal.authority":
+	case "canto.erc20.v1.MsgToggleTokenConversion.authority":
 		x.Authority = ""
-	case "canto.erc20.v1.MsgToggleTokenConversionProposal.Title":
+	case "canto.erc20.v1.MsgToggleTokenConversion.Title":
 		x.Title = ""
-	case "canto.erc20.v1.MsgToggleTokenConversionProposal.description":
+	case "canto.erc20.v1.MsgToggleTokenConversion.description":
 		x.Description = ""
-	case "canto.erc20.v1.MsgToggleTokenConversionProposal.token":
+	case "canto.erc20.v1.MsgToggleTokenConversion.token":
 		x.Token = ""
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgToggleTokenConversionProposal"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgToggleTokenConversion"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgToggleTokenConversionProposal does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgToggleTokenConversion does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -4879,25 +4879,25 @@ func (x *fastReflection_MsgToggleTokenConversionProposal) Clear(fd protoreflect.
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_MsgToggleTokenConversionProposal) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgToggleTokenConversion) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "canto.erc20.v1.MsgToggleTokenConversionProposal.authority":
+	case "canto.erc20.v1.MsgToggleTokenConversion.authority":
 		value := x.Authority
 		return protoreflect.ValueOfString(value)
-	case "canto.erc20.v1.MsgToggleTokenConversionProposal.Title":
+	case "canto.erc20.v1.MsgToggleTokenConversion.Title":
 		value := x.Title
 		return protoreflect.ValueOfString(value)
-	case "canto.erc20.v1.MsgToggleTokenConversionProposal.description":
+	case "canto.erc20.v1.MsgToggleTokenConversion.description":
 		value := x.Description
 		return protoreflect.ValueOfString(value)
-	case "canto.erc20.v1.MsgToggleTokenConversionProposal.token":
+	case "canto.erc20.v1.MsgToggleTokenConversion.token":
 		value := x.Token
 		return protoreflect.ValueOfString(value)
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgToggleTokenConversionProposal"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgToggleTokenConversion"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgToggleTokenConversionProposal does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgToggleTokenConversion does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -4911,21 +4911,21 @@ func (x *fastReflection_MsgToggleTokenConversionProposal) Get(descriptor protore
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgToggleTokenConversionProposal) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_MsgToggleTokenConversion) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "canto.erc20.v1.MsgToggleTokenConversionProposal.authority":
+	case "canto.erc20.v1.MsgToggleTokenConversion.authority":
 		x.Authority = value.Interface().(string)
-	case "canto.erc20.v1.MsgToggleTokenConversionProposal.Title":
+	case "canto.erc20.v1.MsgToggleTokenConversion.Title":
 		x.Title = value.Interface().(string)
-	case "canto.erc20.v1.MsgToggleTokenConversionProposal.description":
+	case "canto.erc20.v1.MsgToggleTokenConversion.description":
 		x.Description = value.Interface().(string)
-	case "canto.erc20.v1.MsgToggleTokenConversionProposal.token":
+	case "canto.erc20.v1.MsgToggleTokenConversion.token":
 		x.Token = value.Interface().(string)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgToggleTokenConversionProposal"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgToggleTokenConversion"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgToggleTokenConversionProposal does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgToggleTokenConversion does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -4939,52 +4939,52 @@ func (x *fastReflection_MsgToggleTokenConversionProposal) Set(fd protoreflect.Fi
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgToggleTokenConversionProposal) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgToggleTokenConversion) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "canto.erc20.v1.MsgToggleTokenConversionProposal.authority":
-		panic(fmt.Errorf("field authority of message canto.erc20.v1.MsgToggleTokenConversionProposal is not mutable"))
-	case "canto.erc20.v1.MsgToggleTokenConversionProposal.Title":
-		panic(fmt.Errorf("field Title of message canto.erc20.v1.MsgToggleTokenConversionProposal is not mutable"))
-	case "canto.erc20.v1.MsgToggleTokenConversionProposal.description":
-		panic(fmt.Errorf("field description of message canto.erc20.v1.MsgToggleTokenConversionProposal is not mutable"))
-	case "canto.erc20.v1.MsgToggleTokenConversionProposal.token":
-		panic(fmt.Errorf("field token of message canto.erc20.v1.MsgToggleTokenConversionProposal is not mutable"))
+	case "canto.erc20.v1.MsgToggleTokenConversion.authority":
+		panic(fmt.Errorf("field authority of message canto.erc20.v1.MsgToggleTokenConversion is not mutable"))
+	case "canto.erc20.v1.MsgToggleTokenConversion.Title":
+		panic(fmt.Errorf("field Title of message canto.erc20.v1.MsgToggleTokenConversion is not mutable"))
+	case "canto.erc20.v1.MsgToggleTokenConversion.description":
+		panic(fmt.Errorf("field description of message canto.erc20.v1.MsgToggleTokenConversion is not mutable"))
+	case "canto.erc20.v1.MsgToggleTokenConversion.token":
+		panic(fmt.Errorf("field token of message canto.erc20.v1.MsgToggleTokenConversion is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgToggleTokenConversionProposal"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgToggleTokenConversion"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgToggleTokenConversionProposal does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgToggleTokenConversion does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_MsgToggleTokenConversionProposal) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgToggleTokenConversion) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "canto.erc20.v1.MsgToggleTokenConversionProposal.authority":
+	case "canto.erc20.v1.MsgToggleTokenConversion.authority":
 		return protoreflect.ValueOfString("")
-	case "canto.erc20.v1.MsgToggleTokenConversionProposal.Title":
+	case "canto.erc20.v1.MsgToggleTokenConversion.Title":
 		return protoreflect.ValueOfString("")
-	case "canto.erc20.v1.MsgToggleTokenConversionProposal.description":
+	case "canto.erc20.v1.MsgToggleTokenConversion.description":
 		return protoreflect.ValueOfString("")
-	case "canto.erc20.v1.MsgToggleTokenConversionProposal.token":
+	case "canto.erc20.v1.MsgToggleTokenConversion.token":
 		return protoreflect.ValueOfString("")
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgToggleTokenConversionProposal"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgToggleTokenConversion"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgToggleTokenConversionProposal does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgToggleTokenConversion does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_MsgToggleTokenConversionProposal) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_MsgToggleTokenConversion) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in canto.erc20.v1.MsgToggleTokenConversionProposal", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in canto.erc20.v1.MsgToggleTokenConversion", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -4992,7 +4992,7 @@ func (x *fastReflection_MsgToggleTokenConversionProposal) WhichOneof(d protorefl
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_MsgToggleTokenConversionProposal) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_MsgToggleTokenConversion) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -5003,7 +5003,7 @@ func (x *fastReflection_MsgToggleTokenConversionProposal) GetUnknown() protorefl
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgToggleTokenConversionProposal) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_MsgToggleTokenConversion) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -5015,7 +5015,7 @@ func (x *fastReflection_MsgToggleTokenConversionProposal) SetUnknown(fields prot
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_MsgToggleTokenConversionProposal) IsValid() bool {
+func (x *fastReflection_MsgToggleTokenConversion) IsValid() bool {
 	return x != nil
 }
 
@@ -5025,9 +5025,9 @@ func (x *fastReflection_MsgToggleTokenConversionProposal) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_MsgToggleTokenConversionProposal) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_MsgToggleTokenConversion) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*MsgToggleTokenConversionProposal)
+		x := input.Message.Interface().(*MsgToggleTokenConversion)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -5065,7 +5065,7 @@ func (x *fastReflection_MsgToggleTokenConversionProposal) ProtoMethods() *protoi
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*MsgToggleTokenConversionProposal)
+		x := input.Message.Interface().(*MsgToggleTokenConversion)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -5123,7 +5123,7 @@ func (x *fastReflection_MsgToggleTokenConversionProposal) ProtoMethods() *protoi
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*MsgToggleTokenConversionProposal)
+		x := input.Message.Interface().(*MsgToggleTokenConversion)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -5155,10 +5155,10 @@ func (x *fastReflection_MsgToggleTokenConversionProposal) ProtoMethods() *protoi
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgToggleTokenConversionProposal: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgToggleTokenConversion: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgToggleTokenConversionProposal: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgToggleTokenConversion: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
@@ -5325,23 +5325,23 @@ func (x *fastReflection_MsgToggleTokenConversionProposal) ProtoMethods() *protoi
 }
 
 var (
-	md_MsgToggleTokenConversionProposalResponse protoreflect.MessageDescriptor
+	md_MsgToggleTokenConversionResponse protoreflect.MessageDescriptor
 )
 
 func init() {
 	file_canto_erc20_v1_tx_proto_init()
-	md_MsgToggleTokenConversionProposalResponse = File_canto_erc20_v1_tx_proto.Messages().ByName("MsgToggleTokenConversionProposalResponse")
+	md_MsgToggleTokenConversionResponse = File_canto_erc20_v1_tx_proto.Messages().ByName("MsgToggleTokenConversionResponse")
 }
 
-var _ protoreflect.Message = (*fastReflection_MsgToggleTokenConversionProposalResponse)(nil)
+var _ protoreflect.Message = (*fastReflection_MsgToggleTokenConversionResponse)(nil)
 
-type fastReflection_MsgToggleTokenConversionProposalResponse MsgToggleTokenConversionProposalResponse
+type fastReflection_MsgToggleTokenConversionResponse MsgToggleTokenConversionResponse
 
-func (x *MsgToggleTokenConversionProposalResponse) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_MsgToggleTokenConversionProposalResponse)(x)
+func (x *MsgToggleTokenConversionResponse) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_MsgToggleTokenConversionResponse)(x)
 }
 
-func (x *MsgToggleTokenConversionProposalResponse) slowProtoReflect() protoreflect.Message {
+func (x *MsgToggleTokenConversionResponse) slowProtoReflect() protoreflect.Message {
 	mi := &file_canto_erc20_v1_tx_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -5353,43 +5353,43 @@ func (x *MsgToggleTokenConversionProposalResponse) slowProtoReflect() protorefle
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_MsgToggleTokenConversionProposalResponse_messageType fastReflection_MsgToggleTokenConversionProposalResponse_messageType
-var _ protoreflect.MessageType = fastReflection_MsgToggleTokenConversionProposalResponse_messageType{}
+var _fastReflection_MsgToggleTokenConversionResponse_messageType fastReflection_MsgToggleTokenConversionResponse_messageType
+var _ protoreflect.MessageType = fastReflection_MsgToggleTokenConversionResponse_messageType{}
 
-type fastReflection_MsgToggleTokenConversionProposalResponse_messageType struct{}
+type fastReflection_MsgToggleTokenConversionResponse_messageType struct{}
 
-func (x fastReflection_MsgToggleTokenConversionProposalResponse_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_MsgToggleTokenConversionProposalResponse)(nil)
+func (x fastReflection_MsgToggleTokenConversionResponse_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_MsgToggleTokenConversionResponse)(nil)
 }
-func (x fastReflection_MsgToggleTokenConversionProposalResponse_messageType) New() protoreflect.Message {
-	return new(fastReflection_MsgToggleTokenConversionProposalResponse)
+func (x fastReflection_MsgToggleTokenConversionResponse_messageType) New() protoreflect.Message {
+	return new(fastReflection_MsgToggleTokenConversionResponse)
 }
-func (x fastReflection_MsgToggleTokenConversionProposalResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgToggleTokenConversionProposalResponse
+func (x fastReflection_MsgToggleTokenConversionResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgToggleTokenConversionResponse
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_MsgToggleTokenConversionProposalResponse) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgToggleTokenConversionProposalResponse
+func (x *fastReflection_MsgToggleTokenConversionResponse) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgToggleTokenConversionResponse
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_MsgToggleTokenConversionProposalResponse) Type() protoreflect.MessageType {
-	return _fastReflection_MsgToggleTokenConversionProposalResponse_messageType
+func (x *fastReflection_MsgToggleTokenConversionResponse) Type() protoreflect.MessageType {
+	return _fastReflection_MsgToggleTokenConversionResponse_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_MsgToggleTokenConversionProposalResponse) New() protoreflect.Message {
-	return new(fastReflection_MsgToggleTokenConversionProposalResponse)
+func (x *fastReflection_MsgToggleTokenConversionResponse) New() protoreflect.Message {
+	return new(fastReflection_MsgToggleTokenConversionResponse)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_MsgToggleTokenConversionProposalResponse) Interface() protoreflect.ProtoMessage {
-	return (*MsgToggleTokenConversionProposalResponse)(x)
+func (x *fastReflection_MsgToggleTokenConversionResponse) Interface() protoreflect.ProtoMessage {
+	return (*MsgToggleTokenConversionResponse)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -5397,7 +5397,7 @@ func (x *fastReflection_MsgToggleTokenConversionProposalResponse) Interface() pr
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_MsgToggleTokenConversionProposalResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_MsgToggleTokenConversionResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 }
 
 // Has reports whether a field is populated.
@@ -5411,13 +5411,13 @@ func (x *fastReflection_MsgToggleTokenConversionProposalResponse) Range(f func(p
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_MsgToggleTokenConversionProposalResponse) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_MsgToggleTokenConversionResponse) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgToggleTokenConversionProposalResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgToggleTokenConversionResponse"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgToggleTokenConversionProposalResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgToggleTokenConversionResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -5427,13 +5427,13 @@ func (x *fastReflection_MsgToggleTokenConversionProposalResponse) Has(fd protore
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgToggleTokenConversionProposalResponse) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_MsgToggleTokenConversionResponse) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgToggleTokenConversionProposalResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgToggleTokenConversionResponse"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgToggleTokenConversionProposalResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgToggleTokenConversionResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -5443,13 +5443,13 @@ func (x *fastReflection_MsgToggleTokenConversionProposalResponse) Clear(fd proto
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_MsgToggleTokenConversionProposalResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgToggleTokenConversionResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgToggleTokenConversionProposalResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgToggleTokenConversionResponse"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgToggleTokenConversionProposalResponse does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgToggleTokenConversionResponse does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -5463,13 +5463,13 @@ func (x *fastReflection_MsgToggleTokenConversionProposalResponse) Get(descriptor
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgToggleTokenConversionProposalResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_MsgToggleTokenConversionResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgToggleTokenConversionProposalResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgToggleTokenConversionResponse"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgToggleTokenConversionProposalResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgToggleTokenConversionResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -5483,36 +5483,36 @@ func (x *fastReflection_MsgToggleTokenConversionProposalResponse) Set(fd protore
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgToggleTokenConversionProposalResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgToggleTokenConversionResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgToggleTokenConversionProposalResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgToggleTokenConversionResponse"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgToggleTokenConversionProposalResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgToggleTokenConversionResponse does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_MsgToggleTokenConversionProposalResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgToggleTokenConversionResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgToggleTokenConversionProposalResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.MsgToggleTokenConversionResponse"))
 		}
-		panic(fmt.Errorf("message canto.erc20.v1.MsgToggleTokenConversionProposalResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message canto.erc20.v1.MsgToggleTokenConversionResponse does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_MsgToggleTokenConversionProposalResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_MsgToggleTokenConversionResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in canto.erc20.v1.MsgToggleTokenConversionProposalResponse", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in canto.erc20.v1.MsgToggleTokenConversionResponse", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -5520,7 +5520,7 @@ func (x *fastReflection_MsgToggleTokenConversionProposalResponse) WhichOneof(d p
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_MsgToggleTokenConversionProposalResponse) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_MsgToggleTokenConversionResponse) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -5531,7 +5531,7 @@ func (x *fastReflection_MsgToggleTokenConversionProposalResponse) GetUnknown() p
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgToggleTokenConversionProposalResponse) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_MsgToggleTokenConversionResponse) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -5543,7 +5543,7 @@ func (x *fastReflection_MsgToggleTokenConversionProposalResponse) SetUnknown(fie
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_MsgToggleTokenConversionProposalResponse) IsValid() bool {
+func (x *fastReflection_MsgToggleTokenConversionResponse) IsValid() bool {
 	return x != nil
 }
 
@@ -5553,9 +5553,9 @@ func (x *fastReflection_MsgToggleTokenConversionProposalResponse) IsValid() bool
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_MsgToggleTokenConversionProposalResponse) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_MsgToggleTokenConversionResponse) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*MsgToggleTokenConversionProposalResponse)
+		x := input.Message.Interface().(*MsgToggleTokenConversionResponse)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -5577,7 +5577,7 @@ func (x *fastReflection_MsgToggleTokenConversionProposalResponse) ProtoMethods()
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*MsgToggleTokenConversionProposalResponse)
+		x := input.Message.Interface().(*MsgToggleTokenConversionResponse)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -5607,7 +5607,7 @@ func (x *fastReflection_MsgToggleTokenConversionProposalResponse) ProtoMethods()
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*MsgToggleTokenConversionProposalResponse)
+		x := input.Message.Interface().(*MsgToggleTokenConversionResponse)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -5639,10 +5639,10 @@ func (x *fastReflection_MsgToggleTokenConversionProposalResponse) ProtoMethods()
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgToggleTokenConversionProposalResponse: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgToggleTokenConversionResponse: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgToggleTokenConversionProposalResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgToggleTokenConversionResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			default:
@@ -5948,7 +5948,7 @@ func (*MsgUpdateParamsResponse) Descriptor() ([]byte, []int) {
 
 // MsgRegisterCoinProposal is a gov Content type to register a token pair for a
 // native Cosmos coin.
-type MsgRegisterCoinProposal struct {
+type MsgRegisterCoin struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -5964,8 +5964,8 @@ type MsgRegisterCoinProposal struct {
 	Metadata *v1beta11.Metadata `protobuf:"bytes,4,opt,name=metadata,proto3" json:"metadata,omitempty"`
 }
 
-func (x *MsgRegisterCoinProposal) Reset() {
-	*x = MsgRegisterCoinProposal{}
+func (x *MsgRegisterCoin) Reset() {
+	*x = MsgRegisterCoin{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_canto_erc20_v1_tx_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -5973,53 +5973,53 @@ func (x *MsgRegisterCoinProposal) Reset() {
 	}
 }
 
-func (x *MsgRegisterCoinProposal) String() string {
+func (x *MsgRegisterCoin) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*MsgRegisterCoinProposal) ProtoMessage() {}
+func (*MsgRegisterCoin) ProtoMessage() {}
 
-// Deprecated: Use MsgRegisterCoinProposal.ProtoReflect.Descriptor instead.
-func (*MsgRegisterCoinProposal) Descriptor() ([]byte, []int) {
+// Deprecated: Use MsgRegisterCoin.ProtoReflect.Descriptor instead.
+func (*MsgRegisterCoin) Descriptor() ([]byte, []int) {
 	return file_canto_erc20_v1_tx_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *MsgRegisterCoinProposal) GetAuthority() string {
+func (x *MsgRegisterCoin) GetAuthority() string {
 	if x != nil {
 		return x.Authority
 	}
 	return ""
 }
 
-func (x *MsgRegisterCoinProposal) GetTitle() string {
+func (x *MsgRegisterCoin) GetTitle() string {
 	if x != nil {
 		return x.Title
 	}
 	return ""
 }
 
-func (x *MsgRegisterCoinProposal) GetDescription() string {
+func (x *MsgRegisterCoin) GetDescription() string {
 	if x != nil {
 		return x.Description
 	}
 	return ""
 }
 
-func (x *MsgRegisterCoinProposal) GetMetadata() *v1beta11.Metadata {
+func (x *MsgRegisterCoin) GetMetadata() *v1beta11.Metadata {
 	if x != nil {
 		return x.Metadata
 	}
 	return nil
 }
 
-type MsgRegisterCoinProposalResponse struct {
+type MsgRegisterCoinResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 }
 
-func (x *MsgRegisterCoinProposalResponse) Reset() {
-	*x = MsgRegisterCoinProposalResponse{}
+func (x *MsgRegisterCoinResponse) Reset() {
+	*x = MsgRegisterCoinResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_canto_erc20_v1_tx_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -6027,20 +6027,20 @@ func (x *MsgRegisterCoinProposalResponse) Reset() {
 	}
 }
 
-func (x *MsgRegisterCoinProposalResponse) String() string {
+func (x *MsgRegisterCoinResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*MsgRegisterCoinProposalResponse) ProtoMessage() {}
+func (*MsgRegisterCoinResponse) ProtoMessage() {}
 
-// Deprecated: Use MsgRegisterCoinProposalResponse.ProtoReflect.Descriptor instead.
-func (*MsgRegisterCoinProposalResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use MsgRegisterCoinResponse.ProtoReflect.Descriptor instead.
+func (*MsgRegisterCoinResponse) Descriptor() ([]byte, []int) {
 	return file_canto_erc20_v1_tx_proto_rawDescGZIP(), []int{7}
 }
 
 // MsgRegisterERC20Proposal is a gov Content type to register a token pair for
 // an ERC20 token
-type MsgRegisterERC20Proposal struct {
+type MsgRegisterERC20 struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -6056,8 +6056,8 @@ type MsgRegisterERC20Proposal struct {
 	Erc20Address string `protobuf:"bytes,4,opt,name=erc20address,proto3" json:"erc20address,omitempty"`
 }
 
-func (x *MsgRegisterERC20Proposal) Reset() {
-	*x = MsgRegisterERC20Proposal{}
+func (x *MsgRegisterERC20) Reset() {
+	*x = MsgRegisterERC20{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_canto_erc20_v1_tx_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -6065,53 +6065,53 @@ func (x *MsgRegisterERC20Proposal) Reset() {
 	}
 }
 
-func (x *MsgRegisterERC20Proposal) String() string {
+func (x *MsgRegisterERC20) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*MsgRegisterERC20Proposal) ProtoMessage() {}
+func (*MsgRegisterERC20) ProtoMessage() {}
 
-// Deprecated: Use MsgRegisterERC20Proposal.ProtoReflect.Descriptor instead.
-func (*MsgRegisterERC20Proposal) Descriptor() ([]byte, []int) {
+// Deprecated: Use MsgRegisterERC20.ProtoReflect.Descriptor instead.
+func (*MsgRegisterERC20) Descriptor() ([]byte, []int) {
 	return file_canto_erc20_v1_tx_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *MsgRegisterERC20Proposal) GetAuthority() string {
+func (x *MsgRegisterERC20) GetAuthority() string {
 	if x != nil {
 		return x.Authority
 	}
 	return ""
 }
 
-func (x *MsgRegisterERC20Proposal) GetTitle() string {
+func (x *MsgRegisterERC20) GetTitle() string {
 	if x != nil {
 		return x.Title
 	}
 	return ""
 }
 
-func (x *MsgRegisterERC20Proposal) GetDescription() string {
+func (x *MsgRegisterERC20) GetDescription() string {
 	if x != nil {
 		return x.Description
 	}
 	return ""
 }
 
-func (x *MsgRegisterERC20Proposal) GetErc20Address() string {
+func (x *MsgRegisterERC20) GetErc20Address() string {
 	if x != nil {
 		return x.Erc20Address
 	}
 	return ""
 }
 
-type MsgRegisterERC20ProposalResponse struct {
+type MsgRegisterERC20Response struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 }
 
-func (x *MsgRegisterERC20ProposalResponse) Reset() {
-	*x = MsgRegisterERC20ProposalResponse{}
+func (x *MsgRegisterERC20Response) Reset() {
+	*x = MsgRegisterERC20Response{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_canto_erc20_v1_tx_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -6119,20 +6119,20 @@ func (x *MsgRegisterERC20ProposalResponse) Reset() {
 	}
 }
 
-func (x *MsgRegisterERC20ProposalResponse) String() string {
+func (x *MsgRegisterERC20Response) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*MsgRegisterERC20ProposalResponse) ProtoMessage() {}
+func (*MsgRegisterERC20Response) ProtoMessage() {}
 
-// Deprecated: Use MsgRegisterERC20ProposalResponse.ProtoReflect.Descriptor instead.
-func (*MsgRegisterERC20ProposalResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use MsgRegisterERC20Response.ProtoReflect.Descriptor instead.
+func (*MsgRegisterERC20Response) Descriptor() ([]byte, []int) {
 	return file_canto_erc20_v1_tx_proto_rawDescGZIP(), []int{9}
 }
 
 // MsgToggleTokenConversionProposal is a gov Content type to toggle the
 // conversion of a token pair.
-type MsgToggleTokenConversionProposal struct {
+type MsgToggleTokenConversion struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -6149,8 +6149,8 @@ type MsgToggleTokenConversionProposal struct {
 	Token string `protobuf:"bytes,4,opt,name=token,proto3" json:"token,omitempty"`
 }
 
-func (x *MsgToggleTokenConversionProposal) Reset() {
-	*x = MsgToggleTokenConversionProposal{}
+func (x *MsgToggleTokenConversion) Reset() {
+	*x = MsgToggleTokenConversion{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_canto_erc20_v1_tx_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -6158,53 +6158,53 @@ func (x *MsgToggleTokenConversionProposal) Reset() {
 	}
 }
 
-func (x *MsgToggleTokenConversionProposal) String() string {
+func (x *MsgToggleTokenConversion) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*MsgToggleTokenConversionProposal) ProtoMessage() {}
+func (*MsgToggleTokenConversion) ProtoMessage() {}
 
-// Deprecated: Use MsgToggleTokenConversionProposal.ProtoReflect.Descriptor instead.
-func (*MsgToggleTokenConversionProposal) Descriptor() ([]byte, []int) {
+// Deprecated: Use MsgToggleTokenConversion.ProtoReflect.Descriptor instead.
+func (*MsgToggleTokenConversion) Descriptor() ([]byte, []int) {
 	return file_canto_erc20_v1_tx_proto_rawDescGZIP(), []int{10}
 }
 
-func (x *MsgToggleTokenConversionProposal) GetAuthority() string {
+func (x *MsgToggleTokenConversion) GetAuthority() string {
 	if x != nil {
 		return x.Authority
 	}
 	return ""
 }
 
-func (x *MsgToggleTokenConversionProposal) GetTitle() string {
+func (x *MsgToggleTokenConversion) GetTitle() string {
 	if x != nil {
 		return x.Title
 	}
 	return ""
 }
 
-func (x *MsgToggleTokenConversionProposal) GetDescription() string {
+func (x *MsgToggleTokenConversion) GetDescription() string {
 	if x != nil {
 		return x.Description
 	}
 	return ""
 }
 
-func (x *MsgToggleTokenConversionProposal) GetToken() string {
+func (x *MsgToggleTokenConversion) GetToken() string {
 	if x != nil {
 		return x.Token
 	}
 	return ""
 }
 
-type MsgToggleTokenConversionProposalResponse struct {
+type MsgToggleTokenConversionResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 }
 
-func (x *MsgToggleTokenConversionProposalResponse) Reset() {
-	*x = MsgToggleTokenConversionProposalResponse{}
+func (x *MsgToggleTokenConversionResponse) Reset() {
+	*x = MsgToggleTokenConversionResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_canto_erc20_v1_tx_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -6212,14 +6212,14 @@ func (x *MsgToggleTokenConversionProposalResponse) Reset() {
 	}
 }
 
-func (x *MsgToggleTokenConversionProposalResponse) String() string {
+func (x *MsgToggleTokenConversionResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*MsgToggleTokenConversionProposalResponse) ProtoMessage() {}
+func (*MsgToggleTokenConversionResponse) ProtoMessage() {}
 
-// Deprecated: Use MsgToggleTokenConversionProposalResponse.ProtoReflect.Descriptor instead.
-func (*MsgToggleTokenConversionProposalResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use MsgToggleTokenConversionResponse.ProtoReflect.Descriptor instead.
+func (*MsgToggleTokenConversionResponse) Descriptor() ([]byte, []int) {
 	return file_canto_erc20_v1_tx_proto_rawDescGZIP(), []int{11}
 }
 
@@ -6281,27 +6281,25 @@ var file_canto_erc20_v1_tx_proto_rawDesc = []byte{
 	0x72, 0x69, 0x74, 0x79, 0x8a, 0xe7, 0xb0, 0x2a, 0x15, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2f, 0x4d,
 	0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x22, 0x19,
 	0x0a, 0x17, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d,
-	0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x80, 0x02, 0x0a, 0x17, 0x4d, 0x73,
-	0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x43, 0x6f, 0x69, 0x6e, 0x50, 0x72, 0x6f,
-	0x70, 0x6f, 0x73, 0x61, 0x6c, 0x12, 0x36, 0x0a, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69,
-	0x74, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f,
-	0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69,
-	0x6e, 0x67, 0x52, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x12, 0x14, 0x0a,
-	0x05, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x69,
-	0x74, 0x6c, 0x65, 0x12, 0x20, 0x0a, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69,
-	0x6f, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69,
-	0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x3f, 0x0a, 0x08, 0x6d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74,
-	0x61, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73,
-	0x2e, 0x62, 0x61, 0x6e, 0x6b, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d, 0x65,
-	0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52, 0x08, 0x6d, 0x65,
-	0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x3a, 0x34, 0xe8, 0xa0, 0x1f, 0x00, 0x82, 0xe7, 0xb0, 0x2a,
-	0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x8a, 0xe7, 0xb0, 0x2a, 0x1d, 0x63,
-	0x61, 0x6e, 0x74, 0x6f, 0x2f, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72,
-	0x43, 0x6f, 0x69, 0x6e, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x61, 0x6c, 0x22, 0x21, 0x0a, 0x1f,
-	0x4d, 0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x43, 0x6f, 0x69, 0x6e, 0x50,
-	0x72, 0x6f, 0x70, 0x6f, 0x73, 0x61, 0x6c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
-	0xe5, 0x01, 0x0a, 0x18, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x45,
-	0x52, 0x43, 0x32, 0x30, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x61, 0x6c, 0x12, 0x36, 0x0a, 0x09,
+	0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xf0, 0x01, 0x0a, 0x0f, 0x4d, 0x73,
+	0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x43, 0x6f, 0x69, 0x6e, 0x12, 0x36, 0x0a,
+	0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64,
+	0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x09, 0x61, 0x75, 0x74, 0x68,
+	0x6f, 0x72, 0x69, 0x74, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x12, 0x20, 0x0a, 0x0b, 0x64,
+	0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x3f, 0x0a,
+	0x08, 0x6d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x1d, 0x2e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x62, 0x61, 0x6e, 0x6b, 0x2e, 0x76, 0x31,
+	0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x42, 0x04,
+	0xc8, 0xde, 0x1f, 0x00, 0x52, 0x08, 0x6d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x3a, 0x2c,
+	0xe8, 0xa0, 0x1f, 0x00, 0x82, 0xe7, 0xb0, 0x2a, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69,
+	0x74, 0x79, 0x8a, 0xe7, 0xb0, 0x2a, 0x15, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2f, 0x4d, 0x73, 0x67,
+	0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x43, 0x6f, 0x69, 0x6e, 0x22, 0x19, 0x0a, 0x17,
+	0x4d, 0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x43, 0x6f, 0x69, 0x6e, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xd5, 0x01, 0x0a, 0x10, 0x4d, 0x73, 0x67, 0x52,
+	0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x45, 0x52, 0x43, 0x32, 0x30, 0x12, 0x36, 0x0a, 0x09,
 	0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42,
 	0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72,
 	0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f,
@@ -6311,99 +6309,92 @@ var file_canto_erc20_v1_tx_proto_rawDesc = []byte{
 	0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x22, 0x0a, 0x0c,
 	0x65, 0x72, 0x63, 0x32, 0x30, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x04, 0x20, 0x01,
 	0x28, 0x09, 0x52, 0x0c, 0x65, 0x72, 0x63, 0x32, 0x30, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73,
-	0x3a, 0x35, 0xe8, 0xa0, 0x1f, 0x00, 0x82, 0xe7, 0xb0, 0x2a, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f,
-	0x72, 0x69, 0x74, 0x79, 0x8a, 0xe7, 0xb0, 0x2a, 0x1e, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2f, 0x4d,
-	0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x45, 0x52, 0x43, 0x32, 0x30, 0x50,
-	0x72, 0x6f, 0x70, 0x6f, 0x73, 0x61, 0x6c, 0x22, 0x22, 0x0a, 0x20, 0x4d, 0x73, 0x67, 0x52, 0x65,
-	0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x45, 0x52, 0x43, 0x32, 0x30, 0x50, 0x72, 0x6f, 0x70, 0x6f,
-	0x73, 0x61, 0x6c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xe7, 0x01, 0x0a, 0x20,
+	0x3a, 0x2d, 0xe8, 0xa0, 0x1f, 0x00, 0x82, 0xe7, 0xb0, 0x2a, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f,
+	0x72, 0x69, 0x74, 0x79, 0x8a, 0xe7, 0xb0, 0x2a, 0x16, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2f, 0x4d,
+	0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x45, 0x52, 0x43, 0x32, 0x30, 0x22,
+	0x1a, 0x0a, 0x18, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x45, 0x52,
+	0x43, 0x32, 0x30, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xd7, 0x01, 0x0a, 0x18,
 	0x4d, 0x73, 0x67, 0x54, 0x6f, 0x67, 0x67, 0x6c, 0x65, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x43, 0x6f,
-	0x6e, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x61, 0x6c,
-	0x12, 0x36, 0x0a, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e,
-	0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x09, 0x61,
-	0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x54, 0x69, 0x74, 0x6c,
-	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x54, 0x69, 0x74, 0x6c, 0x65, 0x12, 0x20,
-	0x0a, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x03, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e,
-	0x12, 0x14, 0x0a, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x3a, 0x3d, 0xe8, 0xa0, 0x1f, 0x01, 0x82, 0xe7, 0xb0, 0x2a,
-	0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x8a, 0xe7, 0xb0, 0x2a, 0x26, 0x63,
-	0x61, 0x6e, 0x74, 0x6f, 0x2f, 0x4d, 0x73, 0x67, 0x54, 0x6f, 0x67, 0x67, 0x6c, 0x65, 0x54, 0x6f,
-	0x6b, 0x65, 0x6e, 0x43, 0x6f, 0x6e, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x50, 0x72, 0x6f,
-	0x70, 0x6f, 0x73, 0x61, 0x6c, 0x22, 0x2a, 0x0a, 0x28, 0x4d, 0x73, 0x67, 0x54, 0x6f, 0x67, 0x67,
+	0x6e, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x36, 0x0a, 0x09, 0x61, 0x75, 0x74, 0x68,
+	0x6f, 0x72, 0x69, 0x74, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d,
+	0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53,
+	0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x74, 0x79,
+	0x12, 0x14, 0x0a, 0x05, 0x54, 0x69, 0x74, 0x6c, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x05, 0x54, 0x69, 0x74, 0x6c, 0x65, 0x12, 0x20, 0x0a, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69,
+	0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x64, 0x65, 0x73,
+	0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x14, 0x0a, 0x05, 0x74, 0x6f, 0x6b, 0x65,
+	0x6e, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x3a, 0x35,
+	0xe8, 0xa0, 0x1f, 0x01, 0x82, 0xe7, 0xb0, 0x2a, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69,
+	0x74, 0x79, 0x8a, 0xe7, 0xb0, 0x2a, 0x1e, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2f, 0x4d, 0x73, 0x67,
+	0x54, 0x6f, 0x67, 0x67, 0x6c, 0x65, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x43, 0x6f, 0x6e, 0x76, 0x65,
+	0x72, 0x73, 0x69, 0x6f, 0x6e, 0x22, 0x22, 0x0a, 0x20, 0x4d, 0x73, 0x67, 0x54, 0x6f, 0x67, 0x67,
 	0x6c, 0x65, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x43, 0x6f, 0x6e, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f,
-	0x6e, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x61, 0x6c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x32, 0xb1, 0x07, 0x0a, 0x03, 0x4d, 0x73, 0x67, 0x12, 0x7e, 0x0a, 0x0b, 0x43, 0x6f, 0x6e,
-	0x76, 0x65, 0x72, 0x74, 0x43, 0x6f, 0x69, 0x6e, 0x12, 0x1e, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f,
-	0x2e, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x43, 0x6f, 0x6e,
-	0x76, 0x65, 0x72, 0x74, 0x43, 0x6f, 0x69, 0x6e, 0x1a, 0x26, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f,
-	0x2e, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x43, 0x6f, 0x6e,
-	0x76, 0x65, 0x72, 0x74, 0x43, 0x6f, 0x69, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x22, 0x27, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x21, 0x12, 0x1f, 0x2f, 0x63, 0x61, 0x6e, 0x74, 0x6f,
-	0x2f, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2f, 0x76, 0x31, 0x2f, 0x74, 0x78, 0x2f, 0x63, 0x6f, 0x6e,
-	0x76, 0x65, 0x72, 0x74, 0x5f, 0x63, 0x6f, 0x69, 0x6e, 0x12, 0x82, 0x01, 0x0a, 0x0c, 0x43, 0x6f,
-	0x6e, 0x76, 0x65, 0x72, 0x74, 0x45, 0x52, 0x43, 0x32, 0x30, 0x12, 0x1f, 0x2e, 0x63, 0x61, 0x6e,
-	0x74, 0x6f, 0x2e, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x43,
-	0x6f, 0x6e, 0x76, 0x65, 0x72, 0x74, 0x45, 0x52, 0x43, 0x32, 0x30, 0x1a, 0x27, 0x2e, 0x63, 0x61,
-	0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67,
-	0x43, 0x6f, 0x6e, 0x76, 0x65, 0x72, 0x74, 0x45, 0x52, 0x43, 0x32, 0x30, 0x52, 0x65, 0x73, 0x70,
-	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x28, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x22, 0x12, 0x20, 0x2f, 0x63,
-	0x61, 0x6e, 0x74, 0x6f, 0x2f, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2f, 0x76, 0x31, 0x2f, 0x74, 0x78,
-	0x2f, 0x63, 0x6f, 0x6e, 0x76, 0x65, 0x72, 0x74, 0x5f, 0x65, 0x72, 0x63, 0x32, 0x30, 0x12, 0x82,
-	0x01, 0x0a, 0x0c, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12,
-	0x1f, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x76, 0x31,
-	0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73,
-	0x1a, 0x27, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x76,
-	0x31, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d,
-	0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x28, 0x82, 0xd3, 0xe4, 0x93, 0x02,
-	0x22, 0x12, 0x20, 0x2f, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2f, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2f,
-	0x76, 0x31, 0x2f, 0x74, 0x78, 0x2f, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x5f, 0x70, 0x61, 0x72,
-	0x61, 0x6d, 0x73, 0x12, 0xa3, 0x01, 0x0a, 0x14, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72,
-	0x43, 0x6f, 0x69, 0x6e, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x61, 0x6c, 0x12, 0x27, 0x2e, 0x63,
-	0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73,
-	0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x43, 0x6f, 0x69, 0x6e, 0x50, 0x72, 0x6f,
-	0x70, 0x6f, 0x73, 0x61, 0x6c, 0x1a, 0x2f, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72,
+	0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0xe6, 0x06, 0x0a, 0x03, 0x4d, 0x73,
+	0x67, 0x12, 0x7e, 0x0a, 0x0b, 0x43, 0x6f, 0x6e, 0x76, 0x65, 0x72, 0x74, 0x43, 0x6f, 0x69, 0x6e,
+	0x12, 0x1e, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x76,
+	0x31, 0x2e, 0x4d, 0x73, 0x67, 0x43, 0x6f, 0x6e, 0x76, 0x65, 0x72, 0x74, 0x43, 0x6f, 0x69, 0x6e,
+	0x1a, 0x26, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x76,
+	0x31, 0x2e, 0x4d, 0x73, 0x67, 0x43, 0x6f, 0x6e, 0x76, 0x65, 0x72, 0x74, 0x43, 0x6f, 0x69, 0x6e,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x27, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x21,
+	0x12, 0x1f, 0x2f, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2f, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2f, 0x76,
+	0x31, 0x2f, 0x74, 0x78, 0x2f, 0x63, 0x6f, 0x6e, 0x76, 0x65, 0x72, 0x74, 0x5f, 0x63, 0x6f, 0x69,
+	0x6e, 0x12, 0x82, 0x01, 0x0a, 0x0c, 0x43, 0x6f, 0x6e, 0x76, 0x65, 0x72, 0x74, 0x45, 0x52, 0x43,
+	0x32, 0x30, 0x12, 0x1f, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72, 0x63, 0x32, 0x30,
+	0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x43, 0x6f, 0x6e, 0x76, 0x65, 0x72, 0x74, 0x45, 0x52,
+	0x43, 0x32, 0x30, 0x1a, 0x27, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72, 0x63, 0x32,
+	0x30, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x43, 0x6f, 0x6e, 0x76, 0x65, 0x72, 0x74, 0x45,
+	0x52, 0x43, 0x32, 0x30, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x28, 0x82, 0xd3,
+	0xe4, 0x93, 0x02, 0x22, 0x12, 0x20, 0x2f, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2f, 0x65, 0x72, 0x63,
+	0x32, 0x30, 0x2f, 0x76, 0x31, 0x2f, 0x74, 0x78, 0x2f, 0x63, 0x6f, 0x6e, 0x76, 0x65, 0x72, 0x74,
+	0x5f, 0x65, 0x72, 0x63, 0x32, 0x30, 0x12, 0x82, 0x01, 0x0a, 0x0c, 0x55, 0x70, 0x64, 0x61, 0x74,
+	0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x1f, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2e,
+	0x65, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61,
+	0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x1a, 0x27, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f,
+	0x2e, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64,
+	0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x22, 0x28, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x22, 0x12, 0x20, 0x2f, 0x63, 0x61, 0x6e, 0x74,
+	0x6f, 0x2f, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2f, 0x76, 0x31, 0x2f, 0x74, 0x78, 0x2f, 0x75, 0x70,
+	0x64, 0x61, 0x74, 0x65, 0x5f, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x8a, 0x01, 0x0a, 0x14,
+	0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x43, 0x6f, 0x69, 0x6e, 0x50, 0x72, 0x6f, 0x70,
+	0x6f, 0x73, 0x61, 0x6c, 0x12, 0x1f, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72, 0x63,
+	0x32, 0x30, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65,
+	0x72, 0x43, 0x6f, 0x69, 0x6e, 0x1a, 0x27, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72,
 	0x63, 0x32, 0x30, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74,
-	0x65, 0x72, 0x43, 0x6f, 0x69, 0x6e, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x61, 0x6c, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x31, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x2b, 0x12, 0x29,
-	0x2f, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2f, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2f, 0x76, 0x31, 0x2f,
-	0x74, 0x78, 0x2f, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x5f, 0x63, 0x6f, 0x69, 0x6e,
-	0x5f, 0x70, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x61, 0x6c, 0x12, 0xa7, 0x01, 0x0a, 0x15, 0x52, 0x65,
-	0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x45, 0x52, 0x43, 0x32, 0x30, 0x50, 0x72, 0x6f, 0x70, 0x6f,
-	0x73, 0x61, 0x6c, 0x12, 0x28, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72, 0x63, 0x32,
-	0x30, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72,
-	0x45, 0x52, 0x43, 0x32, 0x30, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x61, 0x6c, 0x1a, 0x30, 0x2e,
-	0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x76, 0x31, 0x2e, 0x4d,
-	0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x45, 0x52, 0x43, 0x32, 0x30, 0x50,
-	0x72, 0x6f, 0x70, 0x6f, 0x73, 0x61, 0x6c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
-	0x32, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x2c, 0x12, 0x2a, 0x2f, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2f,
-	0x65, 0x72, 0x63, 0x32, 0x30, 0x2f, 0x76, 0x31, 0x2f, 0x74, 0x78, 0x2f, 0x72, 0x65, 0x67, 0x69,
-	0x73, 0x74, 0x65, 0x72, 0x5f, 0x65, 0x72, 0x63, 0x32, 0x30, 0x5f, 0x70, 0x72, 0x6f, 0x70, 0x6f,
-	0x73, 0x61, 0x6c, 0x12, 0xc8, 0x01, 0x0a, 0x1d, 0x54, 0x6f, 0x67, 0x67, 0x6c, 0x65, 0x54, 0x6f,
-	0x6b, 0x65, 0x6e, 0x43, 0x6f, 0x6e, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x50, 0x72, 0x6f,
-	0x70, 0x6f, 0x73, 0x61, 0x6c, 0x12, 0x30, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72,
+	0x65, 0x72, 0x43, 0x6f, 0x69, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x28,
+	0x82, 0xd3, 0xe4, 0x93, 0x02, 0x22, 0x12, 0x20, 0x2f, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2f, 0x65,
+	0x72, 0x63, 0x32, 0x30, 0x2f, 0x76, 0x31, 0x2f, 0x74, 0x78, 0x2f, 0x72, 0x65, 0x67, 0x69, 0x73,
+	0x74, 0x65, 0x72, 0x5f, 0x63, 0x6f, 0x69, 0x6e, 0x12, 0x8e, 0x01, 0x0a, 0x15, 0x52, 0x65, 0x67,
+	0x69, 0x73, 0x74, 0x65, 0x72, 0x45, 0x52, 0x43, 0x32, 0x30, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73,
+	0x61, 0x6c, 0x12, 0x20, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72, 0x63, 0x32, 0x30,
+	0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x45,
+	0x52, 0x43, 0x32, 0x30, 0x1a, 0x28, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72, 0x63,
+	0x32, 0x30, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65,
+	0x72, 0x45, 0x52, 0x43, 0x32, 0x30, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x29,
+	0x82, 0xd3, 0xe4, 0x93, 0x02, 0x23, 0x12, 0x21, 0x2f, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2f, 0x65,
+	0x72, 0x63, 0x32, 0x30, 0x2f, 0x76, 0x31, 0x2f, 0x74, 0x78, 0x2f, 0x72, 0x65, 0x67, 0x69, 0x73,
+	0x74, 0x65, 0x72, 0x5f, 0x65, 0x72, 0x63, 0x32, 0x30, 0x12, 0xaf, 0x01, 0x0a, 0x1d, 0x54, 0x6f,
+	0x67, 0x67, 0x6c, 0x65, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x43, 0x6f, 0x6e, 0x76, 0x65, 0x72, 0x73,
+	0x69, 0x6f, 0x6e, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x61, 0x6c, 0x12, 0x28, 0x2e, 0x63, 0x61,
+	0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67,
+	0x54, 0x6f, 0x67, 0x67, 0x6c, 0x65, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x43, 0x6f, 0x6e, 0x76, 0x65,
+	0x72, 0x73, 0x69, 0x6f, 0x6e, 0x1a, 0x30, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72,
 	0x63, 0x32, 0x30, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x54, 0x6f, 0x67, 0x67, 0x6c, 0x65,
-	0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x43, 0x6f, 0x6e, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x50,
-	0x72, 0x6f, 0x70, 0x6f, 0x73, 0x61, 0x6c, 0x1a, 0x38, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2e,
-	0x65, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x76, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x54, 0x6f, 0x67, 0x67,
-	0x6c, 0x65, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x43, 0x6f, 0x6e, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f,
-	0x6e, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x61, 0x6c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x22, 0x3b, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x35, 0x12, 0x33, 0x2f, 0x63, 0x61, 0x6e, 0x74,
-	0x6f, 0x2f, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2f, 0x76, 0x31, 0x2f, 0x74, 0x78, 0x2f, 0x74, 0x6f,
-	0x67, 0x67, 0x6c, 0x65, 0x5f, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x5f, 0x63, 0x6f, 0x6e, 0x76, 0x65,
-	0x72, 0x73, 0x69, 0x6f, 0x6e, 0x5f, 0x70, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x61, 0x6c, 0x1a, 0x05,
-	0x80, 0xe7, 0xb0, 0x2a, 0x01, 0x42, 0xa0, 0x01, 0x0a, 0x12, 0x63, 0x6f, 0x6d, 0x2e, 0x63, 0x61,
-	0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x76, 0x31, 0x42, 0x07, 0x54, 0x78,
-	0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x27, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73,
-	0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2f,
-	0x65, 0x72, 0x63, 0x32, 0x30, 0x2f, 0x76, 0x31, 0x3b, 0x65, 0x72, 0x63, 0x32, 0x30, 0x76, 0x31,
-	0xa2, 0x02, 0x03, 0x43, 0x45, 0x58, 0xaa, 0x02, 0x0e, 0x43, 0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x45,
-	0x72, 0x63, 0x32, 0x30, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x0e, 0x43, 0x61, 0x6e, 0x74, 0x6f, 0x5c,
-	0x45, 0x72, 0x63, 0x32, 0x30, 0x5c, 0x56, 0x31, 0xe2, 0x02, 0x1a, 0x43, 0x61, 0x6e, 0x74, 0x6f,
-	0x5c, 0x45, 0x72, 0x63, 0x32, 0x30, 0x5c, 0x56, 0x31, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74,
-	0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x10, 0x43, 0x61, 0x6e, 0x74, 0x6f, 0x3a, 0x3a, 0x45,
-	0x72, 0x63, 0x32, 0x30, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x43, 0x6f, 0x6e, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x32, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x2c, 0x12,
+	0x2a, 0x2f, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2f, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2f, 0x76, 0x31,
+	0x2f, 0x74, 0x78, 0x2f, 0x74, 0x6f, 0x67, 0x67, 0x6c, 0x65, 0x5f, 0x74, 0x6f, 0x6b, 0x65, 0x6e,
+	0x5f, 0x63, 0x6f, 0x6e, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x1a, 0x05, 0x80, 0xe7, 0xb0,
+	0x2a, 0x01, 0x42, 0xa0, 0x01, 0x0a, 0x12, 0x63, 0x6f, 0x6d, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f,
+	0x2e, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x76, 0x31, 0x42, 0x07, 0x54, 0x78, 0x50, 0x72, 0x6f,
+	0x74, 0x6f, 0x50, 0x01, 0x5a, 0x27, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e,
+	0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2f, 0x65, 0x72, 0x63,
+	0x32, 0x30, 0x2f, 0x76, 0x31, 0x3b, 0x65, 0x72, 0x63, 0x32, 0x30, 0x76, 0x31, 0xa2, 0x02, 0x03,
+	0x43, 0x45, 0x58, 0xaa, 0x02, 0x0e, 0x43, 0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x45, 0x72, 0x63, 0x32,
+	0x30, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x0e, 0x43, 0x61, 0x6e, 0x74, 0x6f, 0x5c, 0x45, 0x72, 0x63,
+	0x32, 0x30, 0x5c, 0x56, 0x31, 0xe2, 0x02, 0x1a, 0x43, 0x61, 0x6e, 0x74, 0x6f, 0x5c, 0x45, 0x72,
+	0x63, 0x32, 0x30, 0x5c, 0x56, 0x31, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61,
+	0x74, 0x61, 0xea, 0x02, 0x10, 0x43, 0x61, 0x6e, 0x74, 0x6f, 0x3a, 0x3a, 0x45, 0x72, 0x63, 0x32,
+	0x30, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -6420,38 +6411,38 @@ func file_canto_erc20_v1_tx_proto_rawDescGZIP() []byte {
 
 var file_canto_erc20_v1_tx_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_canto_erc20_v1_tx_proto_goTypes = []interface{}{
-	(*MsgConvertCoin)(nil),                           // 0: canto.erc20.v1.MsgConvertCoin
-	(*MsgConvertCoinResponse)(nil),                   // 1: canto.erc20.v1.MsgConvertCoinResponse
-	(*MsgConvertERC20)(nil),                          // 2: canto.erc20.v1.MsgConvertERC20
-	(*MsgConvertERC20Response)(nil),                  // 3: canto.erc20.v1.MsgConvertERC20Response
-	(*MsgUpdateParams)(nil),                          // 4: canto.erc20.v1.MsgUpdateParams
-	(*MsgUpdateParamsResponse)(nil),                  // 5: canto.erc20.v1.MsgUpdateParamsResponse
-	(*MsgRegisterCoinProposal)(nil),                  // 6: canto.erc20.v1.MsgRegisterCoinProposal
-	(*MsgRegisterCoinProposalResponse)(nil),          // 7: canto.erc20.v1.MsgRegisterCoinProposalResponse
-	(*MsgRegisterERC20Proposal)(nil),                 // 8: canto.erc20.v1.MsgRegisterERC20Proposal
-	(*MsgRegisterERC20ProposalResponse)(nil),         // 9: canto.erc20.v1.MsgRegisterERC20ProposalResponse
-	(*MsgToggleTokenConversionProposal)(nil),         // 10: canto.erc20.v1.MsgToggleTokenConversionProposal
-	(*MsgToggleTokenConversionProposalResponse)(nil), // 11: canto.erc20.v1.MsgToggleTokenConversionProposalResponse
-	(*v1beta1.Coin)(nil),                             // 12: cosmos.base.v1beta1.Coin
-	(*Params)(nil),                                   // 13: canto.erc20.v1.Params
-	(*v1beta11.Metadata)(nil),                        // 14: cosmos.bank.v1beta1.Metadata
+	(*MsgConvertCoin)(nil),                   // 0: canto.erc20.v1.MsgConvertCoin
+	(*MsgConvertCoinResponse)(nil),           // 1: canto.erc20.v1.MsgConvertCoinResponse
+	(*MsgConvertERC20)(nil),                  // 2: canto.erc20.v1.MsgConvertERC20
+	(*MsgConvertERC20Response)(nil),          // 3: canto.erc20.v1.MsgConvertERC20Response
+	(*MsgUpdateParams)(nil),                  // 4: canto.erc20.v1.MsgUpdateParams
+	(*MsgUpdateParamsResponse)(nil),          // 5: canto.erc20.v1.MsgUpdateParamsResponse
+	(*MsgRegisterCoin)(nil),                  // 6: canto.erc20.v1.MsgRegisterCoin
+	(*MsgRegisterCoinResponse)(nil),          // 7: canto.erc20.v1.MsgRegisterCoinResponse
+	(*MsgRegisterERC20)(nil),                 // 8: canto.erc20.v1.MsgRegisterERC20
+	(*MsgRegisterERC20Response)(nil),         // 9: canto.erc20.v1.MsgRegisterERC20Response
+	(*MsgToggleTokenConversion)(nil),         // 10: canto.erc20.v1.MsgToggleTokenConversion
+	(*MsgToggleTokenConversionResponse)(nil), // 11: canto.erc20.v1.MsgToggleTokenConversionResponse
+	(*v1beta1.Coin)(nil),                     // 12: cosmos.base.v1beta1.Coin
+	(*Params)(nil),                           // 13: canto.erc20.v1.Params
+	(*v1beta11.Metadata)(nil),                // 14: cosmos.bank.v1beta1.Metadata
 }
 var file_canto_erc20_v1_tx_proto_depIdxs = []int32{
 	12, // 0: canto.erc20.v1.MsgConvertCoin.coin:type_name -> cosmos.base.v1beta1.Coin
 	13, // 1: canto.erc20.v1.MsgUpdateParams.params:type_name -> canto.erc20.v1.Params
-	14, // 2: canto.erc20.v1.MsgRegisterCoinProposal.metadata:type_name -> cosmos.bank.v1beta1.Metadata
+	14, // 2: canto.erc20.v1.MsgRegisterCoin.metadata:type_name -> cosmos.bank.v1beta1.Metadata
 	0,  // 3: canto.erc20.v1.Msg.ConvertCoin:input_type -> canto.erc20.v1.MsgConvertCoin
 	2,  // 4: canto.erc20.v1.Msg.ConvertERC20:input_type -> canto.erc20.v1.MsgConvertERC20
 	4,  // 5: canto.erc20.v1.Msg.UpdateParams:input_type -> canto.erc20.v1.MsgUpdateParams
-	6,  // 6: canto.erc20.v1.Msg.RegisterCoinProposal:input_type -> canto.erc20.v1.MsgRegisterCoinProposal
-	8,  // 7: canto.erc20.v1.Msg.RegisterERC20Proposal:input_type -> canto.erc20.v1.MsgRegisterERC20Proposal
-	10, // 8: canto.erc20.v1.Msg.ToggleTokenConversionProposal:input_type -> canto.erc20.v1.MsgToggleTokenConversionProposal
+	6,  // 6: canto.erc20.v1.Msg.RegisterCoinProposal:input_type -> canto.erc20.v1.MsgRegisterCoin
+	8,  // 7: canto.erc20.v1.Msg.RegisterERC20Proposal:input_type -> canto.erc20.v1.MsgRegisterERC20
+	10, // 8: canto.erc20.v1.Msg.ToggleTokenConversionProposal:input_type -> canto.erc20.v1.MsgToggleTokenConversion
 	1,  // 9: canto.erc20.v1.Msg.ConvertCoin:output_type -> canto.erc20.v1.MsgConvertCoinResponse
 	3,  // 10: canto.erc20.v1.Msg.ConvertERC20:output_type -> canto.erc20.v1.MsgConvertERC20Response
 	5,  // 11: canto.erc20.v1.Msg.UpdateParams:output_type -> canto.erc20.v1.MsgUpdateParamsResponse
-	7,  // 12: canto.erc20.v1.Msg.RegisterCoinProposal:output_type -> canto.erc20.v1.MsgRegisterCoinProposalResponse
-	9,  // 13: canto.erc20.v1.Msg.RegisterERC20Proposal:output_type -> canto.erc20.v1.MsgRegisterERC20ProposalResponse
-	11, // 14: canto.erc20.v1.Msg.ToggleTokenConversionProposal:output_type -> canto.erc20.v1.MsgToggleTokenConversionProposalResponse
+	7,  // 12: canto.erc20.v1.Msg.RegisterCoinProposal:output_type -> canto.erc20.v1.MsgRegisterCoinResponse
+	9,  // 13: canto.erc20.v1.Msg.RegisterERC20Proposal:output_type -> canto.erc20.v1.MsgRegisterERC20Response
+	11, // 14: canto.erc20.v1.Msg.ToggleTokenConversionProposal:output_type -> canto.erc20.v1.MsgToggleTokenConversionResponse
 	9,  // [9:15] is the sub-list for method output_type
 	3,  // [3:9] is the sub-list for method input_type
 	3,  // [3:3] is the sub-list for extension type_name
@@ -6539,7 +6530,7 @@ func file_canto_erc20_v1_tx_proto_init() {
 			}
 		}
 		file_canto_erc20_v1_tx_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgRegisterCoinProposal); i {
+			switch v := v.(*MsgRegisterCoin); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -6551,7 +6542,7 @@ func file_canto_erc20_v1_tx_proto_init() {
 			}
 		}
 		file_canto_erc20_v1_tx_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgRegisterCoinProposalResponse); i {
+			switch v := v.(*MsgRegisterCoinResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -6563,7 +6554,7 @@ func file_canto_erc20_v1_tx_proto_init() {
 			}
 		}
 		file_canto_erc20_v1_tx_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgRegisterERC20Proposal); i {
+			switch v := v.(*MsgRegisterERC20); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -6575,7 +6566,7 @@ func file_canto_erc20_v1_tx_proto_init() {
 			}
 		}
 		file_canto_erc20_v1_tx_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgRegisterERC20ProposalResponse); i {
+			switch v := v.(*MsgRegisterERC20Response); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -6587,7 +6578,7 @@ func file_canto_erc20_v1_tx_proto_init() {
 			}
 		}
 		file_canto_erc20_v1_tx_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgToggleTokenConversionProposal); i {
+			switch v := v.(*MsgToggleTokenConversion); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -6599,7 +6590,7 @@ func file_canto_erc20_v1_tx_proto_init() {
 			}
 		}
 		file_canto_erc20_v1_tx_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgToggleTokenConversionProposalResponse); i {
+			switch v := v.(*MsgToggleTokenConversionResponse); i {
 			case 0:
 				return &v.state
 			case 1:

@@ -12,7 +12,6 @@ import (
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 
 	"github.com/Canto-Network/Canto/v7/contracts"
-	erc20keeper "github.com/Canto-Network/Canto/v7/x/erc20/keeper"
 	"github.com/Canto-Network/Canto/v7/x/erc20/types"
 	"github.com/evmos/ethermint/tests"
 )
@@ -163,7 +162,7 @@ func (suite *KeeperTestSuite) TestEvmHooksRegisteredERC20() {
 
 			tc.malleate(contractAddr)
 
-			balance := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.AccAddress(suite.address.Bytes()), erc20keeper.CreateDenom(contractAddr.String()))
+			balance := suite.app.BankKeeper.GetBalance(suite.ctx, sdk.AccAddress(suite.address.Bytes()), types.CreateDenom(contractAddr.String()))
 			suite.Commit()
 			if tc.result {
 				// Check if the execution was successful

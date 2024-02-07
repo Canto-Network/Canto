@@ -6,11 +6,19 @@ package types
 import (
 	context "context"
 	fmt "fmt"
+	_ "github.com/cosmos/cosmos-proto"
 	_ "github.com/cosmos/cosmos-sdk/types/msgservice"
+	_ "github.com/cosmos/cosmos-sdk/types/tx/amino"
+	_ "github.com/cosmos/gogoproto/gogoproto"
 	grpc1 "github.com/cosmos/gogoproto/grpc"
 	proto "github.com/cosmos/gogoproto/proto"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
+	io "io"
 	math "math"
+	math_bits "math/bits"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -24,21 +32,367 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+type MsgLendingMarketProposal struct {
+	// authority is the address that controls the module (defaults to x/gov unless
+	// overwritten).
+	Authority   string                    `protobuf:"bytes,1,opt,name=authority,proto3" json:"authority,omitempty"`
+	Title       string                    `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	Description string                    `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Metadata    *TreasuryProposalMetadata `protobuf:"bytes,4,opt,name=metadata,proto3" json:"metadata,omitempty"`
+}
+
+func (m *MsgLendingMarketProposal) Reset()         { *m = MsgLendingMarketProposal{} }
+func (m *MsgLendingMarketProposal) String() string { return proto.CompactTextString(m) }
+func (*MsgLendingMarketProposal) ProtoMessage()    {}
+func (*MsgLendingMarketProposal) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d69de145343701ce, []int{0}
+}
+func (m *MsgLendingMarketProposal) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgLendingMarketProposal) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgLendingMarketProposal.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgLendingMarketProposal) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgLendingMarketProposal.Merge(m, src)
+}
+func (m *MsgLendingMarketProposal) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgLendingMarketProposal) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgLendingMarketProposal.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgLendingMarketProposal proto.InternalMessageInfo
+
+func (m *MsgLendingMarketProposal) GetAuthority() string {
+	if m != nil {
+		return m.Authority
+	}
+	return ""
+}
+
+func (m *MsgLendingMarketProposal) GetTitle() string {
+	if m != nil {
+		return m.Title
+	}
+	return ""
+}
+
+func (m *MsgLendingMarketProposal) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+func (m *MsgLendingMarketProposal) GetMetadata() *TreasuryProposalMetadata {
+	if m != nil {
+		return m.Metadata
+	}
+	return nil
+}
+
+type MsgLendingMarketProposalResponse struct {
+}
+
+func (m *MsgLendingMarketProposalResponse) Reset()         { *m = MsgLendingMarketProposalResponse{} }
+func (m *MsgLendingMarketProposalResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgLendingMarketProposalResponse) ProtoMessage()    {}
+func (*MsgLendingMarketProposalResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d69de145343701ce, []int{1}
+}
+func (m *MsgLendingMarketProposalResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgLendingMarketProposalResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgLendingMarketProposalResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgLendingMarketProposalResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgLendingMarketProposalResponse.Merge(m, src)
+}
+func (m *MsgLendingMarketProposalResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgLendingMarketProposalResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgLendingMarketProposalResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgLendingMarketProposalResponse proto.InternalMessageInfo
+
+type MsgTreasuryProposal struct {
+	// authority is the address that controls the module (defaults to x/gov unless
+	// overwritten).
+	Authority   string                    `protobuf:"bytes,1,opt,name=authority,proto3" json:"authority,omitempty"`
+	Title       string                    `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	Description string                    `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Metadata    *TreasuryProposalMetadata `protobuf:"bytes,4,opt,name=metadata,proto3" json:"metadata,omitempty"`
+}
+
+func (m *MsgTreasuryProposal) Reset()         { *m = MsgTreasuryProposal{} }
+func (m *MsgTreasuryProposal) String() string { return proto.CompactTextString(m) }
+func (*MsgTreasuryProposal) ProtoMessage()    {}
+func (*MsgTreasuryProposal) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d69de145343701ce, []int{2}
+}
+func (m *MsgTreasuryProposal) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgTreasuryProposal) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgTreasuryProposal.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgTreasuryProposal) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgTreasuryProposal.Merge(m, src)
+}
+func (m *MsgTreasuryProposal) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgTreasuryProposal) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgTreasuryProposal.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgTreasuryProposal proto.InternalMessageInfo
+
+func (m *MsgTreasuryProposal) GetAuthority() string {
+	if m != nil {
+		return m.Authority
+	}
+	return ""
+}
+
+func (m *MsgTreasuryProposal) GetTitle() string {
+	if m != nil {
+		return m.Title
+	}
+	return ""
+}
+
+func (m *MsgTreasuryProposal) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+func (m *MsgTreasuryProposal) GetMetadata() *TreasuryProposalMetadata {
+	if m != nil {
+		return m.Metadata
+	}
+	return nil
+}
+
+type MsgTreasuryProposalResponse struct {
+}
+
+func (m *MsgTreasuryProposalResponse) Reset()         { *m = MsgTreasuryProposalResponse{} }
+func (m *MsgTreasuryProposalResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgTreasuryProposalResponse) ProtoMessage()    {}
+func (*MsgTreasuryProposalResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d69de145343701ce, []int{3}
+}
+func (m *MsgTreasuryProposalResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgTreasuryProposalResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgTreasuryProposalResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgTreasuryProposalResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgTreasuryProposalResponse.Merge(m, src)
+}
+func (m *MsgTreasuryProposalResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgTreasuryProposalResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgTreasuryProposalResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgTreasuryProposalResponse proto.InternalMessageInfo
+
+type MsgUpdateParams struct {
+	// authority is the address that controls the module (defaults to x/gov unless
+	// overwritten).
+	Authority string `protobuf:"bytes,1,opt,name=authority,proto3" json:"authority,omitempty"`
+	// params defines the x/erc20 parameters to update.
+	//
+	// NOTE: All parameters must be supplied.
+	Params Params `protobuf:"bytes,2,opt,name=params,proto3" json:"params"`
+}
+
+func (m *MsgUpdateParams) Reset()         { *m = MsgUpdateParams{} }
+func (m *MsgUpdateParams) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateParams) ProtoMessage()    {}
+func (*MsgUpdateParams) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d69de145343701ce, []int{4}
+}
+func (m *MsgUpdateParams) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateParams) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateParams.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateParams) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateParams.Merge(m, src)
+}
+func (m *MsgUpdateParams) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateParams) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateParams.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateParams proto.InternalMessageInfo
+
+func (m *MsgUpdateParams) GetAuthority() string {
+	if m != nil {
+		return m.Authority
+	}
+	return ""
+}
+
+func (m *MsgUpdateParams) GetParams() Params {
+	if m != nil {
+		return m.Params
+	}
+	return Params{}
+}
+
+// MsgUpdateParamsResponse defines the response structure for executing a
+// MsgUpdateParams message.
+//
+// Since: cosmos-sdk 0.47
+type MsgUpdateParamsResponse struct {
+}
+
+func (m *MsgUpdateParamsResponse) Reset()         { *m = MsgUpdateParamsResponse{} }
+func (m *MsgUpdateParamsResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateParamsResponse) ProtoMessage()    {}
+func (*MsgUpdateParamsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d69de145343701ce, []int{5}
+}
+func (m *MsgUpdateParamsResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateParamsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateParamsResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateParamsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateParamsResponse.Merge(m, src)
+}
+func (m *MsgUpdateParamsResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateParamsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateParamsResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateParamsResponse proto.InternalMessageInfo
+
+func init() {
+	proto.RegisterType((*MsgLendingMarketProposal)(nil), "canto.govshuttle.v1.MsgLendingMarketProposal")
+	proto.RegisterType((*MsgLendingMarketProposalResponse)(nil), "canto.govshuttle.v1.MsgLendingMarketProposalResponse")
+	proto.RegisterType((*MsgTreasuryProposal)(nil), "canto.govshuttle.v1.MsgTreasuryProposal")
+	proto.RegisterType((*MsgTreasuryProposalResponse)(nil), "canto.govshuttle.v1.MsgTreasuryProposalResponse")
+	proto.RegisterType((*MsgUpdateParams)(nil), "canto.govshuttle.v1.MsgUpdateParams")
+	proto.RegisterType((*MsgUpdateParamsResponse)(nil), "canto.govshuttle.v1.MsgUpdateParamsResponse")
+}
+
 func init() { proto.RegisterFile("canto/govshuttle/v1/tx.proto", fileDescriptor_d69de145343701ce) }
 
 var fileDescriptor_d69de145343701ce = []byte{
-	// 168 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x49, 0x4e, 0xcc, 0x2b,
-	0xc9, 0xd7, 0x4f, 0xcf, 0x2f, 0x2b, 0xce, 0x28, 0x2d, 0x29, 0xc9, 0x49, 0xd5, 0x2f, 0x33, 0xd4,
-	0x2f, 0xa9, 0xd0, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x12, 0x06, 0xcb, 0xea, 0x21, 0x64, 0xf5,
-	0xca, 0x0c, 0xa5, 0xc4, 0x93, 0xf3, 0x8b, 0x73, 0xf3, 0x8b, 0xf5, 0x73, 0x8b, 0xd3, 0x41, 0x8a,
-	0x73, 0x8b, 0xd3, 0x21, 0xaa, 0x8d, 0x78, 0xb8, 0x98, 0x7d, 0x8b, 0xd3, 0xa5, 0x58, 0x1b, 0x9e,
-	0x6f, 0xd0, 0x62, 0x74, 0xf2, 0x3b, 0xf1, 0x48, 0x8e, 0xf1, 0xc2, 0x23, 0x39, 0xc6, 0x07, 0x8f,
-	0xe4, 0x18, 0x27, 0x3c, 0x96, 0x63, 0xb8, 0xf0, 0x58, 0x8e, 0xe1, 0xc6, 0x63, 0x39, 0x86, 0x28,
-	0x93, 0xf4, 0xcc, 0x92, 0x8c, 0xd2, 0x24, 0xbd, 0xe4, 0xfc, 0x5c, 0x7d, 0x67, 0x90, 0x05, 0xba,
-	0x7e, 0xa9, 0x25, 0xe5, 0xf9, 0x45, 0xd9, 0x10, 0x9e, 0x7e, 0x99, 0xb9, 0x7e, 0x05, 0xb2, 0x8b,
-	0x4a, 0x2a, 0x0b, 0x52, 0x8b, 0x93, 0xd8, 0xc0, 0x96, 0x18, 0x03, 0x02, 0x00, 0x00, 0xff, 0xff,
-	0x79, 0x7d, 0xe1, 0xdc, 0xb2, 0x00, 0x00, 0x00,
+	// 617 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xd4, 0x94, 0x41, 0x6b, 0x13, 0x41,
+	0x14, 0xc7, 0xb3, 0xa9, 0x2d, 0x76, 0x2a, 0xa8, 0xdb, 0x96, 0x6e, 0xb6, 0x75, 0x1b, 0x96, 0x8a,
+	0x31, 0x9a, 0x9d, 0x26, 0x5a, 0x0b, 0x3d, 0x08, 0xc6, 0x93, 0xe0, 0x96, 0x12, 0xf5, 0xe2, 0x25,
+	0x4c, 0xb3, 0xc3, 0x64, 0x69, 0x76, 0x67, 0xd9, 0x99, 0xc4, 0xe6, 0x26, 0x39, 0x8a, 0x07, 0xc5,
+	0x2f, 0xa0, 0x37, 0x8f, 0x01, 0xc5, 0xcf, 0xd0, 0x63, 0xd1, 0x8b, 0x27, 0x91, 0x44, 0x88, 0x5f,
+	0x42, 0x90, 0x9d, 0xdd, 0x6e, 0x62, 0xba, 0x0b, 0xd5, 0x9b, 0x97, 0xb0, 0xf3, 0xde, 0xfb, 0xbf,
+	0xf7, 0x7b, 0x7f, 0x32, 0x03, 0xd6, 0x1a, 0xc8, 0xe5, 0x14, 0x12, 0xda, 0x61, 0xcd, 0x36, 0xe7,
+	0x2d, 0x0c, 0x3b, 0x65, 0xc8, 0x0f, 0x0d, 0xcf, 0xa7, 0x9c, 0xca, 0x8b, 0x22, 0x6b, 0x8c, 0xb3,
+	0x46, 0xa7, 0xac, 0xae, 0x11, 0x4a, 0x49, 0x0b, 0x43, 0xe4, 0xd9, 0x10, 0xb9, 0x2e, 0xe5, 0x88,
+	0xdb, 0xd4, 0x65, 0xa1, 0x44, 0x5d, 0x22, 0x94, 0x50, 0xf1, 0x09, 0x83, 0xaf, 0x28, 0xba, 0xd2,
+	0xa0, 0xcc, 0xa1, 0x0c, 0x3a, 0x8c, 0x04, 0x03, 0x1c, 0x46, 0xa2, 0x44, 0x2e, 0x4c, 0xd4, 0x43,
+	0x45, 0x78, 0x88, 0x52, 0x97, 0x91, 0x63, 0xbb, 0x14, 0x8a, 0xdf, 0x28, 0xb4, 0x91, 0x44, 0x3b,
+	0x41, 0x27, 0xaa, 0xf4, 0x97, 0x59, 0xa0, 0x98, 0x8c, 0x3c, 0xc4, 0xae, 0x65, 0xbb, 0xc4, 0x44,
+	0xfe, 0x01, 0xe6, 0x7b, 0x3e, 0xf5, 0x28, 0x43, 0x2d, 0xf9, 0x0e, 0x98, 0x47, 0x6d, 0xde, 0xa4,
+	0xbe, 0xcd, 0xbb, 0x8a, 0x94, 0x97, 0x0a, 0xf3, 0x55, 0xe5, 0xf3, 0xc7, 0xd2, 0x52, 0x34, 0xfa,
+	0x9e, 0x65, 0xf9, 0x98, 0xb1, 0x47, 0xdc, 0xb7, 0x5d, 0x52, 0x1b, 0x97, 0xca, 0x4b, 0x60, 0x96,
+	0xdb, 0xbc, 0x85, 0x95, 0x6c, 0xa0, 0xa9, 0x85, 0x07, 0x39, 0x0f, 0x16, 0x2c, 0xcc, 0x1a, 0xbe,
+	0xed, 0x05, 0x1e, 0x28, 0x33, 0x22, 0x37, 0x19, 0x92, 0x1f, 0x80, 0xf3, 0x0e, 0xe6, 0xc8, 0x42,
+	0x1c, 0x29, 0xe7, 0xf2, 0x52, 0x61, 0xa1, 0x52, 0x32, 0x12, 0x5c, 0x35, 0x1e, 0xfb, 0x18, 0xb1,
+	0xb6, 0xdf, 0x3d, 0x01, 0x35, 0x23, 0x51, 0x2d, 0x96, 0xef, 0x6c, 0xfd, 0x7c, 0xbb, 0x9e, 0xe9,
+	0x8d, 0xfa, 0xc5, 0x31, 0xd6, 0x8b, 0x51, 0xbf, 0xa8, 0x85, 0xa6, 0xa4, 0x6d, 0xac, 0xeb, 0x20,
+	0x9f, 0x96, 0xab, 0x61, 0xe6, 0x51, 0x97, 0x61, 0xbd, 0x97, 0x05, 0x8b, 0x26, 0x23, 0xd3, 0x10,
+	0xff, 0xb3, 0x5b, 0x9b, 0xc9, 0x6e, 0xe5, 0x62, 0xb7, 0xa6, 0x7b, 0xe8, 0x57, 0xc0, 0x6a, 0x42,
+	0x38, 0xf6, 0xe8, 0x83, 0x04, 0x2e, 0x9a, 0x8c, 0x3c, 0xf1, 0x2c, 0xc4, 0xf1, 0x1e, 0xf2, 0x91,
+	0xc3, 0xfe, 0xd9, 0x9f, 0xbb, 0x60, 0xce, 0x13, 0x1d, 0x84, 0x41, 0x0b, 0x95, 0xd5, 0xc4, 0x2d,
+	0xc3, 0x21, 0xd5, 0xf9, 0xa3, 0x6f, 0xeb, 0x99, 0xf7, 0xa3, 0x7e, 0x51, 0xaa, 0x45, 0xaa, 0x9d,
+	0xc2, 0xe9, 0xc5, 0x96, 0xe3, 0xc5, 0x26, 0x09, 0xf5, 0x1c, 0x58, 0x99, 0x0a, 0x9d, 0x2c, 0x54,
+	0xf9, 0x35, 0x03, 0x66, 0x4c, 0x46, 0xe4, 0xd7, 0x12, 0xb8, 0xf0, 0xc7, 0x56, 0x1b, 0x89, 0x34,
+	0x53, 0x6d, 0xd4, 0x9b, 0x67, 0xa9, 0x8a, 0xdd, 0x2b, 0xf5, 0xbe, 0xfc, 0x78, 0x93, 0xbd, 0x26,
+	0x5f, 0x85, 0xc9, 0x2f, 0x0e, 0x6c, 0x0b, 0x55, 0x3d, 0x5c, 0x50, 0xfe, 0x24, 0x81, 0xe5, 0xe4,
+	0x0b, 0x5c, 0x4a, 0x1b, 0x9b, 0x58, 0xae, 0x6e, 0xfd, 0x55, 0x79, 0x8c, 0xbb, 0x2d, 0x70, 0xcb,
+	0x32, 0x4c, 0xc3, 0x6d, 0x85, 0xf2, 0xba, 0x23, 0xf4, 0xc1, 0xfb, 0x15, 0xe2, 0xbd, 0x93, 0xc0,
+	0xa5, 0x53, 0xd7, 0xa8, 0x90, 0x06, 0x31, 0x5d, 0xa9, 0x6e, 0x9e, 0xb5, 0x32, 0x26, 0x2d, 0x0b,
+	0xd2, 0x1b, 0xf2, 0xf5, 0x34, 0x52, 0x1e, 0x29, 0x63, 0x46, 0x75, 0xf6, 0x79, 0xf0, 0x67, 0xaa,
+	0xee, 0x1e, 0x0d, 0x34, 0xe9, 0x78, 0xa0, 0x49, 0xdf, 0x07, 0x9a, 0xf4, 0x6a, 0xa8, 0x65, 0x8e,
+	0x87, 0x5a, 0xe6, 0xeb, 0x50, 0xcb, 0x3c, 0xbd, 0x4d, 0x6c, 0xde, 0x6c, 0xef, 0x1b, 0x0d, 0xea,
+	0xc0, 0xfb, 0x41, 0xd7, 0xd2, 0x2e, 0xe6, 0xcf, 0xa8, 0x7f, 0x10, 0x9e, 0x60, 0x67, 0x1b, 0x1e,
+	0x4e, 0x0e, 0xe2, 0x5d, 0x0f, 0xb3, 0xfd, 0x39, 0xf1, 0xfc, 0xde, 0xfa, 0x1d, 0x00, 0x00, 0xff,
+	0xff, 0x2c, 0xa9, 0x6b, 0xba, 0x54, 0x06, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -53,6 +407,10 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
+	// UpdateParams updates the parameters of the x/erc20 module.
+	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
+	LendingMarketProposal(ctx context.Context, in *MsgLendingMarketProposal, opts ...grpc.CallOption) (*MsgLendingMarketProposalResponse, error)
+	TreasuryProposal(ctx context.Context, in *MsgTreasuryProposal, opts ...grpc.CallOption) (*MsgTreasuryProposalResponse, error)
 }
 
 type msgClient struct {
@@ -63,22 +421,1174 @@ func NewMsgClient(cc grpc1.ClientConn) MsgClient {
 	return &msgClient{cc}
 }
 
+func (c *msgClient) UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error) {
+	out := new(MsgUpdateParamsResponse)
+	err := c.cc.Invoke(ctx, "/canto.govshuttle.v1.Msg/UpdateParams", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) LendingMarketProposal(ctx context.Context, in *MsgLendingMarketProposal, opts ...grpc.CallOption) (*MsgLendingMarketProposalResponse, error) {
+	out := new(MsgLendingMarketProposalResponse)
+	err := c.cc.Invoke(ctx, "/canto.govshuttle.v1.Msg/LendingMarketProposal", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) TreasuryProposal(ctx context.Context, in *MsgTreasuryProposal, opts ...grpc.CallOption) (*MsgTreasuryProposalResponse, error) {
+	out := new(MsgTreasuryProposalResponse)
+	err := c.cc.Invoke(ctx, "/canto.govshuttle.v1.Msg/TreasuryProposal", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
+	// UpdateParams updates the parameters of the x/erc20 module.
+	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
+	LendingMarketProposal(context.Context, *MsgLendingMarketProposal) (*MsgLendingMarketProposalResponse, error)
+	TreasuryProposal(context.Context, *MsgTreasuryProposal) (*MsgTreasuryProposalResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
 type UnimplementedMsgServer struct {
 }
 
+func (*UnimplementedMsgServer) UpdateParams(ctx context.Context, req *MsgUpdateParams) (*MsgUpdateParamsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateParams not implemented")
+}
+func (*UnimplementedMsgServer) LendingMarketProposal(ctx context.Context, req *MsgLendingMarketProposal) (*MsgLendingMarketProposalResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LendingMarketProposal not implemented")
+}
+func (*UnimplementedMsgServer) TreasuryProposal(ctx context.Context, req *MsgTreasuryProposal) (*MsgTreasuryProposalResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TreasuryProposal not implemented")
+}
+
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
 	s.RegisterService(&_Msg_serviceDesc, srv)
+}
+
+func _Msg_UpdateParams_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateParams)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UpdateParams(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/canto.govshuttle.v1.Msg/UpdateParams",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UpdateParams(ctx, req.(*MsgUpdateParams))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_LendingMarketProposal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgLendingMarketProposal)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).LendingMarketProposal(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/canto.govshuttle.v1.Msg/LendingMarketProposal",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).LendingMarketProposal(ctx, req.(*MsgLendingMarketProposal))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_TreasuryProposal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgTreasuryProposal)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).TreasuryProposal(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/canto.govshuttle.v1.Msg/TreasuryProposal",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).TreasuryProposal(ctx, req.(*MsgTreasuryProposal))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "canto.govshuttle.v1.Msg",
 	HandlerType: (*MsgServer)(nil),
-	Methods:     []grpc.MethodDesc{},
-	Streams:     []grpc.StreamDesc{},
-	Metadata:    "canto/govshuttle/v1/tx.proto",
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "UpdateParams",
+			Handler:    _Msg_UpdateParams_Handler,
+		},
+		{
+			MethodName: "LendingMarketProposal",
+			Handler:    _Msg_LendingMarketProposal_Handler,
+		},
+		{
+			MethodName: "TreasuryProposal",
+			Handler:    _Msg_TreasuryProposal_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "canto/govshuttle/v1/tx.proto",
 }
+
+func (m *MsgLendingMarketProposal) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgLendingMarketProposal) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgLendingMarketProposal) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Metadata != nil {
+		{
+			size, err := m.Metadata.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.Description) > 0 {
+		i -= len(m.Description)
+		copy(dAtA[i:], m.Description)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Description)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Title) > 0 {
+		i -= len(m.Title)
+		copy(dAtA[i:], m.Title)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Title)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Authority) > 0 {
+		i -= len(m.Authority)
+		copy(dAtA[i:], m.Authority)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Authority)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgLendingMarketProposalResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgLendingMarketProposalResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgLendingMarketProposalResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgTreasuryProposal) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgTreasuryProposal) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgTreasuryProposal) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Metadata != nil {
+		{
+			size, err := m.Metadata.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.Description) > 0 {
+		i -= len(m.Description)
+		copy(dAtA[i:], m.Description)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Description)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Title) > 0 {
+		i -= len(m.Title)
+		copy(dAtA[i:], m.Title)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Title)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Authority) > 0 {
+		i -= len(m.Authority)
+		copy(dAtA[i:], m.Authority)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Authority)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgTreasuryProposalResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgTreasuryProposalResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgTreasuryProposalResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpdateParams) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateParams) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateParams) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size, err := m.Params.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	if len(m.Authority) > 0 {
+		i -= len(m.Authority)
+		copy(dAtA[i:], m.Authority)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Authority)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpdateParamsResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateParamsResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateParamsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
+	offset -= sovTx(v)
+	base := offset
+	for v >= 1<<7 {
+		dAtA[offset] = uint8(v&0x7f | 0x80)
+		v >>= 7
+		offset++
+	}
+	dAtA[offset] = uint8(v)
+	return base
+}
+func (m *MsgLendingMarketProposal) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Authority)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Title)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Description)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.Metadata != nil {
+		l = m.Metadata.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgLendingMarketProposalResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgTreasuryProposal) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Authority)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Title)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Description)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.Metadata != nil {
+		l = m.Metadata.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgTreasuryProposalResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgUpdateParams) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Authority)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = m.Params.Size()
+	n += 1 + l + sovTx(uint64(l))
+	return n
+}
+
+func (m *MsgUpdateParamsResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func sovTx(x uint64) (n int) {
+	return (math_bits.Len64(x|1) + 6) / 7
+}
+func sozTx(x uint64) (n int) {
+	return sovTx(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+}
+func (m *MsgLendingMarketProposal) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgLendingMarketProposal: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgLendingMarketProposal: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Authority", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Authority = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Title", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Title = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Description = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Metadata", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Metadata == nil {
+				m.Metadata = &TreasuryProposalMetadata{}
+			}
+			if err := m.Metadata.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgLendingMarketProposalResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgLendingMarketProposalResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgLendingMarketProposalResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgTreasuryProposal) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgTreasuryProposal: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgTreasuryProposal: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Authority", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Authority = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Title", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Title = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Description = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Metadata", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Metadata == nil {
+				m.Metadata = &TreasuryProposalMetadata{}
+			}
+			if err := m.Metadata.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgTreasuryProposalResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgTreasuryProposalResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgTreasuryProposalResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateParams) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateParams: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateParams: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Authority", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Authority = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Params", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Params.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateParamsResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateParamsResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateParamsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func skipTx(dAtA []byte) (n int, err error) {
+	l := len(dAtA)
+	iNdEx := 0
+	depth := 0
+	for iNdEx < l {
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return 0, ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return 0, io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		wireType := int(wire & 0x7)
+		switch wireType {
+		case 0:
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return 0, ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return 0, io.ErrUnexpectedEOF
+				}
+				iNdEx++
+				if dAtA[iNdEx-1] < 0x80 {
+					break
+				}
+			}
+		case 1:
+			iNdEx += 8
+		case 2:
+			var length int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return 0, ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return 0, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				length |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if length < 0 {
+				return 0, ErrInvalidLengthTx
+			}
+			iNdEx += length
+		case 3:
+			depth++
+		case 4:
+			if depth == 0 {
+				return 0, ErrUnexpectedEndOfGroupTx
+			}
+			depth--
+		case 5:
+			iNdEx += 4
+		default:
+			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
+		}
+		if iNdEx < 0 {
+			return 0, ErrInvalidLengthTx
+		}
+		if depth == 0 {
+			return iNdEx, nil
+		}
+	}
+	return 0, io.ErrUnexpectedEOF
+}
+
+var (
+	ErrInvalidLengthTx        = fmt.Errorf("proto: negative length found during unmarshaling")
+	ErrIntOverflowTx          = fmt.Errorf("proto: integer overflow")
+	ErrUnexpectedEndOfGroupTx = fmt.Errorf("proto: unexpected end of group")
+)
