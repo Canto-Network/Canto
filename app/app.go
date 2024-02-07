@@ -1452,7 +1452,7 @@ func (app *Canto) setupUpgradeHandlers() {
 	case v8.UpgradeName:
 		setupLegacyKeyTables(&app.ParamsKeeper)
 		storeUpgrades = &storetypes.StoreUpgrades{
-			Added: []string{crisistypes.StoreKey, consensusparamtypes.StoreKey},
+			Added: []string{crisistypes.StoreKey, consensusparamtypes.StoreKey, ibcfeetypes.StoreKey},
 		}
 	}
 
