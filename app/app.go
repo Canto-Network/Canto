@@ -37,18 +37,12 @@ import (
 	"cosmossdk.io/simapp"
 	simappparams "cosmossdk.io/simapp/params"
 	storetypes "cosmossdk.io/store/types"
-	"cosmossdk.io/x/circuit"
-	circuitkeeper "cosmossdk.io/x/circuit/keeper"
-	circuittypes "cosmossdk.io/x/circuit/types"
 	"cosmossdk.io/x/evidence"
 	evidencekeeper "cosmossdk.io/x/evidence/keeper"
 	evidencetypes "cosmossdk.io/x/evidence/types"
 	"cosmossdk.io/x/feegrant"
 	feegrantkeeper "cosmossdk.io/x/feegrant/keeper"
 	feegrantmodule "cosmossdk.io/x/feegrant/module"
-	"cosmossdk.io/x/nft"
-	nftkeeper "cosmossdk.io/x/nft/keeper"
-	nftmodule "cosmossdk.io/x/nft/module"
 	"cosmossdk.io/x/tx/signing"
 	"cosmossdk.io/x/upgrade"
 	upgradekeeper "cosmossdk.io/x/upgrade/keeper"
@@ -103,9 +97,6 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
-	"github.com/cosmos/cosmos-sdk/x/group"
-	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
-	groupmodule "github.com/cosmos/cosmos-sdk/x/group/module"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
@@ -213,7 +204,6 @@ var (
 		govshuttletypes.ModuleName:     {authtypes.Minter, authtypes.Burner},
 		onboardingtypes.ModuleName:     {authtypes.Minter, authtypes.Burner},
 		coinswaptypes.ModuleName:       {authtypes.Minter, authtypes.Burner},
-		nft.ModuleName:                 nil,
 	}
 
 	// module accounts that are allowed to receive tokens
@@ -256,10 +246,7 @@ type Canto struct {
 	AuthzKeeper           authzkeeper.Keeper
 	EvidenceKeeper        evidencekeeper.Keeper
 	FeeGrantKeeper        feegrantkeeper.Keeper
-	GroupKeeper           groupkeeper.Keeper
-	NFTKeeper             nftkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
-	CircuitKeeper         circuitkeeper.Keeper
 	IBCKeeper             *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
 	IBCFeeKeeper          ibcfeekeeper.Keeper
 	TransferKeeper        ibctransferkeeper.Keeper
@@ -390,8 +377,7 @@ func NewCanto(
 		authtypes.StoreKey, banktypes.StoreKey, stakingtypes.StoreKey, crisistypes.StoreKey,
 		distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, consensusparamtypes.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
-		evidencetypes.StoreKey, circuittypes.StoreKey,
-		authzkeeper.StoreKey, nftkeeper.StoreKey, group.StoreKey,
+		evidencetypes.StoreKey, authzkeeper.StoreKey,
 		// ibc keys
 		ibcexported.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey, ibcfeetypes.StoreKey,
 		// ethermint keys
@@ -532,27 +518,12 @@ func NewCanto(
 		),
 	)
 
-	app.CircuitKeeper = circuitkeeper.NewKeeper(
-		appCodec,
-		runtime.NewKVStoreService(keys[circuittypes.StoreKey]),
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
-		app.AccountKeeper.AddressCodec(),
-	)
-	app.BaseApp.SetCircuitBreaker(&app.CircuitKeeper)
-
 	app.AuthzKeeper = authzkeeper.NewKeeper(
 		runtime.NewKVStoreService(keys[authzkeeper.StoreKey]),
 		appCodec,
 		app.MsgServiceRouter(),
 		app.AccountKeeper,
 	)
-
-	groupConfig := group.DefaultConfig()
-	/*
-		Example of setting group params:
-		groupConfig.MaxMetadataLen = 1000
-	*/
-	app.GroupKeeper = groupkeeper.NewKeeper(keys[group.StoreKey], appCodec, app.MsgServiceRouter(), app.AccountKeeper, groupConfig)
 
 	// set the governance module account as the authority for conducting upgrades
 	app.UpgradeKeeper = upgradekeeper.NewKeeper(
@@ -592,13 +563,6 @@ func NewCanto(
 		govtypes.NewMultiGovHooks(
 		// register the governance hooks
 		),
-	)
-
-	app.NFTKeeper = nftkeeper.NewKeeper(
-		runtime.NewKVStoreService(keys[nftkeeper.StoreKey]),
-		appCodec,
-		app.AccountKeeper,
-		app.BankKeeper,
 	)
 
 	// create evidence keeper with router
@@ -802,10 +766,7 @@ func NewCanto(
 		evidence.NewAppModule(app.EvidenceKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
-		groupmodule.NewAppModule(appCodec, app.GroupKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
-		nftmodule.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
-		circuit.NewAppModule(appCodec, app.CircuitKeeper),
 
 		// ibc modules
 		ibc.NewAppModule(app.IBCKeeper),
@@ -876,12 +837,9 @@ func NewCanto(
 		ibctransfertypes.ModuleName,
 		ibcfeetypes.ModuleName,
 		feegrant.ModuleName,
-		nft.ModuleName,
-		group.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
 		consensusparamtypes.ModuleName,
-		circuittypes.ModuleName,
 		crisistypes.ModuleName,
 		inflationtypes.ModuleName,
 		erc20types.ModuleName,
@@ -897,7 +855,6 @@ func NewCanto(
 		evmtypes.ModuleName,
 		feemarkettypes.ModuleName,
 		feegrant.ModuleName,
-		group.ModuleName,
 		onboardingtypes.ModuleName,
 		// no-op modules
 		stakingtypes.ModuleName,
@@ -912,11 +869,9 @@ func NewCanto(
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		authz.ModuleName,
-		nft.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
 		consensusparamtypes.ModuleName,
-		circuittypes.ModuleName,
 		inflationtypes.ModuleName,
 		erc20types.ModuleName,
 		govshuttletypes.ModuleName,
@@ -953,12 +908,9 @@ func NewCanto(
 		authz.ModuleName,
 		ibcfeetypes.ModuleName,
 		feegrant.ModuleName,
-		nft.ModuleName,
-		group.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
 		consensusparamtypes.ModuleName,
-		circuittypes.ModuleName,
 		// Canto modules
 		inflationtypes.ModuleName,
 		erc20types.ModuleName,
@@ -1500,7 +1452,7 @@ func (app *Canto) setupUpgradeHandlers() {
 	case v8.UpgradeName:
 		setupLegacyKeyTables(&app.ParamsKeeper)
 		storeUpgrades = &storetypes.StoreUpgrades{
-			Added: []string{crisistypes.StoreKey, circuittypes.StoreKey, consensusparamtypes.StoreKey, group.StoreKey, nft.StoreKey},
+			Added: []string{crisistypes.StoreKey, consensusparamtypes.StoreKey},
 		}
 	}
 

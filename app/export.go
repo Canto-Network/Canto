@@ -104,11 +104,14 @@ func (app *Canto) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []s
 	/* Handle fee distribution state. */
 
 	// withdraw all validator commission
-	app.StakingKeeper.IterateValidators(ctx, func(_ int64, val stakingtypes.ValidatorI) (stop bool) {
+	err := app.StakingKeeper.IterateValidators(ctx, func(_ int64, val stakingtypes.ValidatorI) (stop bool) {
 		valbz, _ := app.StakingKeeper.ValidatorAddressCodec().StringToBytes(val.GetOperator())
 		_, _ = app.DistrKeeper.WithdrawValidatorCommission(ctx, valbz)
 		return false
 	})
+	if err != nil {
+		return err
+	}
 
 	// withdraw all delegator rewards
 	dels, err := app.StakingKeeper.GetAllDelegations(ctx)
@@ -139,7 +142,7 @@ func (app *Canto) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []s
 	ctx = ctx.WithBlockHeight(0)
 
 	// reinitialize all validators
-	app.StakingKeeper.IterateValidators(ctx, func(_ int64, val stakingtypes.ValidatorI) (stop bool) {
+	err = app.StakingKeeper.IterateValidators(ctx, func(_ int64, val stakingtypes.ValidatorI) (stop bool) {
 		// donate any unwithdrawn outstanding reward fraction tokens to the community pool
 		valbz, _ := app.StakingKeeper.ValidatorAddressCodec().StringToBytes(val.GetOperator())
 		scraps, _ := app.DistrKeeper.GetValidatorOutstandingRewardsCoins(ctx, valbz)
@@ -149,6 +152,9 @@ func (app *Canto) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []s
 		app.DistrKeeper.Hooks().AfterValidatorCreated(ctx, valbz)
 		return false
 	})
+	if err != nil {
+		return err
+	}
 
 	// reinitialize all delegations
 	for _, del := range dels {
