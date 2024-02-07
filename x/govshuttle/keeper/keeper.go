@@ -25,6 +25,7 @@ type (
 		accKeeper   types.AccountKeeper
 		erc20Keeper types.ERC20Keeper
 		govKeeper   *govkeeper.Keeper
+		authority   string
 	}
 )
 
@@ -52,6 +53,11 @@ func NewKeeper(
 		erc20Keeper:  ek,
 		govKeeper:    gk,
 	}
+}
+
+// GetAuthority returns the x/erc20 module's authority.
+func (k Keeper) GetAuthority() string {
+	return k.authority
 }
 
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {

@@ -18,39 +18,27 @@ service Msg {
 
   // ConvertCoin mints a ERC20 representation of the native Cosmos coin denom
   // that is registered on the token mapping.
-  rpc ConvertCoin(MsgConvertCoin) returns (MsgConvertCoinResponse) {
-    option (google.api.http).get = "/canto/erc20/v1/tx/convert_coin";
-  };
+  rpc ConvertCoin(MsgConvertCoin) returns (MsgConvertCoinResponse);
   // ConvertERC20 mints a native Cosmos coin representation of the ERC20 token
   // contract that is registered on the token mapping.
-  rpc ConvertERC20(MsgConvertERC20) returns (MsgConvertERC20Response) {
-    option (google.api.http).get = "/canto/erc20/v1/tx/convert_erc20";
-  };
+  rpc ConvertERC20(MsgConvertERC20) returns (MsgConvertERC20Response);
 
   // UpdateParams updates the parameters of the x/erc20 module.
-  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse) {
-    option (google.api.http).get = "/canto/erc20/v1/tx/update_params";
-  };
+  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
 
   // RegisterCoinProposal defines a method to create a proposal to register a
   // token pair for a native Cosmos coin.
-  rpc RegisterCoinProposal(MsgRegisterCoin) returns (MsgRegisterCoinResponse) {
-    option (google.api.http).get = "/canto/erc20/v1/tx/register_coin";
-  };
+  rpc RegisterCoinProposal(MsgRegisterCoin) returns (MsgRegisterCoinResponse);
 
   // RegisterERC20Proposal defines a method to create a proposal to register a
   // token pair for an ERC20 token.
   rpc RegisterERC20Proposal(MsgRegisterERC20)
-      returns (MsgRegisterERC20Response) {
-    option (google.api.http).get = "/canto/erc20/v1/tx/register_erc20";
-  };
+      returns (MsgRegisterERC20Response);
 
   // ToggleTokenConversionProposal defines a method to create a proposal to
   // toggle the conversion of a token pair.
   rpc ToggleTokenConversionProposal(MsgToggleTokenConversion)
-      returns (MsgToggleTokenConversionResponse) {
-    option (google.api.http).get = "/canto/erc20/v1/tx/toggle_token_conversion";
-  };
+      returns (MsgToggleTokenConversionResponse);
 }
 
 // MsgConvertCoin defines a Msg to convert a native Cosmos coin to a ERC20 token

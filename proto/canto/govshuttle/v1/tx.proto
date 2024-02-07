@@ -15,20 +15,13 @@ service Msg {
   option (cosmos.msg.v1.service) = true;
 
   // UpdateParams updates the parameters of the x/erc20 module.
-  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse) {
-    option (google.api.http).get = "/canto/govshuttle/v1/tx/update_params";
-  };
+  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
 
   rpc LendingMarketProposal(MsgLendingMarketProposal)
-      returns (MsgLendingMarketProposalResponse) {
-    option (google.api.http).get =
-        "/canto/govshuttle/v1/tx/lending_market_proposal";
-  };
+      returns (MsgLendingMarketProposalResponse);
 
   rpc TreasuryProposal(MsgTreasuryProposal)
-      returns (MsgTreasuryProposalResponse) {
-    option (google.api.http).get = "/canto/govshuttle/v1/tx/treasury_proposal";
-  };
+      returns (MsgTreasuryProposalResponse);
 }
 
 message MsgLendingMarketProposal {
@@ -44,7 +37,7 @@ message MsgLendingMarketProposal {
   string title = 2;
   string description = 3;
 
-  TreasuryProposalMetadata metadata = 4;
+  LendingMarketMetadata metadata = 4;
   // NOTE: All parameters must be supplied.
 }
 
