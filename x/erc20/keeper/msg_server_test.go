@@ -711,7 +711,7 @@ func (suite *KeeperTestSuite) TestConvertERC20NativeERC20() {
 			suite.Require().NotNil(contractAddr)
 			suite.Commit()
 
-			coinName = keeper.CreateDenom(contractAddr.String())
+			coinName = types.CreateDenom(contractAddr.String())
 			sender := sdk.AccAddress(suite.address.Bytes())
 			msg := types.NewMsgConvertERC20(
 				sdkmath.NewInt(tc.transfer),

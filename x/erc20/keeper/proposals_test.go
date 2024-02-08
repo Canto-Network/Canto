@@ -264,7 +264,7 @@ func (suite KeeperTestSuite) TestRegisterERC20() {
 			contractAddr, err = suite.DeployContract(erc20Name, erc20Symbol, cosmosDecimals)
 			suite.Require().NoError(err)
 			suite.Commit()
-			coinName := keeper.CreateDenom(contractAddr.String())
+			coinName := types.CreateDenom(contractAddr.String())
 			pair = types.NewTokenPair(contractAddr, coinName, true, types.OWNER_EXTERNAL)
 
 			tc.malleate()
