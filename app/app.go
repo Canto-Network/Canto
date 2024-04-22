@@ -540,6 +540,8 @@ func NewCanto(
 	govRouter.AddRoute(govtypes.RouterKey, govv1beta1.ProposalHandler).
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper))
 	govConfig := govtypes.DefaultConfig()
+	// set the MaxMetadataLen for proposals to the same value as it was pre-sdk v0.47.x
+	govConfig.MaxMetadataLen = 10200
 	/*
 		Example of setting gov params:
 		govConfig.MaxMetadataLen = 10000
