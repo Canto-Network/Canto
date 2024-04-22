@@ -21,6 +21,10 @@ type (
 		evmKeeper        types.EVMKeeper
 		bankKeeper       types.BankKeeper
 		FeeCollectorName string
+
+		// the address capable of executing a MsgUpdateParams message. Typically, this
+		// should be the x/gov module account.
+		authority string
 	}
 )
 
@@ -32,6 +36,7 @@ func NewKeeper(
 	evmKeeper types.EVMKeeper,
 	bankKeeper types.BankKeeper,
 	FeeCollectorName string,
+	authority string,
 ) Keeper {
 	// set KeyTable if it has not already been set
 	if !ps.HasKeyTable() {
@@ -46,7 +51,13 @@ func NewKeeper(
 		evmKeeper:        evmKeeper,
 		bankKeeper:       bankKeeper,
 		FeeCollectorName: FeeCollectorName,
+		authority:        authority,
 	}
+}
+
+// GetAuthority returns the x/csr module's authority.
+func (k Keeper) GetAuthority() string {
+	return k.authority
 }
 
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {

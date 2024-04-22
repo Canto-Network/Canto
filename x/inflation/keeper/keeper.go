@@ -22,6 +22,8 @@ type Keeper struct {
 	distrKeeper      distrkeeper.Keeper
 	stakingKeeper    types.StakingKeeper
 	feeCollectorName string
+
+	authority string
 }
 
 // NewKeeper creates a new mint Keeper instance
@@ -34,6 +36,7 @@ func NewKeeper(
 	dk distrkeeper.Keeper,
 	sk types.StakingKeeper,
 	feeCollectorName string,
+	authority string,
 ) Keeper {
 	// ensure mint module account is set
 	if addr := ak.GetModuleAddress(types.ModuleName); addr == nil {
@@ -54,7 +57,13 @@ func NewKeeper(
 		distrKeeper:      dk,
 		stakingKeeper:    sk,
 		feeCollectorName: feeCollectorName,
+		authority:        authority,
 	}
+}
+
+// GetAuthority returns the x/inflation module's authority.
+func (k Keeper) GetAuthority() string {
+	return k.authority
 }
 
 // Logger returns a module-specific logger.

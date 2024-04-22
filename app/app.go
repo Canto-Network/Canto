@@ -646,6 +646,7 @@ func NewCanto(
 		app.DistrKeeper,
 		app.StakingKeeper,
 		authtypes.FeeCollectorName,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
 	app.Erc20Keeper = erc20keeper.NewKeeper(
@@ -675,6 +676,7 @@ func NewCanto(
 		app.EvmKeeper,
 		app.BankKeeper,
 		authtypes.FeeCollectorName,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
 	epochsKeeper := epochskeeper.NewKeeper(
@@ -703,6 +705,7 @@ func NewCanto(
 		app.TransferKeeper,
 		app.CoinswapKeeper,
 		app.Erc20Keeper,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 	app.OnboardingKeeper.SetTransferKeeper(app.TransferKeeper)
 

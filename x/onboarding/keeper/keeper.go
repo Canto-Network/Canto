@@ -27,6 +27,8 @@ type Keeper struct {
 	transferKeeper types.TransferKeeper
 	coinswapKeeper types.CoinwapKeeper
 	erc20Keeper    types.Erc20Keeper
+
+	authority string
 }
 
 // NewKeeper returns keeper
@@ -38,6 +40,7 @@ func NewKeeper(
 	tk types.TransferKeeper,
 	csk types.CoinwapKeeper,
 	ek types.Erc20Keeper,
+	authority string,
 ) *Keeper {
 	// set KeyTable if it has not already been set
 	if !ps.HasKeyTable() {
@@ -52,6 +55,7 @@ func NewKeeper(
 		transferKeeper: tk,
 		coinswapKeeper: csk,
 		erc20Keeper:    ek,
+		authority:      authority,
 	}
 }
 
@@ -67,6 +71,11 @@ func (k *Keeper) SetICS4Wrapper(ics4Wrapper porttypes.ICS4Wrapper) {
 	}
 
 	k.ics4Wrapper = ics4Wrapper
+}
+
+// GetAuthority returns the x/onboarding module's authority.
+func (k Keeper) GetAuthority() string {
+	return k.authority
 }
 
 // Logger returns logger
