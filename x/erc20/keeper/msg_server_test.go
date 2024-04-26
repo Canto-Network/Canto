@@ -14,6 +14,7 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/evmos/ethermint/tests"
 	"github.com/evmos/ethermint/x/evm/statedb"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 	"github.com/stretchr/testify/mock"
@@ -69,6 +70,134 @@ func (suite *KeeperTestSuite) setupRegisterIBCVoucher() (banktypes.Metadata, *ty
 	suite.Require().NoError(err)
 	suite.Commit()
 	return validMetadata, pair
+}
+
+func (suite *KeeperTestSuite) TestMsgConvertCoin_ValidateBasic() {
+	msg := types.MsgConvertCoin{}
+	suite.Require().Equal("/canto.erc20.v1.MsgConvertCoin", sdk.MsgTypeURL(&msg))
+
+	testCases := []struct {
+		name       string
+		coin       sdk.Coin
+		receiver   string
+		sender     string
+		expectPass bool
+	}{
+		{
+			"invalid denom",
+			sdk.Coin{
+				Denom:  "",
+				Amount: sdkmath.NewInt(100),
+			},
+			"0x0000",
+			tests.GenerateAddress().String(),
+			false,
+		},
+		{
+			"negative coin amount",
+			sdk.Coin{
+				Denom:  "coin",
+				Amount: sdkmath.NewInt(-100),
+			},
+			"0x0000",
+			tests.GenerateAddress().String(),
+			false,
+		},
+		{
+			"msg convert coin - invalid sender",
+			sdk.NewCoin("coin", sdkmath.NewInt(100)),
+			tests.GenerateAddress().String(),
+			"cantoinvalid",
+			false,
+		},
+		{
+			"msg convert coin - invalid receiver",
+			sdk.NewCoin("coin", sdkmath.NewInt(100)),
+			"0x0000",
+			sdk.AccAddress(tests.GenerateAddress().Bytes()).String(),
+			false,
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(tc.name, func() {
+			msg := types.MsgConvertCoin{
+				Coin:     tc.coin,
+				Receiver: tc.receiver,
+				Sender:   tc.sender,
+			}
+			_, err := suite.app.Erc20Keeper.ConvertCoin(suite.ctx, &msg)
+			if tc.expectPass {
+				suite.Require().NoError(err)
+			} else {
+				suite.Require().Error(err)
+			}
+		})
+	}
+}
+
+func (suite *KeeperTestSuite) TestMsgConvertERC20_ValidateBasic() {
+	msg := types.MsgConvertERC20{}
+	suite.Require().Equal("/canto.erc20.v1.MsgConvertERC20", sdk.MsgTypeURL(&msg))
+
+	testCases := []struct {
+		name       string
+		amount     sdkmath.Int
+		receiver   string
+		contract   string
+		sender     string
+		expectPass bool
+	}{
+		{
+			"invalid contract hex address",
+			sdkmath.NewInt(100),
+			sdk.AccAddress(tests.GenerateAddress().Bytes()).String(),
+			sdk.AccAddress{}.String(),
+			tests.GenerateAddress().String(),
+			false,
+		},
+		{
+			"negative coin amount",
+			sdkmath.NewInt(-100),
+			sdk.AccAddress(tests.GenerateAddress().Bytes()).String(),
+			tests.GenerateAddress().String(),
+			tests.GenerateAddress().String(),
+			false,
+		},
+		{
+			"invalid receiver address",
+			sdkmath.NewInt(100),
+			sdk.AccAddress{}.String(),
+			tests.GenerateAddress().String(),
+			tests.GenerateAddress().String(),
+			false,
+		},
+		{
+			"invalid sender address",
+			sdkmath.NewInt(100),
+			sdk.AccAddress(tests.GenerateAddress().Bytes()).String(),
+			tests.GenerateAddress().String(),
+			sdk.AccAddress{}.String(),
+			false,
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(tc.name, func() {
+			msg := types.MsgConvertERC20{
+				ContractAddress: tc.contract,
+				Amount:          tc.amount,
+				Receiver:        tc.receiver,
+				Sender:          tc.sender,
+			}
+			_, err := suite.app.Erc20Keeper.ConvertERC20(suite.ctx, &msg)
+			if tc.expectPass {
+				suite.Require().NoError(err)
+			} else {
+				suite.Require().Error(err)
+			}
+		})
+	}
 }
 
 func (suite *KeeperTestSuite) TestConvertCoinNativeCoin() {

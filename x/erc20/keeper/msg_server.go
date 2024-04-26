@@ -9,6 +9,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hashicorp/go-metrics"
 
@@ -24,6 +25,25 @@ func (k Keeper) ConvertCoin(
 	goCtx context.Context,
 	msg *types.MsgConvertCoin,
 ) (*types.MsgConvertCoinResponse, error) {
+	if err := types.ValidateErc20Denom(msg.Coin.Denom); err != nil {
+		if err := ibctransfertypes.ValidateIBCDenom(msg.Coin.Denom); err != nil {
+			return nil, err
+		}
+	}
+
+	if !msg.Coin.Amount.IsPositive() {
+		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidCoins, "cannot mint a non-positive amount")
+	}
+
+	_, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return nil, errorsmod.Wrap(err, "invalid sender address")
+	}
+
+	if !common.IsHexAddress(msg.Receiver) {
+		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver hex address %s", msg.Receiver)
+	}
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Error checked during msg validation
@@ -66,6 +86,23 @@ func (k Keeper) ConvertERC20(
 	goCtx context.Context,
 	msg *types.MsgConvertERC20,
 ) (*types.MsgConvertERC20Response, error) {
+	if !common.IsHexAddress(msg.ContractAddress) {
+		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid contract hex address '%s'", msg.ContractAddress)
+	}
+
+	if !msg.Amount.IsPositive() {
+		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidCoins, "cannot mint a non-positive amount")
+	}
+
+	_, err := sdk.AccAddressFromBech32(msg.Receiver)
+	if err != nil {
+		return nil, errorsmod.Wrap(err, "invalid receiver address")
+	}
+
+	if !common.IsHexAddress(msg.Sender) {
+		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender hex address %s", msg.Sender)
+	}
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Error checked during msg validation

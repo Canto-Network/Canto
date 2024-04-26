@@ -5,11 +5,14 @@ import (
 
 	"github.com/spf13/cobra"
 
+	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	"github.com/ethereum/go-ethereum/common"
 
 	ethermint "github.com/evmos/ethermint/types"
@@ -69,8 +72,23 @@ func NewConvertCoinCmd() *cobra.Command {
 				Sender:   sender.String(),
 			}
 
-			if err := msg.ValidateBasic(); err != nil {
-				return err
+			if err := types.ValidateErc20Denom(msg.Coin.Denom); err != nil {
+				if err := ibctransfertypes.ValidateIBCDenom(msg.Coin.Denom); err != nil {
+					return err
+				}
+			}
+
+			if !msg.Coin.Amount.IsPositive() {
+				return errorsmod.Wrapf(sdkerrors.ErrInvalidCoins, "cannot mint a non-positive amount")
+			}
+
+			_, err = sdk.AccAddressFromBech32(msg.Sender)
+			if err != nil {
+				return errorsmod.Wrap(err, "invalid sender address")
+			}
+
+			if !common.IsHexAddress(msg.Receiver) {
+				return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver hex address %s", msg.Receiver)
 			}
 
 			return tx.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), msg)
@@ -120,8 +138,21 @@ func NewConvertERC20Cmd() *cobra.Command {
 				Sender:          from.Hex(),
 			}
 
-			if err := msg.ValidateBasic(); err != nil {
-				return err
+			if !common.IsHexAddress(msg.ContractAddress) {
+				return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid contract hex address '%s'", msg.ContractAddress)
+			}
+
+			if !msg.Amount.IsPositive() {
+				return errorsmod.Wrapf(sdkerrors.ErrInvalidCoins, "cannot mint a non-positive amount")
+			}
+
+			_, err = sdk.AccAddressFromBech32(msg.Receiver)
+			if err != nil {
+				return errorsmod.Wrap(err, "invalid receiver address")
+			}
+
+			if !common.IsHexAddress(msg.Sender) {
+				return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender hex address %s", msg.Sender)
 			}
 
 			return tx.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), msg)

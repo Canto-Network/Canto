@@ -178,5 +178,4 @@ var _ sdk.Tx = &invalidTx{}
 type invalidTx struct{}
 
 func (invalidTx) GetMsgs() []sdk.Msg                    { return []sdk.Msg{nil} }
-func (invalidTx) ValidateBasic() error                  { return nil }
 func (invalidTx) GetMsgsV2() ([]protov2.Message, error) { return nil, nil }

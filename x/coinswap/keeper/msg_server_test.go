@@ -1,22 +1,25 @@
-package types
+package keeper_test
 
 import (
-	"testing"
-
 	"github.com/cometbft/cometbft/crypto/tmhash"
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/Canto-Network/Canto/v7/x/coinswap/types"
 )
 
 var (
 	sender = sdk.AccAddress(tmhash.SumTruncated([]byte("sender"))).String()
 )
 
-func TestMsgSwapOrder_ValidateBasic(t *testing.T) {
+func (suite *TestSuite) TestMsgSwapOrder_ValidateBasic() {
+	msg := types.MsgSwapOrder{}
+	suite.Require().Equal("/canto.coinswap.v1.MsgSwapOrder", sdk.MsgTypeURL(&msg))
+
 	type fields struct {
-		Input      Input
-		Output     Output
+		Input      types.Input
+		Output     types.Output
 		Deadline   int64
 		IsBuyOrder bool
 	}
@@ -25,30 +28,35 @@ func TestMsgSwapOrder_ValidateBasic(t *testing.T) {
 		fields  fields
 		wantErr bool
 	}{
-		{name: "right test case", wantErr: false, fields: fields{IsBuyOrder: true, Deadline: 10, Input: Input{Address: sender, Coin: buildCoin("stake", 1000)}, Output: Output{Address: sender, Coin: buildCoin("iris", 1000)}}},
-		{name: "invalid input sender", wantErr: true, fields: fields{IsBuyOrder: true, Deadline: 10, Input: Input{Address: "", Coin: buildCoin("stake", 1000)}, Output: Output{Address: sender, Coin: buildCoin("iris", 1000)}}},
-		{name: "invalid input coin  denom", wantErr: true, fields: fields{IsBuyOrder: true, Deadline: 10, Input: Input{Address: sender, Coin: buildCoin("131stake", 1000)}, Output: Output{Address: sender, Coin: buildCoin("iris", 1000)}}},
-		{name: "invalid input coin amount", wantErr: true, fields: fields{IsBuyOrder: true, Deadline: 10, Input: Input{Address: sender, Coin: buildCoin("stake", -1000)}, Output: Output{Address: sender, Coin: buildCoin("iris", 1000)}}},
-		{name: "invalid output sender", wantErr: true, fields: fields{IsBuyOrder: true, Deadline: 10, Input: Input{Address: sender, Coin: buildCoin("stake", 1000)}, Output: Output{Address: "", Coin: buildCoin("iris", 1000)}}},
-		{name: "invalid output coin denom", wantErr: true, fields: fields{IsBuyOrder: true, Deadline: 10, Input: Input{Address: sender, Coin: buildCoin("stake", 1000)}, Output: Output{Address: sender, Coin: buildCoin("131iris", 1000)}}},
-		{name: "invalid output coin amount", wantErr: true, fields: fields{IsBuyOrder: true, Deadline: 10, Input: Input{Address: sender, Coin: buildCoin("stake", 1000)}, Output: Output{Address: sender, Coin: buildCoin("iris", -1000)}}},
+		{name: "invalid input sender", wantErr: true, fields: fields{IsBuyOrder: true, Deadline: 10, Input: types.Input{Address: "", Coin: buildCoin("stake", 1000)}, Output: types.Output{Address: sender, Coin: buildCoin("iris", 1000)}}},
+		{name: "invalid input coin  denom", wantErr: true, fields: fields{IsBuyOrder: true, Deadline: 10, Input: types.Input{Address: sender, Coin: buildCoin("invalidstake", 1000)}, Output: types.Output{Address: sender, Coin: buildCoin("iris", 1000)}}},
+		{name: "invalid input coin amount", wantErr: true, fields: fields{IsBuyOrder: true, Deadline: 10, Input: types.Input{Address: sender, Coin: buildCoin("stake", -1000)}, Output: types.Output{Address: sender, Coin: buildCoin("iris", 1000)}}},
+		{name: "invalid output sender", wantErr: true, fields: fields{IsBuyOrder: true, Deadline: 10, Input: types.Input{Address: sender, Coin: buildCoin("stake", 1000)}, Output: types.Output{Address: "", Coin: buildCoin("iris", 1000)}}},
+		{name: "invalid output coin denom", wantErr: true, fields: fields{IsBuyOrder: true, Deadline: 10, Input: types.Input{Address: sender, Coin: buildCoin("stake", 1000)}, Output: types.Output{Address: sender, Coin: buildCoin("131iris", 1000)}}},
+		{name: "invalid output coin amount", wantErr: true, fields: fields{IsBuyOrder: true, Deadline: 10, Input: types.Input{Address: sender, Coin: buildCoin("stake", 1000)}, Output: types.Output{Address: sender, Coin: buildCoin("iris", -1000)}}},
 	}
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			msg := MsgSwapOrder{
+		suite.Run(tt.name, func() {
+			msg := types.MsgSwapOrder{
 				Input:      tt.fields.Input,
 				Output:     tt.fields.Output,
 				Deadline:   tt.fields.Deadline,
 				IsBuyOrder: tt.fields.IsBuyOrder,
 			}
-			if err := msg.ValidateBasic(); (err != nil) != tt.wantErr {
-				t.Errorf("MsgSwapOrder.ValidateBasic() error = %v, wantErr %v", err, tt.wantErr)
+			err := suite.app.CoinswapKeeper.Swap(suite.ctx, &msg)
+			if tt.wantErr {
+				suite.Require().Error(err)
+			} else {
+				suite.Require().NoError(err)
 			}
 		})
 	}
 }
 
-func TestMsgAddLiquidity_ValidateBasic(t *testing.T) {
+func (suite *TestSuite) TestMsgAddLiquidity_ValidateBasic() {
+	msg := types.MsgAddLiquidity{}
+	suite.Require().Equal("/canto.coinswap.v1.MsgAddLiquidity", sdk.MsgTypeURL(&msg))
+
 	type fields struct {
 		MaxToken         sdk.Coin
 		ExactStandardAmt sdkmath.Int
@@ -65,7 +73,7 @@ func TestMsgAddLiquidity_ValidateBasic(t *testing.T) {
 			name:    "invalid MaxToken denom",
 			wantErr: true,
 			fields: fields{
-				MaxToken:         buildCoin("131stake", 1000),
+				MaxToken:         buildCoin("invalidstake", 1000),
 				ExactStandardAmt: sdkmath.NewInt(100),
 				MinLiquidity:     sdkmath.NewInt(100),
 				Deadline:         1611213344,
@@ -129,22 +137,30 @@ func TestMsgAddLiquidity_ValidateBasic(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			msg := MsgAddLiquidity{
+		suite.Run(tt.name, func() {
+			msg := types.MsgAddLiquidity{
 				MaxToken:         tt.fields.MaxToken,
 				ExactStandardAmt: tt.fields.ExactStandardAmt,
 				MinLiquidity:     tt.fields.MinLiquidity,
 				Deadline:         tt.fields.Deadline,
 				Sender:           tt.fields.Sender,
 			}
-			if err := msg.ValidateBasic(); (err != nil) != tt.wantErr {
-				t.Errorf("MsgAddLiquidity.ValidateBasic() error = %v, wantErr %v", err, tt.wantErr)
+			res, err := suite.app.CoinswapKeeper.AddLiquidity(suite.ctx, &msg)
+			if tt.wantErr {
+				suite.Require().Error(err)
+				suite.Require().False(res.IsValid())
+			} else {
+				suite.Require().NoError(err)
+				suite.Require().True(res.IsValid())
 			}
 		})
 	}
 }
 
-func TestMsgRemoveLiquidity_ValidateBasic(t *testing.T) {
+func (suite *TestSuite) TestMsgRemoveLiquidity_ValidateBasic() {
+	msg := types.MsgRemoveLiquidity{}
+	suite.Require().Equal("/canto.coinswap.v1.MsgRemoveLiquidity", sdk.MsgTypeURL(&msg))
+
 	type fields struct {
 		WithdrawLiquidity sdk.Coin
 		MinToken          sdkmath.Int
@@ -172,7 +188,7 @@ func TestMsgRemoveLiquidity_ValidateBasic(t *testing.T) {
 			name:    "invalid WithdrawLiquidity denom",
 			wantErr: true,
 			fields: fields{
-				WithdrawLiquidity: buildCoin("131stake", 1000),
+				WithdrawLiquidity: buildCoin("invalidstake", 1000),
 				MinToken:          sdkmath.NewInt(100),
 				MinStandardAmt:    sdkmath.NewInt(100),
 				Deadline:          1611213344,
@@ -225,16 +241,21 @@ func TestMsgRemoveLiquidity_ValidateBasic(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			msg := MsgRemoveLiquidity{
+		suite.Run(tt.name, func() {
+			msg := types.MsgRemoveLiquidity{
 				WithdrawLiquidity: tt.fields.WithdrawLiquidity,
 				MinToken:          tt.fields.MinToken,
 				MinStandardAmt:    tt.fields.MinStandardAmt,
 				Deadline:          tt.fields.Deadline,
 				Sender:            tt.fields.Sender,
 			}
-			if err := msg.ValidateBasic(); (err != nil) != tt.wantErr {
-				t.Errorf("MsgRemoveLiquidity.ValidateBasic() error = %v, wantErr %v", err, tt.wantErr)
+			res, err := suite.app.CoinswapKeeper.RemoveLiquidity(suite.ctx, &msg)
+			if tt.wantErr {
+				suite.Require().Error(err)
+				suite.Require().True(res.IsValid())
+			} else {
+				suite.Require().NoError(err)
+				suite.Require().False(res.IsValid())
 			}
 		})
 	}

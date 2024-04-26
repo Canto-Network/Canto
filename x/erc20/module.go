@@ -7,7 +7,6 @@ import (
 	"math/rand"
 
 	abci "github.com/cometbft/cometbft/abci/types"
-	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -117,10 +116,6 @@ func (AppModule) Name() string {
 }
 
 func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {}
-
-func (am AppModule) NewHandler() baseapp.MsgServiceHandler {
-	return NewHandler(am.keeper)
-}
 
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterMsgServer(cfg.MsgServer(), am.keeper)

@@ -7,7 +7,6 @@ import (
 
 	// this line is used by starport scaffolding # 1
 
-	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
@@ -123,10 +122,6 @@ func (am AppModule) IsAppModule() {}
 // Name returns the csr module's name.
 func (am AppModule) Name() string {
 	return am.AppModuleBasic.Name()
-}
-
-func (am AppModule) NewHandler() baseapp.MsgServiceHandler {
-	return NewHandler(am.keeper)
 }
 
 // RegisterServices registers a GRPC query service to respond to the
