@@ -71,7 +71,7 @@ func TestFullAppSimulation(t *testing.T) {
 	config.ChainID = types.TestnetChainID + "-1"
 	sdk.DefaultPowerReduction = sdkmath.NewIntFromUint64(1000000)
 
-	db, dir, logger, skip, err := simtestutil.SetupSimulation(config, "leveldb-app-sim", "Simulation", simcli.FlagVerboseValue, true)
+	db, dir, logger, skip, err := simtestutil.SetupSimulation(config, "leveldb-app-sim", "Simulation", simcli.FlagVerboseValue, simcli.FlagEnabledValue)
 	if skip {
 		t.Skip("skipping application simulation")
 	}
