@@ -126,7 +126,6 @@ import (
 
 	erc20v1 "github.com/Canto-Network/Canto/v7/api/canto/erc20/v1"
 	evmv1 "github.com/evmos/ethermint/api/ethermint/evm/v1"
-	feemarketv1 "github.com/evmos/ethermint/api/ethermint/feemarket/v1"
 	ethante "github.com/evmos/ethermint/app/ante"
 	enccodec "github.com/evmos/ethermint/encoding/codec"
 	"github.com/evmos/ethermint/ethereum/eip712"
@@ -322,10 +321,8 @@ func NewCanto(
 		},
 	}
 
-	// evm/MsgEthereumTx, evm/MsgUpdateParams, feemarket/MsgUpdateParams, erc20/MsgConvertERC20
+	// evm/MsgEthereumTx, erc20/MsgConvertERC20
 	signingOptions.DefineCustomGetSigners(protov2.MessageName(&evmv1.MsgEthereumTx{}), evmtypes.GetSignersFromMsgEthereumTxV2)
-	signingOptions.DefineCustomGetSigners(protov2.MessageName(&evmv1.MsgUpdateParams{}), evmtypes.GetSignersFromMsgUpdateParamsV2)
-	signingOptions.DefineCustomGetSigners(protov2.MessageName(&feemarketv1.MsgUpdateParams{}), feemarkettypes.GetSignersFromMsgUpdateParamsV2)
 	signingOptions.DefineCustomGetSigners(protov2.MessageName(&erc20v1.MsgConvertERC20{}), erc20types.GetSignersFromMsgConvertERC20V2)
 
 	interfaceRegistry, _ := types.NewInterfaceRegistryWithOptions(types.InterfaceRegistryOptions{
