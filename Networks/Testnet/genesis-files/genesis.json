@@ -2,7 +2,7 @@
   "genesis_time": "2022-07-26T04:07:10.395216142Z",
   "chain_id": "canto_740-1",
   "initial_height": "1",
-  "consensus": {
+  "consensus_params": {
     "block": {
       "max_bytes": "22020096",
       "max_gas": "-1",
