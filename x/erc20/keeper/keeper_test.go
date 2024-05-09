@@ -65,6 +65,7 @@ type KeeperTestSuite struct {
 	ethSigner        ethtypes.Signer
 	signer           keyring.Signer
 	mintFeeCollector bool
+	validator        stakingtypes.Validator
 }
 
 var s *KeeperTestSuite
@@ -90,7 +91,6 @@ func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 
 	// consensus key
 	pubKey := ed25519.GenPrivKey().PubKey()
-	require.NoError(t, err)
 	suite.consAddress = sdk.ConsAddress(pubKey.Address())
 
 	// setup feemarketGenesis params
@@ -173,12 +173,18 @@ func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 
 	suite.app.AccountKeeper.SetAccount(suite.ctx, acc)
 
+	// Set Validator
 	valAddr := sdk.ValAddress(suite.address.Bytes())
 	validator, err := stakingtypes.NewValidator(valAddr.String(), pubKey, stakingtypes.Description{})
 	require.NoError(t, err)
+
+	valbz, err := s.app.StakingKeeper.ValidatorAddressCodec().StringToBytes(validator.GetOperator())
+	s.NoError(err)
+	suite.app.StakingKeeper.SetValidator(suite.ctx, validator)
+	suite.app.StakingKeeper.Hooks().AfterValidatorCreated(suite.ctx, valbz)
 	err = suite.app.StakingKeeper.SetValidatorByConsAddr(suite.ctx, validator)
 	require.NoError(t, err)
-	suite.app.StakingKeeper.SetValidator(suite.ctx, validator)
+	suite.validator = validator
 
 	encodingConfig := encoding.MakeTestEncodingConfig()
 	suite.clientCtx = client.Context{}.WithTxConfig(encodingConfig.TxConfig)
@@ -342,7 +348,12 @@ func (suite *KeeperTestSuite) DeployContractDirectBalanceManipulation(name strin
 	return crypto.CreateAddress(suite.address, nonce)
 }
 
+// Commit commits and starts a new block with an updated context.
 func (suite *KeeperTestSuite) Commit() {
+	suite.CommitAfter(time.Second * 0)
+}
+
+func (suite *KeeperTestSuite) CommitAfter(t time.Duration) {
 	header := suite.ctx.BlockHeader()
 	suite.app.FinalizeBlock(&abci.RequestFinalizeBlock{
 		Height: header.Height,
@@ -351,8 +362,11 @@ func (suite *KeeperTestSuite) Commit() {
 	suite.app.Commit()
 
 	header.Height += 1
+	header.Time = header.Time.Add(t)
 	suite.app.FinalizeBlock(&abci.RequestFinalizeBlock{
-		Height: header.Height,
+		Height:          header.Height,
+		Time:            header.Time,
+		ProposerAddress: suite.consAddress,
 	})
 
 	// update ctx

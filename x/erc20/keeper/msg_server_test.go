@@ -2,22 +2,28 @@ package keeper_test
 
 import (
 	"fmt"
+	"math"
 	"math/big"
 
 	sdkmath "cosmossdk.io/math"
-	"github.com/Canto-Network/Canto/v7/x/erc20/keeper"
-	"github.com/Canto-Network/Canto/v7/x/erc20/types"
-	inflationtypes "github.com/Canto-Network/Canto/v7/x/inflation/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/evmos/ethermint/crypto/ethsecp256k1"
 	"github.com/evmos/ethermint/tests"
 	"github.com/evmos/ethermint/x/evm/statedb"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/Canto-Network/Canto/v7/testutil"
+	"github.com/Canto-Network/Canto/v7/x/erc20/keeper"
+	"github.com/Canto-Network/Canto/v7/x/erc20/types"
+	inflationtypes "github.com/Canto-Network/Canto/v7/x/inflation/types"
 )
 
 const (
@@ -1499,4 +1505,162 @@ func (suite *KeeperTestSuite) TestConvertERC20NativeIBCVoucher() {
 		})
 	}
 	suite.mintFeeCollector = false
+}
+
+func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
+	suite.SetupTest()
+
+	// set denom
+	stakingParams, err := suite.app.StakingKeeper.GetParams(suite.ctx)
+	suite.Require().NoError(err)
+	denom := stakingParams.BondDenom
+
+	// change mindeposit for denom
+	govParams, err := suite.app.GovKeeper.Params.Get(suite.ctx)
+	suite.Require().NoError(err)
+	govParams.MinDeposit = []sdk.Coin{sdk.NewCoin(denom, sdkmath.NewInt(1))}
+	err = suite.app.GovKeeper.Params.Set(suite.ctx, govParams)
+	suite.Require().NoError(err)
+
+	// create account
+	privKey, err := ethsecp256k1.GenerateKey()
+	suite.Require().NoError(err)
+	proposer := sdk.AccAddress(privKey.PubKey().Address().Bytes())
+
+	// deligate to validator
+	initAmount := sdkmath.NewInt(int64(math.Pow10(18)) * 2)
+	initBalance := sdk.NewCoins(sdk.NewCoin(denom, initAmount))
+	testutil.FundAccount(suite.app.BankKeeper, suite.ctx, proposer, initBalance)
+	shares, err := suite.app.StakingKeeper.Delegate(suite.ctx, proposer, sdk.DefaultPowerReduction, stakingtypes.Unbonded, suite.validator, true)
+	suite.Require().NoError(err)
+	suite.Require().True(shares.GT(sdkmath.LegacyNewDec(0)))
+
+	var (
+		erc20Address = suite.DeployContractDirectBalanceManipulation(erc20Name, erc20Symbol).String()
+	)
+
+	testCases := []struct {
+		name      string
+		msg       sdk.Msg
+		malleate  func()
+		checkFunc func(uint64)
+	}{
+		{
+			"ok - proposal MsgRegisterCoin",
+			&types.MsgRegisterCoin{
+				Authority:   authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+				Title:       "MsgRegisterCoin",
+				Description: "MsgRegisterCoin test",
+				Metadata: banktypes.Metadata{
+					Description: "ATOM IBC voucher (channel 14)",
+					Base:        ibcBase,
+					// NOTE: Denom units MUST be increasing
+					DenomUnits: []*banktypes.DenomUnit{
+						{
+							Denom:    ibcBase,
+							Exponent: 0,
+						},
+					},
+					Name:    "ATOM channel-14",
+					Symbol:  "ibcATOM-14",
+					Display: ibcBase,
+				},
+			},
+			func() {
+				err := suite.app.BankKeeper.MintCoins(suite.ctx, inflationtypes.ModuleName, sdk.Coins{sdk.NewInt64Coin(ibcBase, 1)})
+				suite.Require().NoError(err)
+			},
+			func(proposalId uint64) {
+				proposal, err := suite.app.GovKeeper.Proposals.Get(suite.ctx, proposalId)
+				suite.Require().NoError(err)
+				suite.Require().Equal(govtypesv1.ProposalStatus_PROPOSAL_STATUS_PASSED, proposal.Status)
+
+				id := suite.app.Erc20Keeper.GetTokenPairID(suite.ctx, ibcBase)
+				pair, ok := suite.app.Erc20Keeper.GetTokenPair(suite.ctx, id)
+				suite.Require().True(ok)
+				suite.Require().Equal(suite.app.Erc20Keeper.GetDenomMap(suite.ctx, pair.Denom), id)
+				suite.Require().Equal(suite.app.Erc20Keeper.GetERC20Map(suite.ctx, common.HexToAddress(pair.Erc20Address)), id)
+			},
+		},
+		{
+			"ok - proposal MsgRegisterERC20",
+			&types.MsgRegisterERC20{
+				Authority:    authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+				Title:        "MsgRegisterERC20",
+				Description:  "MsgRegisterERC20 test",
+				Erc20Address: erc20Address,
+			},
+			func() {},
+			func(proposalId uint64) {
+				proposal, err := suite.app.GovKeeper.Proposals.Get(suite.ctx, proposalId)
+				suite.Require().NoError(err)
+				suite.Require().Equal(govtypesv1.ProposalStatus_PROPOSAL_STATUS_PASSED, proposal.Status)
+
+				id := suite.app.Erc20Keeper.GetTokenPairID(suite.ctx, erc20Address)
+				pair, ok := suite.app.Erc20Keeper.GetTokenPair(suite.ctx, id)
+				suite.Require().True(ok)
+				suite.Require().Equal(suite.app.Erc20Keeper.GetDenomMap(suite.ctx, pair.Denom), id)
+				suite.Require().Equal(suite.app.Erc20Keeper.GetERC20Map(suite.ctx, common.HexToAddress(pair.Erc20Address)), id)
+			},
+		},
+		{
+			"ok - proposal MsgToggleTokenConversion",
+			&types.MsgToggleTokenConversion{
+				Authority:   authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+				Title:       "MsgToggleTokenConversion",
+				Description: "MsgToggleTokenConversion test",
+				Token:       erc20Address,
+			},
+			func() {},
+			func(proposalId uint64) {
+				proposal, err := suite.app.GovKeeper.Proposals.Get(suite.ctx, proposalId)
+				suite.Require().NoError(err)
+				suite.Require().Equal(govtypesv1.ProposalStatus_PROPOSAL_STATUS_PASSED, proposal.Status)
+
+				id := suite.app.Erc20Keeper.GetTokenPairID(suite.ctx, erc20Address)
+				pair, ok := suite.app.Erc20Keeper.GetTokenPair(suite.ctx, id)
+				suite.Require().True(ok)
+				suite.Require().Equal(pair.Enabled, false)
+			},
+		},
+		{
+			"ok - proposal MsgUpdateParams",
+			&types.MsgUpdateParams{
+				Authority: authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+				Params:    types.NewParams(false, false),
+			},
+			func() {},
+			func(proposalId uint64) {
+				changeParams := types.NewParams(false, false)
+
+				proposal, err := suite.app.GovKeeper.Proposals.Get(suite.ctx, proposalId)
+				suite.Require().NoError(err)
+				suite.Require().Equal(govtypesv1.ProposalStatus_PROPOSAL_STATUS_PASSED, proposal.Status)
+				suite.Require().Equal(suite.app.Erc20Keeper.GetParams(suite.ctx), changeParams)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(tc.name, func() {
+			tc.malleate()
+
+			// submit proposal
+			proposal, err := suite.app.GovKeeper.SubmitProposal(suite.ctx, []sdk.Msg{tc.msg}, "", "test", "description", proposer, false)
+			suite.Require().NoError(err)
+			suite.Commit()
+
+			ok, err := suite.app.GovKeeper.AddDeposit(suite.ctx, proposal.Id, proposer, govParams.MinDeposit)
+			suite.Require().NoError(err)
+			suite.Require().True(ok)
+			suite.Commit()
+
+			err = suite.app.GovKeeper.AddVote(suite.ctx, proposal.Id, proposer, govtypesv1.NewNonSplitVoteOption(govtypesv1.OptionYes), "")
+			suite.Require().NoError(err)
+			suite.CommitAfter(*govParams.VotingPeriod)
+
+			// check proposal result
+			tc.checkFunc(proposal.Id)
+		})
+	}
 }

@@ -9,14 +9,13 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-
 	"github.com/evmos/ethermint/crypto/ethsecp256k1"
 
 	"github.com/Canto-Network/Canto/v7/testutil"
 	onboardingtypes "github.com/Canto-Network/Canto/v7/x/onboarding/types"
 )
 
-func (suite *KeeperTestSuite) TestMsgUpdateParamsByProposal() {
+func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 	suite.SetupTest()
 
 	// set denom
@@ -44,27 +43,46 @@ func (suite *KeeperTestSuite) TestMsgUpdateParamsByProposal() {
 	suite.Require().NoError(err)
 	suite.Require().True(shares.GT(sdkmath.LegacyNewDec(0)))
 
-	// submit proposal for change params
-	changeParams := onboardingtypes.NewParams(true, sdkmath.NewInt(10000), []string{"channel-0"})
-	msg := &onboardingtypes.MsgUpdateParams{
-		Authority: authtypes.NewModuleAddress(govtypes.ModuleName).String(),
-		Params:    changeParams,
+	testCases := []struct {
+		name      string
+		msg       sdk.Msg
+		checkFunc func(uint64)
+	}{
+		{
+			"ok - proposal MsgUpdateParams",
+			&onboardingtypes.MsgUpdateParams{
+				Authority: authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+				Params:    onboardingtypes.NewParams(true, sdkmath.NewInt(10000), []string{"channel-0"}),
+			},
+			func(proposalId uint64) {
+				changeParams := onboardingtypes.NewParams(true, sdkmath.NewInt(10000), []string{"channel-0"})
+
+				proposal, err := suite.app.GovKeeper.Proposals.Get(suite.ctx, proposalId)
+				suite.Require().NoError(err)
+				suite.Require().Equal(govtypesv1.ProposalStatus_PROPOSAL_STATUS_PASSED, proposal.Status)
+				suite.Require().Equal(suite.app.OnboardingKeeper.GetParams(suite.ctx), changeParams)
+			},
+		},
 	}
-	proposal, err := suite.app.GovKeeper.SubmitProposal(suite.ctx, []sdk.Msg{msg}, "", "test", "description", proposer, false)
-	suite.Require().NoError(err)
-	suite.Commit()
 
-	ok, err := suite.app.GovKeeper.AddDeposit(suite.ctx, proposal.Id, proposer, govParams.MinDeposit)
-	suite.Require().NoError(err)
-	suite.Require().True(ok)
-	suite.Commit()
+	for _, tc := range testCases {
+		suite.Run(tc.name, func() {
+			// submit proposal
+			proposal, err := suite.app.GovKeeper.SubmitProposal(suite.ctx, []sdk.Msg{tc.msg}, "", "test", "description", proposer, false)
+			suite.Require().NoError(err)
+			suite.Commit()
 
-	err = suite.app.GovKeeper.AddVote(suite.ctx, proposal.Id, proposer, govtypesv1.NewNonSplitVoteOption(govtypesv1.OptionYes), "")
-	suite.Require().NoError(err)
-	suite.CommitAfter(*govParams.VotingPeriod)
+			ok, err := suite.app.GovKeeper.AddDeposit(suite.ctx, proposal.Id, proposer, govParams.MinDeposit)
+			suite.Require().NoError(err)
+			suite.Require().True(ok)
+			suite.Commit()
 
-	proposal, err = suite.app.GovKeeper.Proposals.Get(suite.ctx, proposal.Id)
-	suite.Require().NoError(err)
-	suite.Require().Equal(govtypesv1.ProposalStatus_PROPOSAL_STATUS_PASSED, proposal.Status)
-	suite.Require().Equal(suite.app.OnboardingKeeper.GetParams(suite.ctx), changeParams)
+			err = suite.app.GovKeeper.AddVote(suite.ctx, proposal.Id, proposer, govtypesv1.NewNonSplitVoteOption(govtypesv1.OptionYes), "")
+			suite.Require().NoError(err)
+			suite.CommitAfter(*govParams.VotingPeriod)
+
+			// check proposal result
+			tc.checkFunc(proposal.Id)
+		})
+	}
 }

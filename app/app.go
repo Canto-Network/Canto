@@ -651,6 +651,7 @@ func NewCanto(
 		app.AccountKeeper,
 		app.Erc20Keeper,
 		govKeeper,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
 	app.CSRKeeper = csrkeeper.NewKeeper(

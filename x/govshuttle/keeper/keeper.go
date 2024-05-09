@@ -33,10 +33,10 @@ func NewKeeper(
 	storeService store.KVStoreService,
 	cdc codec.BinaryCodec,
 	ps paramtypes.Subspace,
-
 	ak types.AccountKeeper,
 	ek types.ERC20Keeper,
 	gk *govkeeper.Keeper,
+	authority string,
 
 ) Keeper {
 	// set KeyTable if it has not already been set
@@ -45,13 +45,13 @@ func NewKeeper(
 	}
 
 	return Keeper{
-
 		cdc:          cdc,
 		storeService: storeService,
 		paramstore:   ps,
 		accKeeper:    ak,
 		erc20Keeper:  ek,
 		govKeeper:    gk,
+		authority:    authority,
 	}
 }
 

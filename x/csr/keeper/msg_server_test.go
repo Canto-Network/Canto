@@ -14,7 +14,7 @@ import (
 	csrtypes "github.com/Canto-Network/Canto/v7/x/csr/types"
 )
 
-func (suite *KeeperTestSuite) TestMsgUpdateParamsByProposal() {
+func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 	suite.SetupTest()
 
 	// change mindeposit for denom
@@ -33,30 +33,52 @@ func (suite *KeeperTestSuite) TestMsgUpdateParamsByProposal() {
 	suite.Require().NoError(err)
 	suite.Require().True(shares.GT(sdkmath.LegacyNewDec(0)))
 
-	// submit proposal for change params
-	changeParams := csrtypes.Params{
-		EnableCsr: false,
-		CsrShares: sdkmath.LegacyNewDecWithPrec(20, 2),
+	testCases := []struct {
+		name      string
+		msg       sdk.Msg
+		checkFunc func(uint64)
+	}{
+		{
+			"ok - proposal MsgUpdateParams",
+			&csrtypes.MsgUpdateParams{
+				Authority: authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+				Params: csrtypes.Params{
+					EnableCsr: false,
+					CsrShares: sdkmath.LegacyNewDecWithPrec(20, 2),
+				},
+			},
+			func(proposalId uint64) {
+				changeParams := csrtypes.Params{
+					EnableCsr: false,
+					CsrShares: sdkmath.LegacyNewDecWithPrec(20, 2),
+				}
+
+				proposal, err := suite.app.GovKeeper.Proposals.Get(suite.ctx, proposalId)
+				suite.Require().NoError(err)
+				suite.Require().Equal(govtypesv1.ProposalStatus_PROPOSAL_STATUS_PASSED, proposal.Status)
+				suite.Require().Equal(suite.app.CSRKeeper.GetParams(suite.ctx), changeParams)
+			},
+		},
 	}
-	msg := &csrtypes.MsgUpdateParams{
-		Authority: authtypes.NewModuleAddress(govtypes.ModuleName).String(),
-		Params:    changeParams,
+
+	for _, tc := range testCases {
+		suite.Run(tc.name, func() {
+			// submit proposal
+			proposal, err := suite.app.GovKeeper.SubmitProposal(suite.ctx, []sdk.Msg{tc.msg}, "", "test", "description", proposer, false)
+			suite.Require().NoError(err)
+			suite.Commit()
+
+			ok, err := suite.app.GovKeeper.AddDeposit(suite.ctx, proposal.Id, proposer, govParams.MinDeposit)
+			suite.Require().NoError(err)
+			suite.Require().True(ok)
+			suite.Commit()
+
+			err = suite.app.GovKeeper.AddVote(suite.ctx, proposal.Id, proposer, govtypesv1.NewNonSplitVoteOption(govtypesv1.OptionYes), "")
+			suite.Require().NoError(err)
+			suite.CommitAfter(*govParams.VotingPeriod)
+
+			// check proposal result
+			tc.checkFunc(proposal.Id)
+		})
 	}
-	proposal, err := suite.app.GovKeeper.SubmitProposal(suite.ctx, []sdk.Msg{msg}, "", "test", "description", proposer, false)
-	suite.Require().NoError(err)
-	suite.Commit()
-
-	ok, err := suite.app.GovKeeper.AddDeposit(suite.ctx, proposal.Id, proposer, govParams.MinDeposit)
-	suite.Require().NoError(err)
-	suite.Require().True(ok)
-	suite.Commit()
-
-	err = suite.app.GovKeeper.AddVote(suite.ctx, proposal.Id, proposer, govtypesv1.NewNonSplitVoteOption(govtypesv1.OptionYes), "")
-	suite.Require().NoError(err)
-	suite.CommitAfter(*govParams.VotingPeriod)
-
-	proposal, err = suite.app.GovKeeper.Proposals.Get(suite.ctx, proposal.Id)
-	suite.Require().NoError(err)
-	suite.Require().Equal(govtypesv1.ProposalStatus_PROPOSAL_STATUS_PASSED, proposal.Status)
-	suite.Require().Equal(suite.app.CSRKeeper.GetParams(suite.ctx), changeParams)
 }

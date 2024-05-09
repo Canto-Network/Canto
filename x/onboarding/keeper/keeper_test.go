@@ -82,10 +82,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.app.StakingKeeper.Hooks().AfterValidatorCreated(suite.ctx, valbz)
 	err = suite.app.StakingKeeper.SetValidatorByConsAddr(suite.ctx, validator)
 	suite.NoError(err)
-
-	validators, err := suite.app.StakingKeeper.GetValidators(suite.ctx, 1)
-	suite.NoError(err)
-	suite.validator = validators[0]
+	suite.validator = validator
 
 	stakingParams, err := suite.app.StakingKeeper.GetParams(suite.ctx)
 	suite.NoError(err)
