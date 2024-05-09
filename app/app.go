@@ -1308,16 +1308,6 @@ func RegisterSwaggerAPI(_ client.Context, rtr *mux.Router, swaggerEnabled bool) 
 	return nil
 }
 
-// GetMaccPerms returns a copy of the module account permissions
-func GetMaccPerms() map[string][]string {
-	dupMaccPerms := make(map[string][]string)
-	for k, v := range maccPerms {
-		dupMaccPerms[k] = v
-	}
-
-	return dupMaccPerms
-}
-
 // BlockedAddrs returns all the app's module account addresses that are not
 // allowed to receive external tokens.
 func (app *Canto) BlockedAddrs() map[string]bool {
@@ -1325,6 +1315,9 @@ func (app *Canto) BlockedAddrs() map[string]bool {
 	for acc := range maccPerms {
 		blockedAddrs[authtypes.NewModuleAddress(acc).String()] = !allowedReceivingModAcc[acc]
 	}
+
+	// allow the following addresses to receive funds
+	delete(blockedAddrs, authtypes.NewModuleAddress(govtypes.ModuleName).String())
 
 	return blockedAddrs
 }
