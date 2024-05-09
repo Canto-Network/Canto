@@ -1019,6 +1019,8 @@ func (app *Canto) setAnteHandler(txConfig client.TxConfig, maxGasWanted uint64, 
 			DisabledAuthzMsgs: []string{
 				sdk.MsgTypeURL(&evmtypes.MsgEthereumTx{}),
 				sdk.MsgTypeURL(&vestingtypes.MsgCreateVestingAccount{}),
+				sdk.MsgTypeURL(&vestingtypes.MsgCreatePermanentLockedAccount{}),
+				sdk.MsgTypeURL(&vestingtypes.MsgCreatePeriodicVestingAccount{}),
 			},
 			Cdc:        cdc,
 			Simulation: simulation,
