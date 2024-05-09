@@ -40,7 +40,9 @@ func (AppModuleBasic) Name() string {
 }
 
 // RegisterLegacyAminoCodec performs a no-op as the onboarding doesn't support Amino encoding
-func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {}
+func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
+	types.RegisterLegacyAminoCodec(cdc)
+}
 
 // ConsensusVersion returns the consensus state-breaking version for the module.
 func (AppModuleBasic) ConsensusVersion() uint64 {
@@ -50,6 +52,7 @@ func (AppModuleBasic) ConsensusVersion() uint64 {
 // RegisterInterfaces registers interfaces and implementations of the onboarding
 // module.
 func (AppModuleBasic) RegisterInterfaces(interfaceRegistry codectypes.InterfaceRegistry) {
+	types.RegisterInterfaces(interfaceRegistry)
 }
 
 // DefaultGenesis returns default genesis state as raw bytes for the onboarding
@@ -118,6 +121,7 @@ func (AppModule) NewHandler() baseapp.MsgServiceHandler {
 }
 
 func (am AppModule) RegisterServices(cfg module.Configurator) {
+	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
 }
 

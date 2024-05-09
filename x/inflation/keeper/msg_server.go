@@ -33,9 +33,6 @@ func (k msgServer) UpdateParams(goCtx context.Context, req *types.MsgUpdateParam
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	k.SetParams(ctx, req.Params)
-	// if err := k.SetParams(ctx, req.Params); err != nil {
-	// 	return nil, err
-	// }
 
 	return &types.MsgUpdateParamsResponse{}, nil
 }

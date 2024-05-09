@@ -14,6 +14,7 @@ import (
 	tmversion "github.com/cometbft/cometbft/proto/tendermint/version"
 	"github.com/cometbft/cometbft/version"
 	"github.com/cosmos/cosmos-sdk/baseapp"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -77,9 +78,9 @@ func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 	suite.denom = "acanto"
 
 	// consensus key
-	privCons, err := ethsecp256k1.GenerateKey()
+	pubKey := ed25519.GenPrivKey().PubKey()
 	require.NoError(t, err)
-	suite.consAddress = sdk.ConsAddress(privCons.PubKey().Address())
+	suite.consAddress = sdk.ConsAddress(pubKey.Address())
 
 	// setup context
 	suite.ctx = suite.app.BaseApp.NewContextLegacy(checkTx, tmproto.Header{
@@ -127,7 +128,7 @@ func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 
 	// Set Validator
 	valAddr := sdk.ValAddress(suite.address.Bytes())
-	validator, err := stakingtypes.NewValidator(valAddr.String(), privCons.PubKey(), stakingtypes.Description{})
+	validator, err := stakingtypes.NewValidator(valAddr.String(), pubKey, stakingtypes.Description{})
 	require.NoError(t, err)
 
 	validator = stakingkeeper.TestingUpdateValidator(suite.app.StakingKeeper, suite.ctx, validator, true)

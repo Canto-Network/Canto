@@ -14,12 +14,12 @@ import (
 	tmversion "github.com/cometbft/cometbft/proto/tendermint/version"
 	"github.com/cometbft/cometbft/version"
 	"github.com/cosmos/cosmos-sdk/baseapp"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/evmos/ethermint/crypto/ethsecp256k1"
 	evm "github.com/evmos/ethermint/x/evm/types"
 
 	"github.com/Canto-Network/Canto/v7/app"
@@ -68,9 +68,8 @@ func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 	// init app
 	suite.app = app.Setup(checkTx, nil)
 
-	privCons, err := ethsecp256k1.GenerateKey()
-	require.NoError(t, err)
-	suite.consAddress = sdk.ConsAddress(privCons.PubKey().Address())
+	pubKey := ed25519.GenPrivKey().PubKey()
+	suite.consAddress = sdk.ConsAddress(pubKey.Address())
 	// setup context
 	suite.ctx = suite.app.BaseApp.NewContextLegacy(checkTx, tmproto.Header{
 		Height:          1,
@@ -117,7 +116,7 @@ func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 
 	// Set Validator
 	valAddr := sdk.ValAddress(suite.address.Bytes())
-	validator, err := stakingtypes.NewValidator(valAddr.String(), privCons.PubKey(), stakingtypes.Description{})
+	validator, err := stakingtypes.NewValidator(valAddr.String(), pubKey, stakingtypes.Description{})
 	require.NoError(t, err)
 
 	validator = stakingkeeper.TestingUpdateValidator(suite.app.StakingKeeper, suite.ctx, validator, true)

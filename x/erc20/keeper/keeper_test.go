@@ -20,6 +20,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -88,9 +89,9 @@ func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 	suite.signer = tests.NewSigner(priv)
 
 	// consensus key
-	priv, err = ethsecp256k1.GenerateKey()
+	pubKey := ed25519.GenPrivKey().PubKey()
 	require.NoError(t, err)
-	suite.consAddress = sdk.ConsAddress(priv.PubKey().Address())
+	suite.consAddress = sdk.ConsAddress(pubKey.Address())
 
 	// setup feemarketGenesis params
 	feemarketGenesis := feemarkettypes.DefaultGenesisState()
@@ -173,7 +174,7 @@ func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 	suite.app.AccountKeeper.SetAccount(suite.ctx, acc)
 
 	valAddr := sdk.ValAddress(suite.address.Bytes())
-	validator, err := stakingtypes.NewValidator(valAddr.String(), priv.PubKey(), stakingtypes.Description{})
+	validator, err := stakingtypes.NewValidator(valAddr.String(), pubKey, stakingtypes.Description{})
 	require.NoError(t, err)
 	err = suite.app.StakingKeeper.SetValidatorByConsAddr(suite.ctx, validator)
 	require.NoError(t, err)

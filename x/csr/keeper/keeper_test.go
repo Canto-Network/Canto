@@ -15,6 +15,7 @@ import (
 	"github.com/Canto-Network/Canto/v7/x/csr/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+	cosmosed25519 "github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
@@ -84,9 +85,9 @@ func (suite *KeeperTestSuite) SetupApp() {
 	suite.denom = "acanto"
 
 	// consensus key
-	privCons, err := ethsecp256k1.GenerateKey()
+	pubKey := cosmosed25519.GenPrivKey().PubKey()
 	require.NoError(t, err)
-	suite.consAddress = sdk.ConsAddress(privCons.PubKey().Address())
+	suite.consAddress = sdk.ConsAddress(pubKey.Address())
 	suite.ctx = suite.app.BaseApp.NewContextLegacy(false, tmproto.Header{
 		Height:          1,
 		ChainID:         "canto_9001-1",
@@ -139,7 +140,7 @@ func (suite *KeeperTestSuite) SetupApp() {
 
 	// Set Validator
 	valAddr := sdk.ValAddress(suite.address.Bytes())
-	validator, err := stakingtypes.NewValidator(valAddr.String(), privCons.PubKey(), stakingtypes.Description{})
+	validator, err := stakingtypes.NewValidator(valAddr.String(), pubKey, stakingtypes.Description{})
 	require.NoError(t, err)
 
 	validator = stakingkeeper.TestingUpdateValidator(suite.app.StakingKeeper, suite.ctx, validator, true)
