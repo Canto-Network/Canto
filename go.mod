@@ -28,7 +28,7 @@ require (
 	github.com/cosmos/ibc-go/v8 v8.0.0
 	github.com/cosmos/rosetta v0.0.0-20231205133638-3bc76705a1c6
 	github.com/ethereum/go-ethereum v1.10.26
-	github.com/evmos/ethermint v0.19.3
+	github.com/evmos/ethermint v0.22.0
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/protobuf v1.5.4
 	github.com/gorilla/mux v1.8.1
@@ -254,7 +254,7 @@ require (
 replace (
 	cosmossdk.io/core => cosmossdk.io/core v0.11.0
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
-	github.com/evmos/ethermint => github.com/b-harvest/ethermint v0.0.0-20240426083134-b156e23dfe07
+	github.com/evmos/ethermint => github.com/b-harvest/ethermint v0.0.0-20240510033229-2bfcbf4da927
 	// replace broken goleveldb
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 )
