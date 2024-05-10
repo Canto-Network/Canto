@@ -44,7 +44,6 @@ func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 	// this line is used by starport scaffolding # 3
 	registry.RegisterImplementations(
 		(*sdk.Msg)(nil),
-		&MsgUpdateParams{},
 		&LendingMarketProposal{},
 		&TreasuryProposal{},
 	)
@@ -59,8 +58,6 @@ func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 }
 
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&MsgUpdateParams{}, msgUpdateParams, nil)
 	cdc.RegisterConcrete(&LendingMarketProposal{}, "canto/LendingMarketProposal", nil)
 	cdc.RegisterConcrete(&TreasuryProposal{}, "canto/TreasuryProposal", nil)
-	cdc.RegisterConcrete(&Params{}, "canto/Params", nil)
 }

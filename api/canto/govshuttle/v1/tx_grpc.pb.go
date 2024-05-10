@@ -19,7 +19,6 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Msg_UpdateParams_FullMethodName          = "/canto.govshuttle.v1.Msg/UpdateParams"
 	Msg_LendingMarketProposal_FullMethodName = "/canto.govshuttle.v1.Msg/LendingMarketProposal"
 	Msg_TreasuryProposal_FullMethodName      = "/canto.govshuttle.v1.Msg/TreasuryProposal"
 )
@@ -28,9 +27,10 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MsgClient interface {
-	// UpdateParams updates the parameters of the x/erc20 module.
-	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
+	// LendingMarketProposal append the lending market proposal of the
+	// x/govshuttle module.
 	LendingMarketProposal(ctx context.Context, in *MsgLendingMarketProposal, opts ...grpc.CallOption) (*MsgLendingMarketProposalResponse, error)
+	// TreasuryProposal append the treasury proposal of the x/govshuttle module.
 	TreasuryProposal(ctx context.Context, in *MsgTreasuryProposal, opts ...grpc.CallOption) (*MsgTreasuryProposalResponse, error)
 }
 
@@ -40,15 +40,6 @@ type msgClient struct {
 
 func NewMsgClient(cc grpc.ClientConnInterface) MsgClient {
 	return &msgClient{cc}
-}
-
-func (c *msgClient) UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error) {
-	out := new(MsgUpdateParamsResponse)
-	err := c.cc.Invoke(ctx, Msg_UpdateParams_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *msgClient) LendingMarketProposal(ctx context.Context, in *MsgLendingMarketProposal, opts ...grpc.CallOption) (*MsgLendingMarketProposalResponse, error) {
@@ -73,9 +64,10 @@ func (c *msgClient) TreasuryProposal(ctx context.Context, in *MsgTreasuryProposa
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility
 type MsgServer interface {
-	// UpdateParams updates the parameters of the x/erc20 module.
-	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
+	// LendingMarketProposal append the lending market proposal of the
+	// x/govshuttle module.
 	LendingMarketProposal(context.Context, *MsgLendingMarketProposal) (*MsgLendingMarketProposalResponse, error)
+	// TreasuryProposal append the treasury proposal of the x/govshuttle module.
 	TreasuryProposal(context.Context, *MsgTreasuryProposal) (*MsgTreasuryProposalResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }
@@ -84,9 +76,6 @@ type MsgServer interface {
 type UnimplementedMsgServer struct {
 }
 
-func (UnimplementedMsgServer) UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateParams not implemented")
-}
 func (UnimplementedMsgServer) LendingMarketProposal(context.Context, *MsgLendingMarketProposal) (*MsgLendingMarketProposalResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LendingMarketProposal not implemented")
 }
@@ -104,24 +93,6 @@ type UnsafeMsgServer interface {
 
 func RegisterMsgServer(s grpc.ServiceRegistrar, srv MsgServer) {
 	s.RegisterService(&Msg_ServiceDesc, srv)
-}
-
-func _Msg_UpdateParams_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgUpdateParams)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MsgServer).UpdateParams(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Msg_UpdateParams_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).UpdateParams(ctx, req.(*MsgUpdateParams))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _Msg_LendingMarketProposal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -167,10 +138,6 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "canto.govshuttle.v1.Msg",
 	HandlerType: (*MsgServer)(nil),
 	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "UpdateParams",
-			Handler:    _Msg_UpdateParams_Handler,
-		},
 		{
 			MethodName: "LendingMarketProposal",
 			Handler:    _Msg_LendingMarketProposal_Handler,
