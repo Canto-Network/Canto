@@ -1390,7 +1390,9 @@ func (app *Canto) setupUpgradeHandlers() {
 			app.ModuleManager,
 			app.ParamsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramstypes.ConsensusParamsKeyTable()),
 			app.ConsensusParamsKeeper.ParamsStore,
-			app.configurator),
+			app.configurator,
+			app.IBCKeeper.ClientKeeper,
+		),
 	)
 
 	// When a planned update height is reached, the old binary will panic
