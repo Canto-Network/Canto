@@ -103,8 +103,6 @@ var _ = Describe("ERC20: Converting", Ordered, func() {
 		BeforeEach(func() {
 			_, pair = s.setupRegisterCoin()
 			coin = sdk.NewCoin(pair.Denom, amt)
-
-			// denom := s.app.ClaimsKeeper.GetParams(s.ctx).ClaimsDenom
 			denom := "acanto"
 
 			err := testutil.FundAccount(s.app.BankKeeper, s.ctx, accAddr, sdk.NewCoins(sdk.NewCoin(denom, sdk.TokensFromConsensusPower(100, ethermint.PowerReduction))))
@@ -164,8 +162,6 @@ var _ = Describe("ERC20: Converting", Ordered, func() {
 			id := s.app.Erc20Keeper.GetTokenPairID(s.ctx, contract.String())
 			tokenPair, _ = s.app.Erc20Keeper.GetTokenPair(s.ctx, id)
 			coin = sdk.NewCoin(tokenPair.Denom, amt)
-
-			// denom := s.app.ClaimsKeeper.GetParams(s.ctx).ClaimsDenom
 			denom := "acanto" //use default denom for claimsDenom
 
 			err := testutil.FundAccount(s.app.BankKeeper, s.ctx, accAddr, sdk.NewCoins(sdk.NewCoin(denom, sdkmath.NewIntWithDecimal(1, 17))))

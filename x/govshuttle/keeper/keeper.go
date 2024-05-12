@@ -55,7 +55,7 @@ func NewKeeper(
 	}
 }
 
-// GetAuthority returns the x/erc20 module's authority.
+// GetAuthority returns the x/govshuttle module's authority.
 func (k Keeper) GetAuthority() string {
 	return k.authority
 }

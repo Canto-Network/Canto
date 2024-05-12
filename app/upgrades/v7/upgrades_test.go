@@ -31,7 +31,6 @@ type UpgradeTestSuite struct {
 }
 
 func (s *UpgradeTestSuite) SetupTest() {
-
 	// consensus key
 	priv, err := ethsecp256k1.GenerateKey()
 	s.Require().NoError(err)

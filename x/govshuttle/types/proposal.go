@@ -24,8 +24,6 @@ var (
 func init() {
 	govv1beta1.RegisterProposalType(ProposalTypeLendingMarket)
 	govv1beta1.RegisterProposalType(ProposalTypeTreasury)
-	//govtypes.RegisterProposalTypeCodec(&LendingMarketProposal{}, "govshuttle/LendingMarketProposal")
-	//govtypes.RegisterProposalTypeCodec(&TreasuryProposal{}, "govshuttle/TreasuryProposal")
 }
 
 func NewLendingMarketProposal(title, description string, m *LendingMarketMetadata) govv1beta1.Content {

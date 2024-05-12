@@ -51,7 +51,6 @@ func (suite *KeeperTestSuite) setupRegisterCoin() (banktypes.Metadata, *types.To
 	err := suite.app.BankKeeper.MintCoins(suite.ctx, inflationtypes.ModuleName, sdk.Coins{sdk.NewInt64Coin(validMetadata.Base, 1)})
 	suite.Require().NoError(err)
 
-	// pair := types.NewTokenPair(contractAddr, cosmosTokenBase, true, types.OWNER_MODULE)
 	pair, err := suite.app.Erc20Keeper.RegisterCoin(suite.ctx, validMetadata)
 	suite.Require().NoError(err)
 	suite.Commit()

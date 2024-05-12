@@ -221,8 +221,7 @@ var _ = Describe("Inflation", Ordered, func() {
 			provision, _ := s.app.InflationKeeper.GetEpochMintProvision(s.ctx)
 			s.CommitAfter(time.Minute)
 			s.CommitAfter(time.Hour * 25) // epoch will have ended
-			//s.app.DistrKeeper.GetFeePoolCommunityCoins(s.ctx) //Get Fee Pool befor
-			//
+
 			valAddr, _ := sdk.ValAddressFromBech32(v.OperatorAddress)
 			valBal, err := s.app.DistrKeeper.GetValidatorCurrentRewards(s.ctx, valAddr)
 			s.Require().NoError(err)

@@ -1,7 +1,6 @@
 syntax = "proto3";
 package canto.erc20.v1;
 
-import "google/api/annotations.proto";
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "cosmos/bank/v1beta1/bank.proto";
@@ -155,7 +154,7 @@ message MsgToggleTokenConversion {
   option (amino.name) = "canto/MsgToggleTokenConversion";
   option (gogoproto.equal) = true;
   // title of the proposal
-  string Title = 2;
+  string title = 2;
   // proposal description
   string description = 3;
   // token identifier can be either the hex contract address of the ERC20 or the

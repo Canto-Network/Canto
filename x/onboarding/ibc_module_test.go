@@ -173,7 +173,7 @@ func (suite *TransferTestSuite) TestHandleMsgTransfer() {
 	suite.Require().Equal(coinSentFromAToB.Amount.Sub(swapAmount), sdkmath.NewIntFromBigInt(balanceErc20))
 
 	// IBC transfer to blocked address
-	blockedAddr := "canto15jtrcjvkrtajx76zfnuf76vfnse4m4m7rhv5sc" // onboarding module
+	blockedAddr := "canto10d07y265gmmuvt4z0w9aw880jnsr700jg5j4zm" // gov module
 	coinToSendToB = suite.chainA.GetSimApp().BankKeeper.GetBalance(suite.chainA.GetContext(), suite.chainA.SenderAccount.GetAddress(), sdk.DefaultBondDenom)
 	msg = types.NewMsgTransfer(path.EndpointA.ChannelConfig.PortID, path.EndpointA.ChannelID, coinToSendToB, suite.chainA.SenderAccount.GetAddress().String(), blockedAddr, timeoutHeight, 0, "")
 

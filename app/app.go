@@ -1327,8 +1327,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(slashingtypes.ModuleName)
 	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govv1.ParamKeyTable())
 	paramsKeeper.Subspace(crisistypes.ModuleName)
-	//paramsKeeper.Subspace(ibctransfertypes.ModuleName)
-	//paramsKeeper.Subspace(ibcexported.ModuleName)
 	// ethermint subspaces
 	paramsKeeper.Subspace(evmtypes.ModuleName)
 	paramsKeeper.Subspace(feemarkettypes.ModuleName)
@@ -1354,11 +1352,13 @@ func (app *Canto) setupUpgradeHandlers() {
 		v2.UpgradeName,
 		v2.CreateUpgradeHandler(app.ModuleManager, app.configurator),
 	)
+
 	// v3 upgrade handler
 	app.UpgradeKeeper.SetUpgradeHandler(
 		v3.UpgradeName,
 		v3.CreateUpgradeHandler(app.ModuleManager, app.configurator),
 	)
+
 	// v4 upgrade handler
 	app.UpgradeKeeper.SetUpgradeHandler(
 		v4.UpgradeName,
@@ -1476,7 +1476,4 @@ func setupLegacyKeyTables(k *paramskeeper.Keeper) {
 			subspace.WithKeyTable(keyTable)
 		}
 	}
-	// sdk 47
-	//k.Subspace(baseapp.Paramspace).
-	//	WithKeyTable(paramstypes.ConsensusParamsKeyTable())
 }

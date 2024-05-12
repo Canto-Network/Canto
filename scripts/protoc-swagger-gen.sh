@@ -4,8 +4,8 @@ set -eo pipefail
 
 mkdir -p ./third_party
 cd third_party
-git clone --branch v0.50.5 --single-branch --depth 1 https://github.com/cosmos/cosmos-sdk
-git clone --branch v8.0.0 --single-branch --depth 1 https://github.com/cosmos/ibc-go
+git clone --branch v0.50.6 --single-branch --depth 1 https://github.com/cosmos/cosmos-sdk
+git clone --branch v8.2.1 --single-branch --depth 1 https://github.com/cosmos/ibc-go
 git clone --branch dudong2/feat/cosmos-sdk@v0.50.x-cometbft@v0.38.0-2 --single-branch --depth 1 https://github.com/b-harvest/ethermint
 cd ..
 
