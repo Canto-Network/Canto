@@ -1392,6 +1392,7 @@ func (app *Canto) setupUpgradeHandlers() {
 			app.ConsensusParamsKeeper.ParamsStore,
 			app.configurator,
 			app.IBCKeeper.ClientKeeper,
+			app.StakingKeeper,
 		),
 	)
 

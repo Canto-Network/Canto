@@ -4,12 +4,14 @@ import (
 	"context"
 
 	"cosmossdk.io/collections"
+	sdkmath "cosmossdk.io/math"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	"github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	clientkeeper "github.com/cosmos/ibc-go/v8/modules/core/02-client/keeper"
 	"github.com/cosmos/ibc-go/v8/modules/core/exported"
 )
@@ -21,6 +23,7 @@ func CreateUpgradeHandler(
 	consensusParamsStore collections.Item[types.ConsensusParams],
 	configurator module.Configurator,
 	clientKeeper clientkeeper.Keeper,
+	stakingKeeper *stakingkeeper.Keeper,
 ) upgradetypes.UpgradeHandler {
 	return func(ctx context.Context, _ upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
 		sdkCtx := sdk.UnwrapSDKContext(ctx)
@@ -45,6 +48,16 @@ func CreateUpgradeHandler(
 
 		if err := baseapp.MigrateParams(sdkCtx, legacySubspace, consensusParamsStore); err != nil {
 			return vm, err
+		}
+
+		// canto v8 custom
+		{
+			params, err := stakingKeeper.GetParams(ctx)
+			if err != nil {
+				return vm, err
+			}
+			params.MinCommissionRate = sdkmath.LegacyNewDecWithPrec(5, 2) // 5%
+			stakingKeeper.SetParams(ctx, params)
 		}
 
 		// Leave modules are as-is to avoid running InitGenesis.
