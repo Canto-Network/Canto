@@ -1,4 +1,4 @@
-package v7_test
+package v8_test
 
 import (
 	"testing"
@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	upgradetypes "cosmossdk.io/x/upgrade/types"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -15,12 +16,10 @@ import (
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
 	abci "github.com/cometbft/cometbft/abci/types"
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	chain "github.com/Canto-Network/Canto/v7/app"
-	v7 "github.com/Canto-Network/Canto/v7/app/upgrades/v7"
-	coinswaptypes "github.com/Canto-Network/Canto/v7/x/coinswap/types"
-	onboardingtypes "github.com/Canto-Network/Canto/v7/x/onboarding/types"
+	v8 "github.com/Canto-Network/Canto/v7/app/upgrades/v8"
 )
 
 type UpgradeTestSuite struct {
@@ -38,12 +37,22 @@ func (s *UpgradeTestSuite) SetupTest() {
 
 	s.app = chain.Setup(false, feemarkettypes.DefaultGenesisState())
 
-	s.ctx = s.app.BaseApp.NewContextLegacy(false, tmproto.Header{
+	s.ctx = s.app.BaseApp.NewContextLegacy(false, cmtproto.Header{
 		ChainID:         "canto_9001-1",
 		Height:          1,
 		Time:            time.Date(2023, 5, 9, 8, 0, 0, 0, time.UTC),
 		ProposerAddress: s.consAddress.Bytes(),
 	})
+
+	// In the upgrade to comsos-sdk v0.47.x, the migration from subspace
+	// to ParamsStore of the consensus module should be performed. Since
+	// the upgrade of binaries does not happen in unittest, it is necessary
+	// to set the required values into subspace to prevent panic.
+	bz := s.app.AppCodec().MustMarshalJSON(chain.DefaultConsensusParams.Block)
+	sp, ok := s.app.ParamsKeeper.GetSubspace(baseapp.Paramspace)
+	s.Require().True(ok)
+	err = sp.Update(s.ctx, baseapp.ParamStoreKeyBlockParams, bz)
+	s.Require().NoError(err)
 
 	// Set Validator
 	valAddr := sdk.ValAddress(s.consAddress.Bytes())
@@ -63,7 +72,7 @@ func TestKeeperTestSuite(t *testing.T) {
 
 const testUpgradeHeight = 10
 
-func (s *UpgradeTestSuite) TestUpgradeV7() {
+func (s *UpgradeTestSuite) TestUpgradeV8() {
 	testCases := []struct {
 		title   string
 		before  func()
@@ -71,19 +80,12 @@ func (s *UpgradeTestSuite) TestUpgradeV7() {
 		expPass bool
 	}{
 		{
-			"v7 upgrade onboarding & coinswap",
+			"v8 upgrade min_commission_rate",
 			func() {},
 			func() {
-				coinswapParams := s.app.CoinswapKeeper.GetParams(s.ctx)
-				s.Require().Equal(coinswapParams.PoolCreationFee, coinswaptypes.DefaultPoolCreationFee)
-				s.Require().Equal(coinswapParams.MaxSwapAmount, coinswaptypes.DefaultMaxSwapAmount)
-				s.Require().Equal(coinswapParams.MaxStandardCoinPerPool, coinswaptypes.DefaultMaxStandardCoinPerPool)
-				s.Require().Equal(coinswapParams.Fee, coinswaptypes.DefaultFee)
-				s.Require().Equal(coinswapParams.TaxRate, coinswaptypes.DefaultTaxRate)
-
-				onboardingParams := s.app.OnboardingKeeper.GetParams(s.ctx)
-				s.Require().Equal(onboardingParams.AutoSwapThreshold, onboardingtypes.DefaultAutoSwapThreshold)
-				s.Require().Equal(onboardingParams.WhitelistedChannels, onboardingtypes.DefaultWhitelistedChannels)
+				params, err := s.app.StakingKeeper.GetParams(s.ctx)
+				s.Require().NoError(err)
+				s.Require().Equal(v8.MinCommissionRate, params.MinCommissionRate)
 			},
 			true,
 		},
@@ -101,7 +103,7 @@ func (s *UpgradeTestSuite) TestUpgradeV7() {
 			}
 
 			// simulate binary upgrade
-			plan := upgradetypes.Plan{Name: v7.UpgradeName, Height: testUpgradeHeight}
+			plan := upgradetypes.Plan{Name: v8.UpgradeName, Height: testUpgradeHeight}
 			err := s.app.UpgradeKeeper.ScheduleUpgrade(s.ctx, plan)
 			s.Require().NoError(err)
 			_, err = s.app.UpgradeKeeper.GetUpgradePlan(s.ctx)

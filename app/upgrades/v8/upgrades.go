@@ -16,6 +16,8 @@ import (
 	"github.com/cosmos/ibc-go/v8/modules/core/exported"
 )
 
+var MinCommissionRate = sdkmath.LegacyNewDecWithPrec(5, 2) // 5%
+
 // CreateUpgradeHandler creates an SDK upgrade handler for v8
 func CreateUpgradeHandler(
 	mm *module.Manager,
@@ -56,7 +58,7 @@ func CreateUpgradeHandler(
 			if err != nil {
 				return vm, err
 			}
-			params.MinCommissionRate = sdkmath.LegacyNewDecWithPrec(5, 2) // 5%
+			params.MinCommissionRate = MinCommissionRate
 			stakingKeeper.SetParams(ctx, params)
 		}
 
