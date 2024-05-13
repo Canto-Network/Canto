@@ -7,6 +7,7 @@ import (
 	"math/rand"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/spf13/cobra"
 
 	abci "github.com/cometbft/cometbft/abci/types"
 
@@ -17,6 +18,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
+	"github.com/Canto-Network/Canto/v7/x/coinswap/client/cli"
 	"github.com/Canto-Network/Canto/v7/x/coinswap/keeper"
 	"github.com/Canto-Network/Canto/v7/x/coinswap/simulation"
 	"github.com/Canto-Network/Canto/v7/x/coinswap/types"
@@ -61,6 +63,17 @@ func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *r
 	if err := types.RegisterQueryHandlerClient(context.Background(), mux, types.NewQueryClient(clientCtx)); err != nil {
 		panic(err)
 	}
+}
+
+// GetTxCmd returns the root tx command for the coinswap module.
+func (AppModuleBasic) GetTxCmd() *cobra.Command {
+	return cli.GetTxCmd()
+}
+
+// GetQueryCmd returns no root query command for the coinswap module.
+func (AppModuleBasic) GetQueryCmd() *cobra.Command {
+	// TODO: add cmd
+	return cli.GetQueryCmd()
 }
 
 // RegisterInterfaces registers interfaces and implementations of the coinswap module.
