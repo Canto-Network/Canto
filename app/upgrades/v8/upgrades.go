@@ -31,6 +31,12 @@ func CreateUpgradeHandler(
 		sdkCtx := sdk.UnwrapSDKContext(ctx)
 		logger := sdkCtx.Logger().With("upgrade: ", UpgradeName)
 
+		// Leave modules are as-is to avoid running InitGenesis.
+		logger.Debug("running module migrations ...")
+		if vm, err := mm.RunMigrations(ctx, configurator, vm); err != nil {
+			return vm, err
+		}
+
 		// ibc-go vX -> v6
 		// - skip
 		// - not implement an ICS27 controller module
@@ -62,8 +68,6 @@ func CreateUpgradeHandler(
 			stakingKeeper.SetParams(ctx, params)
 		}
 
-		// Leave modules are as-is to avoid running InitGenesis.
-		logger.Debug("running module migrations ...")
-		return mm.RunMigrations(ctx, configurator, vm)
+		return vm, nil
 	}
 }
