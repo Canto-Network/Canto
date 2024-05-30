@@ -69,7 +69,10 @@ func interBlockCacheOpt() func(app *baseapp.BaseApp) {
 func TestFullAppSimulation(t *testing.T) {
 	config := simcli.NewConfigFromFlags()
 	config.ChainID = types.TestnetChainID + "-1"
-	sdk.DefaultPowerReduction = sdkmath.NewIntFromUint64(1000000)
+
+	if simcli.FlagGenesisFileValue == "" {
+		sdk.DefaultPowerReduction = sdkmath.NewIntFromUint64(1000000)
+	}
 
 	db, dir, logger, skip, err := simtestutil.SetupSimulation(config, "leveldb-app-sim", "Simulation", simcli.FlagVerboseValue, simcli.FlagEnabledValue)
 	if skip {
@@ -117,8 +120,6 @@ func TestFullAppSimulation(t *testing.T) {
 func TestAppImportExport(t *testing.T) {
 	config := simcli.NewConfigFromFlags()
 	config.ChainID = types.TestnetChainID + "-1"
-
-	sdk.DefaultPowerReduction = sdkmath.NewIntFromUint64(1000000)
 
 	db, dir, logger, skip, err := simtestutil.SetupSimulation(config, "leveldb-app-sim", "Simulation", simcli.FlagVerboseValue, simcli.FlagEnabledValue)
 	if skip {

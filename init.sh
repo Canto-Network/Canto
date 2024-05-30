@@ -1,4 +1,5 @@
 KEY="mykey"
+KEY1="mykey1"
 CHAINID="canto_9000-1"
 MONIKER="localtestnet"
 KEYRING="test"
@@ -21,6 +22,7 @@ cantod config set client keyring-backend $KEYRING
 
 # if $KEY exists it should be deleted
 cantod keys add $KEY --keyring-backend $KEYRING --algo $KEYALGO
+cantod keys add $KEY1 --keyring-backend $KEYRING --algo $KEYALGO
 
 # Set moniker and chain-id for canto (Moniker can be anything, chain-id must be an integer)
 cantod init $MONIKER --chain-id $CHAINID
@@ -85,12 +87,13 @@ fi
 
 # Allocate genesis accounts (cosmos formatted addresses)
 cantod add-genesis-account $KEY 100000000000000000000010000acanto --keyring-backend $KEYRING
+cantod add-genesis-account $KEY1 100000000000000000000000000acanto --keyring-backend $KEYRING
 
 # Update total supply with claim values
 validators_supply=$(cat $HOME/.cantod/config/genesis.json | jq -r '.app_state["bank"]["supply"][0]["amount"]')
 # Bc is required to add this big numbers
 # total_supply=$(bc <<< "$amount_to_claim+$validators_supply")
-total_supply=100000000000000000000010000
+total_supply=200000000000000000000010000
 cat $HOME/.cantod/config/genesis.json | jq -r --arg total_supply "$total_supply" '.app_state["bank"]["supply"][0]["amount"]=$total_supply' > $HOME/.cantod/config/tmp_genesis.json && mv $HOME/.cantod/config/tmp_genesis.json $HOME/.cantod/config/genesis.json
 
 # Sign genesis transaction

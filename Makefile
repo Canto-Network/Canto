@@ -390,7 +390,8 @@ test-sim-nondeterminism-long:
 test-sim-custom-genesis-fast:
 	@echo "Running custom genesis simulation..."
 	@echo "By default, ${HOME}/.$(canto_DIR)/config/genesis.json will be used."
-	@go test -mod=readonly $(SIMAPP) -run TestFullAppSimulation -Enabled=true -NumBlocks=100 -BlockSize=200 -Commit=true -Seed=5 -Period=1 -v -timeout 1h
+	@go test -mod=readonly $(SIMAPP) -run TestFullAppSimulation -Genesis=${HOME}/.$(canto_DIR)/config/genesis.json \
+		-Enabled=true -NumBlocks=100 -BlockSize=200 -Commit=true -Seed=5 -Period=1 -v -timeout 1h
 
 test-sim-import-export: runsim
 	@echo "Running application import/export simulation. This may take several minutes..."
