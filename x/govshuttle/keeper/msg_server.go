@@ -3,8 +3,11 @@ package keeper
 import (
 	"context"
 
-	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+
+	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
 )
 
 type msgServer struct {
@@ -20,6 +23,10 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 var _ types.MsgServer = msgServer{}
 
 func (k Keeper) LendingMarketProposal(goCtx context.Context, req *types.MsgLendingMarketProposal) (*types.MsgLendingMarketProposalResponse, error) {
+	if k.GetAuthority() != req.Authority {
+		return nil, errorsmod.Wrapf(govtypes.ErrInvalidSigner, "invalid authority; expected %s, got %s", k.GetAuthority(), req.Authority)
+	}
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	legacyProposal := types.LendingMarketProposal{
 		Title:       req.Title,
@@ -36,6 +43,10 @@ func (k Keeper) LendingMarketProposal(goCtx context.Context, req *types.MsgLendi
 }
 
 func (k Keeper) TreasuryProposal(goCtx context.Context, req *types.MsgTreasuryProposal) (*types.MsgTreasuryProposalResponse, error) {
+	if k.GetAuthority() != req.Authority {
+		return nil, errorsmod.Wrapf(govtypes.ErrInvalidSigner, "invalid authority; expected %s, got %s", k.GetAuthority(), req.Authority)
+	}
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	legacyTreasuryProposal := types.TreasuryProposal{
 		Title:       req.Title,
