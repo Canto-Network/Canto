@@ -22,19 +22,13 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 
 var _ types.MsgServer = msgServer{}
 
-func (k Keeper) LendingMarketProposal(goCtx context.Context, req *types.MsgLendingMarketProposal) (*types.MsgLendingMarketProposalResponse, error) {
+func (k Keeper) LendingMarketProposal(ctx context.Context, req *types.MsgLendingMarketProposal) (*types.MsgLendingMarketProposalResponse, error) {
 	if k.GetAuthority() != req.Authority {
 		return nil, errorsmod.Wrapf(govtypes.ErrInvalidSigner, "invalid authority; expected %s, got %s", k.GetAuthority(), req.Authority)
 	}
 
-	ctx := sdk.UnwrapSDKContext(goCtx)
-	legacyProposal := types.LendingMarketProposal{
-		Title:       req.Title,
-		Description: req.Description,
-		Metadata:    req.Metadata,
-	}
-
-	_, err := k.AppendLendingMarketProposal(ctx, &legacyProposal)
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	_, err := k.AppendLendingMarketProposal(sdkCtx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -42,21 +36,13 @@ func (k Keeper) LendingMarketProposal(goCtx context.Context, req *types.MsgLendi
 	return &types.MsgLendingMarketProposalResponse{}, nil
 }
 
-func (k Keeper) TreasuryProposal(goCtx context.Context, req *types.MsgTreasuryProposal) (*types.MsgTreasuryProposalResponse, error) {
+func (k Keeper) TreasuryProposal(ctx context.Context, req *types.MsgTreasuryProposal) (*types.MsgTreasuryProposalResponse, error) {
 	if k.GetAuthority() != req.Authority {
 		return nil, errorsmod.Wrapf(govtypes.ErrInvalidSigner, "invalid authority; expected %s, got %s", k.GetAuthority(), req.Authority)
 	}
 
-	ctx := sdk.UnwrapSDKContext(goCtx)
-	legacyTreasuryProposal := types.TreasuryProposal{
-		Title:       req.Title,
-		Description: req.Description,
-		Metadata:    req.Metadata,
-	}
-
-	legacyProposal := legacyTreasuryProposal.FromTreasuryToLendingMarket()
-
-	_, err := k.AppendLendingMarketProposal(ctx, legacyProposal)
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	_, err := k.AppendLendingMarketProposal(sdkCtx, req.FromTreasuryToLendingMarket())
 	if err != nil {
 		return nil, err
 	}

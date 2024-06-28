@@ -16,7 +16,7 @@ import (
 )
 
 // method for appending govshuttle proposal types to the govshuttle Map contract
-func (k *Keeper) AppendLendingMarketProposal(ctx sdk.Context, lm *types.LendingMarketProposal) (*types.LendingMarketProposal, error) {
+func (k *Keeper) AppendLendingMarketProposal(ctx sdk.Context, lm *types.MsgLendingMarketProposal) (*types.MsgLendingMarketProposal, error) {
 	m := lm.GetMetadata()
 	var err error
 	if m.GetPropId() == 0 {
@@ -33,7 +33,7 @@ func (k *Keeper) AppendLendingMarketProposal(ctx sdk.Context, lm *types.LendingM
 	if !found {
 		addr, err = k.DeployMapContract(ctx, lm)
 		if err != nil {
-			return &types.LendingMarketProposal{}, err
+			return nil, err
 		}
 		// set the port address in state
 		k.SetPort(ctx, addr)
@@ -50,8 +50,7 @@ func (k *Keeper) AppendLendingMarketProposal(ctx sdk.Context, lm *types.LendingM
 	return lm, nil
 }
 
-func (k Keeper) DeployMapContract(ctx sdk.Context, lm *types.LendingMarketProposal) (common.Address, error) {
-
+func (k Keeper) DeployMapContract(ctx sdk.Context, lm *types.MsgLendingMarketProposal) (common.Address, error) {
 	m := lm.GetMetadata()
 
 	ctorArgs, err := contracts.ProposalStoreContract.ABI.Pack("", sdkmath.NewIntFromUint64(m.GetPropId()).BigInt(), lm.GetTitle(), lm.GetDescription(), ToAddress(m.GetAccount()),
