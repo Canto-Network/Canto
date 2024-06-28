@@ -767,7 +767,7 @@ func NewCanto(
 		erc20.NewAppModule(app.Erc20Keeper, app.AccountKeeper),
 		epochs.NewAppModule(appCodec, app.EpochsKeeper),
 		onboarding.NewAppModule(*app.OnboardingKeeper),
-		govshuttle.NewAppModule(app.GovshuttleKeeper, app.AccountKeeper),
+		govshuttle.NewAppModule(app.GovshuttleKeeper, app.AccountKeeper, app.AccountKeeper.AddressCodec()),
 		csr.NewAppModule(app.CSRKeeper, app.AccountKeeper),
 		coinswap.NewAppModule(appCodec, app.CoinswapKeeper, app.AccountKeeper, app.BankKeeper),
 	)

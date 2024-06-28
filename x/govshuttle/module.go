@@ -11,15 +11,17 @@ import (
 
 	abci "github.com/cometbft/cometbft/abci/types"
 
-	"github.com/Canto-Network/Canto/v7/x/govshuttle/client/cli"
-	"github.com/Canto-Network/Canto/v7/x/govshuttle/keeper"
-	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
+	"cosmossdk.io/core/address"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+
+	"github.com/Canto-Network/Canto/v7/x/govshuttle/client/cli"
+	"github.com/Canto-Network/Canto/v7/x/govshuttle/keeper"
+	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
 )
 
 var (
@@ -31,13 +33,9 @@ var (
 // AppModuleBasic
 // ----------------------------------------------------------------------------
 
-// AppModuleBasic implements the AppModuleBasic interface for the capability module.
+// AppModule implements the sdk.AppModuleBasic interface.
 type AppModuleBasic struct {
-	cdc codec.BinaryCodec
-}
-
-func NewAppModuleBasic(cdc codec.BinaryCodec) AppModuleBasic {
-	return AppModuleBasic{cdc: cdc}
+	ac address.Codec
 }
 
 // Name returns the capability module's name.
@@ -79,7 +77,7 @@ func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *r
 
 // GetTxCmd returns the capability module's root tx command.
 func (a AppModuleBasic) GetTxCmd() *cobra.Command {
-	return cli.NewTxCmd()
+	return cli.NewTxCmd(a.ac)
 }
 
 // GetQueryCmd returns the capability module's root query command.
@@ -91,7 +89,7 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 // AppModule
 // ----------------------------------------------------------------------------
 
-// AppModule implements the AppModule interface for the capability module.
+// AppModule implements the sdk.AppModule interface.
 type AppModule struct {
 	AppModuleBasic
 
@@ -102,9 +100,10 @@ type AppModule struct {
 func NewAppModule(
 	k keeper.Keeper,
 	ak authkeeper.AccountKeeper,
+	ac address.Codec,
 ) AppModule {
 	return AppModule{
-		AppModuleBasic: AppModuleBasic{},
+		AppModuleBasic: AppModuleBasic{ac: ac},
 		keeper:         k,
 		accountkeeper:  ak,
 	}
