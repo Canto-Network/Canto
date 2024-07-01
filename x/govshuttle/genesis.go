@@ -15,8 +15,10 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, accountKeeper authkeeper.Acco
 	// this line is used by starport scaffolding # genesis/module/init
 	k.SetParams(ctx, genState.Params)
 
-	portAddr := common.HexToAddress(genState.PortContractAddr)
-	k.SetPort(ctx, portAddr)
+	if genState.PortContractAddr != "" {
+		portAddr := common.HexToAddress(genState.PortContractAddr)
+		k.SetPort(ctx, portAddr)
+	}
 
 	if acc := accountKeeper.GetModuleAccount(ctx, types.ModuleName); acc == nil {
 		panic("the govshuttle module account has not been set")
