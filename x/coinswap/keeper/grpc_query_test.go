@@ -7,7 +7,7 @@ import (
 )
 
 func (s *TestSuite) TestGRPCParams() {
-	resp, err := s.queryClient.Params(sdk.WrapSDKContext(s.ctx), &types.QueryParamsRequest{})
+	resp, err := s.queryClient.Params(s.ctx, &types.QueryParamsRequest{})
 	s.Require().NoError(err)
 	s.Require().Equal(s.keeper.GetParams(s.ctx), resp.Params)
 }
@@ -17,7 +17,7 @@ func (s *TestSuite) TestGRPCPool() {
 	poolId := types.GetPoolId(denomBTC)
 	pool, _ := s.app.CoinswapKeeper.GetPool(s.ctx, poolId)
 
-	resp, err := s.queryClient.LiquidityPool(sdk.WrapSDKContext(s.ctx), &types.QueryLiquidityPoolRequest{LptDenom: pool.LptDenom})
+	resp, err := s.queryClient.LiquidityPool(s.ctx, &types.QueryLiquidityPoolRequest{LptDenom: pool.LptDenom})
 	s.Require().NoError(err)
 	s.Require().Equal(pool.Id, resp.Pool.Id)
 	s.Require().Equal(pool.EscrowAddress, resp.Pool.EscrowAddress)
@@ -36,12 +36,12 @@ func (s *TestSuite) TestGRPCPool() {
 
 func (s *TestSuite) TestGRPCPools() {
 	_, _ = createReservePool(s, denomBTC)
-	resp, err := s.queryClient.LiquidityPools(sdk.WrapSDKContext(s.ctx), &types.QueryLiquidityPoolsRequest{})
+	resp, err := s.queryClient.LiquidityPools(s.ctx, &types.QueryLiquidityPoolsRequest{})
 	s.Require().NoError(err)
 	s.Require().Len(resp.Pools, 1)
 
 	_, _ = createReservePool(s, denomETH)
-	resp, err = s.queryClient.LiquidityPools(sdk.WrapSDKContext(s.ctx), &types.QueryLiquidityPoolsRequest{})
+	resp, err = s.queryClient.LiquidityPools(s.ctx, &types.QueryLiquidityPoolsRequest{})
 	s.Require().NoError(err)
 	s.Require().Len(resp.Pools, 2)
 }

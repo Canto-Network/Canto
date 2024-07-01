@@ -340,7 +340,6 @@ func (suite *KeeperTestSuite) TestConvertCoinNativeCoin() {
 			tc.malleate(erc20)
 			suite.Commit()
 
-			ctx := sdk.WrapSDKContext(suite.ctx)
 			coins := sdk.NewCoins(sdk.NewCoin(cosmosTokenBase, sdkmath.NewInt(tc.mint)))
 			sender := sdk.AccAddress(suite.address.Bytes())
 			msg := types.NewMsgConvertCoin(
@@ -353,7 +352,7 @@ func (suite *KeeperTestSuite) TestConvertCoinNativeCoin() {
 			suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, sender, coins)
 
 			tc.extra()
-			res, err := suite.app.Erc20Keeper.ConvertCoin(ctx, msg)
+			res, err := suite.app.Erc20Keeper.ConvertCoin(suite.ctx, msg)
 			expRes := &types.MsgConvertCoinResponse{}
 			suite.Commit()
 			balance := suite.BalanceOf(common.HexToAddress(pair.Erc20Address), suite.address)
@@ -518,8 +517,7 @@ func (suite *KeeperTestSuite) TestConvertERC20NativeCoin() {
 				sender,
 			)
 
-			ctx := sdk.WrapSDKContext(suite.ctx)
-			_, err := suite.app.Erc20Keeper.ConvertCoin(ctx, msg)
+			_, err := suite.app.Erc20Keeper.ConvertCoin(suite.ctx, msg)
 			suite.Require().NoError(err, tc.name)
 			suite.Commit()
 			balance := suite.BalanceOf(common.HexToAddress(pair.Erc20Address), suite.address)
@@ -528,7 +526,6 @@ func (suite *KeeperTestSuite) TestConvertERC20NativeCoin() {
 			suite.Require().Equal(balance, big.NewInt(tc.burn))
 
 			// Convert ERC20s back to Coins
-			ctx = sdk.WrapSDKContext(suite.ctx)
 			contractAddr := common.HexToAddress(pair.Erc20Address)
 			msgConvertERC20 := types.NewMsgConvertERC20(
 				sdkmath.NewInt(tc.reconvert),
@@ -538,7 +535,7 @@ func (suite *KeeperTestSuite) TestConvertERC20NativeCoin() {
 			)
 
 			tc.malleate()
-			res, err := suite.app.Erc20Keeper.ConvertERC20(ctx, msgConvertERC20)
+			res, err := suite.app.Erc20Keeper.ConvertERC20(suite.ctx, msgConvertERC20)
 			expRes := &types.MsgConvertERC20Response{}
 			suite.Commit()
 			balance = suite.BalanceOf(contractAddr, suite.address)
@@ -1076,7 +1073,6 @@ func (suite *KeeperTestSuite) TestConvertCoinNativeERC20() {
 
 			// Convert Coins back to ERC20s
 			receiver := suite.address
-			ctx := sdk.WrapSDKContext(suite.ctx)
 			msg := types.NewMsgConvertCoin(
 				sdk.NewCoin(coinName, sdkmath.NewInt(tc.convert)),
 				receiver,
@@ -1084,7 +1080,7 @@ func (suite *KeeperTestSuite) TestConvertCoinNativeERC20() {
 			)
 
 			tc.extra()
-			res, err := suite.app.Erc20Keeper.ConvertCoin(ctx, msg)
+			res, err := suite.app.Erc20Keeper.ConvertCoin(suite.ctx, msg)
 
 			expRes := &types.MsgConvertCoinResponse{}
 			suite.Commit()
@@ -1135,12 +1131,10 @@ func (suite *KeeperTestSuite) TestWrongPairOwnerERC20NativeCoin() {
 			pair.ContractOwner = types.OWNER_UNSPECIFIED
 			suite.app.Erc20Keeper.SetTokenPair(suite.ctx, *pair)
 
-			ctx := sdk.WrapSDKContext(suite.ctx)
-			_, err := suite.app.Erc20Keeper.ConvertCoin(ctx, msg)
+			_, err := suite.app.Erc20Keeper.ConvertCoin(suite.ctx, msg)
 			suite.Require().Error(err, tc.name)
 
 			// Convert ERC20s back to Coins
-			ctx = sdk.WrapSDKContext(suite.ctx)
 			contractAddr := common.HexToAddress(pair.Erc20Address)
 			msgConvertERC20 := types.NewMsgConvertERC20(
 				sdkmath.NewInt(tc.reconvert),
@@ -1149,7 +1143,7 @@ func (suite *KeeperTestSuite) TestWrongPairOwnerERC20NativeCoin() {
 				suite.address,
 			)
 
-			_, err = suite.app.Erc20Keeper.ConvertERC20(ctx, msgConvertERC20)
+			_, err = suite.app.Erc20Keeper.ConvertERC20(suite.ctx, msgConvertERC20)
 			suite.Require().Error(err, tc.name)
 		})
 	}
@@ -1290,7 +1284,6 @@ func (suite *KeeperTestSuite) TestConvertCoinNativeIBCVoucher() {
 			tc.malleate(erc20)
 			suite.Commit()
 
-			ctx := sdk.WrapSDKContext(suite.ctx)
 			coins := sdk.NewCoins(sdk.NewCoin(ibcBase, sdkmath.NewInt(tc.mint)))
 			sender := sdk.AccAddress(suite.address.Bytes())
 			msg := types.NewMsgConvertCoin(
@@ -1303,7 +1296,7 @@ func (suite *KeeperTestSuite) TestConvertCoinNativeIBCVoucher() {
 			suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, sender, coins)
 
 			tc.extra()
-			res, err := suite.app.Erc20Keeper.ConvertCoin(ctx, msg)
+			res, err := suite.app.Erc20Keeper.ConvertCoin(suite.ctx, msg)
 			expRes := &types.MsgConvertCoinResponse{}
 			suite.Commit()
 			balance := suite.BalanceOf(common.HexToAddress(pair.Erc20Address), suite.address)
@@ -1468,8 +1461,7 @@ func (suite *KeeperTestSuite) TestConvertERC20NativeIBCVoucher() {
 				sender,
 			)
 
-			ctx := sdk.WrapSDKContext(suite.ctx)
-			_, err := suite.app.Erc20Keeper.ConvertCoin(ctx, msg)
+			_, err := suite.app.Erc20Keeper.ConvertCoin(suite.ctx, msg)
 			suite.Require().NoError(err, tc.name)
 			suite.Commit()
 			balance := suite.BalanceOf(common.HexToAddress(pair.Erc20Address), suite.address)
@@ -1478,7 +1470,6 @@ func (suite *KeeperTestSuite) TestConvertERC20NativeIBCVoucher() {
 			suite.Require().Equal(balance, big.NewInt(tc.burn))
 
 			// Convert ERC20s back to Coins
-			ctx = sdk.WrapSDKContext(suite.ctx)
 			contractAddr := common.HexToAddress(pair.Erc20Address)
 			msgConvertERC20 := types.NewMsgConvertERC20(
 				sdkmath.NewInt(tc.reconvert),
@@ -1488,7 +1479,7 @@ func (suite *KeeperTestSuite) TestConvertERC20NativeIBCVoucher() {
 			)
 
 			tc.malleate()
-			res, err := suite.app.Erc20Keeper.ConvertERC20(ctx, msgConvertERC20)
+			res, err := suite.app.Erc20Keeper.ConvertERC20(suite.ctx, msgConvertERC20)
 			expRes := &types.MsgConvertERC20Response{}
 			suite.Commit()
 			balance = suite.BalanceOf(contractAddr, suite.address)
