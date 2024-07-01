@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"math/big"
 
+	sdkmath "cosmossdk.io/math"
+	inflationtypes "github.com/Canto-Network/Canto/v7/x/inflation/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/ethereum/go-ethereum/common"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 
@@ -12,6 +15,47 @@ import (
 	"github.com/Canto-Network/Canto/v7/x/erc20/types"
 	"github.com/evmos/ethermint/tests"
 )
+
+const (
+	erc20Name          = "Coin Token"
+	erc20Symbol        = "CTKN"
+	erc20Decimals      = uint8(18)
+	cosmosTokenBase    = "acoin"
+	cosmosTokenDisplay = "coin"
+	cosmosDecimals     = uint8(6)
+	defaultExponent    = uint32(18)
+	zeroExponent       = uint32(0)
+	ibcBase            = "ibc/7F1D3FCF4AE79E1554D670D1AD949A9BA4E4A3C76C63093E17E446A46061A7A2"
+)
+
+func (suite *KeeperTestSuite) setupRegisterCoin() (banktypes.Metadata, *types.TokenPair) {
+	validMetadata := banktypes.Metadata{
+		Description: "description of the token",
+		Base:        cosmosTokenBase,
+		// NOTE: Denom units MUST be increasing
+		DenomUnits: []*banktypes.DenomUnit{
+			{
+				Denom:    cosmosTokenBase,
+				Exponent: 0,
+			},
+			{
+				Denom:    cosmosTokenBase[1:],
+				Exponent: uint32(18),
+			},
+		},
+		Name:    cosmosTokenBase,
+		Symbol:  erc20Symbol,
+		Display: cosmosTokenBase,
+	}
+
+	err := suite.app.BankKeeper.MintCoins(suite.ctx, inflationtypes.ModuleName, sdk.Coins{sdk.NewInt64Coin(validMetadata.Base, 1)})
+	suite.Require().NoError(err)
+
+	pair, err := suite.app.Erc20Keeper.RegisterCoin(suite.ctx, validMetadata)
+	suite.Require().NoError(err)
+	suite.Commit()
+	return validMetadata, pair
+}
 
 // ensureHooksSet tries to set the hooks on EVMKeeper, this will fail if the erc20 hook is already set
 func (suite *KeeperTestSuite) ensureHooksSet() {
@@ -156,12 +200,12 @@ func (suite *KeeperTestSuite) TestEvmHooksRegisteredCoin() {
 			sender := sdk.AccAddress(suite.address.Bytes())
 			contractAddr := common.HexToAddress(pair.Erc20Address)
 
-			coins := sdk.NewCoins(sdk.NewCoin(cosmosTokenBase, sdk.NewInt(tc.mint)))
+			coins := sdk.NewCoins(sdk.NewCoin(cosmosTokenBase, sdkmath.NewInt(tc.mint)))
 			suite.app.BankKeeper.MintCoins(suite.ctx, types.ModuleName, coins)
 			suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, sender, coins)
 
 			convertCoin := types.NewMsgConvertCoin(
-				sdk.NewCoin(cosmosTokenBase, sdk.NewInt(tc.burn)),
+				sdk.NewCoin(cosmosTokenBase, sdkmath.NewInt(tc.burn)),
 				suite.address,
 				sender,
 			)
@@ -173,7 +217,7 @@ func (suite *KeeperTestSuite) TestEvmHooksRegisteredCoin() {
 
 			balance := suite.BalanceOf(common.HexToAddress(pair.Erc20Address), suite.address)
 			cosmosBalance := suite.app.BankKeeper.GetBalance(suite.ctx, sender, metadata.Base)
-			suite.Require().Equal(cosmosBalance.Amount.Int64(), sdk.NewInt(tc.mint-tc.burn).Int64())
+			suite.Require().Equal(cosmosBalance.Amount.Int64(), sdkmath.NewInt(tc.mint-tc.burn).Int64())
 			suite.Require().Equal(balance, big.NewInt(tc.burn))
 
 			// Burn the 10 tokens of suite.address (owner)
@@ -185,11 +229,11 @@ func (suite *KeeperTestSuite) TestEvmHooksRegisteredCoin() {
 			if tc.result {
 				// Check if the execution was successful
 				suite.Require().NoError(err)
-				suite.Require().Equal(cosmosBalance.Amount, sdk.NewInt(tc.mint-tc.burn+tc.reconvert))
+				suite.Require().Equal(cosmosBalance.Amount, sdkmath.NewInt(tc.mint-tc.burn+tc.reconvert))
 			} else {
 				// Check that no changes were made to the account
 				suite.Require().Error(err)
-				suite.Require().Equal(cosmosBalance.Amount, sdk.NewInt(tc.mint-tc.burn))
+				suite.Require().Equal(cosmosBalance.Amount, sdkmath.NewInt(tc.mint-tc.burn))
 			}
 		})
 	}

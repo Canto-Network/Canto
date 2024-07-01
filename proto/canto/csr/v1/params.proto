@@ -2,6 +2,7 @@ syntax = "proto3";
 package canto.csr.v1;
 
 import "gogoproto/gogo.proto";
+import "cosmos_proto/cosmos.proto";
 
 option go_package = "github.com/Canto-Network/Canto/v7/x/csr/types";
 
@@ -12,7 +13,8 @@ message Params {
   // decimal to determine the transaction fee split between network operators
   // (validators) and CSR
   string csr_shares = 2 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable) = false
   ];
 }

@@ -8,8 +8,15 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+	protov2 "google.golang.org/protobuf/proto"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/Canto-Network/Canto/v7/app"
+	abci "github.com/cometbft/cometbft/abci/types"
+	"github.com/cometbft/cometbft/crypto/tmhash"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	tmversion "github.com/cometbft/cometbft/proto/tendermint/version"
+	"github.com/cometbft/cometbft/version"
 	client "github.com/cosmos/cosmos-sdk/client"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -19,11 +26,6 @@ import (
 	"github.com/evmos/ethermint/encoding"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
-	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/crypto/tmhash"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
-	tmversion "github.com/tendermint/tendermint/proto/tendermint/version"
-	"github.com/tendermint/tendermint/version"
 )
 
 var s *AnteTestSuite
@@ -43,7 +45,7 @@ func (suite *AnteTestSuite) SetupTest(isCheckTx bool) {
 	consAddress := sdk.ConsAddress(privCons.PubKey().Address())
 
 	suite.app = app.Setup(isCheckTx, feemarkettypes.DefaultGenesisState())
-	suite.ctx = suite.app.BaseApp.NewContext(isCheckTx, tmproto.Header{
+	suite.ctx = suite.app.BaseApp.NewContextLegacy(isCheckTx, tmproto.Header{
 		Height:          1,
 		ChainID:         "canto_9001-1",
 		Time:            time.Now().UTC(),
@@ -87,21 +89,24 @@ func (suite *AnteTestSuite) Commit() {
 // Commit commits a block at a given time.
 func (suite *AnteTestSuite) CommitAfter(t time.Duration) {
 	header := suite.ctx.BlockHeader()
-	suite.app.EndBlock(abci.RequestEndBlock{Height: header.Height})
-	_ = suite.app.Commit()
+	suite.app.FinalizeBlock(&abci.RequestFinalizeBlock{
+		Height: header.Height,
+	})
+	suite.app.Commit()
 
 	header.Height += 1
 	header.Time = header.Time.Add(t)
-	suite.app.BeginBlock(abci.RequestBeginBlock{
-		Header: header,
+	suite.app.FinalizeBlock(&abci.RequestFinalizeBlock{
+		Height: header.Height,
+		Time:   header.Time,
 	})
 
 	// update ctx
-	suite.ctx = suite.app.BaseApp.NewContext(false, header)
+	suite.ctx = suite.app.BaseApp.NewContextLegacy(false, header)
 }
 
-func (s *AnteTestSuite) CreateTestTxBuilder(gasPrice sdk.Int, denom string, msgs ...sdk.Msg) client.TxBuilder {
-	encodingConfig := encoding.MakeConfig(app.ModuleBasics)
+func (s *AnteTestSuite) CreateTestTxBuilder(gasPrice sdkmath.Int, denom string, msgs ...sdk.Msg) client.TxBuilder {
+	encodingConfig := encoding.MakeTestEncodingConfig()
 	gasLimit := uint64(1000000)
 
 	txBuilder := encodingConfig.TxConfig.NewTxBuilder()
@@ -115,7 +120,7 @@ func (s *AnteTestSuite) CreateTestTxBuilder(gasPrice sdk.Int, denom string, msgs
 }
 
 func (s *AnteTestSuite) CreateEthTestTxBuilder(msgEthereumTx *evmtypes.MsgEthereumTx) client.TxBuilder {
-	encodingConfig := encoding.MakeConfig(app.ModuleBasics)
+	encodingConfig := encoding.MakeTestEncodingConfig()
 	option, err := codectypes.NewAnyWithValue(&evmtypes.ExtensionOptionsEthereumTx{})
 	s.Require().NoError(err)
 
@@ -130,7 +135,7 @@ func (s *AnteTestSuite) CreateEthTestTxBuilder(msgEthereumTx *evmtypes.MsgEthere
 	txData, err := evmtypes.UnpackTxData(msgEthereumTx.Data)
 	s.Require().NoError(err)
 
-	fees := sdk.Coins{{Denom: s.denom, Amount: sdk.NewIntFromBigInt(txData.Fee())}}
+	fees := sdk.Coins{{Denom: s.denom, Amount: sdkmath.NewIntFromBigInt(txData.Fee())}}
 	builder.SetFeeAmount(fees)
 	builder.SetGasLimit(msgEthereumTx.GetGas())
 
@@ -172,5 +177,5 @@ var _ sdk.Tx = &invalidTx{}
 
 type invalidTx struct{}
 
-func (invalidTx) GetMsgs() []sdk.Msg   { return []sdk.Msg{nil} }
-func (invalidTx) ValidateBasic() error { return nil }
+func (invalidTx) GetMsgs() []sdk.Msg                    { return []sdk.Msg{nil} }
+func (invalidTx) GetMsgsV2() ([]protov2.Message, error) { return nil, nil }

@@ -9,30 +9,33 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/Canto-Network/Canto/v7/app"
 	"github.com/Canto-Network/Canto/v7/contracts"
 	"github.com/Canto-Network/Canto/v7/x/csr/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+	cosmosed25519 "github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/evmos/ethermint/crypto/ethsecp256k1"
-	"github.com/evmos/ethermint/encoding"
 	"github.com/evmos/ethermint/tests"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
+	abci "github.com/cometbft/cometbft/abci/types"
+	"github.com/cometbft/cometbft/crypto/ed25519"
+	"github.com/cometbft/cometbft/crypto/tmhash"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	tmversion "github.com/cometbft/cometbft/proto/tendermint/version"
+	"github.com/cometbft/cometbft/version"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/crypto/ed25519"
-	"github.com/tendermint/tendermint/crypto/tmhash"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
-	tmversion "github.com/tendermint/tendermint/proto/tendermint/version"
-	"github.com/tendermint/tendermint/version"
 )
 
 type KeeperTestSuite struct {
@@ -82,10 +85,10 @@ func (suite *KeeperTestSuite) SetupApp() {
 	suite.denom = "acanto"
 
 	// consensus key
-	privCons, err := ethsecp256k1.GenerateKey()
+	pubKey := cosmosed25519.GenPrivKey().PubKey()
 	require.NoError(t, err)
-	suite.consAddress = sdk.ConsAddress(privCons.PubKey().Address())
-	suite.ctx = suite.app.BaseApp.NewContext(false, tmproto.Header{
+	suite.consAddress = sdk.ConsAddress(pubKey.Address())
+	suite.ctx = suite.app.BaseApp.NewContextLegacy(false, tmproto.Header{
 		Height:          1,
 		ChainID:         "canto_9001-1",
 		Time:            time.Now().UTC(),
@@ -130,22 +133,23 @@ func (suite *KeeperTestSuite) SetupApp() {
 	evmParams.EvmDenom = suite.denom
 	suite.app.EvmKeeper.SetParams(suite.ctx, evmParams)
 
-	stakingParams := suite.app.StakingKeeper.GetParams(suite.ctx)
+	stakingParams, err := suite.app.StakingKeeper.GetParams(suite.ctx)
+	require.NoError(t, err)
 	stakingParams.BondDenom = suite.denom
 	suite.app.StakingKeeper.SetParams(suite.ctx, stakingParams)
 
 	// Set Validator
 	valAddr := sdk.ValAddress(suite.address.Bytes())
-	validator, err := stakingtypes.NewValidator(valAddr, privCons.PubKey(), stakingtypes.Description{})
+	validator, err := stakingtypes.NewValidator(valAddr.String(), pubKey, stakingtypes.Description{})
 	require.NoError(t, err)
 
 	validator = stakingkeeper.TestingUpdateValidator(suite.app.StakingKeeper, suite.ctx, validator, true)
-	suite.app.StakingKeeper.AfterValidatorCreated(suite.ctx, validator.GetOperator())
+	valbz, err := s.app.StakingKeeper.ValidatorAddressCodec().StringToBytes(validator.GetOperator())
+	s.NoError(err)
+	suite.app.StakingKeeper.Hooks().AfterValidatorCreated(suite.ctx, valbz)
 	err = suite.app.StakingKeeper.SetValidatorByConsAddr(suite.ctx, validator)
 	require.NoError(t, err)
-
-	validators := s.app.StakingKeeper.GetValidators(s.ctx, 1)
-	suite.validator = validators[0]
+	suite.validator = validator
 
 	suite.ethSigner = ethtypes.LatestSignerForChainID(s.app.EvmKeeper.ChainID())
 }
@@ -157,17 +161,25 @@ func (suite *KeeperTestSuite) Commit() {
 
 // Commit commits a block at a given time.
 func (suite *KeeperTestSuite) CommitAfter(t time.Duration) {
-	_ = suite.app.Commit()
 	header := suite.ctx.BlockHeader()
+	suite.app.FinalizeBlock(&abci.RequestFinalizeBlock{
+		Height:          header.Height,
+		Time:            header.Time,
+		ProposerAddress: header.ProposerAddress,
+	})
+
+	suite.app.Commit()
 
 	header.Height += 1
 	header.Time = header.Time.Add(t)
-	suite.app.BeginBlock(abci.RequestBeginBlock{
-		Header: header,
+	suite.app.FinalizeBlock(&abci.RequestFinalizeBlock{
+		Height:          header.Height,
+		Time:            header.Time,
+		ProposerAddress: header.ProposerAddress,
 	})
 
 	// update ctx
-	suite.ctx = suite.app.BaseApp.NewContext(false, header)
+	suite.ctx = suite.app.BaseApp.NewContextLegacy(false, header)
 
 	queryHelper := baseapp.NewQueryServerTestHelper(suite.ctx, suite.app.InterfaceRegistry())
 	evmtypes.RegisterQueryServer(queryHelper, suite.app.EvmKeeper)
@@ -221,9 +233,9 @@ func GenerateEventData(name string, contract evmtypes.CompiledContract, args ...
 
 // Helper function that will calculate how much revenue a NFT or the Turnstile should accumulate
 // Calculation is done by the following: int(gasUsed * gasPrice * csrShares)
-func CalculateExpectedFee(gasUsed uint64, gasPrice *big.Int, csrShare sdk.Dec) sdk.Int {
-	fee := sdk.NewIntFromUint64(gasUsed).Mul(sdk.NewIntFromBigInt(gasPrice))
-	expectedTurnstileBalance := sdk.NewDecFromInt(fee).Mul(csrShare).TruncateInt()
+func CalculateExpectedFee(gasUsed uint64, gasPrice *big.Int, csrShare sdkmath.LegacyDec) sdkmath.Int {
+	fee := sdkmath.NewIntFromUint64(gasUsed).Mul(sdkmath.NewIntFromBigInt(gasPrice))
+	expectedTurnstileBalance := sdkmath.LegacyNewDecFromInt(fee).Mul(csrShare).TruncateInt()
 	return expectedTurnstileBalance
 }
 
@@ -252,10 +264,10 @@ func EVMTX(
 	gasTipCap *big.Int,
 	data []byte,
 	accesses *ethtypes.AccessList,
-) abci.ResponseDeliverTx {
+) (*abci.ResponseFinalizeBlock, error) {
 	msgEthereumTx := BuildEthTx(priv, to, amount, gasLimit, gasPrice, gasFeeCap, gasTipCap, data, accesses)
-	res := DeliverEthTx(priv, msgEthereumTx)
-	return res
+	result, err := FinalizeEthBlock(priv, msgEthereumTx)
+	return result, err
 }
 
 // Helper function that creates an ethereum transaction
@@ -290,27 +302,43 @@ func BuildEthTx(
 	return msgEthereumTx
 }
 
-func DeliverEthTx(priv *ethsecp256k1.PrivKey, msgEthereumTx *evmtypes.MsgEthereumTx) abci.ResponseDeliverTx {
+func FinalizeEthBlock(priv *ethsecp256k1.PrivKey, msgEthereumTx *evmtypes.MsgEthereumTx) (*abci.ResponseFinalizeBlock, error) {
 	bz := PrepareEthTx(priv, msgEthereumTx)
-	req := abci.RequestDeliverTx{Tx: bz}
-	res := s.app.BaseApp.DeliverTx(req)
-	return res
+	res, err := s.app.BaseApp.FinalizeBlock(&abci.RequestFinalizeBlock{
+		Height:          s.app.LastBlockHeight() + 1,
+		Txs:             [][]byte{bz},
+		ProposerAddress: s.ctx.BlockHeader().ProposerAddress,
+	})
+	return res, err
 }
 
 func PrepareEthTx(priv *ethsecp256k1.PrivKey, msgEthereumTx *evmtypes.MsgEthereumTx) []byte {
-	// Sign transaction
-	err := msgEthereumTx.Sign(s.ethSigner, tests.NewSigner(priv))
+	txConfig := s.app.TxConfig()
+	option, err := codectypes.NewAnyWithValue(&evmtypes.ExtensionOptionsEthereumTx{})
 	s.Require().NoError(err)
 
-	// Assemble transaction from fields
-	encodingConfig := encoding.MakeConfig(app.ModuleBasics)
-	txBuilder := encodingConfig.TxConfig.NewTxBuilder()
-	tx, err := msgEthereumTx.BuildTx(txBuilder, s.app.EvmKeeper.GetParams(s.ctx).EvmDenom)
+	txBuilder := txConfig.NewTxBuilder()
+	builder, ok := txBuilder.(authtx.ExtensionOptionsTxBuilder)
+	s.Require().True(ok)
+	builder.SetExtensionOptions(option)
+
+	err = msgEthereumTx.Sign(s.ethSigner, tests.NewSigner(priv))
 	s.Require().NoError(err)
 
-	// Encode transaction by default Tx encoder and broadcasted over the network
-	txEncoder := encodingConfig.TxConfig.TxEncoder()
-	bz, err := txEncoder(tx)
+	msgEthereumTx.From = ""
+	err = txBuilder.SetMsgs(msgEthereumTx)
+	s.Require().NoError(err)
+
+	txData, err := evmtypes.UnpackTxData(msgEthereumTx.Data)
+	s.Require().NoError(err)
+
+	evmDenom := s.app.EvmKeeper.GetParams(s.ctx).EvmDenom
+	fees := sdk.Coins{{Denom: evmDenom, Amount: sdkmath.NewIntFromBigInt(txData.Fee())}}
+	builder.SetFeeAmount(fees)
+	builder.SetGasLimit(msgEthereumTx.GetGas())
+
+	// bz are bytes to be broadcasted over the network
+	bz, err := txConfig.TxEncoder()(txBuilder.GetTx())
 	s.Require().NoError(err)
 
 	return bz

@@ -3,11 +3,11 @@ package keeper_test
 import (
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkmath "cosmossdk.io/math"
 )
 
 func (suite *KeeperTestSuite) TestSetGetEpochMintProvision() {
-	expEpochMintProvision := sdk.NewDec(1_000_000)
+	expEpochMintProvision := sdkmath.LegacyNewDec(1_000_000)
 
 	testCases := []struct {
 		name     string
@@ -28,7 +28,7 @@ func (suite *KeeperTestSuite) TestSetGetEpochMintProvision() {
 		},
 	}
 
-	genesisProvision := sdk.MustNewDecFromStr("543478266666666666666667.000000000000000000")
+	genesisProvision := sdkmath.LegacyMustNewDecFromStr("543478266666666666666667.000000000000000000")
 
 	for _, tc := range testCases {
 		suite.Run(fmt.Sprintf("Case %s", tc.name), func() {

@@ -5,12 +5,12 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	transfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
-	channeltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
-	"github.com/cosmos/ibc-go/v3/modules/core/exported"
+	transfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
+	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
+	"github.com/cosmos/ibc-go/v8/modules/core/exported"
 
 	"github.com/ethereum/go-ethereum/common"
 
@@ -56,25 +56,28 @@ func (k Keeper) OnRecvPacket(
 	// Get recipient addresses in `canto1` and the original bech32 format
 	_, recipient, senderBech32, recipientBech32, err := ibc.GetTransferSenderRecipient(packet)
 	if err != nil {
-		return channeltypes.NewErrorAcknowledgement(err.Error())
+		return channeltypes.NewErrorAcknowledgement(err)
 	}
 
 	//get the recipient account
 	account := k.accountKeeper.GetAccount(ctx, recipient)
 
 	// onboarding is not supported for module accounts
-	if _, isModuleAccount := account.(authtypes.ModuleAccountI); isModuleAccount {
+	if _, isModuleAccount := account.(sdk.ModuleAccountI); isModuleAccount {
 		return ack
 	}
 
-	standardDenom := k.coinswapKeeper.GetStandardDenom(ctx)
+	standardDenom, err := k.coinswapKeeper.GetStandardDenom(ctx)
+	if err != nil {
+		return ack
+	}
 
 	var data transfertypes.FungibleTokenPacketData
 	if err = transfertypes.ModuleCdc.UnmarshalJSON(packet.GetData(), &data); err != nil {
 		// NOTE: shouldn't happen as the packet has already
 		// been decoded on ICS20 transfer logic
 		err = errorsmod.Wrapf(types.ErrInvalidType, "cannot unmarshal ICS-20 transfer packet data")
-		return channeltypes.NewErrorAcknowledgement(err.Error())
+		return channeltypes.NewErrorAcknowledgement(err)
 	}
 
 	// parse the transferred denom
@@ -87,12 +90,12 @@ func (k Keeper) OnRecvPacket(
 	autoSwapThreshold := k.GetParams(ctx).AutoSwapThreshold
 	swapCoins := sdk.NewCoin(standardDenom, autoSwapThreshold)
 	standardCoinBalance := k.bankKeeper.SpendableCoins(ctx, recipient).AmountOf(standardDenom)
-	swappedAmount := sdk.ZeroInt()
+	swappedAmount := sdkmath.ZeroInt()
 
 	if standardCoinBalance.LT(autoSwapThreshold) {
 		swappedAmount, err = k.coinswapKeeper.TradeInputForExactOutput(ctx, coinswaptypes.Input{Coin: transferredCoin, Address: recipient.String()}, coinswaptypes.Output{Coin: swapCoins, Address: recipient.String()})
 		if err != nil {
-			swappedAmount = sdk.ZeroInt()
+			swappedAmount = sdkmath.ZeroInt()
 			logger.Error("failed to swap coins", "error", err)
 		} else {
 			ctx.EventManager().EmitEvent(

@@ -6,16 +6,16 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	"github.com/evmos/ethermint/crypto/ethsecp256k1"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
-	abci "github.com/tendermint/tendermint/abci/types"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	abci "github.com/cometbft/cometbft/abci/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	chain "github.com/Canto-Network/Canto/v7/app"
 	v7 "github.com/Canto-Network/Canto/v7/app/upgrades/v7"
@@ -31,7 +31,6 @@ type UpgradeTestSuite struct {
 }
 
 func (s *UpgradeTestSuite) SetupTest() {
-
 	// consensus key
 	priv, err := ethsecp256k1.GenerateKey()
 	s.Require().NoError(err)
@@ -39,7 +38,7 @@ func (s *UpgradeTestSuite) SetupTest() {
 
 	s.app = chain.Setup(false, feemarkettypes.DefaultGenesisState())
 
-	s.ctx = s.app.BaseApp.NewContext(false, tmproto.Header{
+	s.ctx = s.app.BaseApp.NewContextLegacy(false, tmproto.Header{
 		ChainID:         "canto_9001-1",
 		Height:          1,
 		Time:            time.Date(2023, 5, 9, 8, 0, 0, 0, time.UTC),
@@ -48,13 +47,14 @@ func (s *UpgradeTestSuite) SetupTest() {
 
 	// Set Validator
 	valAddr := sdk.ValAddress(s.consAddress.Bytes())
-	validator, err := stakingtypes.NewValidator(valAddr, priv.PubKey(), stakingtypes.Description{})
-	s.NoError(err)
+	validator, err := stakingtypes.NewValidator(valAddr.String(), priv.PubKey(), stakingtypes.Description{})
+	s.Require().NoError(err)
 	validator = stakingkeeper.TestingUpdateValidator(s.app.StakingKeeper, s.ctx, validator, true)
-	s.app.StakingKeeper.AfterValidatorCreated(s.ctx, validator.GetOperator())
+	valbz, err := s.app.StakingKeeper.ValidatorAddressCodec().StringToBytes(validator.GetOperator())
+	s.Require().NoError(err)
+	s.app.StakingKeeper.Hooks().AfterValidatorCreated(s.ctx, valbz)
 	err = s.app.StakingKeeper.SetValidatorByConsAddr(s.ctx, validator)
-	s.NoError(err)
-
+	s.Require().NoError(err)
 }
 
 func TestKeeperTestSuite(t *testing.T) {
@@ -75,22 +75,15 @@ func (s *UpgradeTestSuite) TestUpgradeV7() {
 			func() {},
 			func() {
 				coinswapParams := s.app.CoinswapKeeper.GetParams(s.ctx)
-				s.Require().EqualValues(
-					coinswapParams.PoolCreationFee, coinswaptypes.DefaultPoolCreationFee)
-				s.Require().EqualValues(
-					coinswapParams.MaxSwapAmount, coinswaptypes.DefaultMaxSwapAmount)
-				s.Require().EqualValues(
-					coinswapParams.MaxStandardCoinPerPool, coinswaptypes.DefaultMaxStandardCoinPerPool)
-				s.Require().EqualValues(
-					coinswapParams.Fee, coinswaptypes.DefaultFee)
-				s.Require().EqualValues(
-					coinswapParams.TaxRate, coinswaptypes.DefaultTaxRate)
+				s.Require().Equal(coinswapParams.PoolCreationFee, coinswaptypes.DefaultPoolCreationFee)
+				s.Require().Equal(coinswapParams.MaxSwapAmount, coinswaptypes.DefaultMaxSwapAmount)
+				s.Require().Equal(coinswapParams.MaxStandardCoinPerPool, coinswaptypes.DefaultMaxStandardCoinPerPool)
+				s.Require().Equal(coinswapParams.Fee, coinswaptypes.DefaultFee)
+				s.Require().Equal(coinswapParams.TaxRate, coinswaptypes.DefaultTaxRate)
 
 				onboardingParams := s.app.OnboardingKeeper.GetParams(s.ctx)
-				s.Require().EqualValues(
-					onboardingParams.AutoSwapThreshold, onboardingtypes.DefaultAutoSwapThreshold)
-				s.Require().EqualValues(
-					onboardingParams.WhitelistedChannels, onboardingtypes.DefaultWhitelistedChannels)
+				s.Require().Equal(onboardingParams.AutoSwapThreshold, onboardingtypes.DefaultAutoSwapThreshold)
+				s.Require().Equal(onboardingParams.WhitelistedChannels, onboardingtypes.DefaultWhitelistedChannels)
 			},
 			true,
 		},
@@ -99,23 +92,52 @@ func (s *UpgradeTestSuite) TestUpgradeV7() {
 	for _, tc := range testCases {
 		s.Run(tc.title, func() {
 			s.SetupTest()
-
 			tc.before()
 
-			s.ctx = s.ctx.WithBlockHeight(testUpgradeHeight - 1)
+			// proceed with the block until the test upgrade height
+			for s.ctx.BlockHeight() < testUpgradeHeight {
+				err := s.Commit()
+				s.Require().NoError(err)
+			}
+
+			// simulate binary upgrade
 			plan := upgradetypes.Plan{Name: v7.UpgradeName, Height: testUpgradeHeight}
 			err := s.app.UpgradeKeeper.ScheduleUpgrade(s.ctx, plan)
 			s.Require().NoError(err)
-			_, exists := s.app.UpgradeKeeper.GetUpgradePlan(s.ctx)
-			s.Require().True(exists)
+			_, err = s.app.UpgradeKeeper.GetUpgradePlan(s.ctx)
+			s.Require().NoError(err)
 
-			s.ctx = s.ctx.WithBlockHeight(testUpgradeHeight)
-			s.Require().NotPanics(func() {
-				s.ctx.WithProposer(s.consAddress)
-				s.app.BeginBlocker(s.ctx, abci.RequestBeginBlock{})
-			})
+			// execute upgrade handler
+			err = s.Commit()
+			s.Require().NoError(err)
 
 			tc.after()
 		})
 	}
+}
+
+func (s *UpgradeTestSuite) Commit() error {
+	header := s.ctx.BlockHeader()
+	if _, err := s.app.FinalizeBlock(&abci.RequestFinalizeBlock{
+		Height: header.Height,
+	}); err != nil {
+		return err
+	}
+
+	if _, err := s.app.Commit(); err != nil {
+		return err
+	}
+
+	header.Height += 1
+	if _, err := s.app.FinalizeBlock(&abci.RequestFinalizeBlock{
+		Height: header.Height,
+		Time:   header.Time,
+	}); err != nil {
+		return err
+	}
+
+	// update ctx
+	s.ctx = s.app.BaseApp.NewContextLegacy(false, header)
+
+	return nil
 }

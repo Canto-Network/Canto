@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkmath "cosmossdk.io/math"
 )
 
 func TestParamsMisc(t *testing.T) {
@@ -28,7 +28,7 @@ func TestParamsValidate(t *testing.T) {
 		},
 		{
 			"custom params",
-			NewParams(true, sdk.NewInt(10000), []string{"channel-0"}),
+			NewParams(true, sdkmath.NewInt(10000), []string{"channel-0"}),
 			false,
 		},
 	}

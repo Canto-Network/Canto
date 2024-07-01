@@ -7,8 +7,8 @@ import (
 
 // GetPeriod gets current period
 func (k Keeper) GetPeriod(ctx sdk.Context) uint64 {
-	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(types.KeyPrefixPeriod)
+	store := k.storeService.OpenKVStore(ctx)
+	bz, _ := store.Get(types.KeyPrefixPeriod)
 	if len(bz) == 0 {
 		return 0
 	}
@@ -18,6 +18,6 @@ func (k Keeper) GetPeriod(ctx sdk.Context) uint64 {
 
 // SetPeriod stores the current period
 func (k Keeper) SetPeriod(ctx sdk.Context, period uint64) {
-	store := ctx.KVStore(k.storeKey)
+	store := k.storeService.OpenKVStore(ctx)
 	store.Set(types.KeyPrefixPeriod, sdk.Uint64ToBigEndian(period))
 }

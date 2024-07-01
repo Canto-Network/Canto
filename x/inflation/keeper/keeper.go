@@ -1,38 +1,42 @@
 package keeper
 
 import (
+	"cosmossdk.io/core/store"
+	"cosmossdk.io/log"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
-
-	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/Canto-Network/Canto/v7/x/inflation/types"
 )
 
 // Keeper of the inflation store
 type Keeper struct {
-	storeKey   sdk.StoreKey
-	cdc        codec.BinaryCodec
-	paramstore paramtypes.Subspace
+	storeService store.KVStoreService
+	cdc          codec.BinaryCodec
+	paramstore   paramtypes.Subspace
 
 	accountKeeper    types.AccountKeeper
 	bankKeeper       types.BankKeeper
-	distrKeeper      types.DistrKeeper
+	distrKeeper      distrkeeper.Keeper
 	stakingKeeper    types.StakingKeeper
 	feeCollectorName string
+
+	authority string
 }
 
 // NewKeeper creates a new mint Keeper instance
 func NewKeeper(
-	storeKey sdk.StoreKey,
+	storeService store.KVStoreService,
 	cdc codec.BinaryCodec,
 	ps paramtypes.Subspace,
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
-	dk types.DistrKeeper,
+	dk distrkeeper.Keeper,
 	sk types.StakingKeeper,
 	feeCollectorName string,
+	authority string,
 ) Keeper {
 	// ensure mint module account is set
 	if addr := ak.GetModuleAddress(types.ModuleName); addr == nil {
@@ -45,7 +49,7 @@ func NewKeeper(
 	}
 
 	return Keeper{
-		storeKey:         storeKey,
+		storeService:     storeService,
 		cdc:              cdc,
 		paramstore:       ps,
 		accountKeeper:    ak,
@@ -53,7 +57,13 @@ func NewKeeper(
 		distrKeeper:      dk,
 		stakingKeeper:    sk,
 		feeCollectorName: feeCollectorName,
+		authority:        authority,
 	}
+}
+
+// GetAuthority returns the x/inflation module's authority.
+func (k Keeper) GetAuthority() string {
+	return k.authority
 }
 
 // Logger returns a module-specific logger.
@@ -62,5 +72,6 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 }
 
 func (k Keeper) GetComPool(ctx sdk.Context) sdk.DecCoins {
-	return k.distrKeeper.GetFeePoolCommunityCoins(ctx)
+	feePool, _ := k.distrKeeper.FeePool.Get(ctx)
+	return feePool.CommunityPool
 }

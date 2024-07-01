@@ -11,9 +11,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/gov/client/cli"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	errorsmod "cosmossdk.io/errors"
 
 	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
 )
@@ -22,16 +22,11 @@ var (
 	DefaultRelativePacketTimeoutTimestamp = uint64((time.Duration(10) * time.Minute).Nanoseconds())
 )
 
-const (
-	flagPacketTimeoutTimestamp = "packet-timeout-timestamp"
-	listSeparator              = ","
-)
-
-// NewTxCmd returns a root CLI command handler for certain modules/erc20 transaction commands.
+// NewTxCmd returns a root CLI command handler for certain modules/govshuttle transaction commands.
 func NewTxCmd() *cobra.Command {
 	txCmd := &cobra.Command{
 		Use:                        types.ModuleName,
-		Short:                      "erc20 subcommands",
+		Short:                      "govshuttle subcommands",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
@@ -90,7 +85,7 @@ Where metadata.json contains (example):
 
 			propMetaData, err := ParseLendingMarketMetadata(clientCtx.Codec, args[0])
 			if err != nil {
-				return sdkerrors.Wrap(err, "Failure to parse JSON object")
+				return errorsmod.Wrap(err, "Failure to parse JSON object")
 			}
 
 			from := clientCtx.GetFromAddress()
@@ -102,9 +97,9 @@ Where metadata.json contains (example):
 				return err
 			}
 
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
+			//if err := msg.ValidateBasic(); err != nil {
+			//	return err
+			//}
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
@@ -173,7 +168,7 @@ Where metadata.json contains (example):
 
 			propMetaData, err := ParseTreasuryMetadata(clientCtx.Codec, args[0])
 			if err != nil {
-				return sdkerrors.Wrap(err, "Failure to parse JSON object")
+				return errorsmod.Wrap(err, "Failure to parse JSON object")
 			}
 
 			from := clientCtx.GetFromAddress()
@@ -185,9 +180,9 @@ Where metadata.json contains (example):
 				return err
 			}
 
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
+			//if err := msg.ValidateBasic(); err != nil {
+			//	return err
+			//}
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},

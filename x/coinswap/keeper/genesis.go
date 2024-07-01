@@ -28,15 +28,15 @@ func (k Keeper) InitGenesis(ctx sdk.Context, genState types.GenesisState) {
 
 // ExportGenesis returns the coinswap module's genesis state.
 func (k Keeper) ExportGenesis(ctx sdk.Context) types.GenesisState {
-
 	params := k.GetParams(ctx)
 	//init to prevent nil slice for MaxSwapAmount in params
 	if params.MaxSwapAmount == nil || len(params.MaxSwapAmount) == 0 {
 		params.MaxSwapAmount = sdk.Coins{}
 	}
+	standardDenom, _ := k.GetStandardDenom(ctx)
 	return types.GenesisState{
 		Params:        params,
-		StandardDenom: k.GetStandardDenom(ctx),
+		StandardDenom: standardDenom,
 		Pool:          k.GetAllPools(ctx),
 		Sequence:      k.getSequence(ctx),
 	}

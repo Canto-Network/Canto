@@ -1,8 +1,8 @@
 package types
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	errorsmod "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	ethermint "github.com/evmos/ethermint/types"
 )
 
@@ -12,7 +12,7 @@ func NewCSR(contracts []string, id uint64) CSR {
 		Contracts: contracts,
 		Id:        id,
 		Txs:       0,
-		Revenue:   sdk.Int(sdk.ZeroUint()),
+		Revenue:   sdkmath.Int(sdkmath.ZeroUint()),
 	}
 }
 
@@ -23,11 +23,11 @@ func (csr CSR) Validate() error {
 	seenSmartContracts := make(map[string]bool)
 	for _, smartContract := range csr.Contracts {
 		if err := ethermint.ValidateNonZeroAddress(smartContract); err != nil {
-			return sdkerrors.Wrapf(ErrInvalidSmartContractAddress, "CSR::Validate one or more of the entered smart contract address are invalid: %s", smartContract)
+			return errorsmod.Wrapf(ErrInvalidSmartContractAddress, "CSR::Validate one or more of the entered smart contract address are invalid: %s", smartContract)
 		}
 
 		if seenSmartContracts[smartContract] {
-			return sdkerrors.Wrapf(ErrDuplicateSmartContracts, "CSR::Validate there are duplicate smart contracts in this CSR: %s", smartContract)
+			return errorsmod.Wrapf(ErrDuplicateSmartContracts, "CSR::Validate there are duplicate smart contracts in this CSR: %s", smartContract)
 		}
 		seenSmartContracts[smartContract] = true
 	}
@@ -35,7 +35,7 @@ func (csr CSR) Validate() error {
 	// Ensure that there is at least one smart contract in the CSR Pool
 	numSmartContracts := len(csr.Contracts)
 	if numSmartContracts < 1 {
-		return sdkerrors.Wrapf(ErrSmartContractSupply, "CSR::Validate # of smart contracts must be greater than 0 got: %d", numSmartContracts)
+		return errorsmod.Wrapf(ErrSmartContractSupply, "CSR::Validate # of smart contracts must be greater than 0 got: %d", numSmartContracts)
 	}
 	return nil
 }

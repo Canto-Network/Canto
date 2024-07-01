@@ -3,6 +3,7 @@ package canto.erc20.v1;
 
 import "gogoproto/gogo.proto";
 import "cosmos/bank/v1beta1/bank.proto";
+
 option go_package = "github.com/Canto-Network/Canto/v7/x/erc20/types";
 
 // Owner enumerates the ownership of a ERC20 contract.
@@ -33,7 +34,9 @@ message TokenPair {
 // RegisterCoinProposal is a gov Content type to register a token pair for a
 // native Cosmos coin.
 message RegisterCoinProposal {
+  option deprecated = true;
   option (gogoproto.equal) = false;
+
   // title of the proposal
   string title = 1;
   // proposal description
@@ -45,6 +48,7 @@ message RegisterCoinProposal {
 // RegisterERC20Proposal is a gov Content type to register a token pair for an
 // ERC20 token
 message RegisterERC20Proposal {
+  option deprecated = true;
   option (gogoproto.equal) = false;
   // title of the proposa  string title = 1;
   string title = 1;
@@ -57,9 +61,10 @@ message RegisterERC20Proposal {
 // ToggleTokenConversionProposal is a gov Content type to toggle the conversion
 // of a token pair.
 message ToggleTokenConversionProposal {
-  option (gogoproto.equal) = true;
+  option deprecated = true;
+  option (gogoproto.equal) = false;
   // title of the proposal
-  string Title = 1;
+  string title = 1;
   // proposal description
   string description = 2;
   // token identifier can be either the hex contract address of the ERC20 or the
