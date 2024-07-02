@@ -92,14 +92,6 @@ func (m msgServer) RemoveLiquidity(goCtx context.Context, msg *types.MsgRemoveLi
 		return nil, err
 	}
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
-		),
-	)
-
 	var coins = make([]*sdk.Coin, 0, withdrawCoins.Len())
 	for _, coin := range withdrawCoins {
 		coins = append(coins, &coin)
@@ -141,13 +133,6 @@ func (m msgServer) SwapCoin(goCtx context.Context, msg *types.MsgSwapOrder) (*ty
 		return nil, err
 	}
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Input.Address),
-		),
-	)
 	return &types.MsgSwapCoinResponse{}, nil
 }
 
