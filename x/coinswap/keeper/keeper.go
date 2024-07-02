@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	gogotypes "github.com/gogo/protobuf/types"
+	gogoprototypes "github.com/cosmos/gogoproto/types"
 
 	"cosmossdk.io/core/store"
 	errorsmod "cosmossdk.io/errors"
@@ -352,7 +352,7 @@ func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
 // SetStandardDenom sets the standard denom for the coinswap module.
 func (k Keeper) SetStandardDenom(ctx sdk.Context, denom string) error {
 	store := k.storeService.OpenKVStore(ctx)
-	denomWrap := gogotypes.StringValue{Value: denom}
+	denomWrap := gogoprototypes.StringValue{Value: denom}
 	bz := k.cdc.MustMarshal(&denomWrap)
 	err := store.Set(types.KeyStandardDenom, bz)
 	if err != nil {
@@ -369,7 +369,7 @@ func (k Keeper) GetStandardDenom(ctx sdk.Context) (string, error) {
 		return "", err
 	}
 
-	var denomWrap = gogotypes.StringValue{}
+	var denomWrap = gogoprototypes.StringValue{}
 	k.cdc.MustUnmarshal(bz, &denomWrap)
 	return denomWrap.Value, nil
 }
