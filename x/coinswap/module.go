@@ -29,7 +29,6 @@ var (
 	_ module.AppModuleBasic      = AppModuleBasic{}
 	_ module.AppModuleBasic      = AppModule{}
 	_ module.AppModuleSimulation = AppModule{}
-	_ module.HasInvariants       = AppModule{}
 	_ module.HasServices         = AppModule{}
 	_ module.HasABCIGenesis      = AppModule{}
 
