@@ -7,6 +7,8 @@ import (
 
 	// this line is used by starport scaffolding # 1
 
+	"github.com/Canto-Network/Canto/v7/x/coinswap/simulation"
+	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
@@ -167,4 +169,9 @@ func (am AppModule) BeginBlock(ctx context.Context) error {
 		}
 	}
 	return nil
+}
+
+// ProposalMsgs returns msgs used for governance proposals for simulations.
+func (AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.WeightedProposalMsg {
+	return simulation.ProposalMsgs()
 }
