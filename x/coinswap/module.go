@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math/rand"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
@@ -152,9 +151,9 @@ func (AppModule) ProposalContents(simState module.SimulationState) []simtypes.We
 	return nil
 }
 
-// RandomizedParams creates randomized coinswap param changes for the simulator.
-func (AppModule) RandomizedParams(r *rand.Rand) []simtypes.LegacyParamChange {
-	return simulation.ParamChanges(r)
+// ProposalMsgs returns msgs used for governance proposals for simulations.
+func (AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.WeightedProposalMsg {
+	return simulation.ProposalMsgs()
 }
 
 // RegisterStoreDecoder registers a decoder for coinswap module's types
