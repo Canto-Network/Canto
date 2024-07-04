@@ -312,7 +312,7 @@ func NewCanto(
 		},
 	}
 
-	// evm/MsgEthereumTx, erc20/MsgConvertERC20
+	// evm/MsgEthereumTx, erc20/MsgConvertERC20, coinswap/MsgSwapOrder
 	signingOptions.DefineCustomGetSigners(protov2.MessageName(&evmv1.MsgEthereumTx{}), evmtypes.GetSignersFromMsgEthereumTxV2)
 	signingOptions.DefineCustomGetSigners(protov2.MessageName(&erc20v1.MsgConvertERC20{}), erc20types.GetSignersFromMsgConvertERC20V2)
 	signingOptions.DefineCustomGetSigners(protov2.MessageName(&coinswapv1.MsgSwapOrder{}), coinswaptypes.GetSignersFromMsgSwapOrderV2)

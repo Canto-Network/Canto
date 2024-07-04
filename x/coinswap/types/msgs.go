@@ -1,6 +1,8 @@
 package types
 
 import (
+	"fmt"
+
 	sdkmath "cosmossdk.io/math"
 	coinswapv1 "github.com/Canto-Network/Canto/v7/api/canto/coinswap/v1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -78,7 +80,7 @@ func NewMsgRemoveLiquidity(
 func GetSignersFromMsgSwapOrderV2(msg protov2.Message) ([][]byte, error) {
 	msgv2, ok := msg.(*coinswapv1.MsgSwapOrder)
 	if !ok {
-		return nil, nil
+		return nil, fmt.Errorf("invalid x/coinswap/MsgSwapOrder msg v2: %v", msg)
 	}
 
 	signers := [][]byte{}
