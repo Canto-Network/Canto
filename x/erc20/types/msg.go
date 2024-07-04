@@ -18,6 +18,11 @@ var (
 	_ sdk.Msg = &MsgConvertERC20{}
 )
 
+const (
+	TypeMsgConvertCoin  = "convert_coin"
+	TypeMsgConvertERC20 = "convert_ERC20"
+)
+
 // NewMsgConvertCoin creates a new instance of MsgConvertCoin
 func NewMsgConvertCoin(coin sdk.Coin, receiver common.Address, sender sdk.AccAddress) *MsgConvertCoin { // nolint: interfacer
 	return &MsgConvertCoin{

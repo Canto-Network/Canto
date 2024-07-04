@@ -2,9 +2,11 @@ package types
 
 import (
 	"fmt"
+	"math/rand"
 	"regexp"
 	"strings"
 
+	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
 
@@ -80,4 +82,31 @@ func EqualStringSlice(aliasesA, aliasesB []string) bool {
 	}
 
 	return true
+}
+
+func GenRandomCoinMetadata(r *rand.Rand) banktypes.Metadata {
+	randDescription := simtypes.RandStringOfLength(r, 10)
+	randTokenBase := "a" + simtypes.RandStringOfLength(r, 4)
+	randSymbol := strings.ToUpper(simtypes.RandStringOfLength(r, 4))
+
+	validMetadata := banktypes.Metadata{
+		Description: randDescription,
+		Base:        randTokenBase,
+		// NOTE: Denom units MUST be increasing
+		DenomUnits: []*banktypes.DenomUnit{
+			{
+				Denom:    randTokenBase,
+				Exponent: 0,
+			},
+			{
+				Denom:    randTokenBase[1:],
+				Exponent: uint32(18),
+			},
+		},
+		Name:    randTokenBase,
+		Symbol:  randSymbol,
+		Display: randTokenBase,
+	}
+
+	return validMetadata
 }

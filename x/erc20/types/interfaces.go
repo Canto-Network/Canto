@@ -18,6 +18,7 @@ import (
 type AccountKeeper interface {
 	GetModuleAddress(moduleName string) sdk.AccAddress
 	GetSequence(context.Context, sdk.AccAddress) (uint64, error)
+	GetAccount(ctx context.Context, addr sdk.AccAddress) sdk.AccountI
 }
 
 // BankKeeper defines the expected interface needed to retrieve account balances.
@@ -32,6 +33,7 @@ type BankKeeper interface {
 	SetDenomMetaData(ctx context.Context, denomMetaData banktypes.Metadata)
 	HasSupply(ctx context.Context, denom string) bool
 	GetBalance(ctx context.Context, addr sdk.AccAddress, denom string) sdk.Coin
+	SpendableCoins(ctx context.Context, addr sdk.AccAddress) sdk.Coins
 }
 
 // EVMKeeper defines the expected EVM keeper interface used on erc20
