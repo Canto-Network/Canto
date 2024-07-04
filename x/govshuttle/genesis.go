@@ -30,8 +30,9 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis := types.DefaultGenesis()
 	genesis.Params = k.GetParams(ctx)
 
-	portAddr, _ := k.GetPort(ctx)
-	genesis.PortContractAddr = portAddr.String()
+	if portAddr, ok := k.GetPort(ctx); ok {
+		genesis.PortContractAddr = portAddr.String()
+	}
 
 	// this line is used by starport scaffolding # genesis/module/export
 
