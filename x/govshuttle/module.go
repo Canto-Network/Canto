@@ -6,6 +6,7 @@ import (
 
 	// this line is used by starport scaffolding # 1
 
+	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
@@ -13,6 +14,7 @@ import (
 
 	"github.com/Canto-Network/Canto/v7/x/govshuttle/client/cli"
 	"github.com/Canto-Network/Canto/v7/x/govshuttle/keeper"
+	"github.com/Canto-Network/Canto/v7/x/govshuttle/simulation"
 	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -125,6 +127,7 @@ func (am AppModule) Name() string {
 // module-specific GRPC queries.
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
+	types.RegisterMsgServer(cfg.MsgServer(), am.keeper)
 }
 
 // RegisterInvariants registers the capability module's invariants.
@@ -150,3 +153,8 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 
 // ConsensusVersion implements ConsensusVersion.
 func (AppModule) ConsensusVersion() uint64 { return 2 }
+
+// ProposalMsgs returns msgs used for governance proposals for simulations.
+func (am AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.WeightedProposalMsg {
+	return simulation.ProposalMsgs(am.keeper)
+}
