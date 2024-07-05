@@ -7,23 +7,22 @@ import (
 	"github.com/Canto-Network/Canto/v7/app/params"
 	"github.com/Canto-Network/Canto/v7/x/erc20/simulation"
 	"github.com/Canto-Network/Canto/v7/x/erc20/types"
-	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/address"
-	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/stretchr/testify/require"
 )
 
 func TestProposalMsgs(t *testing.T) {
+	app, ctx := createTestApp(t, false)
+
 	// initialize parameters
-	s := rand.NewSource(1)
+	s := rand.NewSource(2)
 	r := rand.New(s)
 
-	ctx := sdk.NewContext(nil, cmtproto.Header{}, true, nil)
-	accounts := simtypes.RandomAccounts(r, 3)
+	accounts := getTestingAccounts(t, r, app, ctx, 10)
 
 	// execute ProposalMsgs function
-	weightedProposalMsgs := simulation.ProposalMsgs()
+	weightedProposalMsgs := simulation.ProposalMsgs(app.Erc20Keeper, app.AccountKeeper, app.BankKeeper, app.EvmKeeper, app.FeeMarketKeeper)
 	require.Equal(t, 4, len(weightedProposalMsgs))
 
 	w0 := weightedProposalMsgs[0]

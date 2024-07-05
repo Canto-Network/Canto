@@ -71,6 +71,7 @@ func createTestApp(t *testing.T, isCheckTx bool) (*app.Canto, sdk.Context) {
 		Time:            time.Now().UTC(),
 		ProposerAddress: consAddr,
 	})
+	ctx = ctx.WithChainID("canto_9001-1")
 	return app, ctx
 }
 

@@ -2,13 +2,22 @@ package simulation
 
 import (
 	"math/rand"
+	"strings"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/Canto-Network/Canto/v7/app/params"
+	"github.com/Canto-Network/Canto/v7/contracts"
+	"github.com/Canto-Network/Canto/v7/x/erc20/keeper"
 	"github.com/Canto-Network/Canto/v7/x/erc20/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/address"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/evmos/ethermint/crypto/ethsecp256k1"
+	"github.com/evmos/ethermint/tests"
+	evmtypes "github.com/evmos/ethermint/x/evm/types"
 )
 
 // Simulation operation weights constants
@@ -19,10 +28,12 @@ const (
 	OpWeightSimulateRegisterCoinProposal          = "op_weight_register_coin_proposal"
 	OpWeightSimulateRegisterERC20Proposal         = "op_weight_register_erc20_proposal"
 	OpWeightSimulateToggleTokenConversionProposal = "op_weight_toggle_token_conversion_proposal"
+
+	erc20Decimals = uint8(18)
 )
 
 // ProposalMsgs defines the module weighted proposals' contents
-func ProposalMsgs() []simtypes.WeightedProposalMsg {
+func ProposalMsgs(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper, ek types.EVMKeeper, fk types.FeeMarketKeeper) []simtypes.WeightedProposalMsg {
 	return []simtypes.WeightedProposalMsg{
 		simulation.NewWeightedProposalMsg(
 			OpWeightMsgUpdateParams,
@@ -32,17 +43,17 @@ func ProposalMsgs() []simtypes.WeightedProposalMsg {
 		simulation.NewWeightedProposalMsg(
 			OpWeightSimulateRegisterCoinProposal,
 			params.DefaultWeightRegisterCoinProposal,
-			SimulateMsgRegisterCoin,
+			SimulateMsgRegisterCoin(k, bk),
 		),
 		simulation.NewWeightedProposalMsg(
 			OpWeightSimulateRegisterERC20Proposal,
 			params.DefaultWeightRegisterERC20Proposal,
-			SimulateMsgRegisterERC20,
+			SimulateMsgRegisterERC20(k, ak, bk, ek, fk),
 		),
 		simulation.NewWeightedProposalMsg(
 			OpWeightSimulateToggleTokenConversionProposal,
 			params.DefaultWeightToggleTokenConversionProposal,
-			SimulateMsgToggleTokenConversion,
+			SimulateMsgToggleTokenConversion(k, bk, ek, fk),
 		),
 	}
 }
@@ -63,38 +74,183 @@ func SimulateMsgUpdateParams(r *rand.Rand, _ sdk.Context, _ []simtypes.Account) 
 	}
 }
 
-func SimulateMsgRegisterCoin(r *rand.Rand, _ sdk.Context, _ []simtypes.Account) sdk.Msg {
-	// use the default gov module account address as authority
-	var authority sdk.AccAddress = address.Module("gov")
+func SimulateMsgRegisterCoin(k keeper.Keeper, bk types.BankKeeper) simtypes.MsgSimulatorFn {
+	return func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+		coinMetadata := types.GenRandomCoinMetadata(r)
+		if err := bk.MintCoins(ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(coinMetadata.Base, sdkmath.NewInt(1)))); err != nil {
+			panic(err)
+		}
+		bankparams := bk.GetParams(ctx)
+		bankparams.DefaultSendEnabled = true
+		bk.SetParams(ctx, bankparams)
 
-	return &types.MsgRegisterCoin{
-		Authority:   authority.String(),
-		Title:       simtypes.RandStringOfLength(r, 10),
-		Description: simtypes.RandStringOfLength(r, 100),
-		Metadata:    types.GenRandomCoinMetadata(r),
+		params := k.GetParams(ctx)
+		params.EnableErc20 = true
+		k.SetParams(ctx, params)
+
+		// mint cosmos coin to random accounts
+		randomIteration := r.Intn(10)
+		for i := 0; i < randomIteration; i++ {
+			simAccount, _ := simtypes.RandomAcc(r, accs)
+
+			if err := bk.MintCoins(ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(coinMetadata.Base, sdkmath.NewInt(100000000)))); err != nil {
+				panic(err)
+			}
+			if err := bk.SendCoinsFromModuleToAccount(ctx, types.ModuleName, simAccount.Address, sdk.NewCoins(sdk.NewCoin(coinMetadata.Base, sdkmath.NewInt(100000000)))); err != nil {
+				panic(err)
+			}
+		}
+
+		// use the default gov module account address as authority
+		var authority sdk.AccAddress = address.Module("gov")
+
+		msg := &types.MsgRegisterCoin{
+			Authority:   authority.String(),
+			Title:       simtypes.RandStringOfLength(r, 10),
+			Description: simtypes.RandStringOfLength(r, 100),
+			Metadata:    coinMetadata,
+		}
+
+		if _, err := k.RegisterCoinProposal(ctx, msg); err != nil {
+			panic(err)
+		}
+
+		return msg
 	}
 }
 
-func SimulateMsgRegisterERC20(r *rand.Rand, _ sdk.Context, _ []simtypes.Account) sdk.Msg {
-	// use the default gov module account address as authority
-	var authority sdk.AccAddress = address.Module("gov")
+func SimulateMsgRegisterERC20(k keeper.Keeper, accountKeeper types.AccountKeeper, bankKeeper types.BankKeeper, evmKeeper types.EVMKeeper, feemarketKeeper types.FeeMarketKeeper) simtypes.MsgSimulatorFn {
+	return func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg { // use the default gov module account address as authority
+		params := k.GetParams(ctx)
+		params.EnableErc20 = true
+		k.SetParams(ctx, params)
 
-	return &types.MsgRegisterERC20{
-		Authority:    authority.String(),
-		Title:        simtypes.RandStringOfLength(r, 10),
-		Description:  simtypes.RandStringOfLength(r, 100),
-		Erc20Address: "",
+		evmParams := evmtypes.DefaultParams()
+		evmParams.EvmDenom = "stake"
+		evmKeeper.SetParams(ctx, evmParams)
+
+		isNativeErc20 := r.Intn(2) == 1
+		// account key
+		priv, err := ethsecp256k1.GenerateKey()
+		if err != nil {
+			panic(err)
+		}
+		addr := common.BytesToAddress(priv.PubKey().Address().Bytes())
+		signer := tests.NewSigner(priv)
+
+		erc20ABI := contracts.ERC20MinterBurnerDecimalsContract.ABI
+
+		var deployer common.Address
+		var contractAddr common.Address
+		coinMetadata := types.GenRandomCoinMetadata(r)
+
+		coins := sdk.NewCoins(sdk.NewCoin(evmParams.EvmDenom, sdkmath.NewInt(10000000000000000)))
+		if err = bankKeeper.MintCoins(ctx, types.ModuleName, coins); err != nil {
+			panic(err)
+		}
+
+		if err = bankKeeper.SendCoinsFromModuleToModule(ctx, types.ModuleName, authtypes.FeeCollectorName, coins); err != nil {
+			panic(err)
+		}
+		if isNativeErc20 {
+			deployer = types.ModuleAddress
+			contractAddr, err = keeper.DeployERC20Contract(ctx, k, accountKeeper, coinMetadata)
+		} else {
+			deployer = addr
+			erc20Name := coinMetadata.Name
+			erc20Symbol := coinMetadata.Symbol
+			contractAddr, err = keeper.DeployContract(ctx, evmKeeper, feemarketKeeper, deployer, signer, erc20Name, erc20Symbol, erc20Decimals)
+		}
+
+		// mint cosmos coin to random accounts
+		randomIteration := r.Intn(10)
+		for i := 0; i < randomIteration; i++ {
+			simAccount, _ := simtypes.RandomAcc(r, accs)
+
+			mintAmt := sdkmath.NewInt(100000000)
+			receiver := common.BytesToAddress(simAccount.Address.Bytes())
+			before := k.BalanceOf(ctx, erc20ABI, contractAddr, receiver)
+			_, err = k.CallEVM(ctx, erc20ABI, deployer, contractAddr, true, "mint", receiver, mintAmt.BigInt())
+			if err != nil {
+				panic(err)
+			}
+			after := k.BalanceOf(ctx, erc20ABI, contractAddr, receiver)
+			if after.Cmp(before.Add(before, mintAmt.BigInt())) != 0 {
+				panic("mint failed")
+			}
+		}
+
+		// use the default gov module account address as authority
+		var authority sdk.AccAddress = address.Module("gov")
+
+		msg := &types.MsgRegisterERC20{
+			Authority:    authority.String(),
+			Title:        simtypes.RandStringOfLength(r, 10),
+			Description:  simtypes.RandStringOfLength(r, 100),
+			Erc20Address: contractAddr.String(),
+		}
+
+		if _, err := k.RegisterERC20Proposal(ctx, msg); err != nil {
+			panic(err)
+		}
+
+		return msg
 	}
 }
 
-func SimulateMsgToggleTokenConversion(r *rand.Rand, _ sdk.Context, _ []simtypes.Account) sdk.Msg {
-	// use the default gov module account address as authority
-	var authority sdk.AccAddress = address.Module("gov")
+func SimulateMsgToggleTokenConversion(k keeper.Keeper, bankKeeper types.BankKeeper, evmKeeper types.EVMKeeper, feemarketKeeper types.FeeMarketKeeper) simtypes.MsgSimulatorFn {
+	return func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+		params := k.GetParams(ctx)
+		params.EnableErc20 = true
+		k.SetParams(ctx, params)
 
-	return &types.MsgToggleTokenConversion{
-		Authority:   authority.String(),
-		Title:       simtypes.RandStringOfLength(r, 10),
-		Description: simtypes.RandStringOfLength(r, 100),
-		Token:       "",
+		evmParams := evmtypes.DefaultParams()
+		evmParams.EvmDenom = "stake"
+		evmKeeper.SetParams(ctx, evmParams)
+
+		// account key
+		priv, err := ethsecp256k1.GenerateKey()
+		if err != nil {
+			panic(err)
+		}
+		addr := common.BytesToAddress(priv.PubKey().Address().Bytes())
+		signer := tests.NewSigner(priv)
+
+		erc20Name := simtypes.RandStringOfLength(r, 10)
+		erc20Symbol := strings.ToUpper(simtypes.RandStringOfLength(r, 4))
+
+		coins := sdk.NewCoins(sdk.NewCoin(evmParams.EvmDenom, sdkmath.NewInt(10000000000000000)))
+		if err = bankKeeper.MintCoins(ctx, types.ModuleName, coins); err != nil {
+			panic(err)
+		}
+
+		if err = bankKeeper.SendCoinsFromModuleToModule(ctx, types.ModuleName, authtypes.FeeCollectorName, coins); err != nil {
+			panic(err)
+		}
+
+		contractAddr, err := keeper.DeployContract(ctx, evmKeeper, feemarketKeeper, addr, signer, erc20Name, erc20Symbol, erc20Decimals)
+		if err != nil {
+			panic(err)
+		}
+
+		_, err = k.RegisterERC20(ctx, contractAddr)
+		if err != nil {
+			panic(err)
+		}
+
+		var authority sdk.AccAddress = address.Module("gov")
+
+		msg := &types.MsgToggleTokenConversion{
+			Authority:   authority.String(),
+			Title:       simtypes.RandStringOfLength(r, 10),
+			Description: simtypes.RandStringOfLength(r, 100),
+			Token:       contractAddr.String(),
+		}
+
+		if _, err := k.ToggleTokenConversionProposal(ctx, msg); err != nil {
+			panic(err)
+		}
+
+		return msg
 	}
 }
