@@ -118,7 +118,8 @@ func SimulateMsgConvertCoin(k keeper.Keeper, ak types.AccountKeeper, bk types.Ba
 			Bankkeeper:      bk,
 			ModuleName:      types.ModuleName,
 		}
-		return simulation.GenAndDeliverTxWithRandFees(txCtx)
+		op, fOps, err := simulation.GenAndDeliverTxWithRandFees(txCtx)
+		return op, fOps, err
 	}
 }
 
@@ -127,10 +128,11 @@ func SimulateMsgConvertErc20(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-
 		pairs := k.GetTokenPairs(ctx)
 
 		if len(pairs) == 0 {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgConvertERC20, "no pairs available"), nil, nil
+
 			_, err := SimulateRegisterERC20(r, ctx, accs, k, ak, bk, ek, fk)
 			if err != nil {
 				return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgConvertERC20, "no pairs available"), nil, nil
@@ -141,10 +143,29 @@ func SimulateMsgConvertErc20(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 		// randomly pick one pair
 		pair := pairs[r.Intn(len(pairs))]
 
+		erc20ABI := contracts.ERC20MinterBurnerDecimalsContract.ABI
+		deployer := types.ModuleAddress
+		contractAddr := pair.GetERC20Contract()
+		randomIteration := r.Intn(10)
+		for i := 0; i < randomIteration; i++ {
+			simAccount, _ := simtypes.RandomAcc(r, accs)
+
+			mintAmt := sdkmath.NewInt(1000000000)
+			receiver := common.BytesToAddress(simAccount.Address.Bytes())
+			before := k.BalanceOf(ctx, erc20ABI, contractAddr, receiver)
+			_, err := k.CallEVM(ctx, erc20ABI, deployer, contractAddr, true, "mint", receiver, mintAmt.BigInt())
+			if err != nil {
+				return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgConvertERC20, "no account has native ERC20"), nil, nil
+			}
+			after := k.BalanceOf(ctx, erc20ABI, contractAddr, receiver)
+			if after.Cmp(before.Add(before, mintAmt.BigInt())) != 0 {
+				return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgConvertERC20, "no account has native ERC20"), nil, nil
+			}
+		}
+
 		// select random account that has coins baseDenom
 		var simAccount simtypes.Account
 		var erc20Balance *big.Int
-		erc20ABI := contracts.ERC20MinterBurnerDecimalsContract.ABI
 		skip := true
 
 		for i := 0; i < len(accs); i++ {
@@ -175,6 +196,8 @@ func SimulateMsgConvertErc20(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 			Bankkeeper:      bk,
 			ModuleName:      types.ModuleName,
 		}
-		return simulation.GenAndDeliverTxWithRandFees(txCtx)
+
+		op, fOps, err := simulation.GenAndDeliverTxWithRandFees(txCtx)
+		return op, fOps, err
 	}
 }

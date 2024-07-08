@@ -7,6 +7,7 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	"github.com/Canto-Network/Canto/v7/app/params"
+	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/stretchr/testify/require"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -47,11 +48,12 @@ func TestWeightedOperations(t *testing.T) {
 		opMsgName  string
 	}{
 		{params.DefaultWeightMsgConvertCoin, types.ModuleName, sdk.MsgTypeURL(&types.MsgConvertCoin{})},
-		{params.DefaultWeightMsgConvertErc20, types.ModuleName, types.TypeMsgConvertERC20},
+		{params.DefaultWeightMsgConvertErc20, types.ModuleName, sdk.MsgTypeURL(&types.MsgConvertERC20{})},
 	}
 
 	for i, w := range weightedOps {
-		opMsg, _, _ := w.Op()(r, canto.BaseApp, ctx, accs, ctx.ChainID())
+		opMsg, _, err := w.Op()(r, canto.BaseApp, ctx, accs, ctx.ChainID())
+		require.NoError(t, err)
 		require.Equal(t, expected[i].weight, w.Weight())
 		require.Equal(t, expected[i].opMsgRoute, opMsg.Route)
 		require.Equal(t, expected[i].opMsgName, opMsg.Name)
@@ -74,6 +76,13 @@ func createTestApp(t *testing.T, isCheckTx bool) (*app.Canto, sdk.Context) {
 		ProposerAddress: consAddr,
 	})
 	ctx = ctx.WithChainID("canto_9001-1")
+	app.FinalizeBlock(
+		&abci.RequestFinalizeBlock{
+			Height:          1,
+			ProposerAddress: consAddr,
+		},
+	)
+
 	return app, ctx
 }
 
