@@ -337,7 +337,7 @@ func (m *MsgUpdateParamsResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateParamsResponse proto.InternalMessageInfo
 
-// MsgRegisterCoinProposal is a gov Content type to register a token pair for a
+// MsgRegisterCoin is a gov Content type to register a token pair for a
 // native Cosmos coin.
 type MsgRegisterCoin struct {
 	// authority is the address that controls the module (defaults to x/gov unless
@@ -448,7 +448,7 @@ func (m *MsgRegisterCoinResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgRegisterCoinResponse proto.InternalMessageInfo
 
-// MsgRegisterERC20Proposal is a gov Content type to register a token pair for
+// MsgRegisterERC20 is a gov Content type to register a token pair for
 // an ERC20 token
 type MsgRegisterERC20 struct {
 	// authority is the address that controls the module (defaults to x/gov unless

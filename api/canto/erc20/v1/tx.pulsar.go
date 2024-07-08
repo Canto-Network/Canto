@@ -5945,7 +5945,7 @@ func (*MsgUpdateParamsResponse) Descriptor() ([]byte, []int) {
 	return file_canto_erc20_v1_tx_proto_rawDescGZIP(), []int{5}
 }
 
-// MsgRegisterCoinProposal is a gov Content type to register a token pair for a
+// MsgRegisterCoin is a gov Content type to register a token pair for a
 // native Cosmos coin.
 type MsgRegisterCoin struct {
 	state         protoimpl.MessageState
@@ -6037,7 +6037,7 @@ func (*MsgRegisterCoinResponse) Descriptor() ([]byte, []int) {
 	return file_canto_erc20_v1_tx_proto_rawDescGZIP(), []int{7}
 }
 
-// MsgRegisterERC20Proposal is a gov Content type to register a token pair for
+// MsgRegisterERC20 is a gov Content type to register a token pair for
 // an ERC20 token
 type MsgRegisterERC20 struct {
 	state         protoimpl.MessageState
