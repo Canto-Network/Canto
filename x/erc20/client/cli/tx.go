@@ -303,7 +303,7 @@ func NewToggleTokenConversionProposalCmd(ac addresscodec.Codec) *cobra.Command {
 		Args:    cobra.ExactArgs(1),
 		Short:   "Submit a toggle token conversion proposal",
 		Long:    "Submit a proposal to toggle the conversion of a token pair along with an initial deposit.",
-		Example: fmt.Sprintf("$ %s tx gov submit-proposal toggle-token-conversion <denom_or_contract> --from=<key_or_address>", version.AppName),
+		Example: fmt.Sprintf("$ %s tx gov submit-proposal toggle-token-conversion <denom_or_contract>", version.AppName),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
