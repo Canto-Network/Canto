@@ -30,9 +30,11 @@ func TestWeightedOperations(t *testing.T) {
 	weightedOps := simulation.WeightedOperations(
 		appParams,
 		cdc,
+		canto.Erc20Keeper,
 		canto.AccountKeeper,
 		canto.BankKeeper,
-		canto.Erc20Keeper,
+		canto.EvmKeeper,
+		canto.FeeMarketKeeper,
 	)
 
 	s := rand.NewSource(2)
