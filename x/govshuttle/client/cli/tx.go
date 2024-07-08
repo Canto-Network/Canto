@@ -9,6 +9,7 @@ import (
 	addresscodec "cosmossdk.io/core/address"
 	errorsmod "cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/address"
@@ -100,6 +101,7 @@ Where metadata.json contains (example):
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), proposal)
 		},
 	}
+	flags.AddTxFlagsToCmd(cmd)
 	AddGovPropFlagsToCmd(cmd)
 
 	return cmd
@@ -164,6 +166,7 @@ Where metadata.json contains (example):
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), proposal)
 		},
 	}
+	flags.AddTxFlagsToCmd(cmd)
 	AddGovPropFlagsToCmd(cmd)
 
 	return cmd
