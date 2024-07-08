@@ -46,7 +46,7 @@ func TestWeightedOperations(t *testing.T) {
 		opMsgRoute string
 		opMsgName  string
 	}{
-		{params.DefaultWeightMsgConvertCoin, types.ModuleName, types.TypeMsgConvertCoin},
+		{params.DefaultWeightMsgConvertCoin, types.ModuleName, sdk.MsgTypeURL(&types.MsgConvertCoin{})},
 		{params.DefaultWeightMsgConvertErc20, types.ModuleName, types.TypeMsgConvertERC20},
 	}
 

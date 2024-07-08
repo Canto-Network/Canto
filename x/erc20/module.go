@@ -171,5 +171,7 @@ func (am AppModule) RegisterStoreDecoder(decoderRegistry simtypes.StoreDecoderRe
 }
 
 func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {
-	return []simtypes.WeightedOperation{}
+	return simulation.WeightedOperations(
+		simState.AppParams, simState.Cdc, am.keeper, am.ak, am.bk, am.ek, am.fk,
+	)
 }

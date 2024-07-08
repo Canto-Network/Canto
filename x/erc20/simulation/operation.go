@@ -30,9 +30,11 @@ const (
 func WeightedOperations(
 	appParams simtypes.AppParams,
 	cdc codec.JSONCodec,
+	k keeper.Keeper,
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
-	k keeper.Keeper,
+	ek types.EVMKeeper,
+	fk types.FeeMarketKeeper,
 ) simulation.WeightedOperations {
 	var weightMsgConvertCoinNativeCoin int
 	appParams.GetOrGenerate(OpWeightMsgConvertCoin, &weightMsgConvertCoinNativeCoin, nil, func(_ *rand.Rand) {
@@ -47,17 +49,17 @@ func WeightedOperations(
 	return simulation.WeightedOperations{
 		simulation.NewWeightedOperation(
 			weightMsgConvertCoinNativeCoin,
-			SimulateMsgConvertCoin(ak, bk, k),
+			SimulateMsgConvertCoin(k, ak, bk),
 		),
 		simulation.NewWeightedOperation(
 			weightMsgConvertErc20NativeCoin,
-			SimulateMsgConvertErc20(ak, bk, k),
+			SimulateMsgConvertErc20(k, ak, bk, ek, fk),
 		),
 	}
 }
 
 // SimulateMsgConvertCoin generates a MsgConvertCoin with random values for convertCoinNativeCoin
-func SimulateMsgConvertCoin(ak types.AccountKeeper, bk types.BankKeeper, k keeper.Keeper) simtypes.Operation {
+func SimulateMsgConvertCoin(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
@@ -65,7 +67,11 @@ func SimulateMsgConvertCoin(ak types.AccountKeeper, bk types.BankKeeper, k keepe
 		pairs := k.GetTokenPairs(ctx)
 
 		if len(pairs) == 0 {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgConvertCoin, "no pairs available"), nil, nil
+			_, err := SimulateRegisterCoin(r, ctx, accs, k, bk)
+			if err != nil {
+				return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgConvertCoin, "no pairs available"), nil, nil
+			}
+			pairs = k.GetTokenPairs(ctx)
 		}
 
 		// randomly pick one pair
@@ -117,7 +123,7 @@ func SimulateMsgConvertCoin(ak types.AccountKeeper, bk types.BankKeeper, k keepe
 }
 
 // SimulateMsgConvertErc20 generates a MsgConvertErc20 with random values for convertERC20NativeCoin.
-func SimulateMsgConvertErc20(ak types.AccountKeeper, bk types.BankKeeper, k keeper.Keeper) simtypes.Operation {
+func SimulateMsgConvertErc20(k keeper.Keeper, ak types.AccountKeeper, bk types.BankKeeper, ek types.EVMKeeper, fk types.FeeMarketKeeper) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
@@ -125,7 +131,11 @@ func SimulateMsgConvertErc20(ak types.AccountKeeper, bk types.BankKeeper, k keep
 		pairs := k.GetTokenPairs(ctx)
 
 		if len(pairs) == 0 {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgConvertERC20, "no pairs available"), nil, nil
+			_, err := SimulateRegisterERC20(r, ctx, accs, k, ak, bk, ek, fk)
+			if err != nil {
+				return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgConvertERC20, "no pairs available"), nil, nil
+			}
+			pairs = k.GetTokenPairs(ctx)
 		}
 
 		// randomly pick one pair
