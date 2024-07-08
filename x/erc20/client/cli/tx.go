@@ -244,6 +244,7 @@ Where metadata.json contains (example):
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), proposal)
 		},
 	}
+	flags.AddTxFlagsToCmd(cmd)
 	AddGovPropFlagsToCmd(cmd)
 
 	return cmd
@@ -291,6 +292,7 @@ func NewRegisterERC20ProposalCmd(ac addresscodec.Codec) *cobra.Command {
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), proposal)
 		},
 	}
+	flags.AddTxFlagsToCmd(cmd)
 	AddGovPropFlagsToCmd(cmd)
 
 	return cmd
@@ -338,6 +340,7 @@ func NewToggleTokenConversionProposalCmd(ac addresscodec.Codec) *cobra.Command {
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), proposal)
 		},
 	}
+	flags.AddTxFlagsToCmd(cmd)
 	AddGovPropFlagsToCmd(cmd)
 
 	return cmd
