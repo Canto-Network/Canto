@@ -2,6 +2,7 @@ syntax = "proto3";
 package canto.inflation.v1;
 
 import "gogoproto/gogo.proto";
+import "amino/amino.proto";
 
 import "canto/inflation/v1/inflation.proto";
 
@@ -23,6 +24,8 @@ message GenesisState {
 
 // Params holds parameters for the inflation module.
 message Params {
+  option (amino.name) = "canto/x/inflation/Params";
+
   // type of coin to mint
   string mint_denom = 1;
   // variables to calculate exponential inflation
