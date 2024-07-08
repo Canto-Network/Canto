@@ -2513,6 +2513,8 @@ func (x *RegisterERC20Proposal) GetErc20Address() string {
 
 // ToggleTokenConversionProposal is a gov Content type to toggle the conversion
 // of a token pair.
+// Deprecated: This legacy proposal is deprecated in favor of Msg-based gov
+// proposals, see MsgToggleTokenConversion.
 //
 // Deprecated: Do not use.
 type ToggleTokenConversionProposal struct {

@@ -60,6 +60,6 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgRegisterERC20{}, "canto/MsgRegisterERC20", nil)
 	cdc.RegisterConcrete(&MsgConvertCoin{}, "canto/MsgConvertCoin", nil)
 	cdc.RegisterConcrete(&MsgConvertERC20{}, "canto/MsgConvertERC20", nil)
-	cdc.RegisterConcrete(&MsgUpdateParams{}, "canto/MsgUpdateParams", nil)
-	cdc.RegisterConcrete(&Params{}, "canto/Params", nil)
+	cdc.RegisterConcrete(&MsgUpdateParams{}, "canto/x/erc20/MsgUpdateParams", nil)
+	cdc.RegisterConcrete(&Params{}, "canto/x/erc20/Params", nil)
 }

@@ -3,6 +3,7 @@ package canto.erc20.v1;
 
 import "canto/erc20/v1/erc20.proto";
 import "gogoproto/gogo.proto";
+import "amino/amino.proto";
 
 option go_package = "github.com/Canto-Network/Canto/v7/x/erc20/types";
 
@@ -16,6 +17,8 @@ message GenesisState {
 
 // Params defines the erc20 module params
 message Params {
+  option (amino.name) = "canto/x/erc20/Params";
+
   // parameter to enable the conversion of Cosmos coins <--> ERC20 tokens.
   bool enable_erc20 = 1;
   // parameter to enable the EVM hook that converts an ERC20 token to a Cosmos
