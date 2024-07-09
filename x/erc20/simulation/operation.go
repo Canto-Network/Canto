@@ -76,6 +76,9 @@ func SimulateMsgConvertCoin(k keeper.Keeper, ak types.AccountKeeper, bk types.Ba
 
 		// randomly pick one pair
 		pair := pairs[r.Intn(len(pairs))]
+		if !pair.Enabled {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgConvertCoin, "token pair is not enabled"), nil, nil
+		}
 		baseDenom := pair.GetDenom()
 
 		// select random account that has coins baseDenom
@@ -142,6 +145,9 @@ func SimulateMsgConvertErc20(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 
 		// randomly pick one pair
 		pair := pairs[r.Intn(len(pairs))]
+		if !pair.Enabled {
+			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgConvertCoin, "token pair is not enabled"), nil, nil
+		}
 
 		erc20ABI := contracts.ERC20MinterBurnerDecimalsContract.ABI
 		deployer := types.ModuleAddress
