@@ -3,7 +3,7 @@ package keeper
 import (
 	"fmt"
 
-	gogotypes "github.com/gogo/protobuf/types"
+	gogoprototypes "github.com/cosmos/gogoproto/types"
 
 	errorsmod "cosmossdk.io/errors"
 	storetypes "cosmossdk.io/store/types"
@@ -64,7 +64,7 @@ func (k Keeper) GetPoolByLptDenom(ctx sdk.Context, lptDenom string) (types.Pool,
 		return types.Pool{}, false
 	}
 
-	poolId := &gogotypes.StringValue{}
+	poolId := &gogoprototypes.StringValue{}
 	k.cdc.MustUnmarshal(bz, poolId)
 	return k.GetPool(ctx, poolId.Value)
 }
@@ -138,7 +138,7 @@ func (k Keeper) setPool(ctx sdk.Context, pool *types.Pool) {
 	store.Set(types.GetPoolKey(pool.Id), bz)
 
 	// save by lpt denom
-	poolId := &gogotypes.StringValue{Value: pool.Id}
+	poolId := &gogoprototypes.StringValue{Value: pool.Id}
 	poolIdBz := k.cdc.MustMarshal(poolId)
 	store.Set(types.GetLptDenomKey(pool.LptDenom), poolIdBz)
 }
