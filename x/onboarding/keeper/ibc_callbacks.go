@@ -137,8 +137,9 @@ func (k Keeper) OnRecvPacket(
 	// Use cached context to revert the state if the conversion fails
 
 	cacheCtx, writeCache := ctx.CacheContext()
-	if _, err = k.erc20Keeper.ConvertCoin(sdk.WrapSDKContext(cacheCtx), convertMsg); err != nil {
+	if _, err = k.erc20Keeper.ConvertCoin(cacheCtx, convertMsg); err != nil {
 		logger.Error("failed to convert coins", "error", err)
+		convertCoin = sdk.NewCoin(transferredCoin.Denom, sdkmath.ZeroInt())
 	} else {
 		writeCache()
 	}
