@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math/rand"
 
 	"github.com/Canto-Network/Canto/v7/x/inflation/simulation"
 	abci "github.com/cometbft/cometbft/abci/types"
@@ -176,11 +175,6 @@ func (am AppModule) ProposalContents(simState module.SimulationState) []simtypes
 // ProposalMsgs returns msgs used for governance proposals for simulations.
 func (AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.WeightedProposalMsg {
 	return simulation.ProposalMsgs()
-}
-
-// RandomizedParams creates randomized inflation param changes for the simulator.
-func (am AppModule) RandomizedParams(r *rand.Rand) []simtypes.LegacyParamChange {
-	return []simtypes.LegacyParamChange{}
 }
 
 // RegisterStoreDecoder registers a decoder for inflation module's types.

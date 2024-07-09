@@ -1,8 +1,6 @@
 package govshuttle
 
 import (
-	"math/rand"
-
 	//"github.com/Canto-Network/Canto/v2/testutil/sample"
 	govshuttlesimulation "github.com/Canto-Network/Canto/v7/x/govshuttle/simulation"
 	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
@@ -42,12 +40,6 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 // ProposalContents doesn't return any content functions for governance proposals
 func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedProposalContent {
 	return nil
-}
-
-// RandomizedParams creates randomized  param changes for the simulator
-func (am AppModule) RandomizedParams(_ *rand.Rand) []simtypes.LegacyParamChange {
-
-	return []simtypes.LegacyParamChange{}
 }
 
 // RegisterStoreDecoder registers a decoder
