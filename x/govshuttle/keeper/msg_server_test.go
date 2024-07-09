@@ -66,7 +66,7 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 	testCases := []struct {
 		name      string
 		msg       sdk.Msg
-		checkFunc func(uint64)
+		checkFunc func(uint64, sdk.Msg)
 		expectErr bool
 	}{
 		{
@@ -83,7 +83,7 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 					Signatures: []string{"sig1", "sig2"},
 				},
 			},
-			func(proposalId uint64) {},
+			func(uint64, sdk.Msg) {},
 			true,
 		},
 		{
@@ -100,21 +100,42 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 					Signatures: []string{"sig1", "sig2"},
 				},
 			},
-			func(proposalId uint64) {
+			func(proposalId uint64, msg sdk.Msg) {
 				proposal, err := suite.app.GovKeeper.Proposals.Get(suite.ctx, proposalId)
 				suite.Require().NoError(err)
 				suite.Require().Equal(govtypesv1.ProposalStatus_PROPOSAL_STATUS_PASSED, proposal.Status)
 
+				proposalMsg, ok := msg.(*govshuttletypes.MsgLendingMarketProposal)
+				suite.Require().True(ok)
+
+				targets := []common.Address{}
+				for _, acc := range proposalMsg.Metadata.Account {
+					targets = append(targets, common.HexToAddress(acc))
+				}
+
+				values := []*big.Int{}
+				for _, value := range proposalMsg.Metadata.Values {
+					values = append(values, big.NewInt(int64(value)))
+				}
+
+				calldatas := [][]byte{}
+				for _, calldata := range proposalMsg.Metadata.Calldatas {
+					c, err := hex.DecodeString(calldata)
+					suite.Require().NoError(err)
+
+					calldatas = append(calldatas, c)
+				}
+
 				suite.checkQueryPropResult(
 					proposalId,
 					ProposalResult{
-						Id:         big.NewInt(1),
-						Title:      "lending market proposal test",
-						Desc:       "lending market proposal test description",
-						Targets:    []common.Address{common.HexToAddress("0x20F72265e2225837fd77C692e0781f720B93eF89"), common.HexToAddress("0xf6Db2570A2417188a5788D6d5Fd9faAa5B1fE555")},
-						Values:     []*big.Int{big.NewInt(1234), big.NewInt(5678)},
-						Signatures: []string{"sig1", "sig2"},
-						Calldatas:  [][]byte{[]byte("calldata1"), []byte("calldata2")},
+						Id:         big.NewInt(int64(proposalMsg.Metadata.PropId)),
+						Title:      proposalMsg.Title,
+						Desc:       proposalMsg.Description,
+						Targets:    targets,
+						Values:     values,
+						Signatures: proposalMsg.Metadata.Signatures,
+						Calldatas:  calldatas,
 					},
 				)
 			},
@@ -133,7 +154,7 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 					Denom:     "acanto",
 				},
 			},
-			func(proposalId uint64) {},
+			func(uint64, sdk.Msg) {},
 			true,
 		},
 		{
@@ -149,21 +170,29 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 					Denom:     "acanto",
 				},
 			},
-			func(proposalId uint64) {
+			func(proposalId uint64, msg sdk.Msg) {
 				proposal, err := suite.app.GovKeeper.Proposals.Get(suite.ctx, proposalId)
 				suite.Require().NoError(err)
 				suite.Require().Equal(govtypesv1.ProposalStatus_PROPOSAL_STATUS_PASSED, proposal.Status)
 
+				proposalMsg, ok := msg.(*govshuttletypes.MsgTreasuryProposal)
+				suite.Require().True(ok)
+
+				targets := []common.Address{common.HexToAddress(proposalMsg.Metadata.Recipient)}
+				values := []*big.Int{big.NewInt(int64(proposalMsg.Metadata.Amount))}
+				signatures := []string{proposalMsg.Metadata.Denom}
+				calldatas := [][]byte{}
+
 				suite.checkQueryPropResult(
 					proposalId,
 					ProposalResult{
-						Id:         big.NewInt(2),
-						Title:      "treasury proposal test",
-						Desc:       "treasury proposal test description",
-						Targets:    []common.Address{common.HexToAddress("0x20F72265e2225837fd77C692e0781f720B93eF89")},
-						Values:     []*big.Int{big.NewInt(1234)},
-						Signatures: []string{"acanto"},
-						Calldatas:  [][]byte{},
+						Id:         big.NewInt(int64(proposalMsg.Metadata.PropID)),
+						Title:      proposalMsg.Title,
+						Desc:       proposalMsg.Description,
+						Targets:    targets,
+						Values:     values,
+						Signatures: signatures,
+						Calldatas:  calldatas,
 					},
 				)
 			},
@@ -191,7 +220,7 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 				suite.CommitAfter(*govParams.VotingPeriod)
 
 				// check proposal result
-				tc.checkFunc(proposal.Id)
+				tc.checkFunc(proposal.Id, tc.msg)
 			}
 		})
 	}
