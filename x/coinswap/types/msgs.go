@@ -18,13 +18,6 @@ const (
 	LptTokenPrefix = "lpt"
 	// LptTokenFormat defines the name of liquidity token
 	LptTokenFormat = "lpt-%d"
-
-	// TypeMsgAddLiquidity defines the type of MsgAddLiquidity
-	TypeMsgAddLiquidity = "add_liquidity"
-	// TypeMsgRemoveLiquidity defines the type of MsgRemoveLiquidity
-	TypeMsgRemoveLiquidity = "remove_liquidity"
-	// TypeMsgSwapOrder defines the type of MsgSwapOrder
-	TypeMsgSwapOrder = "swap_order"
 )
 
 /* --------------------------------------------------------------------------- */
@@ -51,12 +44,6 @@ func NewMsgSwapOrder(
 		IsBuyOrder: isBuyOrder,
 	}
 }
-
-// Route implements Msg.
-func (msg MsgSwapOrder) Route() string { return RouterKey }
-
-// Type implements Msg.
-func (msg MsgSwapOrder) Type() string { return TypeMsgSwapOrder }
 
 // ValidateBasic implements Msg.
 func (msg MsgSwapOrder) ValidateBasic() error {
@@ -109,12 +96,6 @@ func NewMsgAddLiquidity(
 		Sender:           sender,
 	}
 }
-
-// Route implements Msg.
-func (msg MsgAddLiquidity) Route() string { return RouterKey }
-
-// Type implements Msg.
-func (msg MsgAddLiquidity) Type() string { return TypeMsgAddLiquidity }
 
 // ValidateBasic implements Msg.
 func (msg MsgAddLiquidity) ValidateBasic() error {
@@ -174,12 +155,6 @@ func NewMsgRemoveLiquidity(
 		Sender:            sender,
 	}
 }
-
-// Route implements Msg.
-func (msg MsgRemoveLiquidity) Route() string { return RouterKey }
-
-// Type implements Msg.
-func (msg MsgRemoveLiquidity) Type() string { return TypeMsgRemoveLiquidity }
 
 // ValidateBasic implements Msg.
 func (msg MsgRemoveLiquidity) ValidateBasic() error {

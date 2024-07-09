@@ -44,9 +44,9 @@ func TestWeightedOperations(t *testing.T) {
 		opMsgRoute string
 		opMsgName  string
 	}{
-		{params.DefaultWeightMsgAddLiquidity, types.ModuleName, types.TypeMsgAddLiquidity},
-		{params.DefaultWeightMsgSwapOrder, types.ModuleName, types.TypeMsgSwapOrder},
-		{params.DefaultWeightMsgRemoveLiquidity, types.ModuleName, types.TypeMsgRemoveLiquidity},
+		{params.DefaultWeightMsgAddLiquidity, types.ModuleName, sdk.MsgTypeURL(&types.MsgAddLiquidity{})},
+		{params.DefaultWeightMsgSwapOrder, types.ModuleName, sdk.MsgTypeURL(&types.MsgSwapOrder{})},
+		{params.DefaultWeightMsgRemoveLiquidity, types.ModuleName, sdk.MsgTypeURL(&types.MsgRemoveLiquidity{})},
 	}
 
 	for i, w := range weightedOps {

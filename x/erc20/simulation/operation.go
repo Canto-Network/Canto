@@ -69,7 +69,7 @@ func SimulateMsgConvertCoin(k keeper.Keeper, ak types.AccountKeeper, bk types.Ba
 		if len(pairs) == 0 {
 			_, err := SimulateRegisterCoin(r, ctx, accs, k, bk)
 			if err != nil {
-				return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgConvertCoin, "no pairs available"), nil, nil
+				return simtypes.NoOpMsg(types.ModuleName, sdk.MsgTypeURL(&types.MsgConvertCoin{}), "no pairs available"), nil, nil
 			}
 			pairs = k.GetTokenPairs(ctx)
 		}
@@ -77,7 +77,7 @@ func SimulateMsgConvertCoin(k keeper.Keeper, ak types.AccountKeeper, bk types.Ba
 		// randomly pick one pair
 		pair := pairs[r.Intn(len(pairs))]
 		if !pair.Enabled {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgConvertCoin, "token pair is not enabled"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, sdk.MsgTypeURL(&types.MsgConvertCoin{}), "token pair is not enabled"), nil, nil
 		}
 		baseDenom := pair.GetDenom()
 
@@ -96,7 +96,7 @@ func SimulateMsgConvertCoin(k keeper.Keeper, ak types.AccountKeeper, bk types.Ba
 		}
 
 		if skip {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgConvertCoin, "no account has coins"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, sdk.MsgTypeURL(&types.MsgConvertCoin{}), "no account has coins"), nil, nil
 		}
 
 		priv, _ := ethsecp256k1.GenerateKey()
@@ -134,11 +134,9 @@ func SimulateMsgConvertErc20(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 		pairs := k.GetTokenPairs(ctx)
 
 		if len(pairs) == 0 {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgConvertERC20, "no pairs available"), nil, nil
-
 			_, err := SimulateRegisterERC20(r, ctx, accs, k, ak, bk, ek, fk)
 			if err != nil {
-				return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgConvertERC20, "no pairs available"), nil, nil
+				return simtypes.NoOpMsg(types.ModuleName, sdk.MsgTypeURL(&types.MsgConvertERC20{}), "no pairs available"), nil, nil
 			}
 			pairs = k.GetTokenPairs(ctx)
 		}
@@ -146,7 +144,7 @@ func SimulateMsgConvertErc20(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 		// randomly pick one pair
 		pair := pairs[r.Intn(len(pairs))]
 		if !pair.Enabled {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgConvertCoin, "token pair is not enabled"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, sdk.MsgTypeURL(&types.MsgConvertERC20{}), "token pair is not enabled"), nil, nil
 		}
 
 		erc20ABI := contracts.ERC20MinterBurnerDecimalsContract.ABI
@@ -161,11 +159,11 @@ func SimulateMsgConvertErc20(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 			before := k.BalanceOf(ctx, erc20ABI, contractAddr, receiver)
 			_, err := k.CallEVM(ctx, erc20ABI, deployer, contractAddr, true, "mint", receiver, mintAmt.BigInt())
 			if err != nil {
-				return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgConvertERC20, "no account has native ERC20"), nil, nil
+				return simtypes.NoOpMsg(types.ModuleName, sdk.MsgTypeURL(&types.MsgConvertERC20{}), "no account has native ERC20"), nil, nil
 			}
 			after := k.BalanceOf(ctx, erc20ABI, contractAddr, receiver)
 			if after.Cmp(before.Add(before, mintAmt.BigInt())) != 0 {
-				return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgConvertERC20, "no account has native ERC20"), nil, nil
+				return simtypes.NoOpMsg(types.ModuleName, sdk.MsgTypeURL(&types.MsgConvertERC20{}), "no account has native ERC20"), nil, nil
 			}
 		}
 
@@ -184,7 +182,7 @@ func SimulateMsgConvertErc20(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 		}
 
 		if skip {
-			return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgConvertERC20, "no account has native ERC20"), nil, nil
+			return simtypes.NoOpMsg(types.ModuleName, sdk.MsgTypeURL(&types.MsgConvertERC20{}), "no account has native ERC20"), nil, nil
 		}
 
 		msg := types.NewMsgConvertERC20(sdkmath.NewIntFromBigInt(erc20Balance), simAccount.Address, pair.GetERC20Contract(), common.BytesToAddress(simAccount.Address.Bytes()))
