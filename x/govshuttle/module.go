@@ -11,20 +11,27 @@ import (
 
 	abci "github.com/cometbft/cometbft/abci/types"
 
-	"github.com/Canto-Network/Canto/v7/x/govshuttle/client/cli"
-	"github.com/Canto-Network/Canto/v7/x/govshuttle/keeper"
-	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
+	"cosmossdk.io/core/appmodule"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+
+	"github.com/Canto-Network/Canto/v7/x/govshuttle/client/cli"
+	"github.com/Canto-Network/Canto/v7/x/govshuttle/keeper"
+	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
 )
 
 var (
-	_ module.AppModule      = AppModule{}
-	_ module.AppModuleBasic = AppModuleBasic{}
+	_ module.AppModuleBasic      = AppModuleBasic{}
+	_ module.AppModuleBasic      = AppModule{}
+	_ module.AppModuleSimulation = AppModule{}
+	_ module.HasServices         = AppModule{}
+	_ module.HasABCIGenesis      = AppModule{}
+
+	_ appmodule.AppModule = AppModule{}
 )
 
 // ----------------------------------------------------------------------------
