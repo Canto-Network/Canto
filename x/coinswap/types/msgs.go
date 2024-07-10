@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	sdkmath "cosmossdk.io/math"
+	"cosmossdk.io/x/tx/signing"
 	coinswapv1 "github.com/Canto-Network/Canto/v7/api/canto/coinswap/v1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	protov2 "google.golang.org/protobuf/proto"
@@ -77,14 +78,16 @@ func NewMsgRemoveLiquidity(
 	}
 }
 
-func GetSignersFromMsgSwapOrderV2(msg protov2.Message) ([][]byte, error) {
+func GetSignersFromMsgSwapOrderV2(options *signing.Options, msg protov2.Message) ([][]byte, error) {
 	msgv2, ok := msg.(*coinswapv1.MsgSwapOrder)
 	if !ok {
 		return nil, fmt.Errorf("invalid x/coinswap/MsgSwapOrder msg v2: %v", msg)
 	}
 
-	signers := [][]byte{}
-	signers = append(signers, []byte(msgv2.Input.Address))
+	addr, err := options.AddressCodec.StringToBytes(msgv2.Input.Address)
+	if err != nil {
+		return nil, err
+	}
 
-	return signers, nil
+	return [][]byte{addr}, nil
 }
