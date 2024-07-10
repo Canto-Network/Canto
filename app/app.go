@@ -312,7 +312,13 @@ func NewCanto(
 		},
 	}
 
-	DefineCustomGetSigners(&signingOptions)
+	// evm/MsgEthereumTx, erc20/MsgConvertERC20, coinswap/MsgSwapOrder
+	signingOptions.DefineCustomGetSigners(protov2.MessageName(&evmv1.MsgEthereumTx{}), evmtypes.GetSignersFromMsgEthereumTxV2)
+	signingOptions.DefineCustomGetSigners(protov2.MessageName(&erc20v1.MsgConvertERC20{}), erc20types.GetSignersFromMsgConvertERC20V2)
+	signingOptions.DefineCustomGetSigners(
+		protov2.MessageName(&coinswapv1.MsgSwapOrder{}),
+		coinswaptypes.CreateGetSignersFromMsgSwapOrderV2(&signingOptions),
+	)
 
 	interfaceRegistry, _ := types.NewInterfaceRegistryWithOptions(types.InterfaceRegistryOptions{
 		ProtoFiles:     proto.HybridResolver,
@@ -995,17 +1001,6 @@ func NewCanto(
 	}()
 
 	return app
-}
-
-func DefineCustomGetSigners(options *signing.Options) {
-	// evm/MsgEthereumTx, erc20/MsgConvertERC20, coinswap/MsgSwapOrder
-	options.DefineCustomGetSigners(protov2.MessageName(&evmv1.MsgEthereumTx{}), evmtypes.GetSignersFromMsgEthereumTxV2)
-	options.DefineCustomGetSigners(protov2.MessageName(&erc20v1.MsgConvertERC20{}), erc20types.GetSignersFromMsgConvertERC20V2)
-	options.DefineCustomGetSigners(
-		protov2.MessageName(&coinswapv1.MsgSwapOrder{}),
-		coinswaptypes.CreateGetSignersFromMsgSwapOrderV2(options),
-	)
-
 }
 
 // use Canto's custom AnteHandler
