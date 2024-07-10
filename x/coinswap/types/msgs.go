@@ -78,16 +78,18 @@ func NewMsgRemoveLiquidity(
 	}
 }
 
-func GetSignersFromMsgSwapOrderV2(options *signing.Options, msg protov2.Message) ([][]byte, error) {
-	msgv2, ok := msg.(*coinswapv1.MsgSwapOrder)
-	if !ok {
-		return nil, fmt.Errorf("invalid x/coinswap/MsgSwapOrder msg v2: %v", msg)
-	}
+func CreateGetSignersFromMsgSwapOrderV2(options *signing.Options) func(msg protov2.Message) ([][]byte, error) {
+	return func(msg protov2.Message) ([][]byte, error) {
+		msgv2, ok := msg.(*coinswapv1.MsgSwapOrder)
+		if !ok {
+			return nil, fmt.Errorf("invalid x/coinswap/MsgSwapOrder msg v2: %v", msg)
+		}
 
-	addr, err := options.AddressCodec.StringToBytes(msgv2.Input.Address)
-	if err != nil {
-		return nil, err
-	}
+		addr, err := options.AddressCodec.StringToBytes(msgv2.Input.Address)
+		if err != nil {
+			return nil, err
+		}
 
-	return [][]byte{addr}, nil
+		return [][]byte{addr}, nil
+	}
 }
