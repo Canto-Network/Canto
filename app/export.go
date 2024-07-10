@@ -7,7 +7,6 @@ import (
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	"cosmossdk.io/log"
-	"cosmossdk.io/simapp"
 	storetypes "cosmossdk.io/store/types"
 	dbm "github.com/cosmos/cosmos-db"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
@@ -19,7 +18,7 @@ import (
 )
 
 // NewDefaultGenesisState generates the default state for the application.
-func NewDefaultGenesisState() simapp.GenesisState {
+func NewDefaultGenesisState() GenesisState {
 	tempApp := NewCanto(
 		log.NewNopLogger(),
 		dbm.NewMemDB(),
