@@ -3,7 +3,6 @@ package keeper_test
 import (
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	"github.com/evmos/ethermint/tests"
 
@@ -66,10 +65,9 @@ func (suite *KeeperTestSuite) TestTokenPairs() {
 		suite.Run(fmt.Sprintf("Case %s", tc.name), func() {
 			suite.SetupTest() // reset
 
-			ctx := sdk.WrapSDKContext(suite.ctx)
 			tc.malleate()
 
-			res, err := suite.queryClient.TokenPairs(ctx, req)
+			res, err := suite.queryClient.TokenPairs(suite.ctx, req)
 			if tc.expPass {
 				suite.Require().NoError(err)
 				suite.Require().Equal(expRes.Pagination, res.Pagination)
@@ -146,10 +144,9 @@ func (suite *KeeperTestSuite) TestTokenPair() {
 		suite.Run(fmt.Sprintf("Case %s", tc.name), func() {
 			suite.SetupTest() // reset
 
-			ctx := sdk.WrapSDKContext(suite.ctx)
 			tc.malleate()
 
-			res, err := suite.queryClient.TokenPair(ctx, req)
+			res, err := suite.queryClient.TokenPair(suite.ctx, req)
 			if tc.expPass {
 				suite.Require().NoError(err)
 				suite.Require().Equal(expRes, res)
@@ -161,10 +158,9 @@ func (suite *KeeperTestSuite) TestTokenPair() {
 }
 
 func (suite *KeeperTestSuite) TestQueryParams() {
-	ctx := sdk.WrapSDKContext(suite.ctx)
 	expParams := types.DefaultParams()
 
-	res, err := suite.queryClient.Params(ctx, &types.QueryParamsRequest{})
+	res, err := suite.queryClient.Params(suite.ctx, &types.QueryParamsRequest{})
 	suite.Require().NoError(err)
 	suite.Require().Equal(expParams, res.Params)
 }

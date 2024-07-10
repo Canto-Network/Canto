@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/Canto-Network/Canto/v7/x/epochs/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 )
 
@@ -182,10 +181,9 @@ func (suite *KeeperTestSuite) TestCurrentEpoch() {
 		suite.Run(fmt.Sprintf("Case %s", tc.name), func() {
 			suite.SetupTest() // reset
 
-			ctx := sdk.WrapSDKContext(suite.ctx)
 			tc.malleate()
 
-			res, err := suite.queryClient.CurrentEpoch(ctx, req)
+			res, err := suite.queryClient.CurrentEpoch(suite.ctx, req)
 			if tc.expPass {
 				suite.Require().NoError(err)
 				suite.Require().Equal(expRes, res)

@@ -60,7 +60,6 @@ func (suite *KeeperTestSuite) SetupTest() {
 }
 
 func (suite *KeeperTestSuite) DeployCaller() (common.Address, error) {
-	ctx := sdk.WrapSDKContext(suite.ctx)
 	chainID := suite.app.EvmKeeper.ChainID()
 
 	ctorArgs, err := contracts.CallerContract.ABI.Pack("")
@@ -79,7 +78,7 @@ func (suite *KeeperTestSuite) DeployCaller() (common.Address, error) {
 		return common.Address{}, err
 	}
 
-	res, err := suite.queryClientEvm.EstimateGas(ctx, &evm.EthCallRequest{
+	res, err := suite.queryClientEvm.EstimateGas(suite.ctx, &evm.EthCallRequest{
 		Args:   args,
 		GasCap: uint64(config.DefaultGasCap),
 	})
@@ -107,7 +106,7 @@ func (suite *KeeperTestSuite) DeployCaller() (common.Address, error) {
 		return common.Address{}, err
 	}
 
-	rsp, err := suite.app.EvmKeeper.EthereumTx(ctx, erc20DeployTx)
+	rsp, err := suite.app.EvmKeeper.EthereumTx(suite.ctx, erc20DeployTx)
 	if err != nil {
 		return common.Address{}, err
 	}
