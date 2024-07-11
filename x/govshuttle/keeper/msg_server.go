@@ -3,8 +3,11 @@ package keeper
 import (
 	"context"
 
-	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+
+	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
 )
 
 type msgServer struct {
@@ -19,15 +22,13 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 
 var _ types.MsgServer = msgServer{}
 
-func (k Keeper) LendingMarketProposal(goCtx context.Context, req *types.MsgLendingMarketProposal) (*types.MsgLendingMarketProposalResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-	legacyProposal := types.LendingMarketProposal{
-		Title:       req.Title,
-		Description: req.Description,
-		Metadata:    req.Metadata,
+func (k Keeper) LendingMarketProposal(ctx context.Context, req *types.MsgLendingMarketProposal) (*types.MsgLendingMarketProposalResponse, error) {
+	if k.GetAuthority() != req.Authority {
+		return nil, errorsmod.Wrapf(govtypes.ErrInvalidSigner, "invalid authority; expected %s, got %s", k.GetAuthority(), req.Authority)
 	}
 
-	_, err := k.AppendLendingMarketProposal(ctx, &legacyProposal)
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	_, err := k.AppendLendingMarketProposal(sdkCtx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -35,17 +36,13 @@ func (k Keeper) LendingMarketProposal(goCtx context.Context, req *types.MsgLendi
 	return &types.MsgLendingMarketProposalResponse{}, nil
 }
 
-func (k Keeper) TreasuryProposal(goCtx context.Context, req *types.MsgTreasuryProposal) (*types.MsgTreasuryProposalResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-	legacyTreasuryProposal := types.TreasuryProposal{
-		Title:       req.Title,
-		Description: req.Description,
-		Metadata:    req.Metadata,
+func (k Keeper) TreasuryProposal(ctx context.Context, req *types.MsgTreasuryProposal) (*types.MsgTreasuryProposalResponse, error) {
+	if k.GetAuthority() != req.Authority {
+		return nil, errorsmod.Wrapf(govtypes.ErrInvalidSigner, "invalid authority; expected %s, got %s", k.GetAuthority(), req.Authority)
 	}
 
-	legacyProposal := legacyTreasuryProposal.FromTreasuryToLendingMarket()
-
-	_, err := k.AppendLendingMarketProposal(ctx, legacyProposal)
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	_, err := k.AppendLendingMarketProposal(sdkCtx, req.FromTreasuryToLendingMarket())
 	if err != nil {
 		return nil, err
 	}

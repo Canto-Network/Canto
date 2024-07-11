@@ -29,6 +29,7 @@ import (
 
 	coinswapapi "github.com/Canto-Network/Canto/v7/api/canto/coinswap/v1"
 	csrapi "github.com/Canto-Network/Canto/v7/api/canto/csr/v1"
+	govshuttleapi "github.com/Canto-Network/Canto/v7/api/canto/govshuttle/v1"
 	inflationapi "github.com/Canto-Network/Canto/v7/api/canto/inflation/v1"
 	onboardingapi "github.com/Canto-Network/Canto/v7/api/canto/onboarding/v1"
 	"github.com/Canto-Network/Canto/v7/x/coinswap"
@@ -38,6 +39,7 @@ import (
 	"github.com/Canto-Network/Canto/v7/x/epochs"
 	"github.com/Canto-Network/Canto/v7/x/erc20"
 	"github.com/Canto-Network/Canto/v7/x/govshuttle"
+	govshuttletypes "github.com/Canto-Network/Canto/v7/x/govshuttle/types"
 	"github.com/Canto-Network/Canto/v7/x/inflation"
 	inflationtypes "github.com/Canto-Network/Canto/v7/x/inflation/types"
 	"github.com/Canto-Network/Canto/v7/x/onboarding"
@@ -94,6 +96,10 @@ func TestAminoJSON_Equivalence(t *testing.T) {
 		// onboarding
 		GenType(&onboardingtypes.MsgUpdateParams{}, &onboardingapi.MsgUpdateParams{}, GenOpts.WithDisallowNil()),
 		GenType(&onboardingtypes.Params{}, &onboardingapi.Params{}, GenOpts.WithDisallowNil()),
+
+		// govshuttle
+		GenType(&govshuttletypes.LendingMarketProposal{}, &govshuttleapi.LendingMarketProposal{}, GenOpts.WithDisallowNil()),
+		GenType(&govshuttletypes.TreasuryProposal{}, &govshuttleapi.TreasuryProposal{}, GenOpts.WithDisallowNil()),
 	}
 
 	for _, tt := range testedMsgs {

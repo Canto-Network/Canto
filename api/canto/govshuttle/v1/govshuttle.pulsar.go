@@ -3074,6 +3074,8 @@ func (*Params) Descriptor() ([]byte, []int) {
 
 // Define this object so that the govshuttle.pb.go file is generate, implements
 // govtypes.Content
+// Deprecated: This legacy proposal is deprecated in favor of Msg-based gov
+// proposals, see MsgLendingMarketProposal.
 type LendingMarketProposal struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -3127,6 +3129,8 @@ func (x *LendingMarketProposal) GetMetadata() *LendingMarketMetadata {
 }
 
 // treasury proposal type,
+// Deprecated: This legacy proposal is deprecated in favor of Msg-based gov
+// proposals, see MsgTreasuryProposal.
 type TreasuryProposal struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
