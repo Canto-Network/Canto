@@ -210,8 +210,7 @@ func (suite *KeeperTestSuite) TestEvmHooksRegisteredCoin() {
 				sender,
 			)
 
-			ctx := sdk.WrapSDKContext(suite.ctx)
-			_, err := suite.app.Erc20Keeper.ConvertCoin(ctx, convertCoin)
+			_, err := suite.app.Erc20Keeper.ConvertCoin(suite.ctx, convertCoin)
 			suite.Require().NoError(err, tc.name)
 			suite.Commit()
 

@@ -28,15 +28,22 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
 
 	coinswapapi "github.com/Canto-Network/Canto/v7/api/canto/coinswap/v1"
+	csrapi "github.com/Canto-Network/Canto/v7/api/canto/csr/v1"
 	govshuttleapi "github.com/Canto-Network/Canto/v7/api/canto/govshuttle/v1"
+	inflationapi "github.com/Canto-Network/Canto/v7/api/canto/inflation/v1"
+	onboardingapi "github.com/Canto-Network/Canto/v7/api/canto/onboarding/v1"
 	"github.com/Canto-Network/Canto/v7/x/coinswap"
+	coinswaptypes "github.com/Canto-Network/Canto/v7/x/coinswap/types"
 	"github.com/Canto-Network/Canto/v7/x/csr"
+	csrtypes "github.com/Canto-Network/Canto/v7/x/csr/types"
 	"github.com/Canto-Network/Canto/v7/x/epochs"
 	"github.com/Canto-Network/Canto/v7/x/erc20"
 	"github.com/Canto-Network/Canto/v7/x/govshuttle"
 	govshuttletypes "github.com/Canto-Network/Canto/v7/x/govshuttle/types"
 	"github.com/Canto-Network/Canto/v7/x/inflation"
+	inflationtypes "github.com/Canto-Network/Canto/v7/x/inflation/types"
 	"github.com/Canto-Network/Canto/v7/x/onboarding"
+	onboardingtypes "github.com/Canto-Network/Canto/v7/x/onboarding/types"
 )
 
 // TestAminoJSON_Equivalence tests that x/tx/Encoder encoding is equivalent to the legacy Encoder encoding.
@@ -71,6 +78,25 @@ func TestAminoJSON_Equivalence(t *testing.T) {
 	}
 
 	testedMsgs := []GeneratedType{
+		// coinswap
+		GenType(&coinswaptypes.MsgAddLiquidity{}, &coinswapapi.MsgAddLiquidity{}, GenOpts.WithDisallowNil()),
+		GenType(&coinswaptypes.MsgRemoveLiquidity{}, &coinswapapi.MsgRemoveLiquidity{}, GenOpts.WithDisallowNil()),
+		GenType(&coinswaptypes.MsgSwapOrder{}, &coinswapapi.MsgSwapOrder{}, GenOpts.WithDisallowNil()),
+		GenType(&coinswaptypes.MsgUpdateParams{}, &coinswapapi.MsgUpdateParams{}, GenOpts.WithDisallowNil()),
+		GenType(&coinswaptypes.Params{}, &coinswapapi.Params{}, GenOpts.WithDisallowNil()),
+
+		// csr
+		GenType(&csrtypes.MsgUpdateParams{}, &csrapi.MsgUpdateParams{}, GenOpts.WithDisallowNil()),
+		GenType(&csrtypes.Params{}, &csrapi.Params{}, GenOpts.WithDisallowNil()),
+
+		// inflation
+		GenType(&inflationtypes.MsgUpdateParams{}, &inflationapi.MsgUpdateParams{}, GenOpts.WithDisallowNil()),
+		GenType(&inflationtypes.Params{}, &inflationapi.Params{}, GenOpts.WithDisallowNil()),
+
+		// onboarding
+		GenType(&onboardingtypes.MsgUpdateParams{}, &onboardingapi.MsgUpdateParams{}, GenOpts.WithDisallowNil()),
+		GenType(&onboardingtypes.Params{}, &onboardingapi.Params{}, GenOpts.WithDisallowNil()),
+
 		// govshuttle
 		GenType(&govshuttletypes.LendingMarketProposal{}, &govshuttleapi.LendingMarketProposal{}, GenOpts.WithDisallowNil()),
 		GenType(&govshuttletypes.TreasuryProposal{}, &govshuttleapi.TreasuryProposal{}, GenOpts.WithDisallowNil()),

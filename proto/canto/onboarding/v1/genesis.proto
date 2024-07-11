@@ -3,6 +3,7 @@ package canto.onboarding.v1;
 
 import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";
+import "amino/amino.proto";
 
 option go_package = "github.com/Canto-Network/Canto/v7/x/onboarding/types";
 
@@ -14,6 +15,8 @@ message GenesisState {
 
 // Params holds parameters for the onboarding module
 message Params {
+  option (amino.name) = "canto/x/onboarding/Params";
+
   // enable onboarding IBC middleware
   bool enable_onboarding = 1;
 

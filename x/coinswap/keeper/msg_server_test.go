@@ -4,6 +4,8 @@ import (
 	"math"
 
 	sdkmath "cosmossdk.io/math"
+	"github.com/Canto-Network/Canto/v7/testutil"
+	"github.com/Canto-Network/Canto/v7/x/coinswap/types"
 	"github.com/cometbft/cometbft/crypto/tmhash"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -11,14 +13,41 @@ import (
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/evmos/ethermint/crypto/ethsecp256k1"
-
-	"github.com/Canto-Network/Canto/v7/testutil"
-	"github.com/Canto-Network/Canto/v7/x/coinswap/types"
 )
 
 var (
 	sender = sdk.AccAddress(tmhash.SumTruncated([]byte("sender"))).String()
 )
+
+func (suite *TestSuite) TestEventEmit() {
+	params := types.Params{
+		Fee:                    sdkmath.LegacyNewDec(0),
+		PoolCreationFee:        sdk.Coin{sdk.DefaultBondDenom, sdkmath.ZeroInt()},
+		TaxRate:                sdkmath.LegacyNewDec(0),
+		MaxStandardCoinPerPool: sdkmath.NewInt(10_000_000_000),
+		MaxSwapAmount: sdk.NewCoins(
+			sdk.NewInt64Coin("btc", 10_000_000),
+		),
+	}
+	suite.app.CoinswapKeeper.SetParams(suite.ctx, params)
+
+	msg := types.MsgAddLiquidity{
+		MaxToken:         sdk.NewCoin("btc", sdkmath.NewInt(1000)),
+		ExactStandardAmt: sdkmath.NewInt(100),
+		MinLiquidity:     sdkmath.NewInt(100),
+		Deadline:         2611213344,
+		Sender:           addrSender1.String(),
+	}
+	_, err := suite.msgServer.AddLiquidity(suite.ctx, &msg)
+	suite.NoError(err)
+
+	events := suite.ctx.EventManager().Events()
+	found, index := findEventTypeIndex(events, sdk.EventTypeMessage)
+	suite.Require().True(found)
+	suite.Require().Equal("sender", events[index].Attributes[0].Key)
+	suite.Require().Equal(addrSender1.String(), events[index].Attributes[0].Value)
+
+}
 
 func (suite *TestSuite) TestMsgSwapOrder_ValidateBasic() {
 	msg := types.MsgSwapOrder{}
@@ -361,4 +390,13 @@ func buildCoin(denom string, amt int64) sdk.Coin {
 		Denom:  denom,
 		Amount: sdkmath.NewInt(amt),
 	}
+}
+
+func findEventTypeIndex(events sdk.Events, eventType string) (bool, int) {
+	for index, event := range events {
+		if event.Type == eventType {
+			return true, index
+		}
+	}
+	return false, -1
 }
