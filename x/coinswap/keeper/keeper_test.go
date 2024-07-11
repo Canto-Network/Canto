@@ -93,6 +93,7 @@ func (suite *TestSuite) SetupTest() {
 
 	suite.keeper = suite.app.CoinswapKeeper
 	suite.queryClient = queryClient
+	suite.msgServer = keeper.NewMsgServerImpl(suite.keeper)
 
 	sdk.SetCoinDenomRegex(func() string {
 		return `[a-zA-Z][a-zA-Z0-9/\-]{2,127}`

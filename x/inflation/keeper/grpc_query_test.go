@@ -46,10 +46,9 @@ func (suite *KeeperTestSuite) TestPeriod() {
 		suite.Run(fmt.Sprintf("Case %s", tc.name), func() {
 			suite.SetupTest() // reset
 
-			ctx := sdk.WrapSDKContext(suite.ctx)
 			tc.malleate()
 
-			res, err := suite.queryClient.Period(ctx, req)
+			res, err := suite.queryClient.Period(suite.ctx, req)
 			if tc.expPass {
 				suite.Require().NoError(err)
 				suite.Require().Equal(expRes, res)
@@ -105,10 +104,9 @@ func (suite *KeeperTestSuite) TestEpochMintProvision() {
 		suite.Run(fmt.Sprintf("Case %s", tc.name), func() {
 			suite.SetupTest() // reset
 
-			ctx := sdk.WrapSDKContext(suite.ctx)
 			tc.malleate()
 
-			res, err := suite.queryClient.EpochMintProvision(ctx, req)
+			res, err := suite.queryClient.EpochMintProvision(suite.ctx, req)
 			if tc.expPass {
 				suite.Require().NoError(err)
 				suite.Require().Equal(expRes, res)
@@ -155,10 +153,9 @@ func (suite *KeeperTestSuite) TestSkippedEpochs() {
 		suite.Run(fmt.Sprintf("Case %s", tc.name), func() {
 			suite.SetupTest() // reset
 
-			ctx := sdk.WrapSDKContext(suite.ctx)
 			tc.malleate()
 
-			res, err := suite.queryClient.SkippedEpochs(ctx, req)
+			res, err := suite.queryClient.SkippedEpochs(suite.ctx, req)
 			if tc.expPass {
 				suite.Require().NoError(err)
 				suite.Require().Equal(expRes, res)
@@ -171,7 +168,6 @@ func (suite *KeeperTestSuite) TestSkippedEpochs() {
 
 func (suite *KeeperTestSuite) TestQueryCirculatingSupply() {
 	// Team allocation is only set on mainnet
-	ctx := sdk.WrapSDKContext(suite.ctx)
 
 	// Mint coins to increase supply
 	mintDenom := suite.app.InflationKeeper.GetParams(suite.ctx).MintDenom
@@ -182,13 +178,12 @@ func (suite *KeeperTestSuite) TestQueryCirculatingSupply() {
 	// team allocation is zero if not on mainnet
 	expCirculatingSupply := sdk.NewDecCoin(mintDenom, sdk.TokensFromConsensusPower(400_000_000, ethermint.PowerReduction))
 
-	res, err := suite.queryClient.CirculatingSupply(ctx, &types.QueryCirculatingSupplyRequest{})
+	res, err := suite.queryClient.CirculatingSupply(suite.ctx, &types.QueryCirculatingSupplyRequest{})
 	suite.Require().NoError(err)
 	suite.Require().Equal(expCirculatingSupply, res.CirculatingSupply)
 }
 
 func (suite *KeeperTestSuite) TestQueryInflationRate() {
-	ctx := sdk.WrapSDKContext(suite.ctx)
 
 	// Mint coins to increase supply
 	mintDenom := suite.app.InflationKeeper.GetParams(suite.ctx).MintDenom
@@ -197,16 +192,15 @@ func (suite *KeeperTestSuite) TestQueryInflationRate() {
 	suite.Require().NoError(err)
 
 	expInflationRate := sdkmath.LegacyMustNewDecFromStr("4.076087000000000000")
-	res, err := suite.queryClient.InflationRate(ctx, &types.QueryInflationRateRequest{})
+	res, err := suite.queryClient.InflationRate(suite.ctx, &types.QueryInflationRateRequest{})
 	suite.Require().NoError(err)
 	suite.Require().Equal(expInflationRate, res.InflationRate)
 }
 
 func (suite *KeeperTestSuite) TestQueryParams() {
-	ctx := sdk.WrapSDKContext(suite.ctx)
 	expParams := types.DefaultParams()
 
-	res, err := suite.queryClient.Params(ctx, &types.QueryParamsRequest{})
+	res, err := suite.queryClient.Params(suite.ctx, &types.QueryParamsRequest{})
 	suite.Require().NoError(err)
 	suite.Require().Equal(expParams, res.Params)
 }

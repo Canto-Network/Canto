@@ -3,6 +3,7 @@ package canto.inflation.v1;
 
 import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";
+import "amino/amino.proto";
 
 option go_package = "github.com/Canto-Network/Canto/v7/x/inflation/types";
 
@@ -19,6 +20,7 @@ message InflationDistribution {
   string staking_rewards = 1 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (amino.dont_omitempty) = true,
     (gogoproto.nullable) = false
   ];
   // // usage_incentives defines the proportion of the minted minted_denom that
@@ -33,6 +35,7 @@ message InflationDistribution {
   string community_pool = 3 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (amino.dont_omitempty) = true,
     (gogoproto.nullable) = false
   ];
 }
@@ -47,30 +50,35 @@ message ExponentialCalculation {
   string a = 1 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (amino.dont_omitempty) = true,
     (gogoproto.nullable) = false
   ];
   // reduction factor
   string r = 2 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (amino.dont_omitempty) = true,
     (gogoproto.nullable) = false
   ];
   // long term inflation
   string c = 3 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (amino.dont_omitempty) = true,
     (gogoproto.nullable) = false
   ];
   // bonding target
   string bonding_target = 4 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (amino.dont_omitempty) = true,
     (gogoproto.nullable) = false
   ];
   // max variance
   string max_variance = 5 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (amino.dont_omitempty) = true,
     (gogoproto.nullable) = false
   ];
 }

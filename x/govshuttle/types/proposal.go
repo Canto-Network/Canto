@@ -105,3 +105,22 @@ func (tp *TreasuryProposal) FromTreasuryToLendingMarket() *LendingMarketProposal
 		Metadata:    &lm,
 	}
 }
+
+func (tp *MsgTreasuryProposal) FromTreasuryToLendingMarket() *MsgLendingMarketProposal {
+	m := tp.GetMetadata()
+
+	lm := LendingMarketMetadata{
+		Account:    []string{m.GetRecipient()},
+		PropId:     m.GetPropID(),
+		Values:     []uint64{m.GetAmount()},
+		Calldatas:  nil,
+		Signatures: []string{m.GetDenom()},
+	}
+
+	return &MsgLendingMarketProposal{
+		Authority:   tp.GetAuthority(),
+		Title:       tp.GetTitle(),
+		Description: tp.GetDescription(),
+		Metadata:    &lm,
+	}
+}
