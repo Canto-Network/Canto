@@ -37,30 +37,35 @@ message Pool {
 message Params {
   option (gogoproto.equal) = true;
   option (gogoproto.goproto_stringer) = false;
-  option (amino.name) = "canto/x/coinswap/MsgUpdateParams";
+  option (amino.name) = "canto/x/coinswap/Params";
 
   string fee = 1 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (amino.dont_omitempty) = true,
     (gogoproto.nullable) = false
   ];
 
   cosmos.base.v1beta1.Coin pool_creation_fee = 2
-      [ (gogoproto.nullable) = false ];
+      [ (amino.dont_omitempty) = true, (gogoproto.nullable) = false ];
 
   string tax_rate = 3 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (amino.dont_omitempty) = true,
     (gogoproto.nullable) = false
   ];
 
   string max_standard_coin_per_pool = 4 [
     (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (amino.dont_omitempty) = true,
     (gogoproto.nullable) = false
   ];
 
   repeated cosmos.base.v1beta1.Coin max_swap_amount = 6 [
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
+    (amino.encoding) = "legacy_coins",
+    (amino.dont_omitempty) = true,
     (gogoproto.nullable) = false
   ];
 }

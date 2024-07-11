@@ -18,6 +18,7 @@ message Params {
   string csr_shares = 2 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (amino.dont_omitempty) = true,
     (gogoproto.nullable) = false
   ];
 }

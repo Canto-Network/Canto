@@ -15,7 +15,7 @@ message GenesisState {
 
 // Params holds parameters for the onboarding module
 message Params {
-  option (amino.name) = "canto/x/onboarding/MsgUpdateParams";
+  option (amino.name) = "canto/x/onboarding/Params";
 
   // enable onboarding IBC middleware
   bool enable_onboarding = 1;

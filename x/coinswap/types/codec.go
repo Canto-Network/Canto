@@ -21,11 +21,11 @@ func init() {
 
 // RegisterLegacyAminoCodec registers concrete types on the codec.
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&MsgSwapOrder{}, "coinswap/MsgSwapOrder", nil)
-	cdc.RegisterConcrete(&MsgAddLiquidity{}, "coinswap/MsgAddLiquidity", nil)
-	cdc.RegisterConcrete(&MsgRemoveLiquidity{}, "coinswap/MsgRemoveLiquidity", nil)
-	cdc.RegisterConcrete(&MsgUpdateParams{}, "coinswap/x/coinswap/MsgUpdateParams", nil)
-	cdc.RegisterConcrete(&Params{}, "coinswap/x/coinswap/Params", nil)
+	cdc.RegisterConcrete(&MsgSwapOrder{}, "canto/MsgSwapOrder", nil)
+	cdc.RegisterConcrete(&MsgAddLiquidity{}, "canto/MsgAddLiquidity", nil)
+	cdc.RegisterConcrete(&MsgRemoveLiquidity{}, "canto/MsgRemoveLiquidity", nil)
+	cdc.RegisterConcrete(&MsgUpdateParams{}, "canto/x/coinswap/MsgUpdateParams", nil)
+	cdc.RegisterConcrete(&Params{}, "canto/x/coinswap/Params", nil)
 
 }
 
