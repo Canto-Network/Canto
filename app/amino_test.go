@@ -8,8 +8,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoregistry"
-	"google.golang.org/protobuf/types/known/anypb"
 	"pgregory.net/rapid"
+
+	"github.com/cosmos/cosmos-proto/rapidproto"
 
 	authapi "cosmossdk.io/api/cosmos/auth/v1beta1"
 	v1beta1 "cosmossdk.io/api/cosmos/base/v1beta1"
@@ -17,7 +18,6 @@ import (
 	txv1beta1 "cosmossdk.io/api/cosmos/tx/v1beta1"
 	"cosmossdk.io/x/tx/signing/aminojson"
 	signing_testutil "cosmossdk.io/x/tx/signing/testutil"
-	"github.com/cosmos/cosmos-proto/rapidproto"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/bech32"
@@ -176,16 +176,6 @@ func TestAminoJSON_Equivalence(t *testing.T) {
 				require.Equal(t, string(legacySignBz), string(signBz))
 			})
 		})
-	}
-}
-
-func newAny(t *testing.T, msg proto.Message) *anypb.Any {
-	bz, err := proto.Marshal(msg)
-	require.NoError(t, err)
-	typeName := fmt.Sprintf("/%s", msg.ProtoReflect().Descriptor().FullName())
-	return &anypb.Any{
-		TypeUrl: typeName,
-		Value:   bz,
 	}
 }
 
