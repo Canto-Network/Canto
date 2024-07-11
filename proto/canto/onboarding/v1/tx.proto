@@ -23,7 +23,7 @@ message MsgUpdateParams {
   // authority is the address that controls the module (defaults to x/gov unless
   // overwritten).
   string authority = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
-  option (amino.name) = "canto/MsgUpdateParams";
+  option (amino.name) = "canto/x/onboarding/MsgUpdateParams";
 
   // params defines the x/onboarding parameters to update.
   //

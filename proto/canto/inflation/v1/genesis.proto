@@ -2,6 +2,7 @@ syntax = "proto3";
 package canto.inflation.v1;
 
 import "gogoproto/gogo.proto";
+import "amino/amino.proto";
 
 import "canto/inflation/v1/inflation.proto";
 
@@ -23,14 +24,16 @@ message GenesisState {
 
 // Params holds parameters for the inflation module.
 message Params {
+  option (amino.name) = "canto/x/inflation/Params";
+
   // type of coin to mint
   string mint_denom = 1;
   // variables to calculate exponential inflation
   ExponentialCalculation exponential_calculation = 2
-      [ (gogoproto.nullable) = false ];
+      [ (amino.dont_omitempty) = true, (gogoproto.nullable) = false ];
   // inflation distribution of the minted denom
   InflationDistribution inflation_distribution = 3
-      [ (gogoproto.nullable) = false ];
+      [ (amino.dont_omitempty) = true, (gogoproto.nullable) = false ];
   // parameter to enable inflation and halt increasing the skipped_epochs
   bool enable_inflation = 4;
 }
