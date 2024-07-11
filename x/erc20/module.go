@@ -9,6 +9,7 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
+	"cosmossdk.io/core/address"
 	"cosmossdk.io/core/appmodule"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -35,7 +36,9 @@ var (
 )
 
 // app module Basics object
-type AppModuleBasic struct{}
+type AppModuleBasic struct {
+	ac address.Codec
+}
 
 func (AppModuleBasic) Name() string {
 	return types.ModuleName
@@ -78,8 +81,8 @@ func (b AppModuleBasic) RegisterGRPCGatewayRoutes(c client.Context, serveMux *ru
 }
 
 // GetTxCmd returns the root tx command for the erc20 module.
-func (AppModuleBasic) GetTxCmd() *cobra.Command {
-	return cli.NewTxCmd()
+func (b AppModuleBasic) GetTxCmd() *cobra.Command {
+	return cli.NewTxCmd(b.ac)
 }
 
 // GetQueryCmd returns no root query command for the erc20 module.
@@ -97,9 +100,10 @@ type AppModule struct {
 func NewAppModule(
 	k keeper.Keeper,
 	ak authkeeper.AccountKeeper,
+	ac address.Codec,
 ) AppModule {
 	return AppModule{
-		AppModuleBasic: AppModuleBasic{},
+		AppModuleBasic: AppModuleBasic{ac: ac},
 		keeper:         k,
 		ak:             ak,
 	}

@@ -2393,6 +2393,8 @@ func (x *TokenPair) GetContractOwner() Owner {
 
 // RegisterCoinProposal is a gov Content type to register a token pair for a
 // native Cosmos coin.
+// Deprecated: This legacy proposal is deprecated in favor of Msg-based gov
+// proposals, see MsgRegisterCoin.
 //
 // Deprecated: Do not use.
 type RegisterCoinProposal struct {
@@ -2451,6 +2453,8 @@ func (x *RegisterCoinProposal) GetMetadata() *v1beta1.Metadata {
 
 // RegisterERC20Proposal is a gov Content type to register a token pair for an
 // ERC20 token
+// Deprecated: This legacy proposal is deprecated in favor of Msg-based gov
+// proposals, see MsgRegisterERC20.
 //
 // Deprecated: Do not use.
 type RegisterERC20Proposal struct {
@@ -2509,6 +2513,8 @@ func (x *RegisterERC20Proposal) GetErc20Address() string {
 
 // ToggleTokenConversionProposal is a gov Content type to toggle the conversion
 // of a token pair.
+// Deprecated: This legacy proposal is deprecated in favor of Msg-based gov
+// proposals, see MsgToggleTokenConversion.
 //
 // Deprecated: Do not use.
 type ToggleTokenConversionProposal struct {
