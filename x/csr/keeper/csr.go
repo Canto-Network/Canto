@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 
 	"cosmossdk.io/store/prefix"
+	storetypes "cosmossdk.io/store/types"
 	"github.com/Canto-Network/Canto/v7/x/csr/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -25,6 +26,29 @@ func (k Keeper) GetCSR(ctx sdk.Context, nftId uint64) (*types.CSR, bool) {
 	csr := &types.CSR{}
 	csr.Unmarshal(bz)
 	return csr, true
+}
+
+// Returns all CSR objects in the store.
+func (k Keeper) GetAllCSRs(ctx sdk.Context) (csrs []types.CSR) {
+	k.IterateAllCSRs(ctx, func(csr types.CSR) bool {
+		csrs = append(csrs, csr)
+		return false
+	})
+	return
+}
+
+// Iterates over all CSR objects in the store and performs a callback function on each CSR.
+func (k Keeper) IterateAllCSRs(ctx sdk.Context, cb func(csr types.CSR) (stop bool)) {
+	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	iter := storetypes.KVStorePrefixIterator(store, types.KeyPrefixCSR)
+	defer iter.Close()
+	for ; iter.Valid(); iter.Next() {
+		var csr types.CSR
+		k.cdc.MustUnmarshal(iter.Value(), &csr)
+		if cb(csr) {
+			break
+		}
+	}
 }
 
 // Returns the NFT ID associated with a smart contract address. If the smart contract address
