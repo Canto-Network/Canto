@@ -17,8 +17,9 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, accountKeeper authkeeper.Acco
 	for _, csr := range genState.Csrs {
 		k.SetCSR(ctx, csr)
 	}
-	if genState.TurnstileAddress != nil {
-		k.SetTurnstile(ctx, common.BytesToAddress(genState.TurnstileAddress))
+	if genState.TurnstileAddress != "" {
+		turnstileAddress := common.HexToAddress(genState.TurnstileAddress)
+		k.SetTurnstile(ctx, turnstileAddress)
 	}
 	// make sure that the csr module account is set on genesis
 	if acc := accountKeeper.GetModuleAccount(ctx, types.ModuleName); acc == nil {
@@ -41,9 +42,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	turnstileAddr, ok := k.GetTurnstile(ctx)
 	if ok {
-		genesis.TurnstileAddress = turnstileAddr.Bytes()
-	} else {
-		genesis.TurnstileAddress = nil
+		genesis.TurnstileAddress = turnstileAddr.String()
 	}
 
 	return genesis

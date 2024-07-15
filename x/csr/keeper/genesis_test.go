@@ -23,7 +23,7 @@ func (suite *KeeperTestSuite) TestImportExportGenesisEmpty() {
 	suite.Require().Empty(csrs)
 
 	genState := csr.ExportGenesis(suite.ctx, suite.app.CSRKeeper)
-	suite.Require().Nil(genState.TurnstileAddress)
+	suite.Require().Equal("", genState.TurnstileAddress)
 	suite.Require().Empty(genState.Csrs)
 
 	// Copy genState to genState2 and init with it
@@ -39,7 +39,7 @@ func (suite *KeeperTestSuite) TestImportExportGenesisEmpty() {
 	genState3 := csr.ExportGenesis(suite.ctx, suite.app.CSRKeeper)
 	suite.Equal(*genState, genState2)
 	suite.Equal(genState2, *genState3)
-	suite.Require().Nil(genState3.TurnstileAddress)
+	suite.Require().Equal("", genState3.TurnstileAddress)
 	suite.Require().Empty(genState3.Csrs)
 }
 

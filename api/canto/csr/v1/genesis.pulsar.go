@@ -156,8 +156,8 @@ func (x *fastReflection_GenesisState) Range(f func(protoreflect.FieldDescriptor,
 			return
 		}
 	}
-	if len(x.TurnstileAddress) != 0 {
-		value := protoreflect.ValueOfBytes(x.TurnstileAddress)
+	if x.TurnstileAddress != "" {
+		value := protoreflect.ValueOfString(x.TurnstileAddress)
 		if !f(fd_GenesisState_turnstile_address, value) {
 			return
 		}
@@ -182,7 +182,7 @@ func (x *fastReflection_GenesisState) Has(fd protoreflect.FieldDescriptor) bool 
 	case "canto.csr.v1.GenesisState.csrs":
 		return len(x.Csrs) != 0
 	case "canto.csr.v1.GenesisState.turnstile_address":
-		return len(x.TurnstileAddress) != 0
+		return x.TurnstileAddress != ""
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.csr.v1.GenesisState"))
@@ -204,7 +204,7 @@ func (x *fastReflection_GenesisState) Clear(fd protoreflect.FieldDescriptor) {
 	case "canto.csr.v1.GenesisState.csrs":
 		x.Csrs = nil
 	case "canto.csr.v1.GenesisState.turnstile_address":
-		x.TurnstileAddress = nil
+		x.TurnstileAddress = ""
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.csr.v1.GenesisState"))
@@ -232,7 +232,7 @@ func (x *fastReflection_GenesisState) Get(descriptor protoreflect.FieldDescripto
 		return protoreflect.ValueOfList(listValue)
 	case "canto.csr.v1.GenesisState.turnstile_address":
 		value := x.TurnstileAddress
-		return protoreflect.ValueOfBytes(value)
+		return protoreflect.ValueOfString(value)
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.csr.v1.GenesisState"))
@@ -260,7 +260,7 @@ func (x *fastReflection_GenesisState) Set(fd protoreflect.FieldDescriptor, value
 		clv := lv.(*_GenesisState_2_list)
 		x.Csrs = *clv.list
 	case "canto.csr.v1.GenesisState.turnstile_address":
-		x.TurnstileAddress = value.Bytes()
+		x.TurnstileAddress = value.Interface().(string)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.csr.v1.GenesisState"))
@@ -314,7 +314,7 @@ func (x *fastReflection_GenesisState) NewField(fd protoreflect.FieldDescriptor) 
 		list := []*CSR{}
 		return protoreflect.ValueOfList(&_GenesisState_2_list{list: &list})
 	case "canto.csr.v1.GenesisState.turnstile_address":
-		return protoreflect.ValueOfBytes(nil)
+		return protoreflect.ValueOfString("")
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.csr.v1.GenesisState"))
@@ -587,7 +587,7 @@ func (x *fastReflection_GenesisState) ProtoMethods() *protoiface.Methods {
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field TurnstileAddress", wireType)
 				}
-				var byteLen int
+				var stringLen uint64
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -597,25 +597,23 @@ func (x *fastReflection_GenesisState) ProtoMethods() *protoiface.Methods {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					byteLen |= int(b&0x7F) << shift
+					stringLen |= uint64(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
-				if byteLen < 0 {
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
 				}
-				postIndex := iNdEx + byteLen
+				postIndex := iNdEx + intStringLen
 				if postIndex < 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
 				}
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.TurnstileAddress = append(x.TurnstileAddress[:0], dAtA[iNdEx:postIndex]...)
-				if x.TurnstileAddress == nil {
-					x.TurnstileAddress = []byte{}
-				}
+				x.TurnstileAddress = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
@@ -674,7 +672,7 @@ type GenesisState struct {
 	// params defines all of the parameters of the module
 	Params           *Params `protobuf:"bytes,1,opt,name=params,proto3" json:"params,omitempty"`
 	Csrs             []*CSR  `protobuf:"bytes,2,rep,name=csrs,proto3" json:"csrs,omitempty"`
-	TurnstileAddress []byte  `protobuf:"bytes,3,opt,name=turnstile_address,json=turnstileAddress,proto3" json:"turnstile_address,omitempty"`
+	TurnstileAddress string  `protobuf:"bytes,3,opt,name=turnstile_address,json=turnstileAddress,proto3" json:"turnstile_address,omitempty"`
 }
 
 func (x *GenesisState) Reset() {
@@ -711,11 +709,11 @@ func (x *GenesisState) GetCsrs() []*CSR {
 	return nil
 }
 
-func (x *GenesisState) GetTurnstileAddress() []byte {
+func (x *GenesisState) GetTurnstileAddress() string {
 	if x != nil {
 		return x.TurnstileAddress
 	}
-	return nil
+	return ""
 }
 
 var File_canto_csr_v1_genesis_proto protoreflect.FileDescriptor
@@ -736,7 +734,7 @@ var file_canto_csr_v1_genesis_proto_rawDesc = []byte{
 	0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x63,
 	0x73, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x53, 0x52, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52,
 	0x04, 0x63, 0x73, 0x72, 0x73, 0x12, 0x2b, 0x0a, 0x11, 0x74, 0x75, 0x72, 0x6e, 0x73, 0x74, 0x69,
-	0x6c, 0x65, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0c,
+	0x6c, 0x65, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09,
 	0x52, 0x10, 0x74, 0x75, 0x72, 0x6e, 0x73, 0x74, 0x69, 0x6c, 0x65, 0x41, 0x64, 0x64, 0x72, 0x65,
 	0x73, 0x73, 0x42, 0x97, 0x01, 0x0a, 0x10, 0x63, 0x6f, 0x6d, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f,
 	0x2e, 0x63, 0x73, 0x72, 0x2e, 0x76, 0x31, 0x42, 0x0c, 0x47, 0x65, 0x6e, 0x65, 0x73, 0x69, 0x73,

@@ -12,5 +12,5 @@ message GenesisState {
   // params defines all of the parameters of the module
   Params params = 1 [ (gogoproto.nullable) = false ];
   repeated CSR csrs = 2 [ (gogoproto.nullable) = false ];
-  bytes turnstile_address = 3;
+  string turnstile_address = 3;
 }
