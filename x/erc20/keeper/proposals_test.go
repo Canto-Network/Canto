@@ -58,7 +58,7 @@ func (suite KeeperTestSuite) TestRegisterCoin() {
 			"denom already registered",
 			func() {
 				regPair := types.NewTokenPair(tests.GenerateAddress(), metadata.Base, true, types.OWNER_MODULE)
-				suite.app.Erc20Keeper.SetDenomMap(suite.ctx, regPair.Denom, regPair.GetID())
+				suite.app.Erc20Keeper.SetTokenPairIdByDenom(suite.ctx, regPair.Denom, regPair.GetID())
 				suite.Commit()
 			},
 			false,
@@ -220,14 +220,14 @@ func (suite KeeperTestSuite) TestRegisterERC20() {
 		{
 			"token ERC20 already registered",
 			func() {
-				suite.app.Erc20Keeper.SetERC20Map(suite.ctx, pair.GetERC20Contract(), pair.GetID())
+				suite.app.Erc20Keeper.SetTokenPairIdByERC20Addr(suite.ctx, pair.GetERC20Contract(), pair.GetID())
 			},
 			false,
 		},
 		{
 			"denom already registered",
 			func() {
-				suite.app.Erc20Keeper.SetDenomMap(suite.ctx, pair.Denom, pair.GetID())
+				suite.app.Erc20Keeper.SetTokenPairIdByDenom(suite.ctx, pair.Denom, pair.GetID())
 			},
 			false,
 		},
@@ -328,7 +328,7 @@ func (suite KeeperTestSuite) TestToggleConverision() {
 				suite.Require().NoError(err)
 				suite.Commit()
 				pair = types.NewTokenPair(contractAddr, cosmosTokenBase, true, types.OWNER_MODULE)
-				suite.app.Erc20Keeper.SetERC20Map(suite.ctx, common.HexToAddress(pair.Erc20Address), pair.GetID())
+				suite.app.Erc20Keeper.SetTokenPairIdByERC20Addr(suite.ctx, common.HexToAddress(pair.Erc20Address), pair.GetID())
 			},
 			false,
 			false,

@@ -90,7 +90,7 @@ func (h Hooks) PostTxProcessing(
 
 		// Check that the contract is a registered token pair
 		contractAddr := log.Address
-		id := h.k.GetERC20Map(ctx, contractAddr)
+		id := h.k.GetTokenPairIdByERC20Addr(ctx, contractAddr)
 		if len(id) == 0 {
 			continue
 		}

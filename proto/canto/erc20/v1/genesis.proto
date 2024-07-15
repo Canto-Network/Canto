@@ -13,6 +13,14 @@ message GenesisState {
   Params params = 1 [ (gogoproto.nullable) = false ];
   // registered token pairs
   repeated TokenPair token_pairs = 2 [ (gogoproto.nullable) = false ];
+  // list of mappings from Cosmos denoms to token pair IDs, used for indexing
+  // token pairs by their denom
+  repeated TokenPairDenomIndex denom_indexes = 3
+      [ (gogoproto.nullable) = false ];
+  // list of mappings from ERC20 addresses to token pair IDs, used for indexing
+  // token pairs by their ERC20 address
+  repeated TokenPairERC20AddressIndex erc20_address_indexes = 4
+      [ (gogoproto.nullable) = false ];
 }
 
 // Params defines the erc20 module params

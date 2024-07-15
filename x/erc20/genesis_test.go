@@ -21,6 +21,53 @@ import (
 	"github.com/Canto-Network/Canto/v7/x/erc20/types"
 )
 
+var (
+	uqstars = "ibc/13B6057538B93225F6EBACCB64574C49B2C1568C5AE6CCFE0A039D7DAC02BF29"
+	// uqstars1 and uqstars2 have same denom
+	// uqstars1 is deployed first.
+	uqstars1 = types.TokenPair{
+		Erc20Address:  "0x2C68D1d6aB986Ff4640b51e1F14C716a076E44C4",
+		Denom:         uqstars,
+		Enabled:       true,
+		ContractOwner: types.OWNER_MODULE,
+	}
+	// uqstars2 is deployed later than uqstars1.
+	uqstars2 = types.TokenPair{
+		Erc20Address:  "0xD32eB974468ed767338533842D2D4Cc90B9BAb46",
+		Denom:         uqstars,
+		Enabled:       true,
+		ContractOwner: types.OWNER_MODULE,
+	}
+	customERC20 = types.TokenPair{
+		Erc20Address:  "0xC5e00D3b04563950941f7137B5AfA3a534F0D6d6",
+		Denom:         "custom",
+		Enabled:       true,
+		ContractOwner: types.OWNER_EXTERNAL,
+	}
+
+	tokenPairs = []types.TokenPair{
+		uqstars2,
+		// even if we put uqstars1 later, it should be disabled because
+		// uqstars2 is the deployed later than uqstars1
+		uqstars1,
+		customERC20,
+	}
+	denomIdxs = []types.TokenPairDenomIndex{
+		{
+			Denom: uqstars,
+			// denomIdx must have latest token pair id
+			// if there are multiple token pairs with the same denom
+			TokenPairId: uqstars2.GetID(),
+		},
+	}
+	erc20AddrIdxs = []types.TokenPairERC20AddressIndex{
+		{
+			Erc20Address: customERC20.GetERC20Contract().Bytes(),
+			TokenPairId:  customERC20.GetID(),
+		},
+	}
+)
+
 type GenesisTestSuite struct {
 	suite.Suite
 	ctx     sdk.Context
@@ -82,30 +129,34 @@ func (suite *GenesisTestSuite) TestERC20InitGenesis() {
 			"custom genesis",
 			types.NewGenesisState(
 				types.DefaultParams(),
-				[]types.TokenPair{
-					{
-						Erc20Address:  "0x5dCA2483280D9727c80b5518faC4556617fb19ZZ",
-						Denom:         "coin",
-						Enabled:       true,
-						ContractOwner: types.OWNER_MODULE,
-					},
-				}),
+				tokenPairs,
+				denomIdxs,
+				erc20AddrIdxs,
+			),
 		},
 	}
 
 	for _, tc := range testCases {
-
+		suite.Nil(tc.genesisState.Validate(), "genesis state should be valid")
 		suite.Require().NotPanics(func() {
 			erc20.InitGenesis(suite.ctx, suite.app.Erc20Keeper, suite.app.AccountKeeper, tc.genesisState)
 		})
 		params := suite.app.Erc20Keeper.GetParams(suite.ctx)
+		suite.Require().Equal(tc.genesisState.Params, params)
 
 		tokenPairs := suite.app.Erc20Keeper.GetTokenPairs(suite.ctx)
-		suite.Require().Equal(tc.genesisState.Params, params)
 		if len(tokenPairs) > 0 {
 			suite.Require().Equal(tc.genesisState.TokenPairs, tokenPairs)
+			suite.Equal(denomIdxs, suite.app.Erc20Keeper.GetAllTokenPairDenomIndexes(suite.ctx))
+			suite.Equal(erc20AddrIdxs, suite.app.Erc20Keeper.GetAllTokenPairERC20AddressIndexes(suite.ctx))
+			suite.Equal(
+				uqstars2.GetID(), suite.app.Erc20Keeper.GetTokenPairIdByDenom(suite.ctx, uqstars),
+				"denom index must have latest token pair id",
+			)
 		} else {
-			suite.Require().Len(tc.genesisState.TokenPairs, 0)
+			suite.Len(tc.genesisState.TokenPairs, 0)
+			suite.Len(suite.app.Erc20Keeper.GetAllTokenPairDenomIndexes(suite.ctx), 0)
+			suite.Len(suite.app.Erc20Keeper.GetAllTokenPairERC20AddressIndexes(suite.ctx), 0)
 		}
 	}
 }
@@ -127,14 +178,10 @@ func (suite *GenesisTestSuite) TestErc20ExportGenesis() {
 			"custom genesis",
 			types.NewGenesisState(
 				types.DefaultParams(),
-				[]types.TokenPair{
-					{
-						Erc20Address:  "0x5dCA2483280D9727c80b5518faC4556617fb19ZZ",
-						Denom:         "coin",
-						Enabled:       true,
-						ContractOwner: types.OWNER_MODULE,
-					},
-				}),
+				tokenPairs,
+				denomIdxs,
+				erc20AddrIdxs,
+			),
 		},
 	}
 
@@ -147,11 +194,18 @@ func (suite *GenesisTestSuite) TestErc20ExportGenesis() {
 
 			tokenPairs := suite.app.Erc20Keeper.GetTokenPairs(suite.ctx)
 			if len(tokenPairs) > 0 {
-				suite.Require().Equal(genesisExported.TokenPairs, tokenPairs)
+				suite.Require().Equal(tc.genesisState.TokenPairs, tokenPairs)
+				suite.Equal(denomIdxs, suite.app.Erc20Keeper.GetAllTokenPairDenomIndexes(suite.ctx))
+				suite.Equal(erc20AddrIdxs, suite.app.Erc20Keeper.GetAllTokenPairERC20AddressIndexes(suite.ctx))
+				suite.Equal(
+					uqstars2.GetID(), suite.app.Erc20Keeper.GetTokenPairIdByDenom(suite.ctx, uqstars),
+					"denom index must have latest token pair id",
+				)
 			} else {
-				suite.Require().Len(genesisExported.TokenPairs, 0)
+				suite.Len(tc.genesisState.TokenPairs, 0)
+				suite.Len(suite.app.Erc20Keeper.GetAllTokenPairDenomIndexes(suite.ctx), 0)
+				suite.Len(suite.app.Erc20Keeper.GetAllTokenPairERC20AddressIndexes(suite.ctx), 0)
 			}
 		})
-		// }
 	}
 }

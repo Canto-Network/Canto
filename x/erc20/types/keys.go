@@ -33,7 +33,7 @@ const (
 
 // KVStore key prefixes
 var (
-	KeyPrefixTokenPair        = []byte{prefixTokenPair}
-	KeyPrefixTokenPairByERC20 = []byte{prefixTokenPairByERC20}
-	KeyPrefixTokenPairByDenom = []byte{prefixTokenPairByDenom}
+	KeyPrefixTokenPair               = []byte{prefixTokenPair}
+	KeyPrefixTokenPairByERC20Address = []byte{prefixTokenPairByERC20}
+	KeyPrefixTokenPairByDenom        = []byte{prefixTokenPairByDenom}
 )

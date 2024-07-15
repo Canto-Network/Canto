@@ -18,7 +18,7 @@ func TestGenesisTestSuite(t *testing.T) {
 }
 
 func (suite *GenesisTestSuite) TestValidateGenesis() {
-	newGen := NewGenesisState(DefaultParams(), []TokenPair{})
+	newGen := NewGenesisState(DefaultParams(), []TokenPair{}, []TokenPairDenomIndex{}, []TokenPairERC20AddressIndex{})
 
 	testCases := []struct {
 		name     string

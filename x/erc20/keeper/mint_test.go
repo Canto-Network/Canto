@@ -40,8 +40,8 @@ func (suite *KeeperTestSuite) TestMintingEnabled() {
 			func() {
 				expPair.Enabled = false
 				suite.app.Erc20Keeper.SetTokenPair(suite.ctx, expPair)
-				suite.app.Erc20Keeper.SetDenomMap(suite.ctx, expPair.Denom, id)
-				suite.app.Erc20Keeper.SetERC20Map(suite.ctx, expPair.GetERC20Contract(), id)
+				suite.app.Erc20Keeper.SetTokenPairIdByDenom(suite.ctx, expPair.Denom, id)
+				suite.app.Erc20Keeper.SetTokenPairIdByERC20Addr(suite.ctx, expPair.GetERC20Contract(), id)
 			},
 			false,
 		},
@@ -50,8 +50,8 @@ func (suite *KeeperTestSuite) TestMintingEnabled() {
 			func() {
 				expPair.Enabled = true
 				suite.app.Erc20Keeper.SetTokenPair(suite.ctx, expPair)
-				suite.app.Erc20Keeper.SetDenomMap(suite.ctx, expPair.Denom, id)
-				suite.app.Erc20Keeper.SetERC20Map(suite.ctx, expPair.GetERC20Contract(), id)
+				suite.app.Erc20Keeper.SetTokenPairIdByDenom(suite.ctx, expPair.Denom, id)
+				suite.app.Erc20Keeper.SetTokenPairIdByERC20Addr(suite.ctx, expPair.GetERC20Contract(), id)
 
 				params := banktypes.DefaultParams()
 				params.SendEnabled = []*banktypes.SendEnabled{
@@ -64,8 +64,8 @@ func (suite *KeeperTestSuite) TestMintingEnabled() {
 		{
 			"token not registered",
 			func() {
-				suite.app.Erc20Keeper.SetDenomMap(suite.ctx, expPair.Denom, id)
-				suite.app.Erc20Keeper.SetERC20Map(suite.ctx, expPair.GetERC20Contract(), id)
+				suite.app.Erc20Keeper.SetTokenPairIdByDenom(suite.ctx, expPair.Denom, id)
+				suite.app.Erc20Keeper.SetTokenPairIdByERC20Addr(suite.ctx, expPair.GetERC20Contract(), id)
 			},
 			false,
 		},
@@ -73,8 +73,8 @@ func (suite *KeeperTestSuite) TestMintingEnabled() {
 			"receiver address is blocked (module account)",
 			func() {
 				suite.app.Erc20Keeper.SetTokenPair(suite.ctx, expPair)
-				suite.app.Erc20Keeper.SetDenomMap(suite.ctx, expPair.Denom, id)
-				suite.app.Erc20Keeper.SetERC20Map(suite.ctx, expPair.GetERC20Contract(), id)
+				suite.app.Erc20Keeper.SetTokenPairIdByDenom(suite.ctx, expPair.Denom, id)
+				suite.app.Erc20Keeper.SetTokenPairIdByERC20Addr(suite.ctx, expPair.GetERC20Contract(), id)
 
 				acc := suite.app.AccountKeeper.GetModuleAccount(suite.ctx, types.ModuleName)
 				receiver = acc.GetAddress()
@@ -85,8 +85,8 @@ func (suite *KeeperTestSuite) TestMintingEnabled() {
 			"ok",
 			func() {
 				suite.app.Erc20Keeper.SetTokenPair(suite.ctx, expPair)
-				suite.app.Erc20Keeper.SetDenomMap(suite.ctx, expPair.Denom, id)
-				suite.app.Erc20Keeper.SetERC20Map(suite.ctx, expPair.GetERC20Contract(), id)
+				suite.app.Erc20Keeper.SetTokenPairIdByDenom(suite.ctx, expPair.Denom, id)
+				suite.app.Erc20Keeper.SetTokenPairIdByERC20Addr(suite.ctx, expPair.GetERC20Contract(), id)
 
 				receiver = sdk.AccAddress(tests.GenerateAddress().Bytes())
 			},

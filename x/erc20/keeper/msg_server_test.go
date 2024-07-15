@@ -1594,8 +1594,8 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 				id := suite.app.Erc20Keeper.GetTokenPairID(suite.ctx, ibcBase)
 				pair, ok := suite.app.Erc20Keeper.GetTokenPair(suite.ctx, id)
 				suite.Require().True(ok)
-				suite.Require().Equal(suite.app.Erc20Keeper.GetDenomMap(suite.ctx, pair.Denom), id)
-				suite.Require().Equal(suite.app.Erc20Keeper.GetERC20Map(suite.ctx, common.HexToAddress(pair.Erc20Address)), id)
+				suite.Require().Equal(suite.app.Erc20Keeper.GetTokenPairIdByDenom(suite.ctx, pair.Denom), id)
+				suite.Require().Equal(suite.app.Erc20Keeper.GetTokenPairIdByERC20Addr(suite.ctx, common.HexToAddress(pair.Erc20Address)), id)
 			},
 			false,
 		},
@@ -1628,8 +1628,8 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 				id := suite.app.Erc20Keeper.GetTokenPairID(suite.ctx, erc20Address)
 				pair, ok := suite.app.Erc20Keeper.GetTokenPair(suite.ctx, id)
 				suite.Require().True(ok)
-				suite.Require().Equal(suite.app.Erc20Keeper.GetDenomMap(suite.ctx, pair.Denom), id)
-				suite.Require().Equal(suite.app.Erc20Keeper.GetERC20Map(suite.ctx, common.HexToAddress(pair.Erc20Address)), id)
+				suite.Require().Equal(suite.app.Erc20Keeper.GetTokenPairIdByDenom(suite.ctx, pair.Denom), id)
+				suite.Require().Equal(suite.app.Erc20Keeper.GetTokenPairIdByERC20Addr(suite.ctx, common.HexToAddress(pair.Erc20Address)), id)
 			},
 			false,
 		},

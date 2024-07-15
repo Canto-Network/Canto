@@ -3,10 +3,14 @@ package types
 import "fmt"
 
 // NewGenesisState creates a new genesis state.
-func NewGenesisState(params Params, pairs []TokenPair) GenesisState {
+func NewGenesisState(
+	params Params, pairs []TokenPair, denomIndexes []TokenPairDenomIndex, erc20AddrIndexes []TokenPairERC20AddressIndex,
+) GenesisState {
 	return GenesisState{
-		Params:     params,
-		TokenPairs: pairs,
+		Params:              params,
+		TokenPairs:          pairs,
+		DenomIndexes:        denomIndexes,
+		Erc20AddressIndexes: erc20AddrIndexes,
 	}
 }
 

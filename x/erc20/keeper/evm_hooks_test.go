@@ -136,8 +136,8 @@ func (suite *KeeperTestSuite) TestEvmHooksRegisteredERC20() {
 
 				suite.app.Erc20Keeper.DeleteTokenPair(suite.ctx, *pair)
 
-				suite.app.Erc20Keeper.SetDenomMap(suite.ctx, pair.Denom, pair.GetID())
-				suite.app.Erc20Keeper.SetERC20Map(suite.ctx, pair.GetERC20Contract(), pair.GetID())
+				suite.app.Erc20Keeper.SetTokenPairIdByDenom(suite.ctx, pair.Denom, pair.GetID())
+				suite.app.Erc20Keeper.SetTokenPairIdByERC20Addr(suite.ctx, pair.GetERC20Contract(), pair.GetID())
 				// Mint 10 tokens to suite.address (owner)
 				_ = suite.MintERC20Token(contractAddr, suite.address, suite.address, big.NewInt(10))
 				suite.Commit()
