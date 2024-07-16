@@ -142,6 +142,7 @@ func (k Keeper) IsDenomRegistered(ctx sdk.Context, denom string) bool {
 	return prefixStore.Has([]byte(denom))
 }
 
+// GetAllTokenPairDenomIndexes returns all token pair denom indexes
 func (k Keeper) GetAllTokenPairDenomIndexes(ctx sdk.Context) []types.TokenPairDenomIndex {
 	var idxs []types.TokenPairDenomIndex
 	k.IterateTokenPairDenomIndex(ctx, func(denom string, id []byte) (stop bool) {
@@ -155,6 +156,7 @@ func (k Keeper) GetAllTokenPairDenomIndexes(ctx sdk.Context) []types.TokenPairDe
 	return idxs
 }
 
+// IterateTokenPairDenomIndex iterates over all token pair denom indexes
 func (k Keeper) IterateTokenPairDenomIndex(ctx sdk.Context, cb func(denom string, id []byte) (stop bool)) {
 	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	prefixStore := prefix.NewStore(store, types.KeyPrefixTokenPairByDenom)
@@ -170,6 +172,7 @@ func (k Keeper) IterateTokenPairDenomIndex(ctx sdk.Context, cb func(denom string
 	}
 }
 
+// GetAllTokenPairERC20AddressIndexes returns all token pair ERC20 address indexes
 func (k Keeper) GetAllTokenPairERC20AddressIndexes(ctx sdk.Context) []types.TokenPairERC20AddressIndex {
 	var idxs []types.TokenPairERC20AddressIndex
 	k.IterateTokenPairERC20AddressIndex(ctx, func(erc20Addr common.Address, id []byte) (stop bool) {
@@ -183,6 +186,7 @@ func (k Keeper) GetAllTokenPairERC20AddressIndexes(ctx sdk.Context) []types.Toke
 	return idxs
 }
 
+// IterateTokenPairERC20AddressIndex iterates over all token pair ERC20 address indexes
 func (k Keeper) IterateTokenPairERC20AddressIndex(ctx sdk.Context, cb func(erc20Addr common.Address, id []byte) (stop bool)) {
 	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	prefixStore := prefix.NewStore(store, types.KeyPrefixTokenPairByERC20Address)
