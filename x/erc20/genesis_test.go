@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/suite"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -54,6 +55,10 @@ var (
 	}
 	denomIdxs = []types.TokenPairDenomIndex{
 		{
+			Denom:       customERC20.Denom,
+			TokenPairId: customERC20.GetID(),
+		},
+		{
 			Denom: uqstars,
 			// denomIdx must have latest token pair id
 			// if there are multiple token pairs with the same denom
@@ -62,8 +67,17 @@ var (
 	}
 	erc20AddrIdxs = []types.TokenPairERC20AddressIndex{
 		{
+			Erc20Address: common.HexToAddress(uqstars1.Erc20Address).Bytes(),
+			TokenPairId:  uqstars2.GetID(),
+		},
+		{
 			Erc20Address: customERC20.GetERC20Contract().Bytes(),
 			TokenPairId:  customERC20.GetID(),
+		},
+
+		{
+			Erc20Address: common.HexToAddress(uqstars2.Erc20Address).Bytes(),
+			TokenPairId:  uqstars2.GetID(),
 		},
 	}
 )
