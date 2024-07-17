@@ -120,6 +120,7 @@ import (
 	ibctesting "github.com/cosmos/ibc-go/v8/testing"
 	ibctestingtypes "github.com/cosmos/ibc-go/v8/testing/types"
 
+	coinswapv1 "github.com/Canto-Network/Canto/v7/api/canto/coinswap/v1"
 	erc20v1 "github.com/Canto-Network/Canto/v7/api/canto/erc20/v1"
 	evmv1 "github.com/evmos/ethermint/api/ethermint/evm/v1"
 	ethante "github.com/evmos/ethermint/app/ante"
@@ -310,9 +311,13 @@ func NewCanto(
 		},
 	}
 
-	// evm/MsgEthereumTx, erc20/MsgConvertERC20
+	// evm/MsgEthereumTx, erc20/MsgConvertERC20, coinswap/MsgSwapOrder
 	signingOptions.DefineCustomGetSigners(protov2.MessageName(&evmv1.MsgEthereumTx{}), evmtypes.GetSignersFromMsgEthereumTxV2)
 	signingOptions.DefineCustomGetSigners(protov2.MessageName(&erc20v1.MsgConvertERC20{}), erc20types.GetSignersFromMsgConvertERC20V2)
+	signingOptions.DefineCustomGetSigners(
+		protov2.MessageName(&coinswapv1.MsgSwapOrder{}),
+		coinswaptypes.CreateGetSignersFromMsgSwapOrderV2(&signingOptions),
+	)
 
 	interfaceRegistry, _ := types.NewInterfaceRegistryWithOptions(types.InterfaceRegistryOptions{
 		ProtoFiles:     proto.HybridResolver,

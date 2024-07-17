@@ -1,8 +1,13 @@
 package types
 
 import (
+	"fmt"
+
 	sdkmath "cosmossdk.io/math"
+	"cosmossdk.io/x/tx/signing"
+	coinswapv1 "github.com/Canto-Network/Canto/v7/api/canto/coinswap/v1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	protov2 "google.golang.org/protobuf/proto"
 )
 
 var (
@@ -70,5 +75,21 @@ func NewMsgRemoveLiquidity(
 		MinStandardAmt:    minStandardAmt,
 		Deadline:          deadline,
 		Sender:            sender,
+	}
+}
+
+func CreateGetSignersFromMsgSwapOrderV2(options *signing.Options) func(msg protov2.Message) ([][]byte, error) {
+	return func(msg protov2.Message) ([][]byte, error) {
+		msgv2, ok := msg.(*coinswapv1.MsgSwapOrder)
+		if !ok {
+			return nil, fmt.Errorf("invalid x/coinswap/MsgSwapOrder msg v2: %v", msg)
+		}
+
+		addr, err := options.AddressCodec.StringToBytes(msgv2.Input.Address)
+		if err != nil {
+			return nil, err
+		}
+
+		return [][]byte{addr}, nil
 	}
 }
