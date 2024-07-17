@@ -24,32 +24,21 @@ func InitGenesis(
 		panic("the erc20 module account has not been set")
 	}
 
-	// create token pairs by id
-	tokenPairById := map[string]types.TokenPair{}
+	// set token pair once
 	for _, pair := range data.TokenPairs {
-		id := pair.GetID()
-		tokenPairById[string(id)] = pair
+		k.SetTokenPair(ctx, pair)
 	}
 
-	// set token pairs and indexes first
+	// set token pairs and indexes
 	// multiple contracts at the same denom can exist,
 	// but only one which is in indexes are valid.
 	for _, idx := range data.DenomIndexes {
 		id := idx.GetTokenPairId()
 		k.SetTokenPairIdByDenom(ctx, idx.Denom, id)
-		k.SetTokenPair(ctx, tokenPairById[string(id)])
-		delete(tokenPairById, string(id))
 	}
 	for _, idx := range data.Erc20AddressIndexes {
 		id := idx.GetTokenPairId()
 		k.SetTokenPairIdByERC20Addr(ctx, common.BytesToAddress(idx.Erc20Address), id)
-		k.SetTokenPair(ctx, tokenPairById[string(id)])
-		delete(tokenPairById, string(id))
-	}
-
-	// set remaining token pairs (if any left which is not in indexes)
-	for _, pair := range tokenPairById {
-		k.SetTokenPair(ctx, pair)
 	}
 }
 
