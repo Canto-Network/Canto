@@ -64,10 +64,11 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 	suite.Require().True(shares.GT(sdkmath.LegacyNewDec(0)))
 
 	testCases := []struct {
-		name      string
-		msg       sdk.Msg
-		checkFunc func(uint64, sdk.Msg)
-		expectErr bool
+		name                    string
+		msg                     sdk.Msg
+		checkFunc               func(uint64, sdk.Msg)
+		expectSubmitProposalErr bool
+		expectProposalFailed    bool
 	}{
 		{
 			"fail - MsgLendingMarketProposal - authority check",
@@ -77,7 +78,7 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 				Description: "lending market proposal test description",
 				Metadata: &govshuttletypes.LendingMarketMetadata{
 					Account:    []string{"0x20F72265e2225837fd77C692e0781f720B93eF89", "0xf6Db2570A2417188a5788D6d5Fd9faAa5B1fE555"},
-					PropId:     1,
+					PropId:     0,
 					Values:     []uint64{1234, 5678},
 					Calldatas:  []string{hex.EncodeToString([]byte("calldata1")), hex.EncodeToString([]byte("calldata2"))},
 					Signatures: []string{"sig1", "sig2"},
@@ -85,22 +86,24 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 			},
 			func(uint64, sdk.Msg) {},
 			true,
+			false,
 		},
 		{
 			"fail - MsgLendingMarketProposal - validate basic logic",
 			&govshuttletypes.MsgLendingMarketProposal{
-				Authority:   "canto1yrmjye0zyfvr0lthc6fwq7qlwg9e8muftxa630",
+				Authority:   authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 				Title:       "lending market proposal test",
 				Description: "lending market proposal test description",
 				Metadata: &govshuttletypes.LendingMarketMetadata{
 					Account:    []string{"0x20F72265e2225837fd77C692e0781f720B93eF89", "0xf6Db2570A2417188a5788D6d5Fd9faAa5B1fE555"},
-					PropId:     1,
+					PropId:     0,
 					Values:     []uint64{1234},
 					Calldatas:  []string{hex.EncodeToString([]byte("calldata1")), hex.EncodeToString([]byte("calldata2"))},
 					Signatures: []string{"sig1", "sig2"},
 				},
 			},
 			func(uint64, sdk.Msg) {},
+			false,
 			true,
 		},
 		{
@@ -111,17 +114,13 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 				Description: "lending market proposal test description",
 				Metadata: &govshuttletypes.LendingMarketMetadata{
 					Account:    []string{"0x20F72265e2225837fd77C692e0781f720B93eF89", "0xf6Db2570A2417188a5788D6d5Fd9faAa5B1fE555"},
-					PropId:     1,
+					PropId:     0,
 					Values:     []uint64{1234, 5678},
 					Calldatas:  []string{hex.EncodeToString([]byte("calldata1")), hex.EncodeToString([]byte("calldata2"))},
 					Signatures: []string{"sig1", "sig2"},
 				},
 			},
-			func(proposalId uint64, msg sdk.Msg) {
-				proposal, err := suite.app.GovKeeper.Proposals.Get(suite.ctx, proposalId)
-				suite.Require().NoError(err)
-				suite.Require().Equal(govtypesv1.ProposalStatus_PROPOSAL_STATUS_PASSED, proposal.Status)
-
+			func(propId uint64, msg sdk.Msg) {
 				proposalMsg, ok := msg.(*govshuttletypes.MsgLendingMarketProposal)
 				suite.Require().True(ok)
 
@@ -144,9 +143,9 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 				}
 
 				suite.checkQueryPropResult(
-					proposalId,
+					propId,
 					ProposalResult{
-						Id:         big.NewInt(int64(proposalMsg.Metadata.PropId)),
+						Id:         big.NewInt(int64(propId)),
 						Title:      proposalMsg.Title,
 						Desc:       proposalMsg.Description,
 						Targets:    targets,
@@ -157,6 +156,7 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 				)
 			},
 			false,
+			false,
 		},
 		{
 			"fail - MsgTreasuryProposal - authority check",
@@ -165,7 +165,7 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 				Title:       "treasury proposal test",
 				Description: "treasury proposal test description",
 				Metadata: &govshuttletypes.TreasuryProposalMetadata{
-					PropID:    2,
+					PropID:    0,
 					Recipient: "0x20F72265e2225837fd77C692e0781f720B93eF89",
 					Amount:    1234,
 					Denom:     "acanto",
@@ -173,21 +173,23 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 			},
 			func(uint64, sdk.Msg) {},
 			true,
+			false,
 		},
 		{
 			"fail - MsgTreasuryProposal - validate basic logic",
 			&govshuttletypes.MsgTreasuryProposal{
-				Authority:   "canto1yrmjye0zyfvr0lthc6fwq7qlwg9e8muftxa630",
+				Authority:   authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 				Title:       "treasury proposal test",
 				Description: "treasury proposal test description",
 				Metadata: &govshuttletypes.TreasuryProposalMetadata{
-					PropID:    2,
+					PropID:    0,
 					Recipient: "0x20F72265e2225837fd77C692e0781f720B93eF89",
 					Amount:    1234,
 					Denom:     "canto2",
 				},
 			},
 			func(uint64, sdk.Msg) {},
+			false,
 			true,
 		},
 		{
@@ -197,17 +199,13 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 				Title:       "treasury proposal test",
 				Description: "treasury proposal test description",
 				Metadata: &govshuttletypes.TreasuryProposalMetadata{
-					PropID:    2,
+					PropID:    0,
 					Recipient: "0x20F72265e2225837fd77C692e0781f720B93eF89",
 					Amount:    1234,
 					Denom:     "canto",
 				},
 			},
-			func(proposalId uint64, msg sdk.Msg) {
-				proposal, err := suite.app.GovKeeper.Proposals.Get(suite.ctx, proposalId)
-				suite.Require().NoError(err)
-				suite.Require().Equal(govtypesv1.ProposalStatus_PROPOSAL_STATUS_PASSED, proposal.Status)
-
+			func(propId uint64, msg sdk.Msg) {
 				proposalMsg, ok := msg.(*govshuttletypes.MsgTreasuryProposal)
 				suite.Require().True(ok)
 
@@ -217,9 +215,9 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 				calldatas := [][]byte{}
 
 				suite.checkQueryPropResult(
-					proposalId,
+					propId,
 					ProposalResult{
-						Id:         big.NewInt(int64(proposalMsg.Metadata.PropID)),
+						Id:         big.NewInt(int64(propId)),
 						Title:      proposalMsg.Title,
 						Desc:       proposalMsg.Description,
 						Targets:    targets,
@@ -230,6 +228,7 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 				)
 			},
 			false,
+			false,
 		},
 	}
 
@@ -237,7 +236,7 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 		suite.Run(tc.name, func() {
 			// submit proposal
 			proposal, err := suite.app.GovKeeper.SubmitProposal(suite.ctx, []sdk.Msg{tc.msg}, "", "test", "description", proposer, false)
-			if tc.expectErr {
+			if tc.expectSubmitProposalErr {
 				suite.Require().Error(err)
 			} else {
 				suite.Require().NoError(err)
@@ -252,8 +251,18 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 				suite.Require().NoError(err)
 				suite.CommitAfter(*govParams.VotingPeriod)
 
-				// check proposal result
-				tc.checkFunc(proposal.Id, tc.msg)
+				proposal, err := suite.app.GovKeeper.Proposals.Get(suite.ctx, proposal.Id)
+				suite.Require().NoError(err)
+				if tc.expectProposalFailed {
+					suite.Require().Equal(govtypesv1.ProposalStatus_PROPOSAL_STATUS_FAILED, proposal.Status)
+				} else {
+					suite.Require().Equal(govtypesv1.ProposalStatus_PROPOSAL_STATUS_PASSED, proposal.Status)
+
+					// check proposal result
+					propId, err := suite.app.GovKeeper.ProposalID.Peek(suite.ctx)
+					suite.Require().NoError(err)
+					tc.checkFunc(propId, tc.msg)
+				}
 			}
 		})
 	}
