@@ -87,6 +87,23 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 			true,
 		},
 		{
+			"fail - MsgLendingMarketProposal - validate basic logic",
+			&govshuttletypes.MsgLendingMarketProposal{
+				Authority:   "canto1yrmjye0zyfvr0lthc6fwq7qlwg9e8muftxa630",
+				Title:       "lending market proposal test",
+				Description: "lending market proposal test description",
+				Metadata: &govshuttletypes.LendingMarketMetadata{
+					Account:    []string{"0x20F72265e2225837fd77C692e0781f720B93eF89", "0xf6Db2570A2417188a5788D6d5Fd9faAa5B1fE555"},
+					PropId:     1,
+					Values:     []uint64{1234},
+					Calldatas:  []string{hex.EncodeToString([]byte("calldata1")), hex.EncodeToString([]byte("calldata2"))},
+					Signatures: []string{"sig1", "sig2"},
+				},
+			},
+			func(uint64, sdk.Msg) {},
+			true,
+		},
+		{
 			"ok - MsgLendingMarketProposal",
 			&govshuttletypes.MsgLendingMarketProposal{
 				Authority:   authtypes.NewModuleAddress(govtypes.ModuleName).String(),
@@ -158,6 +175,22 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 			true,
 		},
 		{
+			"fail - MsgTreasuryProposal - validate basic logic",
+			&govshuttletypes.MsgTreasuryProposal{
+				Authority:   "canto1yrmjye0zyfvr0lthc6fwq7qlwg9e8muftxa630",
+				Title:       "treasury proposal test",
+				Description: "treasury proposal test description",
+				Metadata: &govshuttletypes.TreasuryProposalMetadata{
+					PropID:    2,
+					Recipient: "0x20F72265e2225837fd77C692e0781f720B93eF89",
+					Amount:    1234,
+					Denom:     "canto2",
+				},
+			},
+			func(uint64, sdk.Msg) {},
+			true,
+		},
+		{
 			"ok - MsgTreasuryProposal",
 			&govshuttletypes.MsgTreasuryProposal{
 				Authority:   authtypes.NewModuleAddress(govtypes.ModuleName).String(),
@@ -167,7 +200,7 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 					PropID:    2,
 					Recipient: "0x20F72265e2225837fd77C692e0781f720B93eF89",
 					Amount:    1234,
-					Denom:     "acanto",
+					Denom:     "canto",
 				},
 			},
 			func(proposalId uint64, msg sdk.Msg) {
