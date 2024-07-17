@@ -29,7 +29,7 @@ func InitGenesis(
 		k.SetTokenPair(ctx, pair)
 	}
 
-	// set token pairs and indexes
+	// set indexes
 	// multiple contracts at the same denom can exist,
 	// but only one which is in indexes are valid.
 	for _, idx := range data.DenomIndexes {
