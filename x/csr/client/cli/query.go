@@ -95,6 +95,7 @@ func CmdQueryCSRs() *cobra.Command {
 	}
 
 	flags.AddQueryFlagsToCmd(cmd)
+	flags.AddPaginationFlagsToCmd(cmd, "csrs")
 
 	return cmd
 }
