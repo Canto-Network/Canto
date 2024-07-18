@@ -60,7 +60,7 @@ var (
 		},
 		{
 			Denom: uqstars,
-			// denomIdx must have latest token pair id
+			// denomIdx must have the latest token pair id assigned
 			// if there are multiple token pairs with the same denom
 			TokenPairId: uqstars2.GetID(),
 		},
