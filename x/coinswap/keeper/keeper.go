@@ -292,7 +292,7 @@ func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg *types.MsgRemoveLiquidity) 
 	deductUniCoin := msg.WithdrawLiquidity
 
 	if standardWithdrawCoin.Amount.LT(msg.MinStandardAmt) {
-		return nil, errorsmod.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("iris amount not met, user expected: no less than %s, actual: %s", sdk.NewCoin(standardDenom, msg.MinStandardAmt).String(), standardWithdrawCoin.String()))
+		return nil, errorsmod.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("standard coin amount not met, user expected: no less than %s, actual: %s", sdk.NewCoin(standardDenom, msg.MinStandardAmt).String(), standardWithdrawCoin.String()))
 	}
 	if tokenWithdrawCoin.Amount.LT(msg.MinToken) {
 		return nil, errorsmod.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("token amount not met, user expected: no less than %s, actual: %s", sdk.NewCoin(minTokenDenom, msg.MinToken).String(), tokenWithdrawCoin.String()))
