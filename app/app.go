@@ -12,7 +12,6 @@ import (
 
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/migrations/legacytx"
-	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	"github.com/cosmos/gogoproto/proto"
 	ibcclienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 	ibcconnectiontypes "github.com/cosmos/ibc-go/v8/modules/core/03-connection/types"
@@ -1454,8 +1453,6 @@ func setupLegacyKeyTables(k *paramskeeper.Keeper) {
 			keyTable = banktypes.ParamKeyTable() //nolint:staticcheck
 		case stakingtypes.ModuleName:
 			keyTable = stakingtypes.ParamKeyTable() //nolint:staticcheck
-		case minttypes.ModuleName:
-			keyTable = minttypes.ParamKeyTable() //nolint:staticcheck
 		case distrtypes.ModuleName:
 			keyTable = distrtypes.ParamKeyTable() //nolint:staticcheck
 		case slashingtypes.ModuleName:
