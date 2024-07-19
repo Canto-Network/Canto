@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -14,6 +15,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/address"
 	"github.com/cosmos/cosmos-sdk/version"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
 )
@@ -76,6 +78,15 @@ Where metadata.json contains (example):
 			propMetaData, err := ParseLendingMarketMetadata(clientCtx.Codec, args[0])
 			if err != nil {
 				return errorsmod.Wrap(err, "Failure to parse JSON object")
+			}
+
+			// validate basic logic
+			cd, vals, sigs := len(propMetaData.GetCalldatas()), len(propMetaData.GetValues()), len(propMetaData.GetSignatures())
+			if cd != vals {
+				return errorsmod.Wrap(govtypes.ErrInvalidProposalContent, "proposal array arguments must be same length")
+			}
+			if vals != sigs {
+				return errorsmod.Wrap(govtypes.ErrInvalidProposalContent, "proposal array arguments must be same length")
 			}
 
 			authority, _ := cmd.Flags().GetString(FlagAuthority)
@@ -141,6 +152,12 @@ Where metadata.json contains (example):
 			propMetaData, err := ParseTreasuryMetadata(clientCtx.Codec, args[0])
 			if err != nil {
 				return errorsmod.Wrap(err, "Failure to parse JSON object")
+			}
+
+			// validate basic logic
+			s := strings.ToLower(propMetaData.GetDenom())
+			if s != "canto" && s != "note" {
+				return errorsmod.Wrapf(govtypes.ErrInvalidProposalContent, "%s is not a valid denom string", propMetaData.GetDenom())
 			}
 
 			authority, _ := cmd.Flags().GetString(FlagAuthority)
