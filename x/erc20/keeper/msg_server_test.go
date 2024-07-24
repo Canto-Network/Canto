@@ -340,7 +340,6 @@ func (suite *KeeperTestSuite) TestConvertCoinNativeCoin() {
 			tc.malleate(erc20)
 			suite.Commit()
 
-			ctx := sdk.WrapSDKContext(suite.ctx)
 			coins := sdk.NewCoins(sdk.NewCoin(cosmosTokenBase, sdkmath.NewInt(tc.mint)))
 			sender := sdk.AccAddress(suite.address.Bytes())
 			msg := types.NewMsgConvertCoin(
@@ -353,7 +352,7 @@ func (suite *KeeperTestSuite) TestConvertCoinNativeCoin() {
 			suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, sender, coins)
 
 			tc.extra()
-			res, err := suite.app.Erc20Keeper.ConvertCoin(ctx, msg)
+			res, err := suite.app.Erc20Keeper.ConvertCoin(suite.ctx, msg)
 			expRes := &types.MsgConvertCoinResponse{}
 			suite.Commit()
 			balance := suite.BalanceOf(common.HexToAddress(pair.Erc20Address), suite.address)
@@ -518,8 +517,7 @@ func (suite *KeeperTestSuite) TestConvertERC20NativeCoin() {
 				sender,
 			)
 
-			ctx := sdk.WrapSDKContext(suite.ctx)
-			_, err := suite.app.Erc20Keeper.ConvertCoin(ctx, msg)
+			_, err := suite.app.Erc20Keeper.ConvertCoin(suite.ctx, msg)
 			suite.Require().NoError(err, tc.name)
 			suite.Commit()
 			balance := suite.BalanceOf(common.HexToAddress(pair.Erc20Address), suite.address)
@@ -528,7 +526,6 @@ func (suite *KeeperTestSuite) TestConvertERC20NativeCoin() {
 			suite.Require().Equal(balance, big.NewInt(tc.burn))
 
 			// Convert ERC20s back to Coins
-			ctx = sdk.WrapSDKContext(suite.ctx)
 			contractAddr := common.HexToAddress(pair.Erc20Address)
 			msgConvertERC20 := types.NewMsgConvertERC20(
 				sdkmath.NewInt(tc.reconvert),
@@ -538,7 +535,7 @@ func (suite *KeeperTestSuite) TestConvertERC20NativeCoin() {
 			)
 
 			tc.malleate()
-			res, err := suite.app.Erc20Keeper.ConvertERC20(ctx, msgConvertERC20)
+			res, err := suite.app.Erc20Keeper.ConvertERC20(suite.ctx, msgConvertERC20)
 			expRes := &types.MsgConvertERC20Response{}
 			suite.Commit()
 			balance = suite.BalanceOf(contractAddr, suite.address)
@@ -1076,7 +1073,6 @@ func (suite *KeeperTestSuite) TestConvertCoinNativeERC20() {
 
 			// Convert Coins back to ERC20s
 			receiver := suite.address
-			ctx := sdk.WrapSDKContext(suite.ctx)
 			msg := types.NewMsgConvertCoin(
 				sdk.NewCoin(coinName, sdkmath.NewInt(tc.convert)),
 				receiver,
@@ -1084,7 +1080,7 @@ func (suite *KeeperTestSuite) TestConvertCoinNativeERC20() {
 			)
 
 			tc.extra()
-			res, err := suite.app.Erc20Keeper.ConvertCoin(ctx, msg)
+			res, err := suite.app.Erc20Keeper.ConvertCoin(suite.ctx, msg)
 
 			expRes := &types.MsgConvertCoinResponse{}
 			suite.Commit()
@@ -1135,12 +1131,10 @@ func (suite *KeeperTestSuite) TestWrongPairOwnerERC20NativeCoin() {
 			pair.ContractOwner = types.OWNER_UNSPECIFIED
 			suite.app.Erc20Keeper.SetTokenPair(suite.ctx, *pair)
 
-			ctx := sdk.WrapSDKContext(suite.ctx)
-			_, err := suite.app.Erc20Keeper.ConvertCoin(ctx, msg)
+			_, err := suite.app.Erc20Keeper.ConvertCoin(suite.ctx, msg)
 			suite.Require().Error(err, tc.name)
 
 			// Convert ERC20s back to Coins
-			ctx = sdk.WrapSDKContext(suite.ctx)
 			contractAddr := common.HexToAddress(pair.Erc20Address)
 			msgConvertERC20 := types.NewMsgConvertERC20(
 				sdkmath.NewInt(tc.reconvert),
@@ -1149,7 +1143,7 @@ func (suite *KeeperTestSuite) TestWrongPairOwnerERC20NativeCoin() {
 				suite.address,
 			)
 
-			_, err = suite.app.Erc20Keeper.ConvertERC20(ctx, msgConvertERC20)
+			_, err = suite.app.Erc20Keeper.ConvertERC20(suite.ctx, msgConvertERC20)
 			suite.Require().Error(err, tc.name)
 		})
 	}
@@ -1290,7 +1284,6 @@ func (suite *KeeperTestSuite) TestConvertCoinNativeIBCVoucher() {
 			tc.malleate(erc20)
 			suite.Commit()
 
-			ctx := sdk.WrapSDKContext(suite.ctx)
 			coins := sdk.NewCoins(sdk.NewCoin(ibcBase, sdkmath.NewInt(tc.mint)))
 			sender := sdk.AccAddress(suite.address.Bytes())
 			msg := types.NewMsgConvertCoin(
@@ -1303,7 +1296,7 @@ func (suite *KeeperTestSuite) TestConvertCoinNativeIBCVoucher() {
 			suite.app.BankKeeper.SendCoinsFromModuleToAccount(suite.ctx, types.ModuleName, sender, coins)
 
 			tc.extra()
-			res, err := suite.app.Erc20Keeper.ConvertCoin(ctx, msg)
+			res, err := suite.app.Erc20Keeper.ConvertCoin(suite.ctx, msg)
 			expRes := &types.MsgConvertCoinResponse{}
 			suite.Commit()
 			balance := suite.BalanceOf(common.HexToAddress(pair.Erc20Address), suite.address)
@@ -1468,8 +1461,7 @@ func (suite *KeeperTestSuite) TestConvertERC20NativeIBCVoucher() {
 				sender,
 			)
 
-			ctx := sdk.WrapSDKContext(suite.ctx)
-			_, err := suite.app.Erc20Keeper.ConvertCoin(ctx, msg)
+			_, err := suite.app.Erc20Keeper.ConvertCoin(suite.ctx, msg)
 			suite.Require().NoError(err, tc.name)
 			suite.Commit()
 			balance := suite.BalanceOf(common.HexToAddress(pair.Erc20Address), suite.address)
@@ -1478,7 +1470,6 @@ func (suite *KeeperTestSuite) TestConvertERC20NativeIBCVoucher() {
 			suite.Require().Equal(balance, big.NewInt(tc.burn))
 
 			// Convert ERC20s back to Coins
-			ctx = sdk.WrapSDKContext(suite.ctx)
 			contractAddr := common.HexToAddress(pair.Erc20Address)
 			msgConvertERC20 := types.NewMsgConvertERC20(
 				sdkmath.NewInt(tc.reconvert),
@@ -1488,7 +1479,7 @@ func (suite *KeeperTestSuite) TestConvertERC20NativeIBCVoucher() {
 			)
 
 			tc.malleate()
-			res, err := suite.app.Erc20Keeper.ConvertERC20(ctx, msgConvertERC20)
+			res, err := suite.app.Erc20Keeper.ConvertERC20(suite.ctx, msgConvertERC20)
 			expRes := &types.MsgConvertERC20Response{}
 			suite.Commit()
 			balance = suite.BalanceOf(contractAddr, suite.address)
@@ -1543,9 +1534,35 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 		msg       sdk.Msg
 		malleate  func()
 		checkFunc func(uint64)
+		expectErr bool
 	}{
 		{
-			"ok - proposal MsgRegisterCoin",
+			"fail - MsgRegisterCoin - authority check",
+			&types.MsgRegisterCoin{
+				Authority:   "canto1yrmjye0zyfvr0lthc6fwq7qlwg9e8muftxa630",
+				Title:       "MsgRegisterCoin",
+				Description: "MsgRegisterCoin test",
+				Metadata: banktypes.Metadata{
+					Description: "ATOM IBC voucher (channel 14)",
+					Base:        ibcBase,
+					// NOTE: Denom units MUST be increasing
+					DenomUnits: []*banktypes.DenomUnit{
+						{
+							Denom:    ibcBase,
+							Exponent: 0,
+						},
+					},
+					Name:    "ATOM channel-14",
+					Symbol:  "ibcATOM-14",
+					Display: ibcBase,
+				},
+			},
+			func() {},
+			func(_ uint64) {},
+			true,
+		},
+		{
+			"ok - MsgRegisterCoin",
 			&types.MsgRegisterCoin{
 				Authority:   authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 				Title:       "MsgRegisterCoin",
@@ -1577,12 +1594,25 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 				id := suite.app.Erc20Keeper.GetTokenPairID(suite.ctx, ibcBase)
 				pair, ok := suite.app.Erc20Keeper.GetTokenPair(suite.ctx, id)
 				suite.Require().True(ok)
-				suite.Require().Equal(suite.app.Erc20Keeper.GetDenomMap(suite.ctx, pair.Denom), id)
-				suite.Require().Equal(suite.app.Erc20Keeper.GetERC20Map(suite.ctx, common.HexToAddress(pair.Erc20Address)), id)
+				suite.Require().Equal(suite.app.Erc20Keeper.GetTokenPairIdByDenom(suite.ctx, pair.Denom), id)
+				suite.Require().Equal(suite.app.Erc20Keeper.GetTokenPairIdByERC20Addr(suite.ctx, common.HexToAddress(pair.Erc20Address)), id)
 			},
+			false,
 		},
 		{
-			"ok - proposal MsgRegisterERC20",
+			"fail - MsgRegisterERC20 - authority check",
+			&types.MsgRegisterERC20{
+				Authority:    "canto1yrmjye0zyfvr0lthc6fwq7qlwg9e8muftxa630",
+				Title:        "MsgRegisterERC20",
+				Description:  "MsgRegisterERC20 test",
+				Erc20Address: erc20Address,
+			},
+			func() {},
+			func(_ uint64) {},
+			true,
+		},
+		{
+			"ok - MsgRegisterERC20",
 			&types.MsgRegisterERC20{
 				Authority:    authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 				Title:        "MsgRegisterERC20",
@@ -1598,12 +1628,25 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 				id := suite.app.Erc20Keeper.GetTokenPairID(suite.ctx, erc20Address)
 				pair, ok := suite.app.Erc20Keeper.GetTokenPair(suite.ctx, id)
 				suite.Require().True(ok)
-				suite.Require().Equal(suite.app.Erc20Keeper.GetDenomMap(suite.ctx, pair.Denom), id)
-				suite.Require().Equal(suite.app.Erc20Keeper.GetERC20Map(suite.ctx, common.HexToAddress(pair.Erc20Address)), id)
+				suite.Require().Equal(suite.app.Erc20Keeper.GetTokenPairIdByDenom(suite.ctx, pair.Denom), id)
+				suite.Require().Equal(suite.app.Erc20Keeper.GetTokenPairIdByERC20Addr(suite.ctx, common.HexToAddress(pair.Erc20Address)), id)
 			},
+			false,
 		},
 		{
-			"ok - proposal MsgToggleTokenConversion",
+			"fail - MsgToggleTokenConversion - authority check",
+			&types.MsgToggleTokenConversion{
+				Authority:   "canto1yrmjye0zyfvr0lthc6fwq7qlwg9e8muftxa630",
+				Title:       "MsgToggleTokenConversion",
+				Description: "MsgToggleTokenConversion test",
+				Token:       erc20Address,
+			},
+			func() {},
+			func(_ uint64) {},
+			true,
+		},
+		{
+			"ok - MsgToggleTokenConversion",
 			&types.MsgToggleTokenConversion{
 				Authority:   authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 				Title:       "MsgToggleTokenConversion",
@@ -1621,9 +1664,20 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 				suite.Require().True(ok)
 				suite.Require().Equal(pair.Enabled, false)
 			},
+			false,
 		},
 		{
-			"ok - proposal MsgUpdateParams",
+			"fail - MsgUpdateParams - authority check",
+			&types.MsgUpdateParams{
+				Authority: "canto1yrmjye0zyfvr0lthc6fwq7qlwg9e8muftxa630",
+				Params:    types.NewParams(false, false),
+			},
+			func() {},
+			func(proposalId uint64) {},
+			true,
+		},
+		{
+			"ok - MsgUpdateParams",
 			&types.MsgUpdateParams{
 				Authority: authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 				Params:    types.NewParams(false, false),
@@ -1637,6 +1691,7 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 				suite.Require().Equal(govtypesv1.ProposalStatus_PROPOSAL_STATUS_PASSED, proposal.Status)
 				suite.Require().Equal(suite.app.Erc20Keeper.GetParams(suite.ctx), changeParams)
 			},
+			false,
 		},
 	}
 
@@ -1646,20 +1701,24 @@ func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {
 
 			// submit proposal
 			proposal, err := suite.app.GovKeeper.SubmitProposal(suite.ctx, []sdk.Msg{tc.msg}, "", "test", "description", proposer, false)
-			suite.Require().NoError(err)
-			suite.Commit()
+			if tc.expectErr {
+				suite.Require().Error(err)
+			} else {
+				suite.Require().NoError(err)
+				suite.Commit()
 
-			ok, err := suite.app.GovKeeper.AddDeposit(suite.ctx, proposal.Id, proposer, govParams.MinDeposit)
-			suite.Require().NoError(err)
-			suite.Require().True(ok)
-			suite.Commit()
+				ok, err := suite.app.GovKeeper.AddDeposit(suite.ctx, proposal.Id, proposer, govParams.MinDeposit)
+				suite.Require().NoError(err)
+				suite.Require().True(ok)
+				suite.Commit()
 
-			err = suite.app.GovKeeper.AddVote(suite.ctx, proposal.Id, proposer, govtypesv1.NewNonSplitVoteOption(govtypesv1.OptionYes), "")
-			suite.Require().NoError(err)
-			suite.CommitAfter(*govParams.VotingPeriod)
+				err = suite.app.GovKeeper.AddVote(suite.ctx, proposal.Id, proposer, govtypesv1.NewNonSplitVoteOption(govtypesv1.OptionYes), "")
+				suite.Require().NoError(err)
+				suite.CommitAfter(*govParams.VotingPeriod)
 
-			// check proposal result
-			tc.checkFunc(proposal.Id)
+				// check proposal result
+				tc.checkFunc(proposal.Id)
+			}
 		})
 	}
 }

@@ -2,7 +2,6 @@ package keeper_test
 
 import (
 	"github.com/Canto-Network/Canto/v7/x/csr/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	"github.com/evmos/ethermint/tests"
 )
@@ -10,8 +9,7 @@ import (
 // Special edge case for when the request made is null, cannot be routed to the query client
 func (suite *KeeperTestSuite) TestKeeperCSRs() {
 	suite.SetupTest()
-	ctx := sdk.WrapSDKContext(suite.ctx)
-	res, err := suite.app.CSRKeeper.CSRs(ctx, nil)
+	res, err := suite.app.CSRKeeper.CSRs(suite.ctx, nil)
 	suite.Require().Error(err)
 	suite.Require().Nil(res)
 }
@@ -114,10 +112,9 @@ func (suite *KeeperTestSuite) TestCSRs() {
 		suite.Run(tc.name, func() {
 			suite.SetupTest()
 
-			ctx := sdk.WrapSDKContext(suite.ctx)
 			tc.prepare()
 
-			response, err := suite.queryClient.CSRs(ctx, request)
+			response, err := suite.queryClient.CSRs(suite.ctx, request)
 			if tc.pass {
 				suite.Require().NoError(err)
 				suite.Require().Equal(expectedResponse.Pagination.Total, response.Pagination.Total)
@@ -132,8 +129,7 @@ func (suite *KeeperTestSuite) TestCSRs() {
 // Special edge case for when the request made is null, cannot be routed to the query client
 func (suite *KeeperTestSuite) TestKeeperCSRsByNFT() {
 	suite.SetupTest()
-	ctx := sdk.WrapSDKContext(suite.ctx)
-	res, err := suite.app.CSRKeeper.CSRByNFT(ctx, nil)
+	res, err := suite.app.CSRKeeper.CSRByNFT(suite.ctx, nil)
 	suite.Require().Error(err)
 	suite.Require().Nil(res)
 }
@@ -190,10 +186,9 @@ func (suite *KeeperTestSuite) TestCSRByNFT() {
 		suite.Run(tc.name, func() {
 			suite.SetupTest()
 
-			ctx := sdk.WrapSDKContext(suite.ctx)
 			tc.prepare()
 
-			response, err := suite.queryClient.CSRByNFT(ctx, request)
+			response, err := suite.queryClient.CSRByNFT(suite.ctx, request)
 			if tc.pass {
 				suite.Require().NoError(err)
 			} else {
@@ -207,8 +202,7 @@ func (suite *KeeperTestSuite) TestCSRByNFT() {
 // Special edge case for when the request made is null, cannot be routed to the query client
 func (suite *KeeperTestSuite) TestKeeperCSRsByContract() {
 	suite.SetupTest()
-	ctx := sdk.WrapSDKContext(suite.ctx)
-	res, err := suite.app.CSRKeeper.CSRByContract(ctx, nil)
+	res, err := suite.app.CSRKeeper.CSRByContract(suite.ctx, nil)
 	suite.Require().Error(err)
 	suite.Require().Nil(res)
 }
@@ -284,10 +278,9 @@ func (suite *KeeperTestSuite) TestCSRByContract() {
 		suite.Run(tc.name, func() {
 			suite.SetupTest()
 
-			ctx := sdk.WrapSDKContext(suite.ctx)
 			tc.prepare()
 
-			response, err := suite.queryClient.CSRByContract(ctx, request)
+			response, err := suite.queryClient.CSRByContract(suite.ctx, request)
 			if tc.pass {
 				suite.Require().NoError(err)
 			} else {
@@ -300,11 +293,10 @@ func (suite *KeeperTestSuite) TestCSRByContract() {
 
 // Test the query service for params
 func (suite *KeeperTestSuite) TestQueryParams() {
-	ctx := sdk.WrapSDKContext(suite.ctx)
 	expectedParams := types.DefaultParams()
 	expectedParams.EnableCsr = true
 
-	res, err := suite.queryClient.Params(ctx, &types.QueryParamsRequest{})
+	res, err := suite.queryClient.Params(suite.ctx, &types.QueryParamsRequest{})
 	suite.Require().NoError(err)
 	suite.Require().Equal(expectedParams, res.Params)
 }
@@ -312,12 +304,11 @@ func (suite *KeeperTestSuite) TestQueryParams() {
 // Test the query service that retrieves the turnstile address
 func (suite *KeeperTestSuite) TestQueryTurnstile() {
 	suite.Commit()
-	ctx := sdk.WrapSDKContext(suite.ctx)
 
 	address, found := suite.app.CSRKeeper.GetTurnstile(suite.ctx)
 	suite.Require().True(found)
 
-	res, err := suite.queryClient.Turnstile(ctx, &types.QueryTurnstileRequest{})
+	res, err := suite.queryClient.Turnstile(suite.ctx, &types.QueryTurnstileRequest{})
 	suite.Require().NoError(err)
 	suite.Require().Equal(address.String(), res.Address)
 }

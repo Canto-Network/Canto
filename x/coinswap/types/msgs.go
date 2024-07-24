@@ -1,10 +1,13 @@
 package types
 
 import (
-	errorsmod "cosmossdk.io/errors"
+	"fmt"
+
 	sdkmath "cosmossdk.io/math"
+	"cosmossdk.io/x/tx/signing"
+	coinswapv1 "github.com/Canto-Network/Canto/v7/api/canto/coinswap/v1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	protov2 "google.golang.org/protobuf/proto"
 )
 
 var (
@@ -45,41 +48,6 @@ func NewMsgSwapOrder(
 	}
 }
 
-// ValidateBasic implements Msg.
-func (msg MsgSwapOrder) ValidateBasic() error {
-	if err := ValidateInput(msg.Input); err != nil {
-		return err
-	}
-
-	if err := ValidateOutput(msg.Output); err != nil {
-		return err
-	}
-
-	if msg.Input.Coin.Denom == msg.Output.Coin.Denom {
-		return errorsmod.Wrapf(ErrEqualDenom, "invalid swap")
-	}
-
-	return ValidateDeadline(msg.Deadline)
-}
-
-// GetSignBytes implements Msg.
-func (msg MsgSwapOrder) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners implements Msg.
-func (msg MsgSwapOrder) GetSigners() []sdk.AccAddress {
-	from, err := sdk.AccAddressFromBech32(msg.Input.Address)
-	if err != nil {
-		panic(err)
-	}
-	return []sdk.AccAddress{from}
-}
-
-/* --------------------------------------------------------------------------- */
-// MsgAddLiquidity
-/* --------------------------------------------------------------------------- */
-
 // NewMsgAddLiquidity creates a new MsgAddLiquidity object.
 func NewMsgAddLiquidity(
 	maxToken sdk.Coin,
@@ -96,48 +64,6 @@ func NewMsgAddLiquidity(
 		Sender:           sender,
 	}
 }
-
-// ValidateBasic implements Msg.
-func (msg MsgAddLiquidity) ValidateBasic() error {
-	if err := ValidateMaxToken(msg.MaxToken); err != nil {
-		return err
-	}
-
-	if err := ValidateExactStandardAmt(msg.ExactStandardAmt); err != nil {
-		return err
-	}
-
-	if err := ValidateMinLiquidity(msg.MinLiquidity); err != nil {
-		return err
-	}
-
-	if err := ValidateDeadline(msg.Deadline); err != nil {
-		return err
-	}
-
-	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
-	}
-	return nil
-}
-
-// GetSignBytes implements Msg.
-func (msg MsgAddLiquidity) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners implements Msg.
-func (msg MsgAddLiquidity) GetSigners() []sdk.AccAddress {
-	from, err := sdk.AccAddressFromBech32(msg.Sender)
-	if err != nil {
-		panic(err)
-	}
-	return []sdk.AccAddress{from}
-}
-
-/* --------------------------------------------------------------------------- */
-// MsgRemoveLiquidity
-/* --------------------------------------------------------------------------- */
 
 // NewMsgRemoveLiquidity creates a new MsgRemoveLiquidity object
 func NewMsgRemoveLiquidity(
@@ -156,40 +82,18 @@ func NewMsgRemoveLiquidity(
 	}
 }
 
-// ValidateBasic implements Msg.
-func (msg MsgRemoveLiquidity) ValidateBasic() error {
-	if err := ValidateMinToken(msg.MinToken); err != nil {
-		return err
-	}
+func CreateGetSignersFromMsgSwapOrderV2(options *signing.Options) func(msg protov2.Message) ([][]byte, error) {
+	return func(msg protov2.Message) ([][]byte, error) {
+		msgv2, ok := msg.(*coinswapv1.MsgSwapOrder)
+		if !ok {
+			return nil, fmt.Errorf("invalid x/coinswap/MsgSwapOrder msg v2: %v", msg)
+		}
 
-	if err := ValidateWithdrawLiquidity(msg.WithdrawLiquidity); err != nil {
-		return err
-	}
+		addr, err := options.AddressCodec.StringToBytes(msgv2.Input.Address)
+		if err != nil {
+			return nil, err
+		}
 
-	if err := ValidateMinStandardAmt(msg.MinStandardAmt); err != nil {
-		return err
+		return [][]byte{addr}, nil
 	}
-
-	if err := ValidateDeadline(msg.Deadline); err != nil {
-		return err
-	}
-
-	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
-		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
-	}
-	return nil
-}
-
-// GetSignBytes implements Msg.
-func (msg MsgRemoveLiquidity) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners implements Msg.
-func (msg MsgRemoveLiquidity) GetSigners() []sdk.AccAddress {
-	from, err := sdk.AccAddressFromBech32(msg.Sender)
-	if err != nil {
-		panic(err)
-	}
-	return []sdk.AccAddress{from}
 }

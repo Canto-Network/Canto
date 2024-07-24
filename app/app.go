@@ -8,11 +8,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"sync"
 
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/migrations/legacytx"
-	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	"github.com/cosmos/gogoproto/proto"
 	ibcclienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 	ibcconnectiontypes "github.com/cosmos/ibc-go/v8/modules/core/03-connection/types"
@@ -34,7 +31,6 @@ import (
 	"cosmossdk.io/core/appmodule"
 	"cosmossdk.io/log"
 	sdkmath "cosmossdk.io/math"
-	"cosmossdk.io/simapp"
 	simappparams "cosmossdk.io/simapp/params"
 	storetypes "cosmossdk.io/store/types"
 	"cosmossdk.io/x/evidence"
@@ -121,6 +117,7 @@ import (
 	ibctesting "github.com/cosmos/ibc-go/v8/testing"
 	ibctestingtypes "github.com/cosmos/ibc-go/v8/testing/types"
 
+	coinswapv1 "github.com/Canto-Network/Canto/v7/api/canto/coinswap/v1"
 	erc20v1 "github.com/Canto-Network/Canto/v7/api/canto/erc20/v1"
 	evmv1 "github.com/evmos/ethermint/api/ethermint/evm/v1"
 	ethante "github.com/evmos/ethermint/app/ante"
@@ -270,7 +267,6 @@ type Canto struct {
 	configurator module.Configurator
 
 	tpsCounter *tpsCounter
-	once       sync.Once
 }
 
 func init() {
@@ -311,9 +307,13 @@ func NewCanto(
 		},
 	}
 
-	// evm/MsgEthereumTx, erc20/MsgConvertERC20
+	// evm/MsgEthereumTx, erc20/MsgConvertERC20, coinswap/MsgSwapOrder
 	signingOptions.DefineCustomGetSigners(protov2.MessageName(&evmv1.MsgEthereumTx{}), evmtypes.GetSignersFromMsgEthereumTxV2)
 	signingOptions.DefineCustomGetSigners(protov2.MessageName(&erc20v1.MsgConvertERC20{}), erc20types.GetSignersFromMsgConvertERC20V2)
+	signingOptions.DefineCustomGetSigners(
+		protov2.MessageName(&coinswapv1.MsgSwapOrder{}),
+		coinswaptypes.CreateGetSignersFromMsgSwapOrderV2(&signingOptions),
+	)
 
 	interfaceRegistry, _ := types.NewInterfaceRegistryWithOptions(types.InterfaceRegistryOptions{
 		ProtoFiles:     proto.HybridResolver,
@@ -335,12 +335,7 @@ func NewCanto(
 
 	eip712.SetEncodingConfig(encodingConfig)
 
-	// create and set dummy vote extension handler
-	voteExtOp := func(bApp *baseapp.BaseApp) {
-		voteExtHandler := simapp.NewVoteExtensionHandler()
-		voteExtHandler.SetHandlers(bApp)
-	}
-	baseAppOptions = append(baseAppOptions, voteExtOp, baseapp.SetOptimisticExecution())
+	baseAppOptions = append(baseAppOptions, baseapp.SetOptimisticExecution())
 
 	// NOTE we use custom transaction decoder that supports the sdk.Tx interface instead of sdk.StdTx
 	// Setup Mempool and Proposal Handlers
@@ -427,7 +422,7 @@ func NewCanto(
 		ethermint.ProtoAccount,
 		maccPerms,
 		authcodec.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix()),
-		sdk.Bech32MainPrefix,
+		sdk.GetConfig().GetBech32AccountAddrPrefix(),
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 	app.BankKeeper = bankkeeper.NewBaseKeeper(
@@ -583,7 +578,7 @@ func NewCanto(
 	// since fee middleware will wrap the IBCKeeper for underlying application.
 	app.TransferKeeper = ibctransferkeeper.NewKeeper(
 		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName),
-		nil, // ISC4 Wrapper: fee IBC middleware
+		app.IBCKeeper.ChannelKeeper, // ICS4 Wrapper
 		app.IBCKeeper.ChannelKeeper, app.IBCKeeper.PortKeeper,
 		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
@@ -764,10 +759,10 @@ func NewCanto(
 
 		// Canto app modules
 		inflation.NewAppModule(app.InflationKeeper, app.AccountKeeper, *app.StakingKeeper),
-		erc20.NewAppModule(app.Erc20Keeper, app.AccountKeeper, app.BankKeeper, app.EvmKeeper, app.FeeMarketKeeper),
+		erc20.NewAppModule(app.Erc20Keeper, app.AccountKeeper, app.BankKeeper, app.EvmKeeper, app.FeeMarketKeeper, app.AccountKeeper.AddressCodec()),
 		epochs.NewAppModule(appCodec, app.EpochsKeeper),
 		onboarding.NewAppModule(*app.OnboardingKeeper),
-		govshuttle.NewAppModule(app.GovshuttleKeeper, app.AccountKeeper),
+		govshuttle.NewAppModule(app.GovshuttleKeeper, app.AccountKeeper, app.AccountKeeper.AddressCodec()),
 		csr.NewAppModule(app.CSRKeeper, app.AccountKeeper),
 		coinswap.NewAppModule(appCodec, app.CoinswapKeeper, app.AccountKeeper, app.BankKeeper),
 	)
@@ -1066,7 +1061,7 @@ func (app *Canto) Configurator() module.Configurator {
 
 // InitChainer updates at chain initialization
 func (app *Canto) InitChainer(ctx sdk.Context, req *abci.RequestInitChain) (*abci.ResponseInitChain, error) {
-	var genesisState simapp.GenesisState
+	var genesisState GenesisState
 	if err := json.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
 		panic(err)
 	}
@@ -1267,23 +1262,6 @@ func (app *Canto) GetTxConfig() client.TxConfig {
 }
 
 func (app *Canto) FinalizeBlock(req *abci.RequestFinalizeBlock) (*abci.ResponseFinalizeBlock, error) {
-	// when skipping sdk 47 for sdk 50, the upgrade handler is called too late in BaseApp
-	// this is a hack to ensure that the migration is executed when needed and not panics
-	app.once.Do(func() {
-		ctx := app.NewUncachedContext(false, tmproto.Header{})
-		if _, err := app.ConsensusParamsKeeper.Params(ctx, &consensusparamtypes.QueryParamsRequest{}); err != nil {
-			// prevents panic: consensus key is nil: collections: not found: key 'no_key' of type github.com/cosmos/gogoproto/tendermint.types.ConsensusParams
-			// sdk 47:
-			// Migrate Tendermint consensus parameters from x/params module to a dedicated x/consensus module.
-			// see https://github.com/cosmos/cosmos-sdk/blob/v0.47.0/simapp/upgrades.go#L66
-			baseAppLegacySS := app.GetSubspace(baseapp.Paramspace)
-			err := baseapp.MigrateParams(sdk.UnwrapSDKContext(ctx), baseAppLegacySS, app.ConsensusParamsKeeper.ParamsStore)
-			if err != nil {
-				panic(err)
-			}
-		}
-	})
-
 	return app.BaseApp.FinalizeBlock(req)
 }
 
@@ -1455,8 +1433,6 @@ func setupLegacyKeyTables(k *paramskeeper.Keeper) {
 			keyTable = banktypes.ParamKeyTable() //nolint:staticcheck
 		case stakingtypes.ModuleName:
 			keyTable = stakingtypes.ParamKeyTable() //nolint:staticcheck
-		case minttypes.ModuleName:
-			keyTable = minttypes.ParamKeyTable() //nolint:staticcheck
 		case distrtypes.ModuleName:
 			keyTable = distrtypes.ParamKeyTable() //nolint:staticcheck
 		case slashingtypes.ModuleName:

@@ -2,6 +2,7 @@
 package erc20v1
 
 import (
+	_ "cosmossdk.io/api/amino"
 	fmt "fmt"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
 	_ "github.com/cosmos/gogoproto/gogoproto"
@@ -64,10 +65,114 @@ func (x *_GenesisState_2_list) IsValid() bool {
 	return x.list != nil
 }
 
+var _ protoreflect.List = (*_GenesisState_3_list)(nil)
+
+type _GenesisState_3_list struct {
+	list *[]*TokenPairDenomIndex
+}
+
+func (x *_GenesisState_3_list) Len() int {
+	if x.list == nil {
+		return 0
+	}
+	return len(*x.list)
+}
+
+func (x *_GenesisState_3_list) Get(i int) protoreflect.Value {
+	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
+}
+
+func (x *_GenesisState_3_list) Set(i int, value protoreflect.Value) {
+	valueUnwrapped := value.Message()
+	concreteValue := valueUnwrapped.Interface().(*TokenPairDenomIndex)
+	(*x.list)[i] = concreteValue
+}
+
+func (x *_GenesisState_3_list) Append(value protoreflect.Value) {
+	valueUnwrapped := value.Message()
+	concreteValue := valueUnwrapped.Interface().(*TokenPairDenomIndex)
+	*x.list = append(*x.list, concreteValue)
+}
+
+func (x *_GenesisState_3_list) AppendMutable() protoreflect.Value {
+	v := new(TokenPairDenomIndex)
+	*x.list = append(*x.list, v)
+	return protoreflect.ValueOfMessage(v.ProtoReflect())
+}
+
+func (x *_GenesisState_3_list) Truncate(n int) {
+	for i := n; i < len(*x.list); i++ {
+		(*x.list)[i] = nil
+	}
+	*x.list = (*x.list)[:n]
+}
+
+func (x *_GenesisState_3_list) NewElement() protoreflect.Value {
+	v := new(TokenPairDenomIndex)
+	return protoreflect.ValueOfMessage(v.ProtoReflect())
+}
+
+func (x *_GenesisState_3_list) IsValid() bool {
+	return x.list != nil
+}
+
+var _ protoreflect.List = (*_GenesisState_4_list)(nil)
+
+type _GenesisState_4_list struct {
+	list *[]*TokenPairERC20AddressIndex
+}
+
+func (x *_GenesisState_4_list) Len() int {
+	if x.list == nil {
+		return 0
+	}
+	return len(*x.list)
+}
+
+func (x *_GenesisState_4_list) Get(i int) protoreflect.Value {
+	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
+}
+
+func (x *_GenesisState_4_list) Set(i int, value protoreflect.Value) {
+	valueUnwrapped := value.Message()
+	concreteValue := valueUnwrapped.Interface().(*TokenPairERC20AddressIndex)
+	(*x.list)[i] = concreteValue
+}
+
+func (x *_GenesisState_4_list) Append(value protoreflect.Value) {
+	valueUnwrapped := value.Message()
+	concreteValue := valueUnwrapped.Interface().(*TokenPairERC20AddressIndex)
+	*x.list = append(*x.list, concreteValue)
+}
+
+func (x *_GenesisState_4_list) AppendMutable() protoreflect.Value {
+	v := new(TokenPairERC20AddressIndex)
+	*x.list = append(*x.list, v)
+	return protoreflect.ValueOfMessage(v.ProtoReflect())
+}
+
+func (x *_GenesisState_4_list) Truncate(n int) {
+	for i := n; i < len(*x.list); i++ {
+		(*x.list)[i] = nil
+	}
+	*x.list = (*x.list)[:n]
+}
+
+func (x *_GenesisState_4_list) NewElement() protoreflect.Value {
+	v := new(TokenPairERC20AddressIndex)
+	return protoreflect.ValueOfMessage(v.ProtoReflect())
+}
+
+func (x *_GenesisState_4_list) IsValid() bool {
+	return x.list != nil
+}
+
 var (
-	md_GenesisState             protoreflect.MessageDescriptor
-	fd_GenesisState_params      protoreflect.FieldDescriptor
-	fd_GenesisState_token_pairs protoreflect.FieldDescriptor
+	md_GenesisState                       protoreflect.MessageDescriptor
+	fd_GenesisState_params                protoreflect.FieldDescriptor
+	fd_GenesisState_token_pairs           protoreflect.FieldDescriptor
+	fd_GenesisState_denom_indexes         protoreflect.FieldDescriptor
+	fd_GenesisState_erc20_address_indexes protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -75,6 +180,8 @@ func init() {
 	md_GenesisState = File_canto_erc20_v1_genesis_proto.Messages().ByName("GenesisState")
 	fd_GenesisState_params = md_GenesisState.Fields().ByName("params")
 	fd_GenesisState_token_pairs = md_GenesisState.Fields().ByName("token_pairs")
+	fd_GenesisState_denom_indexes = md_GenesisState.Fields().ByName("denom_indexes")
+	fd_GenesisState_erc20_address_indexes = md_GenesisState.Fields().ByName("erc20_address_indexes")
 }
 
 var _ protoreflect.Message = (*fastReflection_GenesisState)(nil)
@@ -154,6 +261,18 @@ func (x *fastReflection_GenesisState) Range(f func(protoreflect.FieldDescriptor,
 			return
 		}
 	}
+	if len(x.DenomIndexes) != 0 {
+		value := protoreflect.ValueOfList(&_GenesisState_3_list{list: &x.DenomIndexes})
+		if !f(fd_GenesisState_denom_indexes, value) {
+			return
+		}
+	}
+	if len(x.Erc20AddressIndexes) != 0 {
+		value := protoreflect.ValueOfList(&_GenesisState_4_list{list: &x.Erc20AddressIndexes})
+		if !f(fd_GenesisState_erc20_address_indexes, value) {
+			return
+		}
+	}
 }
 
 // Has reports whether a field is populated.
@@ -173,6 +292,10 @@ func (x *fastReflection_GenesisState) Has(fd protoreflect.FieldDescriptor) bool 
 		return x.Params != nil
 	case "canto.erc20.v1.GenesisState.token_pairs":
 		return len(x.TokenPairs) != 0
+	case "canto.erc20.v1.GenesisState.denom_indexes":
+		return len(x.DenomIndexes) != 0
+	case "canto.erc20.v1.GenesisState.erc20_address_indexes":
+		return len(x.Erc20AddressIndexes) != 0
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.GenesisState"))
@@ -193,6 +316,10 @@ func (x *fastReflection_GenesisState) Clear(fd protoreflect.FieldDescriptor) {
 		x.Params = nil
 	case "canto.erc20.v1.GenesisState.token_pairs":
 		x.TokenPairs = nil
+	case "canto.erc20.v1.GenesisState.denom_indexes":
+		x.DenomIndexes = nil
+	case "canto.erc20.v1.GenesisState.erc20_address_indexes":
+		x.Erc20AddressIndexes = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.GenesisState"))
@@ -217,6 +344,18 @@ func (x *fastReflection_GenesisState) Get(descriptor protoreflect.FieldDescripto
 			return protoreflect.ValueOfList(&_GenesisState_2_list{})
 		}
 		listValue := &_GenesisState_2_list{list: &x.TokenPairs}
+		return protoreflect.ValueOfList(listValue)
+	case "canto.erc20.v1.GenesisState.denom_indexes":
+		if len(x.DenomIndexes) == 0 {
+			return protoreflect.ValueOfList(&_GenesisState_3_list{})
+		}
+		listValue := &_GenesisState_3_list{list: &x.DenomIndexes}
+		return protoreflect.ValueOfList(listValue)
+	case "canto.erc20.v1.GenesisState.erc20_address_indexes":
+		if len(x.Erc20AddressIndexes) == 0 {
+			return protoreflect.ValueOfList(&_GenesisState_4_list{})
+		}
+		listValue := &_GenesisState_4_list{list: &x.Erc20AddressIndexes}
 		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
@@ -244,6 +383,14 @@ func (x *fastReflection_GenesisState) Set(fd protoreflect.FieldDescriptor, value
 		lv := value.List()
 		clv := lv.(*_GenesisState_2_list)
 		x.TokenPairs = *clv.list
+	case "canto.erc20.v1.GenesisState.denom_indexes":
+		lv := value.List()
+		clv := lv.(*_GenesisState_3_list)
+		x.DenomIndexes = *clv.list
+	case "canto.erc20.v1.GenesisState.erc20_address_indexes":
+		lv := value.List()
+		clv := lv.(*_GenesisState_4_list)
+		x.Erc20AddressIndexes = *clv.list
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.GenesisState"))
@@ -275,6 +422,18 @@ func (x *fastReflection_GenesisState) Mutable(fd protoreflect.FieldDescriptor) p
 		}
 		value := &_GenesisState_2_list{list: &x.TokenPairs}
 		return protoreflect.ValueOfList(value)
+	case "canto.erc20.v1.GenesisState.denom_indexes":
+		if x.DenomIndexes == nil {
+			x.DenomIndexes = []*TokenPairDenomIndex{}
+		}
+		value := &_GenesisState_3_list{list: &x.DenomIndexes}
+		return protoreflect.ValueOfList(value)
+	case "canto.erc20.v1.GenesisState.erc20_address_indexes":
+		if x.Erc20AddressIndexes == nil {
+			x.Erc20AddressIndexes = []*TokenPairERC20AddressIndex{}
+		}
+		value := &_GenesisState_4_list{list: &x.Erc20AddressIndexes}
+		return protoreflect.ValueOfList(value)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.GenesisState"))
@@ -294,6 +453,12 @@ func (x *fastReflection_GenesisState) NewField(fd protoreflect.FieldDescriptor) 
 	case "canto.erc20.v1.GenesisState.token_pairs":
 		list := []*TokenPair{}
 		return protoreflect.ValueOfList(&_GenesisState_2_list{list: &list})
+	case "canto.erc20.v1.GenesisState.denom_indexes":
+		list := []*TokenPairDenomIndex{}
+		return protoreflect.ValueOfList(&_GenesisState_3_list{list: &list})
+	case "canto.erc20.v1.GenesisState.erc20_address_indexes":
+		list := []*TokenPairERC20AddressIndex{}
+		return protoreflect.ValueOfList(&_GenesisState_4_list{list: &list})
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.GenesisState"))
@@ -373,6 +538,18 @@ func (x *fastReflection_GenesisState) ProtoMethods() *protoiface.Methods {
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
 		}
+		if len(x.DenomIndexes) > 0 {
+			for _, e := range x.DenomIndexes {
+				l = options.Size(e)
+				n += 1 + l + runtime.Sov(uint64(l))
+			}
+		}
+		if len(x.Erc20AddressIndexes) > 0 {
+			for _, e := range x.Erc20AddressIndexes {
+				l = options.Size(e)
+				n += 1 + l + runtime.Sov(uint64(l))
+			}
+		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
 		}
@@ -401,6 +578,38 @@ func (x *fastReflection_GenesisState) ProtoMethods() *protoiface.Methods {
 		if x.unknownFields != nil {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
+		}
+		if len(x.Erc20AddressIndexes) > 0 {
+			for iNdEx := len(x.Erc20AddressIndexes) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.Erc20AddressIndexes[iNdEx])
+				if err != nil {
+					return protoiface.MarshalOutput{
+						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+						Buf:               input.Buf,
+					}, err
+				}
+				i -= len(encoded)
+				copy(dAtA[i:], encoded)
+				i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+				i--
+				dAtA[i] = 0x22
+			}
+		}
+		if len(x.DenomIndexes) > 0 {
+			for iNdEx := len(x.DenomIndexes) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.DenomIndexes[iNdEx])
+				if err != nil {
+					return protoiface.MarshalOutput{
+						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+						Buf:               input.Buf,
+					}, err
+				}
+				i -= len(encoded)
+				copy(dAtA[i:], encoded)
+				i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+				i--
+				dAtA[i] = 0x1a
+			}
 		}
 		if len(x.TokenPairs) > 0 {
 			for iNdEx := len(x.TokenPairs) - 1; iNdEx >= 0; iNdEx-- {
@@ -548,6 +757,74 @@ func (x *fastReflection_GenesisState) ProtoMethods() *protoiface.Methods {
 				}
 				x.TokenPairs = append(x.TokenPairs, &TokenPair{})
 				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.TokenPairs[len(x.TokenPairs)-1]); err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				iNdEx = postIndex
+			case 3:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field DenomIndexes", wireType)
+				}
+				var msglen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					msglen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if msglen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + msglen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.DenomIndexes = append(x.DenomIndexes, &TokenPairDenomIndex{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.DenomIndexes[len(x.DenomIndexes)-1]); err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				iNdEx = postIndex
+			case 4:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Erc20AddressIndexes", wireType)
+				}
+				var msglen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					msglen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if msglen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + msglen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Erc20AddressIndexes = append(x.Erc20AddressIndexes, &TokenPairERC20AddressIndex{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Erc20AddressIndexes[len(x.Erc20AddressIndexes)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -1073,6 +1350,12 @@ type GenesisState struct {
 	Params *Params `protobuf:"bytes,1,opt,name=params,proto3" json:"params,omitempty"`
 	// registered token pairs
 	TokenPairs []*TokenPair `protobuf:"bytes,2,rep,name=token_pairs,json=tokenPairs,proto3" json:"token_pairs,omitempty"`
+	// list of mappings from Cosmos denoms to token pair IDs, used for indexing
+	// token pairs by their denom
+	DenomIndexes []*TokenPairDenomIndex `protobuf:"bytes,3,rep,name=denom_indexes,json=denomIndexes,proto3" json:"denom_indexes,omitempty"`
+	// list of mappings from ERC20 addresses to token pair IDs, used for indexing
+	// token pairs by their ERC20 address
+	Erc20AddressIndexes []*TokenPairERC20AddressIndex `protobuf:"bytes,4,rep,name=erc20_address_indexes,json=erc20AddressIndexes,proto3" json:"erc20_address_indexes,omitempty"`
 }
 
 func (x *GenesisState) Reset() {
@@ -1105,6 +1388,20 @@ func (x *GenesisState) GetParams() *Params {
 func (x *GenesisState) GetTokenPairs() []*TokenPair {
 	if x != nil {
 		return x.TokenPairs
+	}
+	return nil
+}
+
+func (x *GenesisState) GetDenomIndexes() []*TokenPairDenomIndex {
+	if x != nil {
+		return x.DenomIndexes
+	}
+	return nil
+}
+
+func (x *GenesisState) GetErc20AddressIndexes() []*TokenPairERC20AddressIndex {
+	if x != nil {
+		return x.Erc20AddressIndexes
 	}
 	return nil
 }
@@ -1166,33 +1463,47 @@ var file_canto_erc20_v1_genesis_proto_rawDesc = []byte{
 	0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2f, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2f, 0x76, 0x31, 0x2f, 0x65,
 	0x72, 0x63, 0x32, 0x30, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x14, 0x67, 0x6f, 0x67, 0x6f,
 	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x67, 0x6f, 0x67, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x22, 0x86, 0x01, 0x0a, 0x0c, 0x47, 0x65, 0x6e, 0x65, 0x73, 0x69, 0x73, 0x53, 0x74, 0x61, 0x74,
-	0x65, 0x12, 0x34, 0x0a, 0x06, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x0b, 0x32, 0x16, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2e,
-	0x76, 0x31, 0x2e, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52,
-	0x06, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x40, 0x0a, 0x0b, 0x74, 0x6f, 0x6b, 0x65, 0x6e,
-	0x5f, 0x70, 0x61, 0x69, 0x72, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63,
-	0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x76, 0x31, 0x2e, 0x54, 0x6f,
-	0x6b, 0x65, 0x6e, 0x50, 0x61, 0x69, 0x72, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52, 0x0a, 0x74,
-	0x6f, 0x6b, 0x65, 0x6e, 0x50, 0x61, 0x69, 0x72, 0x73, 0x22, 0x66, 0x0a, 0x06, 0x50, 0x61, 0x72,
-	0x61, 0x6d, 0x73, 0x12, 0x21, 0x0a, 0x0c, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x5f, 0x65, 0x72,
-	0x63, 0x32, 0x30, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0b, 0x65, 0x6e, 0x61, 0x62, 0x6c,
-	0x65, 0x45, 0x72, 0x63, 0x32, 0x30, 0x12, 0x39, 0x0a, 0x0f, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65,
-	0x5f, 0x65, 0x76, 0x6d, 0x5f, 0x68, 0x6f, 0x6f, 0x6b, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x42,
-	0x11, 0xe2, 0xde, 0x1f, 0x0d, 0x45, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x45, 0x56, 0x4d, 0x48, 0x6f,
-	0x6f, 0x6b, 0x52, 0x0d, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x45, 0x76, 0x6d, 0x48, 0x6f, 0x6f,
-	0x6b, 0x42, 0xa5, 0x01, 0x0a, 0x12, 0x63, 0x6f, 0x6d, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2e,
-	0x65, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x76, 0x31, 0x42, 0x0c, 0x47, 0x65, 0x6e, 0x65, 0x73, 0x69,
-	0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x27, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73,
-	0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x63, 0x61, 0x6e, 0x74, 0x6f,
-	0x2f, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2f, 0x76, 0x31, 0x3b, 0x65, 0x72, 0x63, 0x32, 0x30, 0x76,
-	0x31, 0xa2, 0x02, 0x03, 0x43, 0x45, 0x58, 0xaa, 0x02, 0x0e, 0x43, 0x61, 0x6e, 0x74, 0x6f, 0x2e,
-	0x45, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x0e, 0x43, 0x61, 0x6e, 0x74, 0x6f,
-	0x5c, 0x45, 0x72, 0x63, 0x32, 0x30, 0x5c, 0x56, 0x31, 0xe2, 0x02, 0x1a, 0x43, 0x61, 0x6e, 0x74,
-	0x6f, 0x5c, 0x45, 0x72, 0x63, 0x32, 0x30, 0x5c, 0x56, 0x31, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65,
-	0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x10, 0x43, 0x61, 0x6e, 0x74, 0x6f, 0x3a, 0x3a,
-	0x45, 0x72, 0x63, 0x32, 0x30, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x33,
+	0x1a, 0x11, 0x61, 0x6d, 0x69, 0x6e, 0x6f, 0x2f, 0x61, 0x6d, 0x69, 0x6e, 0x6f, 0x2e, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x22, 0xbc, 0x02, 0x0a, 0x0c, 0x47, 0x65, 0x6e, 0x65, 0x73, 0x69, 0x73, 0x53,
+	0x74, 0x61, 0x74, 0x65, 0x12, 0x34, 0x0a, 0x06, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x16, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72, 0x63,
+	0x32, 0x30, 0x2e, 0x76, 0x31, 0x2e, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x42, 0x04, 0xc8, 0xde,
+	0x1f, 0x00, 0x52, 0x06, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x40, 0x0a, 0x0b, 0x74, 0x6f,
+	0x6b, 0x65, 0x6e, 0x5f, 0x70, 0x61, 0x69, 0x72, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32,
+	0x19, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x76, 0x31,
+	0x2e, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x50, 0x61, 0x69, 0x72, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00,
+	0x52, 0x0a, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x50, 0x61, 0x69, 0x72, 0x73, 0x12, 0x4e, 0x0a, 0x0d,
+	0x64, 0x65, 0x6e, 0x6f, 0x6d, 0x5f, 0x69, 0x6e, 0x64, 0x65, 0x78, 0x65, 0x73, 0x18, 0x03, 0x20,
+	0x03, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72, 0x63, 0x32,
+	0x30, 0x2e, 0x76, 0x31, 0x2e, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x50, 0x61, 0x69, 0x72, 0x44, 0x65,
+	0x6e, 0x6f, 0x6d, 0x49, 0x6e, 0x64, 0x65, 0x78, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52, 0x0c,
+	0x64, 0x65, 0x6e, 0x6f, 0x6d, 0x49, 0x6e, 0x64, 0x65, 0x78, 0x65, 0x73, 0x12, 0x64, 0x0a, 0x15,
+	0x65, 0x72, 0x63, 0x32, 0x30, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x5f, 0x69, 0x6e,
+	0x64, 0x65, 0x78, 0x65, 0x73, 0x18, 0x04, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x2a, 0x2e, 0x63, 0x61,
+	0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x76, 0x31, 0x2e, 0x54, 0x6f, 0x6b,
+	0x65, 0x6e, 0x50, 0x61, 0x69, 0x72, 0x45, 0x52, 0x43, 0x32, 0x30, 0x41, 0x64, 0x64, 0x72, 0x65,
+	0x73, 0x73, 0x49, 0x6e, 0x64, 0x65, 0x78, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52, 0x13, 0x65,
+	0x72, 0x63, 0x32, 0x30, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x49, 0x6e, 0x64, 0x65, 0x78,
+	0x65, 0x73, 0x22, 0x81, 0x01, 0x0a, 0x06, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x21, 0x0a,
+	0x0c, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x5f, 0x65, 0x72, 0x63, 0x32, 0x30, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x08, 0x52, 0x0b, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x45, 0x72, 0x63, 0x32, 0x30,
+	0x12, 0x39, 0x0a, 0x0f, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x5f, 0x65, 0x76, 0x6d, 0x5f, 0x68,
+	0x6f, 0x6f, 0x6b, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x42, 0x11, 0xe2, 0xde, 0x1f, 0x0d, 0x45,
+	0x6e, 0x61, 0x62, 0x6c, 0x65, 0x45, 0x56, 0x4d, 0x48, 0x6f, 0x6f, 0x6b, 0x52, 0x0d, 0x65, 0x6e,
+	0x61, 0x62, 0x6c, 0x65, 0x45, 0x76, 0x6d, 0x48, 0x6f, 0x6f, 0x6b, 0x3a, 0x19, 0x8a, 0xe7, 0xb0,
+	0x2a, 0x14, 0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2f, 0x78, 0x2f, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2f,
+	0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x42, 0xa5, 0x01, 0x0a, 0x12, 0x63, 0x6f, 0x6d, 0x2e, 0x63,
+	0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x76, 0x31, 0x42, 0x0c, 0x47,
+	0x65, 0x6e, 0x65, 0x73, 0x69, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x27, 0x63,
+	0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f,
+	0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2f, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2f, 0x76, 0x31, 0x3b, 0x65,
+	0x72, 0x63, 0x32, 0x30, 0x76, 0x31, 0xa2, 0x02, 0x03, 0x43, 0x45, 0x58, 0xaa, 0x02, 0x0e, 0x43,
+	0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x45, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x0e,
+	0x43, 0x61, 0x6e, 0x74, 0x6f, 0x5c, 0x45, 0x72, 0x63, 0x32, 0x30, 0x5c, 0x56, 0x31, 0xe2, 0x02,
+	0x1a, 0x43, 0x61, 0x6e, 0x74, 0x6f, 0x5c, 0x45, 0x72, 0x63, 0x32, 0x30, 0x5c, 0x56, 0x31, 0x5c,
+	0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x10, 0x43, 0x61,
+	0x6e, 0x74, 0x6f, 0x3a, 0x3a, 0x45, 0x72, 0x63, 0x32, 0x30, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x06,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1209,18 +1520,22 @@ func file_canto_erc20_v1_genesis_proto_rawDescGZIP() []byte {
 
 var file_canto_erc20_v1_genesis_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_canto_erc20_v1_genesis_proto_goTypes = []interface{}{
-	(*GenesisState)(nil), // 0: canto.erc20.v1.GenesisState
-	(*Params)(nil),       // 1: canto.erc20.v1.Params
-	(*TokenPair)(nil),    // 2: canto.erc20.v1.TokenPair
+	(*GenesisState)(nil),               // 0: canto.erc20.v1.GenesisState
+	(*Params)(nil),                     // 1: canto.erc20.v1.Params
+	(*TokenPair)(nil),                  // 2: canto.erc20.v1.TokenPair
+	(*TokenPairDenomIndex)(nil),        // 3: canto.erc20.v1.TokenPairDenomIndex
+	(*TokenPairERC20AddressIndex)(nil), // 4: canto.erc20.v1.TokenPairERC20AddressIndex
 }
 var file_canto_erc20_v1_genesis_proto_depIdxs = []int32{
 	1, // 0: canto.erc20.v1.GenesisState.params:type_name -> canto.erc20.v1.Params
 	2, // 1: canto.erc20.v1.GenesisState.token_pairs:type_name -> canto.erc20.v1.TokenPair
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	3, // 2: canto.erc20.v1.GenesisState.denom_indexes:type_name -> canto.erc20.v1.TokenPairDenomIndex
+	4, // 3: canto.erc20.v1.GenesisState.erc20_address_indexes:type_name -> canto.erc20.v1.TokenPairERC20AddressIndex
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_canto_erc20_v1_genesis_proto_init() }

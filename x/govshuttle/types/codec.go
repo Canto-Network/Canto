@@ -2,6 +2,7 @@ package types
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/codec/legacy"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -20,13 +21,6 @@ var (
 	// The actual codec used for serialization should be provided to modules/erc20 and
 	// defined at the application level.
 	ModuleCdc = codec.NewProtoCodec(codectypes.NewInterfaceRegistry())
-
-	// AminoCdc is a amino codec created to support amino JSON compatible msgs.
-	AminoCdc = codec.NewAminoCodec(amino)
-)
-
-const (
-	msgUpdateParams = "canto/MsgUpdateParams"
 )
 
 // NOTE: This is required for the GetSignBytes function
@@ -46,6 +40,8 @@ func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 		(*sdk.Msg)(nil),
 		&LendingMarketProposal{},
 		&TreasuryProposal{},
+		&MsgLendingMarketProposal{},
+		&MsgTreasuryProposal{},
 	)
 
 	registry.RegisterImplementations(
@@ -58,6 +54,8 @@ func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 }
 
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&LendingMarketProposal{}, "canto/LendingMarketProposal", nil)
-	cdc.RegisterConcrete(&TreasuryProposal{}, "canto/TreasuryProposal", nil)
+	legacy.RegisterAminoMsg(cdc, &LendingMarketProposal{}, "canto/LendingMarketProposal")
+	legacy.RegisterAminoMsg(cdc, &TreasuryProposal{}, "canto/TreasuryProposal")
+	legacy.RegisterAminoMsg(cdc, &MsgLendingMarketProposal{}, "canto/MsgLendingMarketProposal")
+	legacy.RegisterAminoMsg(cdc, &MsgTreasuryProposal{}, "canto/MsgTreasuryProposal")
 }

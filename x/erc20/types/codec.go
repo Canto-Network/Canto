@@ -23,13 +23,6 @@ var (
 	AminoCdc = codec.NewAminoCodec(amino)
 )
 
-const (
-	// Amino names
-	convertERC20Name = "canto/MsgConvertERC20"
-	convertCoinName  = "canto/MsgConvertCoin"
-	msgUpdateParams  = "canto/MsgUpdateParams"
-)
-
 // NOTE: This is required for the GetSignBytes function
 func init() {
 	RegisterLegacyAminoCodec(amino)
@@ -63,10 +56,10 @@ func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 // concrete types on the provided LegacyAmino codec. These types are used for
 // Amino JSON serialization and EIP-712 compatibility.
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&MsgRegisterCoin{}, "canto/RegisterCoinProposal", nil)
-	cdc.RegisterConcrete(&MsgRegisterERC20{}, "canto/RegisterERC20Proposal", nil)
-	cdc.RegisterConcrete(&MsgConvertERC20{}, convertERC20Name, nil)
-	cdc.RegisterConcrete(&MsgConvertCoin{}, convertCoinName, nil)
-	cdc.RegisterConcrete(&MsgUpdateParams{}, msgUpdateParams, nil)
-	cdc.RegisterConcrete(&Params{}, "canto/Params", nil)
+	cdc.RegisterConcrete(&MsgRegisterCoin{}, "canto/MsgRegisterCoin", nil)
+	cdc.RegisterConcrete(&MsgRegisterERC20{}, "canto/MsgRegisterERC20", nil)
+	cdc.RegisterConcrete(&MsgConvertCoin{}, "canto/MsgConvertCoin", nil)
+	cdc.RegisterConcrete(&MsgConvertERC20{}, "canto/MsgConvertERC20", nil)
+	cdc.RegisterConcrete(&MsgUpdateParams{}, "canto/x/erc20/MsgUpdateParams", nil)
+	cdc.RegisterConcrete(&Params{}, "canto/x/erc20/Params", nil)
 }

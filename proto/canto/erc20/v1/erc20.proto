@@ -31,8 +31,26 @@ message TokenPair {
   Owner contract_owner = 4;
 }
 
+// TokenPairDenomIndex is a mapping of a token pair's denom to its token pair
+// ID.
+message TokenPairDenomIndex {
+  option (gogoproto.equal) = true;
+  string denom = 1;
+  bytes token_pair_id = 2;
+}
+
+// TokenPairERC20AddressIndex is a mapping of a token pair's ERC20 address to
+// its token pair ID.
+message TokenPairERC20AddressIndex {
+  option (gogoproto.equal) = true;
+  bytes erc20_address = 1;
+  bytes token_pair_id = 2;
+}
+
 // RegisterCoinProposal is a gov Content type to register a token pair for a
 // native Cosmos coin.
+// Deprecated: This legacy proposal is deprecated in favor of Msg-based gov
+// proposals, see MsgRegisterCoin.
 message RegisterCoinProposal {
   option deprecated = true;
   option (gogoproto.equal) = false;
@@ -47,6 +65,8 @@ message RegisterCoinProposal {
 
 // RegisterERC20Proposal is a gov Content type to register a token pair for an
 // ERC20 token
+// Deprecated: This legacy proposal is deprecated in favor of Msg-based gov
+// proposals, see MsgRegisterERC20.
 message RegisterERC20Proposal {
   option deprecated = true;
   option (gogoproto.equal) = false;
@@ -60,6 +80,8 @@ message RegisterERC20Proposal {
 
 // ToggleTokenConversionProposal is a gov Content type to toggle the conversion
 // of a token pair.
+// Deprecated: This legacy proposal is deprecated in favor of Msg-based gov
+// proposals, see MsgToggleTokenConversion.
 message ToggleTokenConversionProposal {
   option deprecated = true;
   option (gogoproto.equal) = false;

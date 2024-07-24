@@ -208,7 +208,6 @@ func (suite *KeeperTestSuite) MintFeeCollector(coins sdk.Coins) {
 
 // DeployContract deploys the ERC20MinterBurnerDecimalsContract.
 func (suite *KeeperTestSuite) DeployContract(name, symbol string, decimals uint8) (common.Address, error) {
-	ctx := sdk.WrapSDKContext(suite.ctx)
 	chainID := suite.app.EvmKeeper.ChainID()
 
 	ctorArgs, err := contracts.ERC20MinterBurnerDecimalsContract.ABI.Pack("", name, symbol, decimals)
@@ -225,7 +224,7 @@ func (suite *KeeperTestSuite) DeployContract(name, symbol string, decimals uint8
 		return common.Address{}, err
 	}
 
-	res, err := suite.queryClientEvm.EstimateGas(ctx, &evm.EthCallRequest{
+	res, err := suite.queryClientEvm.EstimateGas(suite.ctx, &evm.EthCallRequest{
 		Args:   args,
 		GasCap: uint64(config.DefaultGasCap),
 	})
@@ -253,7 +252,7 @@ func (suite *KeeperTestSuite) DeployContract(name, symbol string, decimals uint8
 		return common.Address{}, err
 	}
 
-	rsp, err := suite.app.EvmKeeper.EthereumTx(ctx, erc20DeployTx)
+	rsp, err := suite.app.EvmKeeper.EthereumTx(suite.ctx, erc20DeployTx)
 	if err != nil {
 		return common.Address{}, err
 	}
@@ -263,7 +262,6 @@ func (suite *KeeperTestSuite) DeployContract(name, symbol string, decimals uint8
 }
 
 func (suite *KeeperTestSuite) DeployContractMaliciousDelayed(name string, symbol string) common.Address {
-	ctx := sdk.WrapSDKContext(suite.ctx)
 	chainID := suite.app.EvmKeeper.ChainID()
 
 	ctorArgs, err := contracts.ERC20MaliciousDelayedContract.ABI.Pack("", big.NewInt(1000000000000000000))
@@ -276,7 +274,7 @@ func (suite *KeeperTestSuite) DeployContractMaliciousDelayed(name string, symbol
 	})
 	suite.Require().NoError(err)
 
-	res, err := suite.queryClientEvm.EstimateGas(ctx, &evm.EthCallRequest{
+	res, err := suite.queryClientEvm.EstimateGas(suite.ctx, &evm.EthCallRequest{
 		Args:   args,
 		GasCap: uint64(config.DefaultGasCap),
 	})
@@ -299,14 +297,13 @@ func (suite *KeeperTestSuite) DeployContractMaliciousDelayed(name string, symbol
 	erc20DeployTx.From = suite.address.Hex()
 	err = erc20DeployTx.Sign(ethtypes.LatestSignerForChainID(chainID), suite.signer)
 	suite.Require().NoError(err)
-	rsp, err := suite.app.EvmKeeper.EthereumTx(ctx, erc20DeployTx)
+	rsp, err := suite.app.EvmKeeper.EthereumTx(suite.ctx, erc20DeployTx)
 	suite.Require().NoError(err)
 	suite.Require().Empty(rsp.VmError)
 	return crypto.CreateAddress(suite.address, nonce)
 }
 
 func (suite *KeeperTestSuite) DeployContractDirectBalanceManipulation(name string, symbol string) common.Address {
-	ctx := sdk.WrapSDKContext(suite.ctx)
 	chainID := suite.app.EvmKeeper.ChainID()
 
 	ctorArgs, err := contracts.ERC20DirectBalanceManipulationContract.ABI.Pack("", big.NewInt(1000000000000000000))
@@ -319,7 +316,7 @@ func (suite *KeeperTestSuite) DeployContractDirectBalanceManipulation(name strin
 	})
 	suite.Require().NoError(err)
 
-	res, err := suite.queryClientEvm.EstimateGas(ctx, &evm.EthCallRequest{
+	res, err := suite.queryClientEvm.EstimateGas(suite.ctx, &evm.EthCallRequest{
 		Args:   args,
 		GasCap: uint64(config.DefaultGasCap),
 	})
@@ -342,7 +339,7 @@ func (suite *KeeperTestSuite) DeployContractDirectBalanceManipulation(name strin
 	erc20DeployTx.From = suite.address.Hex()
 	err = erc20DeployTx.Sign(ethtypes.LatestSignerForChainID(chainID), suite.signer)
 	suite.Require().NoError(err)
-	rsp, err := suite.app.EvmKeeper.EthereumTx(ctx, erc20DeployTx)
+	rsp, err := suite.app.EvmKeeper.EthereumTx(suite.ctx, erc20DeployTx)
 	suite.Require().NoError(err)
 	suite.Require().Empty(rsp.VmError)
 	return crypto.CreateAddress(suite.address, nonce)
@@ -402,12 +399,11 @@ func (suite *KeeperTestSuite) GrantERC20Token(contractAddr, from, to common.Addr
 }
 
 func (suite *KeeperTestSuite) sendTx(contractAddr, from common.Address, transferData []byte) *evm.MsgEthereumTx {
-	ctx := sdk.WrapSDKContext(suite.ctx)
 	chainID := suite.app.EvmKeeper.ChainID()
 
 	args, err := json.Marshal(&evm.TransactionArgs{To: &contractAddr, From: &from, Data: (*hexutil.Bytes)(&transferData)})
 	suite.Require().NoError(err)
-	res, err := suite.queryClientEvm.EstimateGas(ctx, &evm.EthCallRequest{
+	res, err := suite.queryClientEvm.EstimateGas(suite.ctx, &evm.EthCallRequest{
 		Args:   args,
 		GasCap: uint64(config.DefaultGasCap),
 	})
@@ -434,7 +430,7 @@ func (suite *KeeperTestSuite) sendTx(contractAddr, from common.Address, transfer
 	ercTransferTx.From = suite.address.Hex()
 	err = ercTransferTx.Sign(ethtypes.LatestSignerForChainID(chainID), suite.signer)
 	suite.Require().NoError(err)
-	rsp, err := suite.app.EvmKeeper.EthereumTx(ctx, ercTransferTx)
+	rsp, err := suite.app.EvmKeeper.EthereumTx(suite.ctx, ercTransferTx)
 	suite.Require().NoError(err)
 	suite.Require().Empty(rsp.VmError)
 	return ercTransferTx

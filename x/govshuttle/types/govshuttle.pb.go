@@ -62,6 +62,8 @@ var xxx_messageInfo_Params proto.InternalMessageInfo
 
 // Define this object so that the govshuttle.pb.go file is generate, implements
 // govtypes.Content
+// Deprecated: This legacy proposal is deprecated in favor of Msg-based gov
+// proposals, see MsgLendingMarketProposal.
 type LendingMarketProposal struct {
 	// title
 	Title       string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
@@ -124,6 +126,8 @@ func (m *LendingMarketProposal) GetMetadata() *LendingMarketMetadata {
 }
 
 // treasury proposal type,
+// Deprecated: This legacy proposal is deprecated in favor of Msg-based gov
+// proposals, see MsgTreasuryProposal.
 type TreasuryProposal struct {
 	Title       string                    `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
 	Description string                    `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`

@@ -5,8 +5,14 @@ const DefaultIndex uint64 = 1
 
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
+	return NewGenesisState(DefaultParams(), []CSR{}, "")
+}
+
+func NewGenesisState(params Params, csrs []CSR, turnstileAddress string) *GenesisState {
 	return &GenesisState{
-		Params: DefaultParams(),
+		Params:           params,
+		Csrs:             csrs,
+		TurnstileAddress: turnstileAddress,
 	}
 }
 

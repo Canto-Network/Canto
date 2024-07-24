@@ -104,8 +104,8 @@ func (suite *KeeperTestSuite) TestDeleteTokenPair() {
 	pair := types.NewTokenPair(tests.GenerateAddress(), evmtypes.DefaultEVMDenom, true, types.OWNER_MODULE)
 	id := pair.GetID()
 	suite.app.Erc20Keeper.SetTokenPair(suite.ctx, pair)
-	suite.app.Erc20Keeper.SetERC20Map(suite.ctx, pair.GetERC20Contract(), id)
-	suite.app.Erc20Keeper.SetDenomMap(suite.ctx, pair.Denom, id)
+	suite.app.Erc20Keeper.SetTokenPairIdByERC20Addr(suite.ctx, pair.GetERC20Contract(), id)
+	suite.app.Erc20Keeper.SetTokenPairIdByDenom(suite.ctx, pair.Denom, id)
 
 	testCases := []struct {
 		name     string
@@ -163,8 +163,8 @@ func (suite *KeeperTestSuite) TestIsERC20Registered() {
 	addr := tests.GenerateAddress()
 	pair := types.NewTokenPair(addr, "coin", true, types.OWNER_MODULE)
 	suite.app.Erc20Keeper.SetTokenPair(suite.ctx, pair)
-	suite.app.Erc20Keeper.SetERC20Map(suite.ctx, addr, pair.GetID())
-	suite.app.Erc20Keeper.SetDenomMap(suite.ctx, pair.Denom, pair.GetID())
+	suite.app.Erc20Keeper.SetTokenPairIdByERC20Addr(suite.ctx, addr, pair.GetID())
+	suite.app.Erc20Keeper.SetTokenPairIdByDenom(suite.ctx, pair.Denom, pair.GetID())
 
 	testCases := []struct {
 		name     string
@@ -200,8 +200,8 @@ func (suite *KeeperTestSuite) TestIsDenomRegistered() {
 	addr := tests.GenerateAddress()
 	pair := types.NewTokenPair(addr, "coin", true, types.OWNER_MODULE)
 	suite.app.Erc20Keeper.SetTokenPair(suite.ctx, pair)
-	suite.app.Erc20Keeper.SetERC20Map(suite.ctx, addr, pair.GetID())
-	suite.app.Erc20Keeper.SetDenomMap(suite.ctx, pair.Denom, pair.GetID())
+	suite.app.Erc20Keeper.SetTokenPairIdByERC20Addr(suite.ctx, addr, pair.GetID())
+	suite.app.Erc20Keeper.SetTokenPairIdByDenom(suite.ctx, pair.Denom, pair.GetID())
 
 	testCases := []struct {
 		name     string

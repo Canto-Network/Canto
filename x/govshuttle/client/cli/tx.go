@@ -2,28 +2,32 @@ package cli
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
 
+	addresscodec "cosmossdk.io/core/address"
+	errorsmod "cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/address"
 	"github.com/cosmos/cosmos-sdk/version"
-	"github.com/cosmos/cosmos-sdk/x/gov/client/cli"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
-
-	errorsmod "cosmossdk.io/errors"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
 )
 
 var (
 	DefaultRelativePacketTimeoutTimestamp = uint64((time.Duration(10) * time.Minute).Nanoseconds())
+
+	FlagAuthority = "authority"
 )
 
 // NewTxCmd returns a root CLI command handler for certain modules/govshuttle transaction commands.
-func NewTxCmd() *cobra.Command {
+func NewTxCmd(ac addresscodec.Codec) *cobra.Command {
 	txCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "govshuttle subcommands",
@@ -32,12 +36,15 @@ func NewTxCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	txCmd.AddCommand()
+	txCmd.AddCommand(
+		NewLendingMarketProposalCmd(ac),
+		NewTreasuryProposalCmd(ac),
+	)
 	return txCmd
 }
 
 // NewRegisterCoinProposalCmd implements the command to submit a community-pool-spend proposal
-func NewLendingMarketProposalCmd() *cobra.Command {
+func NewLendingMarketProposalCmd(ac addresscodec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "lending-market [metadata]",
 		Args:  cobra.ExactArgs(1),
@@ -51,9 +58,9 @@ Where metadata.json contains (example):
 
 {
 	"Account": ["address_1", "address_2"],
-        "PropId":  1,
+	"PropId":  1,
 	"values": ["canto", "osmo"],
-	"calldatas: ["calldata1", "calldata2"],
+	"calldatas": ["calldata1", "calldata2"],
 	"signatures": ["func1", "func2"]
 }`, version.AppName,
 		),
@@ -63,22 +70,7 @@ Where metadata.json contains (example):
 				return err
 			}
 
-			title, err := cmd.Flags().GetString(cli.FlagTitle)
-			if err != nil {
-				return err
-			}
-
-			description, err := cmd.Flags().GetString(cli.FlagDescription)
-			if err != nil {
-				return err
-			}
-
-			depositStr, err := cmd.Flags().GetString(cli.FlagDeposit)
-			if err != nil {
-				return err
-			}
-
-			deposit, err := sdk.ParseCoinsNormalized(depositStr)
+			proposal, err := ReadGovPropFlags(clientCtx, cmd.Flags())
 			if err != nil {
 				return err
 			}
@@ -88,40 +80,46 @@ Where metadata.json contains (example):
 				return errorsmod.Wrap(err, "Failure to parse JSON object")
 			}
 
-			from := clientCtx.GetFromAddress()
-
-			content := types.NewLendingMarketProposal(title, description, &propMetaData)
-
-			msg, err := govtypes.NewMsgSubmitProposal(content, deposit, from)
-			if err != nil {
-				return err
+			// validate basic logic
+			cd, vals, sigs := len(propMetaData.GetCalldatas()), len(propMetaData.GetValues()), len(propMetaData.GetSignatures())
+			if cd != vals {
+				return errorsmod.Wrap(govtypes.ErrInvalidProposalContent, "proposal array arguments must be same length")
+			}
+			if vals != sigs {
+				return errorsmod.Wrap(govtypes.ErrInvalidProposalContent, "proposal array arguments must be same length")
 			}
 
-			//if err := msg.ValidateBasic(); err != nil {
-			//	return err
-			//}
+			authority, _ := cmd.Flags().GetString(FlagAuthority)
+			if authority != "" {
+				if _, err = ac.StringToBytes(authority); err != nil {
+					return fmt.Errorf("invalid authority address: %w", err)
+				}
+			} else {
+				authority = sdk.AccAddress(address.Module("gov")).String()
+			}
 
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+			if err := proposal.SetMsgs([]sdk.Msg{
+				&types.MsgLendingMarketProposal{
+					Authority:   authority,
+					Title:       proposal.Title,
+					Description: proposal.Summary,
+					Metadata:    &propMetaData,
+				},
+			}); err != nil {
+				return fmt.Errorf("failed to create submit lending market proposal message: %w", err)
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), proposal)
 		},
 	}
+	flags.AddTxFlagsToCmd(cmd)
+	AddGovPropFlagsToCmd(cmd)
 
-	cmd.Flags().String(cli.FlagTitle, "", "title of proposal")
-	cmd.Flags().String(cli.FlagDescription, "", "description of proposal")
-	cmd.Flags().String(cli.FlagDeposit, "1aevmos", "deposit of proposal")
-	if err := cmd.MarkFlagRequired(cli.FlagTitle); err != nil {
-		panic(err)
-	}
-	if err := cmd.MarkFlagRequired(cli.FlagDescription); err != nil {
-		panic(err)
-	}
-	if err := cmd.MarkFlagRequired(cli.FlagDeposit); err != nil {
-		panic(err)
-	}
 	return cmd
 }
 
 // Register TreasuryProposal submit cmd
-func NewTreasuryProposalCmd() *cobra.Command {
+func NewTreasuryProposalCmd(ac addresscodec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "treasury-proposal [metadata]",
 		Args:  cobra.ExactArgs(1),
@@ -135,7 +133,7 @@ Where metadata.json contains (example):
 
 {
 	"recipient": "0xfffffff...",
-        "PropID":  1,
+	"PropID":  1,
 	"amount": 1,
 	"denom": "canto/note"
 }`, version.AppName,
@@ -146,22 +144,7 @@ Where metadata.json contains (example):
 				return err
 			}
 
-			title, err := cmd.Flags().GetString(cli.FlagTitle)
-			if err != nil {
-				return err
-			}
-
-			description, err := cmd.Flags().GetString(cli.FlagDescription)
-			if err != nil {
-				return err
-			}
-
-			depositStr, err := cmd.Flags().GetString(cli.FlagDeposit)
-			if err != nil {
-				return err
-			}
-
-			deposit, err := sdk.ParseCoinsNormalized(depositStr)
+			proposal, err := ReadGovPropFlags(clientCtx, cmd.Flags())
 			if err != nil {
 				return err
 			}
@@ -171,34 +154,37 @@ Where metadata.json contains (example):
 				return errorsmod.Wrap(err, "Failure to parse JSON object")
 			}
 
-			from := clientCtx.GetFromAddress()
-
-			content := types.NewTreasuryProposal(title, description, &propMetaData)
-
-			msg, err := govtypes.NewMsgSubmitProposal(content, deposit, from)
-			if err != nil {
-				return err
+			// validate basic logic
+			s := strings.ToLower(propMetaData.GetDenom())
+			if s != "canto" && s != "note" {
+				return errorsmod.Wrapf(govtypes.ErrInvalidProposalContent, "%s is not a valid denom string", propMetaData.GetDenom())
 			}
 
-			//if err := msg.ValidateBasic(); err != nil {
-			//	return err
-			//}
+			authority, _ := cmd.Flags().GetString(FlagAuthority)
+			if authority != "" {
+				if _, err = ac.StringToBytes(authority); err != nil {
+					return fmt.Errorf("invalid authority address: %w", err)
+				}
+			} else {
+				authority = sdk.AccAddress(address.Module("gov")).String()
+			}
 
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+			if err := proposal.SetMsgs([]sdk.Msg{
+				&types.MsgTreasuryProposal{
+					Authority:   authority,
+					Title:       proposal.Title,
+					Description: proposal.Summary,
+					Metadata:    &propMetaData,
+				},
+			}); err != nil {
+				return fmt.Errorf("failed to create submit treasury proposal message: %w", err)
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), proposal)
 		},
 	}
+	flags.AddTxFlagsToCmd(cmd)
+	AddGovPropFlagsToCmd(cmd)
 
-	cmd.Flags().String(cli.FlagTitle, "", "title of proposal")
-	cmd.Flags().String(cli.FlagDescription, "", "description of proposal")
-	cmd.Flags().String(cli.FlagDeposit, "1aevmos", "deposit of proposal")
-	if err := cmd.MarkFlagRequired(cli.FlagTitle); err != nil {
-		panic(err)
-	}
-	if err := cmd.MarkFlagRequired(cli.FlagDescription); err != nil {
-		panic(err)
-	}
-	if err := cmd.MarkFlagRequired(cli.FlagDeposit); err != nil {
-		panic(err)
-	}
 	return cmd
 }

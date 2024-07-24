@@ -3,6 +3,7 @@ package canto.erc20.v1;
 
 import "canto/erc20/v1/erc20.proto";
 import "gogoproto/gogo.proto";
+import "amino/amino.proto";
 
 option go_package = "github.com/Canto-Network/Canto/v7/x/erc20/types";
 
@@ -12,10 +13,20 @@ message GenesisState {
   Params params = 1 [ (gogoproto.nullable) = false ];
   // registered token pairs
   repeated TokenPair token_pairs = 2 [ (gogoproto.nullable) = false ];
+  // list of mappings from Cosmos denoms to token pair IDs, used for indexing
+  // token pairs by their denom
+  repeated TokenPairDenomIndex denom_indexes = 3
+      [ (gogoproto.nullable) = false ];
+  // list of mappings from ERC20 addresses to token pair IDs, used for indexing
+  // token pairs by their ERC20 address
+  repeated TokenPairERC20AddressIndex erc20_address_indexes = 4
+      [ (gogoproto.nullable) = false ];
 }
 
 // Params defines the erc20 module params
 message Params {
+  option (amino.name) = "canto/x/erc20/Params";
+
   // parameter to enable the conversion of Cosmos coins <--> ERC20 tokens.
   bool enable_erc20 = 1;
   // parameter to enable the EVM hook that converts an ERC20 token to a Cosmos

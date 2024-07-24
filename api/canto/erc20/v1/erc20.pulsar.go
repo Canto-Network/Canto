@@ -601,6 +601,980 @@ func (x *fastReflection_TokenPair) ProtoMethods() *protoiface.Methods {
 }
 
 var (
+	md_TokenPairDenomIndex               protoreflect.MessageDescriptor
+	fd_TokenPairDenomIndex_denom         protoreflect.FieldDescriptor
+	fd_TokenPairDenomIndex_token_pair_id protoreflect.FieldDescriptor
+)
+
+func init() {
+	file_canto_erc20_v1_erc20_proto_init()
+	md_TokenPairDenomIndex = File_canto_erc20_v1_erc20_proto.Messages().ByName("TokenPairDenomIndex")
+	fd_TokenPairDenomIndex_denom = md_TokenPairDenomIndex.Fields().ByName("denom")
+	fd_TokenPairDenomIndex_token_pair_id = md_TokenPairDenomIndex.Fields().ByName("token_pair_id")
+}
+
+var _ protoreflect.Message = (*fastReflection_TokenPairDenomIndex)(nil)
+
+type fastReflection_TokenPairDenomIndex TokenPairDenomIndex
+
+func (x *TokenPairDenomIndex) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_TokenPairDenomIndex)(x)
+}
+
+func (x *TokenPairDenomIndex) slowProtoReflect() protoreflect.Message {
+	mi := &file_canto_erc20_v1_erc20_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+var _fastReflection_TokenPairDenomIndex_messageType fastReflection_TokenPairDenomIndex_messageType
+var _ protoreflect.MessageType = fastReflection_TokenPairDenomIndex_messageType{}
+
+type fastReflection_TokenPairDenomIndex_messageType struct{}
+
+func (x fastReflection_TokenPairDenomIndex_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_TokenPairDenomIndex)(nil)
+}
+func (x fastReflection_TokenPairDenomIndex_messageType) New() protoreflect.Message {
+	return new(fastReflection_TokenPairDenomIndex)
+}
+func (x fastReflection_TokenPairDenomIndex_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_TokenPairDenomIndex
+}
+
+// Descriptor returns message descriptor, which contains only the protobuf
+// type information for the message.
+func (x *fastReflection_TokenPairDenomIndex) Descriptor() protoreflect.MessageDescriptor {
+	return md_TokenPairDenomIndex
+}
+
+// Type returns the message type, which encapsulates both Go and protobuf
+// type information. If the Go type information is not needed,
+// it is recommended that the message descriptor be used instead.
+func (x *fastReflection_TokenPairDenomIndex) Type() protoreflect.MessageType {
+	return _fastReflection_TokenPairDenomIndex_messageType
+}
+
+// New returns a newly allocated and mutable empty message.
+func (x *fastReflection_TokenPairDenomIndex) New() protoreflect.Message {
+	return new(fastReflection_TokenPairDenomIndex)
+}
+
+// Interface unwraps the message reflection interface and
+// returns the underlying ProtoMessage interface.
+func (x *fastReflection_TokenPairDenomIndex) Interface() protoreflect.ProtoMessage {
+	return (*TokenPairDenomIndex)(x)
+}
+
+// Range iterates over every populated field in an undefined order,
+// calling f for each field descriptor and value encountered.
+// Range returns immediately if f returns false.
+// While iterating, mutating operations may only be performed
+// on the current field descriptor.
+func (x *fastReflection_TokenPairDenomIndex) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if x.Denom != "" {
+		value := protoreflect.ValueOfString(x.Denom)
+		if !f(fd_TokenPairDenomIndex_denom, value) {
+			return
+		}
+	}
+	if len(x.TokenPairId) != 0 {
+		value := protoreflect.ValueOfBytes(x.TokenPairId)
+		if !f(fd_TokenPairDenomIndex_token_pair_id, value) {
+			return
+		}
+	}
+}
+
+// Has reports whether a field is populated.
+//
+// Some fields have the property of nullability where it is possible to
+// distinguish between the default value of a field and whether the field
+// was explicitly populated with the default value. Singular message fields,
+// member fields of a oneof, and proto2 scalar fields are nullable. Such
+// fields are populated only if explicitly set.
+//
+// In other cases (aside from the nullable cases above),
+// a proto3 scalar field is populated if it contains a non-zero value, and
+// a repeated field is populated if it is non-empty.
+func (x *fastReflection_TokenPairDenomIndex) Has(fd protoreflect.FieldDescriptor) bool {
+	switch fd.FullName() {
+	case "canto.erc20.v1.TokenPairDenomIndex.denom":
+		return x.Denom != ""
+	case "canto.erc20.v1.TokenPairDenomIndex.token_pair_id":
+		return len(x.TokenPairId) != 0
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.TokenPairDenomIndex"))
+		}
+		panic(fmt.Errorf("message canto.erc20.v1.TokenPairDenomIndex does not contain field %s", fd.FullName()))
+	}
+}
+
+// Clear clears the field such that a subsequent Has call reports false.
+//
+// Clearing an extension field clears both the extension type and value
+// associated with the given field number.
+//
+// Clear is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_TokenPairDenomIndex) Clear(fd protoreflect.FieldDescriptor) {
+	switch fd.FullName() {
+	case "canto.erc20.v1.TokenPairDenomIndex.denom":
+		x.Denom = ""
+	case "canto.erc20.v1.TokenPairDenomIndex.token_pair_id":
+		x.TokenPairId = nil
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.TokenPairDenomIndex"))
+		}
+		panic(fmt.Errorf("message canto.erc20.v1.TokenPairDenomIndex does not contain field %s", fd.FullName()))
+	}
+}
+
+// Get retrieves the value for a field.
+//
+// For unpopulated scalars, it returns the default value, where
+// the default value of a bytes scalar is guaranteed to be a copy.
+// For unpopulated composite types, it returns an empty, read-only view
+// of the value; to obtain a mutable reference, use Mutable.
+func (x *fastReflection_TokenPairDenomIndex) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+	switch descriptor.FullName() {
+	case "canto.erc20.v1.TokenPairDenomIndex.denom":
+		value := x.Denom
+		return protoreflect.ValueOfString(value)
+	case "canto.erc20.v1.TokenPairDenomIndex.token_pair_id":
+		value := x.TokenPairId
+		return protoreflect.ValueOfBytes(value)
+	default:
+		if descriptor.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.TokenPairDenomIndex"))
+		}
+		panic(fmt.Errorf("message canto.erc20.v1.TokenPairDenomIndex does not contain field %s", descriptor.FullName()))
+	}
+}
+
+// Set stores the value for a field.
+//
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType.
+// When setting a composite type, it is unspecified whether the stored value
+// aliases the source's memory in any way. If the composite value is an
+// empty, read-only value, then it panics.
+//
+// Set is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_TokenPairDenomIndex) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+	switch fd.FullName() {
+	case "canto.erc20.v1.TokenPairDenomIndex.denom":
+		x.Denom = value.Interface().(string)
+	case "canto.erc20.v1.TokenPairDenomIndex.token_pair_id":
+		x.TokenPairId = value.Bytes()
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.TokenPairDenomIndex"))
+		}
+		panic(fmt.Errorf("message canto.erc20.v1.TokenPairDenomIndex does not contain field %s", fd.FullName()))
+	}
+}
+
+// Mutable returns a mutable reference to a composite type.
+//
+// If the field is unpopulated, it may allocate a composite value.
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType
+// if not already stored.
+// It panics if the field does not contain a composite type.
+//
+// Mutable is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_TokenPairDenomIndex) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "canto.erc20.v1.TokenPairDenomIndex.denom":
+		panic(fmt.Errorf("field denom of message canto.erc20.v1.TokenPairDenomIndex is not mutable"))
+	case "canto.erc20.v1.TokenPairDenomIndex.token_pair_id":
+		panic(fmt.Errorf("field token_pair_id of message canto.erc20.v1.TokenPairDenomIndex is not mutable"))
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.TokenPairDenomIndex"))
+		}
+		panic(fmt.Errorf("message canto.erc20.v1.TokenPairDenomIndex does not contain field %s", fd.FullName()))
+	}
+}
+
+// NewField returns a new value that is assignable to the field
+// for the given descriptor. For scalars, this returns the default value.
+// For lists, maps, and messages, this returns a new, empty, mutable value.
+func (x *fastReflection_TokenPairDenomIndex) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "canto.erc20.v1.TokenPairDenomIndex.denom":
+		return protoreflect.ValueOfString("")
+	case "canto.erc20.v1.TokenPairDenomIndex.token_pair_id":
+		return protoreflect.ValueOfBytes(nil)
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.TokenPairDenomIndex"))
+		}
+		panic(fmt.Errorf("message canto.erc20.v1.TokenPairDenomIndex does not contain field %s", fd.FullName()))
+	}
+}
+
+// WhichOneof reports which field within the oneof is populated,
+// returning nil if none are populated.
+// It panics if the oneof descriptor does not belong to this message.
+func (x *fastReflection_TokenPairDenomIndex) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+	switch d.FullName() {
+	default:
+		panic(fmt.Errorf("%s is not a oneof field in canto.erc20.v1.TokenPairDenomIndex", d.FullName()))
+	}
+	panic("unreachable")
+}
+
+// GetUnknown retrieves the entire list of unknown fields.
+// The caller may only mutate the contents of the RawFields
+// if the mutated bytes are stored back into the message with SetUnknown.
+func (x *fastReflection_TokenPairDenomIndex) GetUnknown() protoreflect.RawFields {
+	return x.unknownFields
+}
+
+// SetUnknown stores an entire list of unknown fields.
+// The raw fields must be syntactically valid according to the wire format.
+// An implementation may panic if this is not the case.
+// Once stored, the caller must not mutate the content of the RawFields.
+// An empty RawFields may be passed to clear the fields.
+//
+// SetUnknown is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_TokenPairDenomIndex) SetUnknown(fields protoreflect.RawFields) {
+	x.unknownFields = fields
+}
+
+// IsValid reports whether the message is valid.
+//
+// An invalid message is an empty, read-only value.
+//
+// An invalid message often corresponds to a nil pointer of the concrete
+// message type, but the details are implementation dependent.
+// Validity is not part of the protobuf data model, and may not
+// be preserved in marshaling or other operations.
+func (x *fastReflection_TokenPairDenomIndex) IsValid() bool {
+	return x != nil
+}
+
+// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
+// This method may return nil.
+//
+// The returned methods type is identical to
+// "google.golang.org/protobuf/runtime/protoiface".Methods.
+// Consult the protoiface package documentation for details.
+func (x *fastReflection_TokenPairDenomIndex) ProtoMethods() *protoiface.Methods {
+	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
+		x := input.Message.Interface().(*TokenPairDenomIndex)
+		if x == nil {
+			return protoiface.SizeOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Size:              0,
+			}
+		}
+		options := runtime.SizeInputToOptions(input)
+		_ = options
+		var n int
+		var l int
+		_ = l
+		l = len(x.Denom)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.TokenPairId)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.unknownFields != nil {
+			n += len(x.unknownFields)
+		}
+		return protoiface.SizeOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Size:              n,
+		}
+	}
+
+	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
+		x := input.Message.Interface().(*TokenPairDenomIndex)
+		if x == nil {
+			return protoiface.MarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Buf:               input.Buf,
+			}, nil
+		}
+		options := runtime.MarshalInputToOptions(input)
+		_ = options
+		size := options.Size(x)
+		dAtA := make([]byte, size)
+		i := len(dAtA)
+		_ = i
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			i -= len(x.unknownFields)
+			copy(dAtA[i:], x.unknownFields)
+		}
+		if len(x.TokenPairId) > 0 {
+			i -= len(x.TokenPairId)
+			copy(dAtA[i:], x.TokenPairId)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.TokenPairId)))
+			i--
+			dAtA[i] = 0x12
+		}
+		if len(x.Denom) > 0 {
+			i -= len(x.Denom)
+			copy(dAtA[i:], x.Denom)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Denom)))
+			i--
+			dAtA[i] = 0xa
+		}
+		if input.Buf != nil {
+			input.Buf = append(input.Buf, dAtA...)
+		} else {
+			input.Buf = dAtA
+		}
+		return protoiface.MarshalOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Buf:               input.Buf,
+		}, nil
+	}
+	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
+		x := input.Message.Interface().(*TokenPairDenomIndex)
+		if x == nil {
+			return protoiface.UnmarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Flags:             input.Flags,
+			}, nil
+		}
+		options := runtime.UnmarshalInputToOptions(input)
+		_ = options
+		dAtA := input.Buf
+		l := len(dAtA)
+		iNdEx := 0
+		for iNdEx < l {
+			preIndex := iNdEx
+			var wire uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				wire |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			fieldNum := int32(wire >> 3)
+			wireType := int(wire & 0x7)
+			if wireType == 4 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: TokenPairDenomIndex: wiretype end group for non-group")
+			}
+			if fieldNum <= 0 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: TokenPairDenomIndex: illegal tag %d (wire type %d)", fieldNum, wire)
+			}
+			switch fieldNum {
+			case 1:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Denom", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Denom = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 2:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field TokenPairId", wireType)
+				}
+				var byteLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					byteLen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if byteLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + byteLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.TokenPairId = append(x.TokenPairId[:0], dAtA[iNdEx:postIndex]...)
+				if x.TokenPairId == nil {
+					x.TokenPairId = []byte{}
+				}
+				iNdEx = postIndex
+			default:
+				iNdEx = preIndex
+				skippy, err := runtime.Skip(dAtA[iNdEx:])
+				if err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				if (skippy < 0) || (iNdEx+skippy) < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if (iNdEx + skippy) > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if !options.DiscardUnknown {
+					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+				}
+				iNdEx += skippy
+			}
+		}
+
+		if iNdEx > l {
+			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+		}
+		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
+	}
+	return &protoiface.Methods{
+		NoUnkeyedLiterals: struct{}{},
+		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
+		Size:              size,
+		Marshal:           marshal,
+		Unmarshal:         unmarshal,
+		Merge:             nil,
+		CheckInitialized:  nil,
+	}
+}
+
+var (
+	md_TokenPairERC20AddressIndex               protoreflect.MessageDescriptor
+	fd_TokenPairERC20AddressIndex_erc20_address protoreflect.FieldDescriptor
+	fd_TokenPairERC20AddressIndex_token_pair_id protoreflect.FieldDescriptor
+)
+
+func init() {
+	file_canto_erc20_v1_erc20_proto_init()
+	md_TokenPairERC20AddressIndex = File_canto_erc20_v1_erc20_proto.Messages().ByName("TokenPairERC20AddressIndex")
+	fd_TokenPairERC20AddressIndex_erc20_address = md_TokenPairERC20AddressIndex.Fields().ByName("erc20_address")
+	fd_TokenPairERC20AddressIndex_token_pair_id = md_TokenPairERC20AddressIndex.Fields().ByName("token_pair_id")
+}
+
+var _ protoreflect.Message = (*fastReflection_TokenPairERC20AddressIndex)(nil)
+
+type fastReflection_TokenPairERC20AddressIndex TokenPairERC20AddressIndex
+
+func (x *TokenPairERC20AddressIndex) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_TokenPairERC20AddressIndex)(x)
+}
+
+func (x *TokenPairERC20AddressIndex) slowProtoReflect() protoreflect.Message {
+	mi := &file_canto_erc20_v1_erc20_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+var _fastReflection_TokenPairERC20AddressIndex_messageType fastReflection_TokenPairERC20AddressIndex_messageType
+var _ protoreflect.MessageType = fastReflection_TokenPairERC20AddressIndex_messageType{}
+
+type fastReflection_TokenPairERC20AddressIndex_messageType struct{}
+
+func (x fastReflection_TokenPairERC20AddressIndex_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_TokenPairERC20AddressIndex)(nil)
+}
+func (x fastReflection_TokenPairERC20AddressIndex_messageType) New() protoreflect.Message {
+	return new(fastReflection_TokenPairERC20AddressIndex)
+}
+func (x fastReflection_TokenPairERC20AddressIndex_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_TokenPairERC20AddressIndex
+}
+
+// Descriptor returns message descriptor, which contains only the protobuf
+// type information for the message.
+func (x *fastReflection_TokenPairERC20AddressIndex) Descriptor() protoreflect.MessageDescriptor {
+	return md_TokenPairERC20AddressIndex
+}
+
+// Type returns the message type, which encapsulates both Go and protobuf
+// type information. If the Go type information is not needed,
+// it is recommended that the message descriptor be used instead.
+func (x *fastReflection_TokenPairERC20AddressIndex) Type() protoreflect.MessageType {
+	return _fastReflection_TokenPairERC20AddressIndex_messageType
+}
+
+// New returns a newly allocated and mutable empty message.
+func (x *fastReflection_TokenPairERC20AddressIndex) New() protoreflect.Message {
+	return new(fastReflection_TokenPairERC20AddressIndex)
+}
+
+// Interface unwraps the message reflection interface and
+// returns the underlying ProtoMessage interface.
+func (x *fastReflection_TokenPairERC20AddressIndex) Interface() protoreflect.ProtoMessage {
+	return (*TokenPairERC20AddressIndex)(x)
+}
+
+// Range iterates over every populated field in an undefined order,
+// calling f for each field descriptor and value encountered.
+// Range returns immediately if f returns false.
+// While iterating, mutating operations may only be performed
+// on the current field descriptor.
+func (x *fastReflection_TokenPairERC20AddressIndex) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if len(x.Erc20Address) != 0 {
+		value := protoreflect.ValueOfBytes(x.Erc20Address)
+		if !f(fd_TokenPairERC20AddressIndex_erc20_address, value) {
+			return
+		}
+	}
+	if len(x.TokenPairId) != 0 {
+		value := protoreflect.ValueOfBytes(x.TokenPairId)
+		if !f(fd_TokenPairERC20AddressIndex_token_pair_id, value) {
+			return
+		}
+	}
+}
+
+// Has reports whether a field is populated.
+//
+// Some fields have the property of nullability where it is possible to
+// distinguish between the default value of a field and whether the field
+// was explicitly populated with the default value. Singular message fields,
+// member fields of a oneof, and proto2 scalar fields are nullable. Such
+// fields are populated only if explicitly set.
+//
+// In other cases (aside from the nullable cases above),
+// a proto3 scalar field is populated if it contains a non-zero value, and
+// a repeated field is populated if it is non-empty.
+func (x *fastReflection_TokenPairERC20AddressIndex) Has(fd protoreflect.FieldDescriptor) bool {
+	switch fd.FullName() {
+	case "canto.erc20.v1.TokenPairERC20AddressIndex.erc20_address":
+		return len(x.Erc20Address) != 0
+	case "canto.erc20.v1.TokenPairERC20AddressIndex.token_pair_id":
+		return len(x.TokenPairId) != 0
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.TokenPairERC20AddressIndex"))
+		}
+		panic(fmt.Errorf("message canto.erc20.v1.TokenPairERC20AddressIndex does not contain field %s", fd.FullName()))
+	}
+}
+
+// Clear clears the field such that a subsequent Has call reports false.
+//
+// Clearing an extension field clears both the extension type and value
+// associated with the given field number.
+//
+// Clear is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_TokenPairERC20AddressIndex) Clear(fd protoreflect.FieldDescriptor) {
+	switch fd.FullName() {
+	case "canto.erc20.v1.TokenPairERC20AddressIndex.erc20_address":
+		x.Erc20Address = nil
+	case "canto.erc20.v1.TokenPairERC20AddressIndex.token_pair_id":
+		x.TokenPairId = nil
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.TokenPairERC20AddressIndex"))
+		}
+		panic(fmt.Errorf("message canto.erc20.v1.TokenPairERC20AddressIndex does not contain field %s", fd.FullName()))
+	}
+}
+
+// Get retrieves the value for a field.
+//
+// For unpopulated scalars, it returns the default value, where
+// the default value of a bytes scalar is guaranteed to be a copy.
+// For unpopulated composite types, it returns an empty, read-only view
+// of the value; to obtain a mutable reference, use Mutable.
+func (x *fastReflection_TokenPairERC20AddressIndex) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+	switch descriptor.FullName() {
+	case "canto.erc20.v1.TokenPairERC20AddressIndex.erc20_address":
+		value := x.Erc20Address
+		return protoreflect.ValueOfBytes(value)
+	case "canto.erc20.v1.TokenPairERC20AddressIndex.token_pair_id":
+		value := x.TokenPairId
+		return protoreflect.ValueOfBytes(value)
+	default:
+		if descriptor.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.TokenPairERC20AddressIndex"))
+		}
+		panic(fmt.Errorf("message canto.erc20.v1.TokenPairERC20AddressIndex does not contain field %s", descriptor.FullName()))
+	}
+}
+
+// Set stores the value for a field.
+//
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType.
+// When setting a composite type, it is unspecified whether the stored value
+// aliases the source's memory in any way. If the composite value is an
+// empty, read-only value, then it panics.
+//
+// Set is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_TokenPairERC20AddressIndex) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+	switch fd.FullName() {
+	case "canto.erc20.v1.TokenPairERC20AddressIndex.erc20_address":
+		x.Erc20Address = value.Bytes()
+	case "canto.erc20.v1.TokenPairERC20AddressIndex.token_pair_id":
+		x.TokenPairId = value.Bytes()
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.TokenPairERC20AddressIndex"))
+		}
+		panic(fmt.Errorf("message canto.erc20.v1.TokenPairERC20AddressIndex does not contain field %s", fd.FullName()))
+	}
+}
+
+// Mutable returns a mutable reference to a composite type.
+//
+// If the field is unpopulated, it may allocate a composite value.
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType
+// if not already stored.
+// It panics if the field does not contain a composite type.
+//
+// Mutable is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_TokenPairERC20AddressIndex) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "canto.erc20.v1.TokenPairERC20AddressIndex.erc20_address":
+		panic(fmt.Errorf("field erc20_address of message canto.erc20.v1.TokenPairERC20AddressIndex is not mutable"))
+	case "canto.erc20.v1.TokenPairERC20AddressIndex.token_pair_id":
+		panic(fmt.Errorf("field token_pair_id of message canto.erc20.v1.TokenPairERC20AddressIndex is not mutable"))
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.TokenPairERC20AddressIndex"))
+		}
+		panic(fmt.Errorf("message canto.erc20.v1.TokenPairERC20AddressIndex does not contain field %s", fd.FullName()))
+	}
+}
+
+// NewField returns a new value that is assignable to the field
+// for the given descriptor. For scalars, this returns the default value.
+// For lists, maps, and messages, this returns a new, empty, mutable value.
+func (x *fastReflection_TokenPairERC20AddressIndex) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "canto.erc20.v1.TokenPairERC20AddressIndex.erc20_address":
+		return protoreflect.ValueOfBytes(nil)
+	case "canto.erc20.v1.TokenPairERC20AddressIndex.token_pair_id":
+		return protoreflect.ValueOfBytes(nil)
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: canto.erc20.v1.TokenPairERC20AddressIndex"))
+		}
+		panic(fmt.Errorf("message canto.erc20.v1.TokenPairERC20AddressIndex does not contain field %s", fd.FullName()))
+	}
+}
+
+// WhichOneof reports which field within the oneof is populated,
+// returning nil if none are populated.
+// It panics if the oneof descriptor does not belong to this message.
+func (x *fastReflection_TokenPairERC20AddressIndex) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+	switch d.FullName() {
+	default:
+		panic(fmt.Errorf("%s is not a oneof field in canto.erc20.v1.TokenPairERC20AddressIndex", d.FullName()))
+	}
+	panic("unreachable")
+}
+
+// GetUnknown retrieves the entire list of unknown fields.
+// The caller may only mutate the contents of the RawFields
+// if the mutated bytes are stored back into the message with SetUnknown.
+func (x *fastReflection_TokenPairERC20AddressIndex) GetUnknown() protoreflect.RawFields {
+	return x.unknownFields
+}
+
+// SetUnknown stores an entire list of unknown fields.
+// The raw fields must be syntactically valid according to the wire format.
+// An implementation may panic if this is not the case.
+// Once stored, the caller must not mutate the content of the RawFields.
+// An empty RawFields may be passed to clear the fields.
+//
+// SetUnknown is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_TokenPairERC20AddressIndex) SetUnknown(fields protoreflect.RawFields) {
+	x.unknownFields = fields
+}
+
+// IsValid reports whether the message is valid.
+//
+// An invalid message is an empty, read-only value.
+//
+// An invalid message often corresponds to a nil pointer of the concrete
+// message type, but the details are implementation dependent.
+// Validity is not part of the protobuf data model, and may not
+// be preserved in marshaling or other operations.
+func (x *fastReflection_TokenPairERC20AddressIndex) IsValid() bool {
+	return x != nil
+}
+
+// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
+// This method may return nil.
+//
+// The returned methods type is identical to
+// "google.golang.org/protobuf/runtime/protoiface".Methods.
+// Consult the protoiface package documentation for details.
+func (x *fastReflection_TokenPairERC20AddressIndex) ProtoMethods() *protoiface.Methods {
+	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
+		x := input.Message.Interface().(*TokenPairERC20AddressIndex)
+		if x == nil {
+			return protoiface.SizeOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Size:              0,
+			}
+		}
+		options := runtime.SizeInputToOptions(input)
+		_ = options
+		var n int
+		var l int
+		_ = l
+		l = len(x.Erc20Address)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.TokenPairId)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.unknownFields != nil {
+			n += len(x.unknownFields)
+		}
+		return protoiface.SizeOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Size:              n,
+		}
+	}
+
+	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
+		x := input.Message.Interface().(*TokenPairERC20AddressIndex)
+		if x == nil {
+			return protoiface.MarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Buf:               input.Buf,
+			}, nil
+		}
+		options := runtime.MarshalInputToOptions(input)
+		_ = options
+		size := options.Size(x)
+		dAtA := make([]byte, size)
+		i := len(dAtA)
+		_ = i
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			i -= len(x.unknownFields)
+			copy(dAtA[i:], x.unknownFields)
+		}
+		if len(x.TokenPairId) > 0 {
+			i -= len(x.TokenPairId)
+			copy(dAtA[i:], x.TokenPairId)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.TokenPairId)))
+			i--
+			dAtA[i] = 0x12
+		}
+		if len(x.Erc20Address) > 0 {
+			i -= len(x.Erc20Address)
+			copy(dAtA[i:], x.Erc20Address)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Erc20Address)))
+			i--
+			dAtA[i] = 0xa
+		}
+		if input.Buf != nil {
+			input.Buf = append(input.Buf, dAtA...)
+		} else {
+			input.Buf = dAtA
+		}
+		return protoiface.MarshalOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Buf:               input.Buf,
+		}, nil
+	}
+	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
+		x := input.Message.Interface().(*TokenPairERC20AddressIndex)
+		if x == nil {
+			return protoiface.UnmarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Flags:             input.Flags,
+			}, nil
+		}
+		options := runtime.UnmarshalInputToOptions(input)
+		_ = options
+		dAtA := input.Buf
+		l := len(dAtA)
+		iNdEx := 0
+		for iNdEx < l {
+			preIndex := iNdEx
+			var wire uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				wire |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			fieldNum := int32(wire >> 3)
+			wireType := int(wire & 0x7)
+			if wireType == 4 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: TokenPairERC20AddressIndex: wiretype end group for non-group")
+			}
+			if fieldNum <= 0 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: TokenPairERC20AddressIndex: illegal tag %d (wire type %d)", fieldNum, wire)
+			}
+			switch fieldNum {
+			case 1:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Erc20Address", wireType)
+				}
+				var byteLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					byteLen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if byteLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + byteLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Erc20Address = append(x.Erc20Address[:0], dAtA[iNdEx:postIndex]...)
+				if x.Erc20Address == nil {
+					x.Erc20Address = []byte{}
+				}
+				iNdEx = postIndex
+			case 2:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field TokenPairId", wireType)
+				}
+				var byteLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					byteLen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if byteLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + byteLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.TokenPairId = append(x.TokenPairId[:0], dAtA[iNdEx:postIndex]...)
+				if x.TokenPairId == nil {
+					x.TokenPairId = []byte{}
+				}
+				iNdEx = postIndex
+			default:
+				iNdEx = preIndex
+				skippy, err := runtime.Skip(dAtA[iNdEx:])
+				if err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				if (skippy < 0) || (iNdEx+skippy) < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if (iNdEx + skippy) > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if !options.DiscardUnknown {
+					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+				}
+				iNdEx += skippy
+			}
+		}
+
+		if iNdEx > l {
+			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+		}
+		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
+	}
+	return &protoiface.Methods{
+		NoUnkeyedLiterals: struct{}{},
+		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
+		Size:              size,
+		Marshal:           marshal,
+		Unmarshal:         unmarshal,
+		Merge:             nil,
+		CheckInitialized:  nil,
+	}
+}
+
+var (
 	md_RegisterCoinProposal             protoreflect.MessageDescriptor
 	fd_RegisterCoinProposal_title       protoreflect.FieldDescriptor
 	fd_RegisterCoinProposal_description protoreflect.FieldDescriptor
@@ -624,7 +1598,7 @@ func (x *RegisterCoinProposal) ProtoReflect() protoreflect.Message {
 }
 
 func (x *RegisterCoinProposal) slowProtoReflect() protoreflect.Message {
-	mi := &file_canto_erc20_v1_erc20_proto_msgTypes[1]
+	mi := &file_canto_erc20_v1_erc20_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1187,7 +2161,7 @@ func (x *RegisterERC20Proposal) ProtoReflect() protoreflect.Message {
 }
 
 func (x *RegisterERC20Proposal) slowProtoReflect() protoreflect.Message {
-	mi := &file_canto_erc20_v1_erc20_proto_msgTypes[2]
+	mi := &file_canto_erc20_v1_erc20_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1735,7 +2709,7 @@ func (x *ToggleTokenConversionProposal) ProtoReflect() protoreflect.Message {
 }
 
 func (x *ToggleTokenConversionProposal) slowProtoReflect() protoreflect.Message {
-	mi := &file_canto_erc20_v1_erc20_proto_msgTypes[3]
+	mi := &file_canto_erc20_v1_erc20_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2391,8 +3365,100 @@ func (x *TokenPair) GetContractOwner() Owner {
 	return Owner_OWNER_UNSPECIFIED
 }
 
+// TokenPairDenomIndex is a mapping of a token pair's denom to its token pair
+// ID.
+type TokenPairDenomIndex struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Denom       string `protobuf:"bytes,1,opt,name=denom,proto3" json:"denom,omitempty"`
+	TokenPairId []byte `protobuf:"bytes,2,opt,name=token_pair_id,json=tokenPairId,proto3" json:"token_pair_id,omitempty"`
+}
+
+func (x *TokenPairDenomIndex) Reset() {
+	*x = TokenPairDenomIndex{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_canto_erc20_v1_erc20_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TokenPairDenomIndex) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TokenPairDenomIndex) ProtoMessage() {}
+
+// Deprecated: Use TokenPairDenomIndex.ProtoReflect.Descriptor instead.
+func (*TokenPairDenomIndex) Descriptor() ([]byte, []int) {
+	return file_canto_erc20_v1_erc20_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *TokenPairDenomIndex) GetDenom() string {
+	if x != nil {
+		return x.Denom
+	}
+	return ""
+}
+
+func (x *TokenPairDenomIndex) GetTokenPairId() []byte {
+	if x != nil {
+		return x.TokenPairId
+	}
+	return nil
+}
+
+// TokenPairERC20AddressIndex is a mapping of a token pair's ERC20 address to
+// its token pair ID.
+type TokenPairERC20AddressIndex struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Erc20Address []byte `protobuf:"bytes,1,opt,name=erc20_address,json=erc20Address,proto3" json:"erc20_address,omitempty"`
+	TokenPairId  []byte `protobuf:"bytes,2,opt,name=token_pair_id,json=tokenPairId,proto3" json:"token_pair_id,omitempty"`
+}
+
+func (x *TokenPairERC20AddressIndex) Reset() {
+	*x = TokenPairERC20AddressIndex{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_canto_erc20_v1_erc20_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TokenPairERC20AddressIndex) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TokenPairERC20AddressIndex) ProtoMessage() {}
+
+// Deprecated: Use TokenPairERC20AddressIndex.ProtoReflect.Descriptor instead.
+func (*TokenPairERC20AddressIndex) Descriptor() ([]byte, []int) {
+	return file_canto_erc20_v1_erc20_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *TokenPairERC20AddressIndex) GetErc20Address() []byte {
+	if x != nil {
+		return x.Erc20Address
+	}
+	return nil
+}
+
+func (x *TokenPairERC20AddressIndex) GetTokenPairId() []byte {
+	if x != nil {
+		return x.TokenPairId
+	}
+	return nil
+}
+
 // RegisterCoinProposal is a gov Content type to register a token pair for a
 // native Cosmos coin.
+// Deprecated: This legacy proposal is deprecated in favor of Msg-based gov
+// proposals, see MsgRegisterCoin.
 //
 // Deprecated: Do not use.
 type RegisterCoinProposal struct {
@@ -2411,7 +3477,7 @@ type RegisterCoinProposal struct {
 func (x *RegisterCoinProposal) Reset() {
 	*x = RegisterCoinProposal{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_canto_erc20_v1_erc20_proto_msgTypes[1]
+		mi := &file_canto_erc20_v1_erc20_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2425,7 +3491,7 @@ func (*RegisterCoinProposal) ProtoMessage() {}
 
 // Deprecated: Use RegisterCoinProposal.ProtoReflect.Descriptor instead.
 func (*RegisterCoinProposal) Descriptor() ([]byte, []int) {
-	return file_canto_erc20_v1_erc20_proto_rawDescGZIP(), []int{1}
+	return file_canto_erc20_v1_erc20_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *RegisterCoinProposal) GetTitle() string {
@@ -2451,6 +3517,8 @@ func (x *RegisterCoinProposal) GetMetadata() *v1beta1.Metadata {
 
 // RegisterERC20Proposal is a gov Content type to register a token pair for an
 // ERC20 token
+// Deprecated: This legacy proposal is deprecated in favor of Msg-based gov
+// proposals, see MsgRegisterERC20.
 //
 // Deprecated: Do not use.
 type RegisterERC20Proposal struct {
@@ -2469,7 +3537,7 @@ type RegisterERC20Proposal struct {
 func (x *RegisterERC20Proposal) Reset() {
 	*x = RegisterERC20Proposal{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_canto_erc20_v1_erc20_proto_msgTypes[2]
+		mi := &file_canto_erc20_v1_erc20_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2483,7 +3551,7 @@ func (*RegisterERC20Proposal) ProtoMessage() {}
 
 // Deprecated: Use RegisterERC20Proposal.ProtoReflect.Descriptor instead.
 func (*RegisterERC20Proposal) Descriptor() ([]byte, []int) {
-	return file_canto_erc20_v1_erc20_proto_rawDescGZIP(), []int{2}
+	return file_canto_erc20_v1_erc20_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *RegisterERC20Proposal) GetTitle() string {
@@ -2509,6 +3577,8 @@ func (x *RegisterERC20Proposal) GetErc20Address() string {
 
 // ToggleTokenConversionProposal is a gov Content type to toggle the conversion
 // of a token pair.
+// Deprecated: This legacy proposal is deprecated in favor of Msg-based gov
+// proposals, see MsgToggleTokenConversion.
 //
 // Deprecated: Do not use.
 type ToggleTokenConversionProposal struct {
@@ -2528,7 +3598,7 @@ type ToggleTokenConversionProposal struct {
 func (x *ToggleTokenConversionProposal) Reset() {
 	*x = ToggleTokenConversionProposal{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_canto_erc20_v1_erc20_proto_msgTypes[3]
+		mi := &file_canto_erc20_v1_erc20_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2542,7 +3612,7 @@ func (*ToggleTokenConversionProposal) ProtoMessage() {}
 
 // Deprecated: Use ToggleTokenConversionProposal.ProtoReflect.Descriptor instead.
 func (*ToggleTokenConversionProposal) Descriptor() ([]byte, []int) {
-	return file_canto_erc20_v1_erc20_proto_rawDescGZIP(), []int{3}
+	return file_canto_erc20_v1_erc20_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ToggleTokenConversionProposal) GetTitle() string {
@@ -2585,48 +3655,60 @@ var file_canto_erc20_v1_erc20_proto_rawDesc = []byte{
 	0x74, 0x5f, 0x6f, 0x77, 0x6e, 0x65, 0x72, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x15, 0x2e,
 	0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x76, 0x31, 0x2e, 0x4f,
 	0x77, 0x6e, 0x65, 0x72, 0x52, 0x0d, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x61, 0x63, 0x74, 0x4f, 0x77,
-	0x6e, 0x65, 0x72, 0x3a, 0x04, 0xe8, 0xa0, 0x1f, 0x01, 0x22, 0x97, 0x01, 0x0a, 0x14, 0x52, 0x65,
-	0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x43, 0x6f, 0x69, 0x6e, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73,
-	0x61, 0x6c, 0x12, 0x14, 0x0a, 0x05, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x05, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x12, 0x20, 0x0a, 0x0b, 0x64, 0x65, 0x73, 0x63,
-	0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x64,
-	0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x3f, 0x0a, 0x08, 0x6d, 0x65,
-	0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x63,
-	0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x62, 0x61, 0x6e, 0x6b, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74,
-	0x61, 0x31, 0x2e, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x42, 0x04, 0xc8, 0xde, 0x1f,
-	0x00, 0x52, 0x08, 0x6d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x3a, 0x06, 0x18, 0x01, 0xe8,
-	0xa0, 0x1f, 0x00, 0x22, 0x7b, 0x0a, 0x15, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x45,
-	0x52, 0x43, 0x32, 0x30, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x61, 0x6c, 0x12, 0x14, 0x0a, 0x05,
-	0x74, 0x69, 0x74, 0x6c, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x69, 0x74,
-	0x6c, 0x65, 0x12, 0x20, 0x0a, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f,
-	0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70,
-	0x74, 0x69, 0x6f, 0x6e, 0x12, 0x22, 0x0a, 0x0c, 0x65, 0x72, 0x63, 0x32, 0x30, 0x61, 0x64, 0x64,
-	0x72, 0x65, 0x73, 0x73, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x65, 0x72, 0x63, 0x32,
-	0x30, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x3a, 0x06, 0x18, 0x01, 0xe8, 0xa0, 0x1f, 0x00,
-	0x22, 0x75, 0x0a, 0x1d, 0x54, 0x6f, 0x67, 0x67, 0x6c, 0x65, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x43,
-	0x6f, 0x6e, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x61,
-	0x6c, 0x12, 0x14, 0x0a, 0x05, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x05, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x12, 0x20, 0x0a, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72,
-	0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x64, 0x65,
-	0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x14, 0x0a, 0x05, 0x74, 0x6f, 0x6b,
-	0x65, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x3a,
-	0x06, 0x18, 0x01, 0xe8, 0xa0, 0x1f, 0x00, 0x2a, 0x4a, 0x0a, 0x05, 0x4f, 0x77, 0x6e, 0x65, 0x72,
-	0x12, 0x15, 0x0a, 0x11, 0x4f, 0x57, 0x4e, 0x45, 0x52, 0x5f, 0x55, 0x4e, 0x53, 0x50, 0x45, 0x43,
-	0x49, 0x46, 0x49, 0x45, 0x44, 0x10, 0x00, 0x12, 0x10, 0x0a, 0x0c, 0x4f, 0x57, 0x4e, 0x45, 0x52,
-	0x5f, 0x4d, 0x4f, 0x44, 0x55, 0x4c, 0x45, 0x10, 0x01, 0x12, 0x12, 0x0a, 0x0e, 0x4f, 0x57, 0x4e,
-	0x45, 0x52, 0x5f, 0x45, 0x58, 0x54, 0x45, 0x52, 0x4e, 0x41, 0x4c, 0x10, 0x02, 0x1a, 0x04, 0x88,
-	0xa3, 0x1e, 0x00, 0x42, 0xa3, 0x01, 0x0a, 0x12, 0x63, 0x6f, 0x6d, 0x2e, 0x63, 0x61, 0x6e, 0x74,
-	0x6f, 0x2e, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x76, 0x31, 0x42, 0x0a, 0x45, 0x72, 0x63, 0x32,
-	0x30, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x27, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73,
-	0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x63, 0x61, 0x6e, 0x74, 0x6f,
-	0x2f, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2f, 0x76, 0x31, 0x3b, 0x65, 0x72, 0x63, 0x32, 0x30, 0x76,
-	0x31, 0xa2, 0x02, 0x03, 0x43, 0x45, 0x58, 0xaa, 0x02, 0x0e, 0x43, 0x61, 0x6e, 0x74, 0x6f, 0x2e,
-	0x45, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x0e, 0x43, 0x61, 0x6e, 0x74, 0x6f,
-	0x5c, 0x45, 0x72, 0x63, 0x32, 0x30, 0x5c, 0x56, 0x31, 0xe2, 0x02, 0x1a, 0x43, 0x61, 0x6e, 0x74,
-	0x6f, 0x5c, 0x45, 0x72, 0x63, 0x32, 0x30, 0x5c, 0x56, 0x31, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65,
-	0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x10, 0x43, 0x61, 0x6e, 0x74, 0x6f, 0x3a, 0x3a,
-	0x45, 0x72, 0x63, 0x32, 0x30, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x33,
+	0x6e, 0x65, 0x72, 0x3a, 0x04, 0xe8, 0xa0, 0x1f, 0x01, 0x22, 0x55, 0x0a, 0x13, 0x54, 0x6f, 0x6b,
+	0x65, 0x6e, 0x50, 0x61, 0x69, 0x72, 0x44, 0x65, 0x6e, 0x6f, 0x6d, 0x49, 0x6e, 0x64, 0x65, 0x78,
+	0x12, 0x14, 0x0a, 0x05, 0x64, 0x65, 0x6e, 0x6f, 0x6d, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x05, 0x64, 0x65, 0x6e, 0x6f, 0x6d, 0x12, 0x22, 0x0a, 0x0d, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x5f,
+	0x70, 0x61, 0x69, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x0b, 0x74,
+	0x6f, 0x6b, 0x65, 0x6e, 0x50, 0x61, 0x69, 0x72, 0x49, 0x64, 0x3a, 0x04, 0xe8, 0xa0, 0x1f, 0x01,
+	0x22, 0x6b, 0x0a, 0x1a, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x50, 0x61, 0x69, 0x72, 0x45, 0x52, 0x43,
+	0x32, 0x30, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x49, 0x6e, 0x64, 0x65, 0x78, 0x12, 0x23,
+	0x0a, 0x0d, 0x65, 0x72, 0x63, 0x32, 0x30, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x0c, 0x65, 0x72, 0x63, 0x32, 0x30, 0x41, 0x64, 0x64, 0x72,
+	0x65, 0x73, 0x73, 0x12, 0x22, 0x0a, 0x0d, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x5f, 0x70, 0x61, 0x69,
+	0x72, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x0b, 0x74, 0x6f, 0x6b, 0x65,
+	0x6e, 0x50, 0x61, 0x69, 0x72, 0x49, 0x64, 0x3a, 0x04, 0xe8, 0xa0, 0x1f, 0x01, 0x22, 0x97, 0x01,
+	0x0a, 0x14, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x43, 0x6f, 0x69, 0x6e, 0x50, 0x72,
+	0x6f, 0x70, 0x6f, 0x73, 0x61, 0x6c, 0x12, 0x14, 0x0a, 0x05, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x12, 0x20, 0x0a, 0x0b,
+	0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x3f,
+	0x0a, 0x08, 0x6d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x1d, 0x2e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x62, 0x61, 0x6e, 0x6b, 0x2e, 0x76,
+	0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x42,
+	0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52, 0x08, 0x6d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x3a,
+	0x06, 0x18, 0x01, 0xe8, 0xa0, 0x1f, 0x00, 0x22, 0x7b, 0x0a, 0x15, 0x52, 0x65, 0x67, 0x69, 0x73,
+	0x74, 0x65, 0x72, 0x45, 0x52, 0x43, 0x32, 0x30, 0x50, 0x72, 0x6f, 0x70, 0x6f, 0x73, 0x61, 0x6c,
+	0x12, 0x14, 0x0a, 0x05, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x05, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x12, 0x20, 0x0a, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69,
+	0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x64, 0x65, 0x73,
+	0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x22, 0x0a, 0x0c, 0x65, 0x72, 0x63, 0x32,
+	0x30, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c,
+	0x65, 0x72, 0x63, 0x32, 0x30, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x3a, 0x06, 0x18, 0x01,
+	0xe8, 0xa0, 0x1f, 0x00, 0x22, 0x75, 0x0a, 0x1d, 0x54, 0x6f, 0x67, 0x67, 0x6c, 0x65, 0x54, 0x6f,
+	0x6b, 0x65, 0x6e, 0x43, 0x6f, 0x6e, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x50, 0x72, 0x6f,
+	0x70, 0x6f, 0x73, 0x61, 0x6c, 0x12, 0x14, 0x0a, 0x05, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x12, 0x20, 0x0a, 0x0b, 0x64,
+	0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x14, 0x0a,
+	0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x6f,
+	0x6b, 0x65, 0x6e, 0x3a, 0x06, 0x18, 0x01, 0xe8, 0xa0, 0x1f, 0x00, 0x2a, 0x4a, 0x0a, 0x05, 0x4f,
+	0x77, 0x6e, 0x65, 0x72, 0x12, 0x15, 0x0a, 0x11, 0x4f, 0x57, 0x4e, 0x45, 0x52, 0x5f, 0x55, 0x4e,
+	0x53, 0x50, 0x45, 0x43, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10, 0x00, 0x12, 0x10, 0x0a, 0x0c, 0x4f,
+	0x57, 0x4e, 0x45, 0x52, 0x5f, 0x4d, 0x4f, 0x44, 0x55, 0x4c, 0x45, 0x10, 0x01, 0x12, 0x12, 0x0a,
+	0x0e, 0x4f, 0x57, 0x4e, 0x45, 0x52, 0x5f, 0x45, 0x58, 0x54, 0x45, 0x52, 0x4e, 0x41, 0x4c, 0x10,
+	0x02, 0x1a, 0x04, 0x88, 0xa3, 0x1e, 0x00, 0x42, 0xa3, 0x01, 0x0a, 0x12, 0x63, 0x6f, 0x6d, 0x2e,
+	0x63, 0x61, 0x6e, 0x74, 0x6f, 0x2e, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x76, 0x31, 0x42, 0x0a,
+	0x45, 0x72, 0x63, 0x32, 0x30, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x27, 0x63, 0x6f,
+	0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x63,
+	0x61, 0x6e, 0x74, 0x6f, 0x2f, 0x65, 0x72, 0x63, 0x32, 0x30, 0x2f, 0x76, 0x31, 0x3b, 0x65, 0x72,
+	0x63, 0x32, 0x30, 0x76, 0x31, 0xa2, 0x02, 0x03, 0x43, 0x45, 0x58, 0xaa, 0x02, 0x0e, 0x43, 0x61,
+	0x6e, 0x74, 0x6f, 0x2e, 0x45, 0x72, 0x63, 0x32, 0x30, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x0e, 0x43,
+	0x61, 0x6e, 0x74, 0x6f, 0x5c, 0x45, 0x72, 0x63, 0x32, 0x30, 0x5c, 0x56, 0x31, 0xe2, 0x02, 0x1a,
+	0x43, 0x61, 0x6e, 0x74, 0x6f, 0x5c, 0x45, 0x72, 0x63, 0x32, 0x30, 0x5c, 0x56, 0x31, 0x5c, 0x47,
+	0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x10, 0x43, 0x61, 0x6e,
+	0x74, 0x6f, 0x3a, 0x3a, 0x45, 0x72, 0x63, 0x32, 0x30, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x06, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -2642,18 +3724,20 @@ func file_canto_erc20_v1_erc20_proto_rawDescGZIP() []byte {
 }
 
 var file_canto_erc20_v1_erc20_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_canto_erc20_v1_erc20_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_canto_erc20_v1_erc20_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_canto_erc20_v1_erc20_proto_goTypes = []interface{}{
 	(Owner)(0),                            // 0: canto.erc20.v1.Owner
 	(*TokenPair)(nil),                     // 1: canto.erc20.v1.TokenPair
-	(*RegisterCoinProposal)(nil),          // 2: canto.erc20.v1.RegisterCoinProposal
-	(*RegisterERC20Proposal)(nil),         // 3: canto.erc20.v1.RegisterERC20Proposal
-	(*ToggleTokenConversionProposal)(nil), // 4: canto.erc20.v1.ToggleTokenConversionProposal
-	(*v1beta1.Metadata)(nil),              // 5: cosmos.bank.v1beta1.Metadata
+	(*TokenPairDenomIndex)(nil),           // 2: canto.erc20.v1.TokenPairDenomIndex
+	(*TokenPairERC20AddressIndex)(nil),    // 3: canto.erc20.v1.TokenPairERC20AddressIndex
+	(*RegisterCoinProposal)(nil),          // 4: canto.erc20.v1.RegisterCoinProposal
+	(*RegisterERC20Proposal)(nil),         // 5: canto.erc20.v1.RegisterERC20Proposal
+	(*ToggleTokenConversionProposal)(nil), // 6: canto.erc20.v1.ToggleTokenConversionProposal
+	(*v1beta1.Metadata)(nil),              // 7: cosmos.bank.v1beta1.Metadata
 }
 var file_canto_erc20_v1_erc20_proto_depIdxs = []int32{
 	0, // 0: canto.erc20.v1.TokenPair.contract_owner:type_name -> canto.erc20.v1.Owner
-	5, // 1: canto.erc20.v1.RegisterCoinProposal.metadata:type_name -> cosmos.bank.v1beta1.Metadata
+	7, // 1: canto.erc20.v1.RegisterCoinProposal.metadata:type_name -> cosmos.bank.v1beta1.Metadata
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
@@ -2680,7 +3764,7 @@ func file_canto_erc20_v1_erc20_proto_init() {
 			}
 		}
 		file_canto_erc20_v1_erc20_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RegisterCoinProposal); i {
+			switch v := v.(*TokenPairDenomIndex); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2692,7 +3776,7 @@ func file_canto_erc20_v1_erc20_proto_init() {
 			}
 		}
 		file_canto_erc20_v1_erc20_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RegisterERC20Proposal); i {
+			switch v := v.(*TokenPairERC20AddressIndex); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2704,6 +3788,30 @@ func file_canto_erc20_v1_erc20_proto_init() {
 			}
 		}
 		file_canto_erc20_v1_erc20_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*RegisterCoinProposal); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_canto_erc20_v1_erc20_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*RegisterERC20Proposal); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_canto_erc20_v1_erc20_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ToggleTokenConversionProposal); i {
 			case 0:
 				return &v.state
@@ -2722,7 +3830,7 @@ func file_canto_erc20_v1_erc20_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_canto_erc20_v1_erc20_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   4,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
