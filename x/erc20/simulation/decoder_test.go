@@ -24,7 +24,7 @@ func TestERC20Store(t *testing.T) {
 	kvPairs := kv.Pairs{
 		Pairs: []kv.Pair{
 			{Key: types.KeyPrefixTokenPair, Value: cdc.MustMarshal(&tokenPair)},
-			{Key: types.KeyPrefixTokenPairByERC20, Value: cdc.MustMarshal(&tokenPair)},
+			{Key: types.KeyPrefixTokenPairByERC20Address, Value: cdc.MustMarshal(&tokenPair)},
 			{Key: types.KeyPrefixTokenPairByDenom, Value: cdc.MustMarshal(&tokenPair)},
 			{Key: []byte{0x99}, Value: []byte{0x99}},
 		},
