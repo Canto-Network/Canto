@@ -21,7 +21,7 @@ func NewDecodeStore(cdc codec.Codec) func(kvA, kvB kv.Pair) string {
 			cdc.MustUnmarshal(kvB.Value, &tpB)
 			return fmt.Sprintf("%v\n%v", tpA, tpB)
 
-		case bytes.Equal(kvA.Key[:1], types.KeyPrefixTokenPairByERC20):
+		case bytes.Equal(kvA.Key[:1], types.KeyPrefixTokenPairByERC20Address):
 			var tpA, tpB types.TokenPair
 			cdc.MustUnmarshal(kvA.Value, &tpA)
 			cdc.MustUnmarshal(kvB.Value, &tpB)
