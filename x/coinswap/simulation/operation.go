@@ -171,6 +171,9 @@ func SimulateMsgAddLiquidity(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 			}
 
 			standardReserveAmt := balances.AmountOf(standardDenom)
+			if !standardReserveAmt.IsPositive() {
+				return simtypes.NoOpMsg(types.ModuleName, TypeMsgAddLiquidity, "standardReserveAmt should be positive"), nil, err
+			}
 			liquidity := bk.GetSupply(ctx, pool.LptDenom).Amount
 			minLiquidity = liquidity.Mul(exactStandardAmt).Quo(standardReserveAmt)
 
