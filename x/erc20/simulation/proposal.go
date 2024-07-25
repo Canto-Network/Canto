@@ -89,10 +89,11 @@ func SimulateRegisterCoin(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account
 
 	// mint cosmos coin to random accounts
 	randomIteration := r.Intn(10)
+	mintAmt := sdkmath.NewInt(100000000)
 	for i := 0; i < randomIteration; i++ {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 
-		if err := bk.MintCoins(ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(coinMetadata.Base, sdkmath.NewInt(1000000000)))); err != nil {
+		if err := bk.MintCoins(ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(coinMetadata.Base, mintAmt))); err != nil {
 			return &types.MsgRegisterCoin{}, err
 		}
 		if err := bk.SendCoinsFromModuleToAccount(ctx, types.ModuleName, simAccount.Address, sdk.NewCoins(sdk.NewCoin(coinMetadata.Base, sdkmath.NewInt(1000000000)))); err != nil {
