@@ -32,7 +32,7 @@ const (
 // An exact coin has the senders desired buy or sell amount.
 // A calculated coin has the desired denomination and bounded amount
 // the sender is willing to buy or sell in this order.
-
+//
 // NewMsgSwapOrder creates a new MsgSwapOrder object.
 func NewMsgSwapOrder(
 	input Input,
