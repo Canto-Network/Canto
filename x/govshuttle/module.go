@@ -42,7 +42,12 @@ var (
 
 // AppModule implements the sdk.AppModuleBasic interface.
 type AppModuleBasic struct {
-	ac address.Codec
+	ac  address.Codec
+	cdc codec.Codec
+}
+
+func NewAppModuleBasic(ac address.Codec, cdc codec.Codec) AppModuleBasic {
+	return AppModuleBasic{ac: ac, cdc: cdc}
 }
 
 // Name returns the capability module's name.
@@ -105,12 +110,13 @@ type AppModule struct {
 }
 
 func NewAppModule(
+	cdc codec.Codec,
 	k keeper.Keeper,
 	ak authkeeper.AccountKeeper,
 	ac address.Codec,
 ) AppModule {
 	return AppModule{
-		AppModuleBasic: AppModuleBasic{ac: ac},
+		AppModuleBasic: AppModuleBasic{ac: ac, cdc: cdc},
 		keeper:         k,
 		accountkeeper:  ak,
 	}

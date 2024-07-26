@@ -22,6 +22,7 @@ import (
 
 	"github.com/Canto-Network/Canto/v7/x/epochs/client/cli"
 	"github.com/Canto-Network/Canto/v7/x/epochs/keeper"
+	"github.com/Canto-Network/Canto/v7/x/epochs/simulation"
 	"github.com/Canto-Network/Canto/v7/x/epochs/types"
 )
 
@@ -170,8 +171,9 @@ func (AppModule) ProposalContents(simState module.SimulationState) []simtypes.We
 	return []simtypes.WeightedProposalContent{}
 }
 
-// RegisterStoreDecoder registers a decoder for supply module's types
+// RegisterStoreDecoder registers a decoder for epoch module's types
 func (am AppModule) RegisterStoreDecoder(sdr simtypes.StoreDecoderRegistry) {
+	sdr[types.ModuleName] = simulation.NewDecodeStore(am.cdc)
 }
 
 // WeightedOperations returns the all the gov module operations with their respective weights.

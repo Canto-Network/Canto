@@ -37,7 +37,12 @@ var (
 
 // app module Basics object
 type AppModuleBasic struct {
-	ac address.Codec
+	ac  address.Codec
+	cdc codec.Codec
+}
+
+func NewAppModuleBasic(ac address.Codec, cdc codec.Codec) AppModuleBasic {
+	return AppModuleBasic{ac: ac, cdc: cdc}
 }
 
 func (AppModuleBasic) Name() string {
@@ -102,6 +107,7 @@ type AppModule struct {
 
 // NewAppModule creates a new AppModule Object
 func NewAppModule(
+	cdc codec.Codec,
 	k keeper.Keeper,
 	ak authkeeper.AccountKeeper,
 	bk types.BankKeeper,
@@ -110,7 +116,7 @@ func NewAppModule(
 	ac address.Codec,
 ) AppModule {
 	return AppModule{
-		AppModuleBasic: AppModuleBasic{ac: ac},
+		AppModuleBasic: AppModuleBasic{ac: ac, cdc: cdc},
 		keeper:         k,
 		ak:             ak,
 		bk:             bk,
@@ -172,6 +178,7 @@ func (am AppModule) ProposalContents(simState module.SimulationState) []simtypes
 }
 
 func (am AppModule) RegisterStoreDecoder(decoderRegistry simtypes.StoreDecoderRegistry) {
+	decoderRegistry[types.ModuleName] = simulation.NewDecodeStore(am.cdc)
 }
 
 func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {

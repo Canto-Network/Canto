@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/Canto-Network/Canto/v7/x/inflation/simulation"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
@@ -23,6 +22,7 @@ import (
 
 	"github.com/Canto-Network/Canto/v7/x/inflation/client/cli"
 	"github.com/Canto-Network/Canto/v7/x/inflation/keeper"
+	"github.com/Canto-Network/Canto/v7/x/inflation/simulation"
 	"github.com/Canto-Network/Canto/v7/x/inflation/types"
 )
 
@@ -37,7 +37,13 @@ var (
 )
 
 // app module Basics object
-type AppModuleBasic struct{}
+type AppModuleBasic struct {
+	cdc codec.Codec
+}
+
+func NewAppModuleBasic(cdc codec.Codec) AppModuleBasic {
+	return AppModuleBasic{cdc: cdc}
+}
 
 // Name returns the inflation module's name.
 func (AppModuleBasic) Name() string {
@@ -105,12 +111,13 @@ type AppModule struct {
 
 // NewAppModule creates a new AppModule Object
 func NewAppModule(
+	cdc codec.Codec,
 	k keeper.Keeper,
 	ak authkeeper.AccountKeeper,
 	sk stakingkeeper.Keeper,
 ) AppModule {
 	return AppModule{
-		AppModuleBasic: AppModuleBasic{},
+		AppModuleBasic: NewAppModuleBasic(cdc),
 		keeper:         k,
 		ak:             ak,
 		sk:             sk,
@@ -186,6 +193,7 @@ func (AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.Weight
 
 // RegisterStoreDecoder registers a decoder for inflation module's types.
 func (am AppModule) RegisterStoreDecoder(decoderRegistry simtypes.StoreDecoderRegistry) {
+	decoderRegistry[types.ModuleName] = simulation.NewDecodeStore(am.cdc)
 }
 
 // WeightedOperations doesn't return any inflation module operation.
