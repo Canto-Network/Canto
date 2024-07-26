@@ -478,6 +478,26 @@ type MockEVMKeeper struct {
 	mock.Mock
 }
 
+func (m *MockEVMKeeper) SetParams(ctx sdk.Context, params evmtypes.Params) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockEVMKeeper) ChainID() *big.Int {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockEVMKeeper) GetNonce(ctx sdk.Context, addr common.Address) uint64 {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockEVMKeeper) EthereumTx(goCtx context.Context, msg *evmtypes.MsgEthereumTx) (*evmtypes.MsgEthereumTxResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (m *MockEVMKeeper) GetParams(ctx sdk.Context) evmtypes.Params {
 	args := m.Called(mock.Anything)
 	return args.Get(0).(evmtypes.Params)
@@ -512,6 +532,26 @@ var _ types.BankKeeper = &MockBankKeeper{}
 
 type MockBankKeeper struct {
 	mock.Mock
+}
+
+func (b *MockBankKeeper) SendCoinsFromModuleToModule(ctx context.Context, senderModule, recipientModule string, amt sdk.Coins) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (b *MockBankKeeper) SpendableCoins(ctx context.Context, addr sdk.AccAddress) sdk.Coins {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (b *MockBankKeeper) GetParams(ctx context.Context) banktypes.Params {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (b *MockBankKeeper) SetParams(ctx context.Context, params banktypes.Params) error {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (b *MockBankKeeper) SendCoinsFromModuleToAccount(ctx context.Context, senderModule string, recipientAddr sdk.AccAddress, amt sdk.Coins) error {

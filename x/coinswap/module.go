@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math/rand"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
@@ -38,6 +37,11 @@ var (
 // AppModuleBasic defines the basic application module used by the coinswap module.
 type AppModuleBasic struct {
 	cdc codec.Codec
+}
+
+// NewAppModuleBasic return a new AppModuleBasic
+func NewAppModuleBasic(cdc codec.Codec) AppModuleBasic {
+	return AppModuleBasic{cdc: cdc}
 }
 
 // Name returns the coinswap module's name.
@@ -100,7 +104,7 @@ type AppModule struct {
 // NewAppModule creates a new AppModule object
 func NewAppModule(cdc codec.Codec, keeper keeper.Keeper, accountKeeper types.AccountKeeper, bankKeeper types.BankKeeper) AppModule {
 	return AppModule{
-		AppModuleBasic: AppModuleBasic{cdc: cdc},
+		AppModuleBasic: NewAppModuleBasic(cdc),
 		keeper:         keeper,
 		accountKeeper:  accountKeeper,
 		bankKeeper:     bankKeeper,
@@ -157,13 +161,14 @@ func (AppModule) ProposalContents(simState module.SimulationState) []simtypes.We
 	return nil
 }
 
-// RandomizedParams creates randomized coinswap param changes for the simulator.
-func (AppModule) RandomizedParams(r *rand.Rand) []simtypes.LegacyParamChange {
-	return simulation.ParamChanges(r)
+// ProposalMsgs returns msgs used for governance proposals for simulations.
+func (AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.WeightedProposalMsg {
+	return simulation.ProposalMsgs()
 }
 
 // RegisterStoreDecoder registers a decoder for coinswap module's types
 func (am AppModule) RegisterStoreDecoder(sdr simtypes.StoreDecoderRegistry) {
+	sdr[types.StoreKey] = simulation.NewDecodeStore(am.cdc)
 }
 
 // WeightedOperations returns the all the coinswap module operations with their respective weights.

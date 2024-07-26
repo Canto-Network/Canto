@@ -758,12 +758,12 @@ func NewCanto(
 		feemarket.NewAppModule(app.FeeMarketKeeper, feeMarketSs),
 
 		// Canto app modules
-		inflation.NewAppModule(app.InflationKeeper, app.AccountKeeper, *app.StakingKeeper),
-		erc20.NewAppModule(app.Erc20Keeper, app.AccountKeeper, app.AccountKeeper.AddressCodec()),
+		inflation.NewAppModule(appCodec, app.InflationKeeper, app.AccountKeeper, *app.StakingKeeper),
+		erc20.NewAppModule(appCodec, app.Erc20Keeper, app.AccountKeeper, app.BankKeeper, app.EvmKeeper, app.FeeMarketKeeper, app.AccountKeeper.AddressCodec()),
 		epochs.NewAppModule(appCodec, app.EpochsKeeper),
 		onboarding.NewAppModule(*app.OnboardingKeeper),
-		govshuttle.NewAppModule(app.GovshuttleKeeper, app.AccountKeeper, app.AccountKeeper.AddressCodec()),
-		csr.NewAppModule(app.CSRKeeper, app.AccountKeeper),
+		govshuttle.NewAppModule(appCodec, app.GovshuttleKeeper, app.AccountKeeper, app.AccountKeeper.AddressCodec()),
+		csr.NewAppModule(appCodec, app.CSRKeeper, app.AccountKeeper),
 		coinswap.NewAppModule(appCodec, app.CoinswapKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 

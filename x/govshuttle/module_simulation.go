@@ -1,8 +1,6 @@
 package govshuttle
 
 import (
-	"math/rand"
-
 	//"github.com/Canto-Network/Canto/v2/testutil/sample"
 	govshuttlesimulation "github.com/Canto-Network/Canto/v7/x/govshuttle/simulation"
 	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
@@ -44,14 +42,10 @@ func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedP
 	return nil
 }
 
-// RandomizedParams creates randomized  param changes for the simulator
-func (am AppModule) RandomizedParams(_ *rand.Rand) []simtypes.LegacyParamChange {
-
-	return []simtypes.LegacyParamChange{}
-}
-
 // RegisterStoreDecoder registers a decoder
-func (am AppModule) RegisterStoreDecoder(_ simtypes.StoreDecoderRegistry) {}
+func (am AppModule) RegisterStoreDecoder(sdr simtypes.StoreDecoderRegistry) {
+	sdr[types.ModuleName] = govshuttlesimulation.NewDecodeStore(am.cdc)
+}
 
 // WeightedOperations returns the all the gov module operations with their respective weights.
 func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {

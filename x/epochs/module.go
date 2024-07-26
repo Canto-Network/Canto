@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math/rand"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
@@ -23,14 +22,16 @@ import (
 
 	"github.com/Canto-Network/Canto/v7/x/epochs/client/cli"
 	"github.com/Canto-Network/Canto/v7/x/epochs/keeper"
+	"github.com/Canto-Network/Canto/v7/x/epochs/simulation"
 	"github.com/Canto-Network/Canto/v7/x/epochs/types"
 )
 
 var (
-	_ module.AppModuleBasic = AppModuleBasic{}
-	_ module.AppModuleBasic = AppModule{}
-	_ module.HasServices    = AppModule{}
-	_ module.HasABCIGenesis = AppModule{}
+	_ module.AppModuleBasic      = AppModuleBasic{}
+	_ module.AppModuleBasic      = AppModule{}
+	_ module.HasServices         = AppModule{}
+	_ module.HasABCIGenesis      = AppModule{}
+	_ module.AppModuleSimulation = AppModule{}
 
 	_ appmodule.AppModule       = AppModule{}
 	_ appmodule.HasBeginBlocker = AppModule{}
@@ -171,13 +172,9 @@ func (AppModule) ProposalContents(simState module.SimulationState) []simtypes.We
 	return []simtypes.WeightedProposalContent{}
 }
 
-// RandomizedParams creates randomizedepochs param changes for the simulator.
-func (AppModule) RandomizedParams(r *rand.Rand) []simtypes.LegacyParamChange {
-	return []simtypes.LegacyParamChange{}
-}
-
-// RegisterStoreDecoder registers a decoder for supply module's types
+// RegisterStoreDecoder registers a decoder for epoch module's types
 func (am AppModule) RegisterStoreDecoder(sdr simtypes.StoreDecoderRegistry) {
+	sdr[types.ModuleName] = simulation.NewDecodeStore(am.cdc)
 }
 
 // WeightedOperations returns the all the gov module operations with their respective weights.

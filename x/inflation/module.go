@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math/rand"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
@@ -23,21 +22,29 @@ import (
 
 	"github.com/Canto-Network/Canto/v7/x/inflation/client/cli"
 	"github.com/Canto-Network/Canto/v7/x/inflation/keeper"
+	"github.com/Canto-Network/Canto/v7/x/inflation/simulation"
 	"github.com/Canto-Network/Canto/v7/x/inflation/types"
 )
 
 // type check to ensure the interface is properly implemented
 var (
-	_ module.AppModuleBasic = AppModuleBasic{}
-	_ module.AppModuleBasic = AppModule{}
-	_ module.HasServices    = AppModule{}
-	_ module.HasABCIGenesis = AppModule{}
+	_ module.AppModuleBasic      = AppModuleBasic{}
+	_ module.AppModuleBasic      = AppModule{}
+	_ module.HasServices         = AppModule{}
+	_ module.HasABCIGenesis      = AppModule{}
+	_ module.AppModuleSimulation = AppModule{}
 
 	_ appmodule.AppModule = AppModule{}
 )
 
 // app module Basics object
-type AppModuleBasic struct{}
+type AppModuleBasic struct {
+	cdc codec.Codec
+}
+
+func NewAppModuleBasic(cdc codec.Codec) AppModuleBasic {
+	return AppModuleBasic{cdc: cdc}
+}
 
 // Name returns the inflation module's name.
 func (AppModuleBasic) Name() string {
@@ -105,12 +112,13 @@ type AppModule struct {
 
 // NewAppModule creates a new AppModule Object
 func NewAppModule(
+	cdc codec.Codec,
 	k keeper.Keeper,
 	ak authkeeper.AccountKeeper,
 	sk stakingkeeper.Keeper,
 ) AppModule {
 	return AppModule{
-		AppModuleBasic: AppModuleBasic{},
+		AppModuleBasic: NewAppModuleBasic(cdc),
 		keeper:         k,
 		ak:             ak,
 		sk:             sk,
@@ -179,13 +187,14 @@ func (am AppModule) ProposalContents(simState module.SimulationState) []simtypes
 	return []simtypes.WeightedProposalContent{}
 }
 
-// RandomizedParams creates randomized inflation param changes for the simulator.
-func (am AppModule) RandomizedParams(r *rand.Rand) []simtypes.LegacyParamChange {
-	return []simtypes.LegacyParamChange{}
+// ProposalMsgs returns msgs used for governance proposals for simulations.
+func (AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.WeightedProposalMsg {
+	return simulation.ProposalMsgs()
 }
 
 // RegisterStoreDecoder registers a decoder for inflation module's types.
 func (am AppModule) RegisterStoreDecoder(decoderRegistry simtypes.StoreDecoderRegistry) {
+	decoderRegistry[types.ModuleName] = simulation.NewDecodeStore(am.cdc)
 }
 
 // WeightedOperations doesn't return any inflation module operation.

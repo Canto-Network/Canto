@@ -23,6 +23,10 @@ const (
 	LptTokenFormat = "lpt-%d"
 )
 
+/* --------------------------------------------------------------------------- */
+// MsgSwapOrder
+/* --------------------------------------------------------------------------- */
+
 // MsgSwapOrder - struct for swapping a coin
 // Input and Output can either be exact or calculated.
 // An exact coin has the senders desired buy or sell amount.

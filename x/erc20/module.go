@@ -4,13 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math/rand"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
 	"cosmossdk.io/core/address"
 	"cosmossdk.io/core/appmodule"
+	"github.com/Canto-Network/Canto/v7/x/erc20/simulation"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -27,17 +27,23 @@ import (
 
 // type check to ensure the interface is properly implemented
 var (
-	_ module.AppModuleBasic = AppModuleBasic{}
-	_ module.AppModuleBasic = AppModule{}
-	_ module.HasServices    = AppModule{}
-	_ module.HasABCIGenesis = AppModule{}
+	_ module.AppModuleBasic      = AppModuleBasic{}
+	_ module.AppModuleBasic      = AppModule{}
+	_ module.HasServices         = AppModule{}
+	_ module.HasABCIGenesis      = AppModule{}
+	_ module.AppModuleSimulation = AppModule{}
 
 	_ appmodule.AppModule = AppModule{}
 )
 
 // app module Basics object
 type AppModuleBasic struct {
-	ac address.Codec
+	ac  address.Codec
+	cdc codec.Codec
+}
+
+func NewAppModuleBasic(ac address.Codec, cdc codec.Codec) AppModuleBasic {
+	return AppModuleBasic{ac: ac, cdc: cdc}
 }
 
 func (AppModuleBasic) Name() string {
@@ -93,19 +99,30 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 type AppModule struct {
 	AppModuleBasic
 	keeper keeper.Keeper
-	ak     authkeeper.AccountKeeper
+	// TODO: Add keepers that your application module simulation requires
+	ak authkeeper.AccountKeeper
+	bk types.BankKeeper
+	ek types.EVMKeeper
+	fk types.FeeMarketKeeper
 }
 
 // NewAppModule creates a new AppModule Object
 func NewAppModule(
+	cdc codec.Codec,
 	k keeper.Keeper,
 	ak authkeeper.AccountKeeper,
+	bk types.BankKeeper,
+	ek types.EVMKeeper,
+	fk types.FeeMarketKeeper,
 	ac address.Codec,
 ) AppModule {
 	return AppModule{
-		AppModuleBasic: AppModuleBasic{ac: ac},
+		AppModuleBasic: AppModuleBasic{ac: ac, cdc: cdc},
 		keeper:         k,
 		ak:             ak,
+		bk:             bk,
+		ek:             ek,
+		fk:             fk,
 	}
 }
 
@@ -136,6 +153,11 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 	}
 }
 
+// ProposalMsgs returns msgs used for governance proposals for simulations.
+func (am AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.WeightedProposalMsg {
+	return simulation.ProposalMsgs(am.keeper, am.ak, am.bk, am.ek, am.fk)
+}
+
 func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, data json.RawMessage) []abci.ValidatorUpdate {
 	var genesisState types.GenesisState
 
@@ -156,13 +178,12 @@ func (am AppModule) ProposalContents(simState module.SimulationState) []simtypes
 	return []simtypes.WeightedProposalContent{}
 }
 
-func (am AppModule) RandomizedParams(r *rand.Rand) []simtypes.LegacyParamChange {
-	return []simtypes.LegacyParamChange{}
-}
-
 func (am AppModule) RegisterStoreDecoder(decoderRegistry simtypes.StoreDecoderRegistry) {
+	decoderRegistry[types.ModuleName] = simulation.NewDecodeStore(am.cdc)
 }
 
 func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {
-	return []simtypes.WeightedOperation{}
+	return simulation.WeightedOperations(
+		simState.AppParams, simState.Cdc, am.keeper, am.ak, am.bk, am.ek, am.fk,
+	)
 }
