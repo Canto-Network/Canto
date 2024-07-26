@@ -15,26 +15,22 @@ type ClientConfig interface {
 }
 
 type TendermintConfig struct {
-	TrustLevel                   ibctm.Fraction
-	TrustingPeriod               time.Duration
-	UnbondingPeriod              time.Duration
-	MaxClockDrift                time.Duration
-	AllowUpdateAfterExpiry       bool
-	AllowUpdateAfterMisbehaviour bool
+	TrustLevel      ibctm.Fraction
+	TrustingPeriod  time.Duration
+	UnbondingPeriod time.Duration
+	MaxClockDrift   time.Duration
 }
 
 func NewTendermintConfig() *TendermintConfig {
 	return &TendermintConfig{
-		TrustLevel:                   DefaultTrustLevel,
-		TrustingPeriod:               TrustingPeriod,
-		UnbondingPeriod:              UnbondingPeriod,
-		MaxClockDrift:                MaxClockDrift,
-		AllowUpdateAfterExpiry:       false,
-		AllowUpdateAfterMisbehaviour: false,
+		TrustLevel:      DefaultTrustLevel,
+		TrustingPeriod:  TrustingPeriod,
+		UnbondingPeriod: UnbondingPeriod,
+		MaxClockDrift:   MaxClockDrift,
 	}
 }
 
-func (tmcfg *TendermintConfig) GetClientType() string {
+func (*TendermintConfig) GetClientType() string {
 	return exported.Tendermint
 }
 
@@ -51,9 +47,10 @@ func NewConnectionConfig() *ConnectionConfig {
 }
 
 type ChannelConfig struct {
-	PortID  string
-	Version string
-	Order   channeltypes.Order
+	PortID          string
+	Version         string
+	Order           channeltypes.Order
+	ProposedUpgrade channeltypes.Upgrade
 }
 
 func NewChannelConfig() *ChannelConfig {
