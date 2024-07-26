@@ -32,13 +32,12 @@ func NewPath(chainA, chainB *TestChain) *Path {
 	}
 }
 
+// NewTransferPath constructs a new path between each chain suitable for use with
+// the transfer module.
 func NewTransferPath(chainA, chainB *TestChain) *Path {
 	path := NewPath(chainA, chainB)
 	path.EndpointA.ChannelConfig.PortID = TransferPort
 	path.EndpointB.ChannelConfig.PortID = TransferPort
-
-	path.EndpointA.ChannelConfig.Order = channeltypes.UNORDERED
-	path.EndpointB.ChannelConfig.Order = channeltypes.UNORDERED
 	path.EndpointA.ChannelConfig.Version = transfertypes.Version
 	path.EndpointB.ChannelConfig.Version = transfertypes.Version
 

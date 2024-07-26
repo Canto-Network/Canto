@@ -12,6 +12,7 @@ import (
 	"cosmossdk.io/log"
 	sdkmath "cosmossdk.io/math"
 
+	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -107,7 +108,7 @@ func SetupWithGenesisValSet(t *testing.T, valSet *cmttypes.ValidatorSet, genAccs
 //
 // CONTRACT: BeginBlock must be called before this function.
 func SignAndDeliver(
-	tb testing.TB, txCfg client.TxConfig, app *bam.BaseApp, msgs []sdk.Msg,
+	tb testing.TB, txCfg client.TxConfig, app *bam.BaseApp, header cmtproto.Header, msgs []sdk.Msg,
 	chainID string, accNums, accSeqs []uint64, expPass bool, blockTime time.Time, nextValHash []byte, priv ...cryptotypes.PrivKey,
 ) (*abci.ResponseFinalizeBlock, error) {
 	tb.Helper()
@@ -132,5 +133,21 @@ func SignAndDeliver(
 		Time:               blockTime,
 		NextValidatorsHash: nextValHash,
 		Txs:                [][]byte{txBytes},
+		ProposerAddress:    header.ProposerAddress,
 	})
+}
+
+// ApplyValSetChanges takes in cmttypes.ValidatorSet and []abci.ValidatorUpdate and will return a new cmttypes.ValidatorSet which has the
+// provided validator updates applied to the provided validator set.
+func ApplyValSetChanges(tb testing.TB, valSet *cmttypes.ValidatorSet, valUpdates []abci.ValidatorUpdate) *cmttypes.ValidatorSet {
+	tb.Helper()
+	updates, err := cmttypes.PB2TM.ValidatorUpdates(valUpdates)
+	require.NoError(tb, err)
+
+	// must copy since validator set will mutate with UpdateWithChangeSet
+	newVals := valSet.Copy()
+	err = newVals.UpdateWithChangeSet(updates)
+	require.NoError(tb, err)
+
+	return newVals
 }

@@ -72,6 +72,10 @@ func SetupTestingCantoApp() (TestingApp, map[string]json.RawMessage) {
 	return app, cantoapp.NewDefaultGenesisState()
 }
 
+// SetupWithGenesisValSet initializes a new SimApp with a validator set and genesis accounts
+// that also act as delegators. For simplicity, each validator is bonded with a delegation
+// of one consensus engine unit (10^6) in the default token of the simapp from first genesis
+// account. A Nop logger is set in SimApp.
 func SetupWithGenesisValSet(tb testing.TB, valSet *tmtypes.ValidatorSet, genAccs []authtypes.GenesisAccount, chainID string, powerReduction sdkmath.Int, balances ...banktypes.Balance) TestingApp {
 	tb.Helper()
 	app, genesisState := DefaultTestingAppInit()
