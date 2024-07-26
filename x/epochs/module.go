@@ -27,10 +27,11 @@ import (
 )
 
 var (
-	_ module.AppModuleBasic = AppModuleBasic{}
-	_ module.AppModuleBasic = AppModule{}
-	_ module.HasServices    = AppModule{}
-	_ module.HasABCIGenesis = AppModule{}
+	_ module.AppModuleBasic      = AppModuleBasic{}
+	_ module.AppModuleBasic      = AppModule{}
+	_ module.HasServices         = AppModule{}
+	_ module.HasABCIGenesis      = AppModule{}
+	_ module.AppModuleSimulation = AppModule{}
 
 	_ appmodule.AppModule       = AppModule{}
 	_ appmodule.HasBeginBlocker = AppModule{}
