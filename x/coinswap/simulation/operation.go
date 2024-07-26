@@ -273,17 +273,6 @@ func SimulateMsgSwapOrder(k keeper.Keeper, ak types.AccountKeeper, bk types.Bank
 			isBuyOrder            bool
 		)
 
-		pools := k.GetAllPools(ctx)
-		if len(pools) == 0 {
-			return simtypes.NoOpMsg(
-				types.ModuleName,
-				TypeMsgSwapOrder,
-				"no pool found",
-			), nil, nil
-		}
-
-		pool := pools[r.Intn(len(pools))]
-
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 		err = FundAccount(r, ctx, k, bk, simAccount.Address)
 		if err != nil {
@@ -297,8 +286,35 @@ func SimulateMsgSwapOrder(k keeper.Keeper, ak types.AccountKeeper, bk types.Bank
 			return simtypes.NoOpMsg(
 				types.ModuleName,
 				TypeMsgSwapOrder,
-				"spendable  is zero",
+				"spendable is zero",
 			), nil, err
+		}
+
+		pools := k.GetAllPools(ctx)
+		if len(pools) == 0 {
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				TypeMsgSwapOrder,
+				"no pool found",
+			), nil, nil
+		}
+
+		pool := pools[r.Intn(len(pools))]
+
+		reservePool, err := k.GetPoolBalancesByLptDenom(ctx, pool.LptDenom)
+		if err != nil {
+			return simtypes.NoOpMsg(types.ModuleName, TypeMsgRemoveLiquidity, "inputCoin should exist in the pool"), nil, nil
+		}
+
+		standardReserveAmt := reservePool.AmountOf(standardDenom)
+		tokenReserveAmt := reservePool.AmountOf(pool.CounterpartyDenom)
+
+		if !standardReserveAmt.IsPositive() || !tokenReserveAmt.IsPositive() {
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				TypeMsgSwapOrder,
+				"reserve pool should be positive",
+			), nil, nil
 		}
 
 		// sold coin
@@ -352,17 +368,6 @@ func SimulateMsgSwapOrder(k keeper.Keeper, ak types.AccountKeeper, bk types.Bank
 					"insufficient funds",
 				), nil, nil
 			}
-		}
-
-		reservePool, err := k.GetPoolBalancesByLptDenom(ctx, pool.LptDenom)
-		standardReserveAmt := reservePool.AmountOf(standardDenom)
-		tokenReserveAmt := reservePool.AmountOf(pool.CounterpartyDenom)
-		if !standardReserveAmt.IsPositive() || !tokenReserveAmt.IsPositive() {
-			return simtypes.NoOpMsg(
-				types.ModuleName,
-				TypeMsgSwapOrder,
-				"reserve pool should be positive",
-			), nil, nil
 		}
 
 		if !outputCoin.Amount.IsPositive() {
