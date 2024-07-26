@@ -114,6 +114,14 @@ func SimulateMsgAddLiquidity(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 				"standardAmount should be positive",
 			), nil, nil
 		}
+		params := k.GetParams(ctx)
+		if exactStandardAmt.GTE(params.MaxStandardCoinPerPool) {
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				TypeMsgAddLiquidity,
+				"standardAmount should be less than MaxStandardCoinPerPool",
+			), nil, nil
+		}
 
 		maxToken, err = randToken(r, spendable)
 		if err != nil {
@@ -145,6 +153,25 @@ func SimulateMsgAddLiquidity(k keeper.Keeper, ak types.AccountKeeper, bk types.B
 				types.ModuleName,
 				TypeMsgAddLiquidity,
 				"maxToken must is positive",
+			), nil, err
+		}
+
+		// check maxToken is registered in MaxSwapAmount
+		found := func(denom string) bool {
+			MaxSwapAmount := params.MaxSwapAmount
+			for _, coin := range MaxSwapAmount {
+				if coin.Denom == denom {
+					return true
+				}
+			}
+			return false
+		}(maxToken.Denom)
+
+		if !found {
+			return simtypes.NoOpMsg(
+				types.ModuleName,
+				TypeMsgAddLiquidity,
+				"maxToken is not registered in MaxSwapAmount",
 			), nil, err
 		}
 
