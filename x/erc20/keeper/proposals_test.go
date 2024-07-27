@@ -20,24 +20,32 @@ import (
 	inflationtypes "github.com/Canto-Network/Canto/v7/x/inflation/types"
 )
 
+// The following constants are based on query result of mainnet denoms metadata query.
+const (
+	gravitonIBCDenom = "ibc/FC9D92EC12BC974E8B6179D411351524CD5C2EBC3CE29D5BA856414FEFA47093"
+	gravitonDenom    = "graviton"
+	gravitonName     = "Graviton"
+	gravitonSymbol   = "GRAV"
+)
+
 func (suite KeeperTestSuite) TestRegisterCoin() {
 	metadata := banktypes.Metadata{
 		Description: "description",
-		Base:        cosmosTokenBase,
+		Base:        gravitonIBCDenom,
 		// NOTE: Denom units MUST be increasing
 		DenomUnits: []*banktypes.DenomUnit{
 			{
-				Denom:    cosmosTokenBase,
+				Denom:    gravitonIBCDenom,
 				Exponent: 0,
 			},
 			{
-				Denom:    cosmosTokenDisplay,
+				Denom:    gravitonDenom,
 				Exponent: defaultExponent,
 			},
 		},
-		Name:    cosmosTokenBase,
-		Symbol:  erc20Symbol,
-		Display: cosmosTokenDisplay,
+		Name:    gravitonName,
+		Symbol:  gravitonSymbol,
+		Display: gravitonDenom,
 	}
 
 	testCases := []struct {
@@ -46,7 +54,7 @@ func (suite KeeperTestSuite) TestRegisterCoin() {
 		expPass  bool
 	}{
 		{
-			"conversion is disabled globally",
+			"fail: conversion is disabled globally",
 			func() {
 				params := types.DefaultParams()
 				params.EnableErc20 = false
@@ -55,42 +63,27 @@ func (suite KeeperTestSuite) TestRegisterCoin() {
 			false,
 		},
 		{
-			"denom already registered",
+			"fail: denom already registered",
 			func() {
 				regPair := types.NewTokenPair(tests.GenerateAddress(), metadata.Base, true, types.OWNER_MODULE)
+				suite.app.Erc20Keeper.SetTokenPair(suite.ctx, regPair)
 				suite.app.Erc20Keeper.SetTokenPairIdByDenom(suite.ctx, regPair.Denom, regPair.GetID())
 				suite.Commit()
 			},
 			false,
 		},
 		{
-			"token doesn't have supply",
+			"fail :token doesn't have supply",
 			func() {
 			},
 			false,
 		},
 		{
-			"metadata different that stored",
+			"fail: metadata different that stored",
 			func() {
-				metadata.Base = cosmosTokenBase
-				validMetadata := banktypes.Metadata{
-					Description: "description",
-					Base:        cosmosTokenBase,
-					// NOTE: Denom units MUST be increasing
-					DenomUnits: []*banktypes.DenomUnit{
-						{
-							Denom:    cosmosTokenBase,
-							Exponent: 0,
-						},
-						{
-							Denom:    cosmosTokenDisplay,
-							Exponent: uint32(18),
-						},
-					},
-					Name:    erc20Name,
-					Symbol:  erc20Symbol,
-					Display: cosmosTokenDisplay,
-				}
+				metadata.Base = gravitonDenom
+				validMetadata := metadata
+				validMetadata.Name = "different"
 
 				err := suite.app.BankKeeper.MintCoins(suite.ctx, inflationtypes.ModuleName, sdk.Coins{sdk.NewInt64Coin(validMetadata.Base, 1)})
 				suite.Require().NoError(err)
@@ -108,16 +101,7 @@ func (suite KeeperTestSuite) TestRegisterCoin() {
 			false,
 		},
 		{
-			"evm denom registration - CANTO",
-			func() {
-				metadata.Base = "CANTO"
-				err := suite.app.BankKeeper.MintCoins(suite.ctx, inflationtypes.ModuleName, sdk.Coins{sdk.NewInt64Coin(metadata.Base, 1)})
-				suite.Require().NoError(err)
-			},
-			false,
-		},
-		{
-			"evm denom registration - aCANTO",
+			"fail: evm denom registration - aCANTO",
 			func() {
 				metadata.Base = "aCANTO"
 				err := suite.app.BankKeeper.MintCoins(suite.ctx, inflationtypes.ModuleName, sdk.Coins{sdk.NewInt64Coin(metadata.Base, 1)})
@@ -126,7 +110,7 @@ func (suite KeeperTestSuite) TestRegisterCoin() {
 			false,
 		},
 		{
-			"evm denom registration - wCANTO",
+			"fail: evm denom registration - wCANTO",
 			func() {
 				metadata.Base = "wCANTO"
 				err := suite.app.BankKeeper.MintCoins(suite.ctx, inflationtypes.ModuleName, sdk.Coins{sdk.NewInt64Coin(metadata.Base, 1)})
@@ -137,16 +121,16 @@ func (suite KeeperTestSuite) TestRegisterCoin() {
 		{
 			"ok",
 			func() {
-				metadata.Base = cosmosTokenBase
+				metadata.Base = gravitonIBCDenom
 				err := suite.app.BankKeeper.MintCoins(suite.ctx, inflationtypes.ModuleName, sdk.Coins{sdk.NewInt64Coin(metadata.Base, 1)})
 				suite.Require().NoError(err)
 			},
 			true,
 		},
 		{
-			"force fail evm",
+			"fail: force fail evm",
 			func() {
-				metadata.Base = cosmosTokenBase
+				metadata.Base = gravitonDenom
 				err := suite.app.BankKeeper.MintCoins(suite.ctx, inflationtypes.ModuleName, sdk.Coins{sdk.NewInt64Coin(metadata.Base, 1)})
 				suite.Require().NoError(err)
 
@@ -160,14 +144,37 @@ func (suite KeeperTestSuite) TestRegisterCoin() {
 			false,
 		},
 		{
-			"force delete module account evm",
+			"fail: force delete module account evm",
 			func() {
-				metadata.Base = cosmosTokenBase
+				metadata.Base = gravitonIBCDenom
 				err := suite.app.BankKeeper.MintCoins(suite.ctx, inflationtypes.ModuleName, sdk.Coins{sdk.NewInt64Coin(metadata.Base, 1)})
 				suite.Require().NoError(err)
 
 				acc := suite.app.AccountKeeper.GetAccount(suite.ctx, types.ModuleAddress.Bytes())
 				suite.app.AccountKeeper.RemoveAccount(suite.ctx, acc)
+			},
+			false,
+		},
+		{
+			"fail: token pair already exists with same denom",
+			func() {
+				metadata.Base = gravitonIBCDenom
+				err := suite.app.BankKeeper.MintCoins(suite.ctx, inflationtypes.ModuleName, sdk.Coins{sdk.NewInt64Coin(metadata.Base, 1)})
+				suite.Require().NoError(err)
+
+				tokenPair, err := suite.app.Erc20Keeper.RegisterCoin(suite.ctx, metadata)
+				suite.Require().NoError(err)
+				suite.Commit()
+
+				// check token pair is stored
+				suite.Require().Equal(types.OWNER_MODULE, tokenPair.ContractOwner)
+				suite.Require().Equal(metadata.Base, tokenPair.Denom)
+				suite.Require().Equal(true, tokenPair.Enabled)
+
+				// check indexes are stored
+				id := tokenPair.GetID()
+				suite.Require().Equal(id, suite.app.Erc20Keeper.GetTokenPairIdByDenom(suite.ctx, tokenPair.Denom))
+				suite.Require().Equal(id, suite.app.Erc20Keeper.GetTokenPairIdByERC20Addr(suite.ctx, common.HexToAddress(tokenPair.Erc20Address)))
 			},
 			false,
 		},
@@ -183,9 +190,9 @@ func (suite KeeperTestSuite) TestRegisterCoin() {
 
 			expPair := &types.TokenPair{
 				Erc20Address:  "0x80b5a32E4F032B2a058b4F29EC95EEfEEB87aDcd",
-				Denom:         "acoin",
+				Denom:         gravitonIBCDenom,
 				Enabled:       true,
-				ContractOwner: 1,
+				ContractOwner: types.OWNER_MODULE,
 			}
 
 			if tc.expPass {

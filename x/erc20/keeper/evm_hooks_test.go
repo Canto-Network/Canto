@@ -17,15 +17,14 @@ import (
 )
 
 const (
-	erc20Name          = "Coin Token"
-	erc20Symbol        = "CTKN"
-	erc20Decimals      = uint8(18)
-	cosmosTokenBase    = "acoin"
-	cosmosTokenDisplay = "coin"
-	cosmosDecimals     = uint8(6)
-	defaultExponent    = uint32(18)
-	zeroExponent       = uint32(0)
-	ibcBase            = "ibc/7F1D3FCF4AE79E1554D670D1AD949A9BA4E4A3C76C63093E17E446A46061A7A2"
+	erc20Name       = "Coin Token"
+	erc20Symbol     = "CTKN"
+	erc20Decimals   = uint8(18)
+	cosmosTokenBase = "acoin"
+	cosmosDecimals  = uint8(6)
+	defaultExponent = uint32(18)
+	zeroExponent    = uint32(0)
+	ibcBase         = "ibc/7F1D3FCF4AE79E1554D670D1AD949A9BA4E4A3C76C63093E17E446A46061A7A2"
 )
 
 func (suite *KeeperTestSuite) setupRegisterCoin() (banktypes.Metadata, *types.TokenPair) {
