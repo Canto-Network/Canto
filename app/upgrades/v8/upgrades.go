@@ -31,9 +31,14 @@ func CreateUpgradeHandler(
 		sdkCtx := sdk.UnwrapSDKContext(ctx)
 		logger := sdkCtx.Logger().With("upgrade: ", UpgradeName)
 
+		var (
+			updatedVM module.VersionMap
+			err       error
+		)
+
 		// Leave modules are as-is to avoid running InitGenesis.
 		logger.Debug("running module migrations ...")
-		if vm, err := mm.RunMigrations(ctx, configurator, vm); err != nil {
+		if updatedVM, err = mm.RunMigrations(ctx, configurator, vm); err != nil {
 			return vm, err
 		}
 
@@ -55,19 +60,19 @@ func CreateUpgradeHandler(
 		}
 
 		if err := baseapp.MigrateParams(sdkCtx, legacySubspace, consensusParamsStore); err != nil {
-			return vm, err
+			return updatedVM, err
 		}
 
 		// canto v8 custom
 		{
 			params, err := stakingKeeper.GetParams(ctx)
 			if err != nil {
-				return vm, err
+				return updatedVM, err
 			}
 			params.MinCommissionRate = MinCommissionRate
 			stakingKeeper.SetParams(ctx, params)
 		}
 
-		return vm, nil
+		return updatedVM, nil
 	}
 }
