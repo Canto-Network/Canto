@@ -2,7 +2,7 @@ package keeper_test
 
 import (
 	sdkmath "cosmossdk.io/math"
-	_ "github.com/Canto-Network/Canto/v7/x/csr/keeper"
+	_ "github.com/Canto-Network/Canto/v8/x/csr/keeper"
 )
 
 // params test suite

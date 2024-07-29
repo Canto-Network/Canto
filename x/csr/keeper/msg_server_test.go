@@ -10,8 +10,8 @@ import (
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	"github.com/Canto-Network/Canto/v7/testutil"
-	csrtypes "github.com/Canto-Network/Canto/v7/x/csr/types"
+	"github.com/Canto-Network/Canto/v8/testutil"
+	csrtypes "github.com/Canto-Network/Canto/v8/x/csr/types"
 )
 
 func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {

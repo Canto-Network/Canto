@@ -3,9 +3,9 @@ package simulation
 import (
 	"math/rand"
 
-	"github.com/Canto-Network/Canto/v7/app/params"
-	"github.com/Canto-Network/Canto/v7/x/govshuttle/keeper"
-	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
+	"github.com/Canto-Network/Canto/v8/app/params"
+	"github.com/Canto-Network/Canto/v8/x/govshuttle/keeper"
+	"github.com/Canto-Network/Canto/v8/x/govshuttle/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/address"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"

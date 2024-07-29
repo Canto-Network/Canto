@@ -5,8 +5,8 @@ import (
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/ethereum/go-ethereum/common"
 
-	"github.com/Canto-Network/Canto/v7/x/govshuttle/keeper"
-	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
+	"github.com/Canto-Network/Canto/v8/x/govshuttle/keeper"
+	"github.com/Canto-Network/Canto/v8/x/govshuttle/types"
 )
 
 // InitGenesis initializes the capability module's state from a provided genesis

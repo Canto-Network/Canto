@@ -11,7 +11,7 @@ import (
 	protov2 "google.golang.org/protobuf/proto"
 
 	sdkmath "cosmossdk.io/math"
-	"github.com/Canto-Network/Canto/v7/app"
+	"github.com/Canto-Network/Canto/v8/app"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/crypto/tmhash"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"

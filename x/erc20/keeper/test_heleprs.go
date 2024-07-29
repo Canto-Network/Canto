@@ -17,8 +17,8 @@ import (
 	evm "github.com/evmos/ethermint/x/evm/types"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
-	"github.com/Canto-Network/Canto/v7/contracts"
-	"github.com/Canto-Network/Canto/v7/x/erc20/types"
+	"github.com/Canto-Network/Canto/v8/contracts"
+	"github.com/Canto-Network/Canto/v8/x/erc20/types"
 )
 
 func DeployContract(ctx sdk.Context,

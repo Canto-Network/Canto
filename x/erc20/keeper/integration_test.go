@@ -17,9 +17,9 @@ import (
 	"github.com/evmos/ethermint/encoding"
 	ethermint "github.com/evmos/ethermint/types"
 
-	"github.com/Canto-Network/Canto/v7/testutil"
-	"github.com/Canto-Network/Canto/v7/x/erc20"
-	"github.com/Canto-Network/Canto/v7/x/erc20/types"
+	"github.com/Canto-Network/Canto/v8/testutil"
+	"github.com/Canto-Network/Canto/v8/x/erc20"
+	"github.com/Canto-Network/Canto/v8/x/erc20/types"
 
 	sdkmath "cosmossdk.io/math"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"

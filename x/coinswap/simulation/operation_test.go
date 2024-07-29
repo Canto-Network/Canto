@@ -6,7 +6,7 @@ import (
 	"time"
 
 	sdkmath "cosmossdk.io/math"
-	"github.com/Canto-Network/Canto/v7/app/params"
+	"github.com/Canto-Network/Canto/v8/app/params"
 	"github.com/stretchr/testify/require"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -17,9 +17,9 @@ import (
 
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
-	"github.com/Canto-Network/Canto/v7/app"
-	"github.com/Canto-Network/Canto/v7/x/coinswap/simulation"
-	"github.com/Canto-Network/Canto/v7/x/coinswap/types"
+	"github.com/Canto-Network/Canto/v8/app"
+	"github.com/Canto-Network/Canto/v8/x/coinswap/simulation"
+	"github.com/Canto-Network/Canto/v8/x/coinswap/types"
 )
 
 func TestWeightedOperations(t *testing.T) {

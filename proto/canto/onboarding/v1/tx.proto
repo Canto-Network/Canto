@@ -7,7 +7,7 @@ import "cosmos_proto/cosmos.proto";
 import "amino/amino.proto";
 import "canto/onboarding/v1/genesis.proto";
 
-option go_package = "github.com/Canto-Network/Canto/v7/x/onboarding/types";
+option go_package = "github.com/Canto-Network/Canto/v8/x/onboarding/types";
 
 // Msg defines the Msg service.
 service Msg {

@@ -6,7 +6,7 @@ import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";
 import "amino/amino.proto";
 
-option go_package = "github.com/Canto-Network/Canto/v7/x/coinswap/types";
+option go_package = "github.com/Canto-Network/Canto/v8/x/coinswap/types";
 option (gogoproto.goproto_getters_all) = false;
 
 // Input defines the properties of order's input

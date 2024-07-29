@@ -1,4 +1,4 @@
-module github.com/Canto-Network/Canto/v7
+module github.com/Canto-Network/Canto/v8
 
 go 1.21
 

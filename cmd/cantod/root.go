@@ -40,9 +40,9 @@ import (
 	servercfg "github.com/evmos/ethermint/server/config"
 	srvflags "github.com/evmos/ethermint/server/flags"
 
-	"github.com/Canto-Network/Canto/v7/app"
-	cmdcfg "github.com/Canto-Network/Canto/v7/cmd/config"
-	cantokr "github.com/Canto-Network/Canto/v7/crypto/keyring"
+	"github.com/Canto-Network/Canto/v8/app"
+	cmdcfg "github.com/Canto-Network/Canto/v8/cmd/config"
+	cantokr "github.com/Canto-Network/Canto/v8/crypto/keyring"
 
 	rosettacmd "github.com/cosmos/rosetta/cmd"
 )

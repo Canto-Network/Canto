@@ -9,8 +9,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 	"github.com/stretchr/testify/require"
 
-	"github.com/Canto-Network/Canto/v7/app"
-	cantod "github.com/Canto-Network/Canto/v7/cmd/cantod"
+	"github.com/Canto-Network/Canto/v8/app"
+	cantod "github.com/Canto-Network/Canto/v8/cmd/cantod"
 )
 
 func TestInitCmd(t *testing.T) {

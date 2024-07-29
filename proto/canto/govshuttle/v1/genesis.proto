@@ -5,7 +5,7 @@ import "gogoproto/gogo.proto";
 import "canto/govshuttle/v1/govshuttle.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
-option go_package = "github.com/Canto-Network/Canto/v7/x/govshuttle/types";
+option go_package = "github.com/Canto-Network/Canto/v8/x/govshuttle/types";
 
 // GenesisState defines the govshuttle module's genesis state.
 message GenesisState {

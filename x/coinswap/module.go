@@ -18,10 +18,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/Canto-Network/Canto/v7/x/coinswap/client/cli"
-	"github.com/Canto-Network/Canto/v7/x/coinswap/keeper"
-	"github.com/Canto-Network/Canto/v7/x/coinswap/simulation"
-	"github.com/Canto-Network/Canto/v7/x/coinswap/types"
+	"github.com/Canto-Network/Canto/v8/x/coinswap/client/cli"
+	"github.com/Canto-Network/Canto/v8/x/coinswap/keeper"
+	"github.com/Canto-Network/Canto/v8/x/coinswap/simulation"
+	"github.com/Canto-Network/Canto/v8/x/coinswap/types"
 )
 
 var (

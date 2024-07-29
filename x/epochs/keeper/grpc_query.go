@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/Canto-Network/Canto/v7/x/epochs/types"
+	"github.com/Canto-Network/Canto/v8/x/epochs/types"
 )
 
 var _ types.QueryServer = Keeper{}

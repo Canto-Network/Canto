@@ -14,7 +14,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 
-	"github.com/Canto-Network/Canto/v7/types"
+	"github.com/Canto-Network/Canto/v8/types"
 )
 
 func TestCantoExport(t *testing.T) {

@@ -14,8 +14,8 @@ import (
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/Canto-Network/Canto/v7/app"
-	"github.com/Canto-Network/Canto/v7/x/govshuttle"
+	"github.com/Canto-Network/Canto/v8/app"
+	"github.com/Canto-Network/Canto/v8/x/govshuttle"
 )
 
 type GenesisTestSuite struct {

@@ -20,10 +20,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
-	"github.com/Canto-Network/Canto/v7/x/epochs/client/cli"
-	"github.com/Canto-Network/Canto/v7/x/epochs/keeper"
-	"github.com/Canto-Network/Canto/v7/x/epochs/simulation"
-	"github.com/Canto-Network/Canto/v7/x/epochs/types"
+	"github.com/Canto-Network/Canto/v8/x/epochs/client/cli"
+	"github.com/Canto-Network/Canto/v8/x/epochs/keeper"
+	"github.com/Canto-Network/Canto/v8/x/epochs/simulation"
+	"github.com/Canto-Network/Canto/v8/x/epochs/types"
 )
 
 var (

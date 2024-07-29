@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/Canto-Network/Canto/v7/x/erc20"
+	"github.com/Canto-Network/Canto/v8/x/erc20"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cosmos/cosmos-sdk/types/kv"
 	testutil "github.com/evmos/ethermint/tests"
 
-	"github.com/Canto-Network/Canto/v7/x/erc20/simulation"
-	"github.com/Canto-Network/Canto/v7/x/erc20/types"
+	"github.com/Canto-Network/Canto/v8/x/erc20/simulation"
+	"github.com/Canto-Network/Canto/v8/x/erc20/types"
 )
 
 func TestERC20Store(t *testing.T) {

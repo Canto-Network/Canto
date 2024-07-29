@@ -27,8 +27,8 @@ import (
 	"github.com/evmos/ethermint/crypto/ethsecp256k1"
 	evm "github.com/evmos/ethermint/x/evm/types"
 
-	"github.com/Canto-Network/Canto/v7/app"
-	"github.com/Canto-Network/Canto/v7/x/epochs/types"
+	"github.com/Canto-Network/Canto/v8/app"
+	"github.com/Canto-Network/Canto/v8/x/epochs/types"
 )
 
 var denomMint = evm.DefaultEVMDenom

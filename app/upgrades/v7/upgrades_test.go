@@ -17,10 +17,10 @@ import (
 	abci "github.com/cometbft/cometbft/abci/types"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
-	chain "github.com/Canto-Network/Canto/v7/app"
-	v7 "github.com/Canto-Network/Canto/v7/app/upgrades/v7"
-	coinswaptypes "github.com/Canto-Network/Canto/v7/x/coinswap/types"
-	onboardingtypes "github.com/Canto-Network/Canto/v7/x/onboarding/types"
+	chain "github.com/Canto-Network/Canto/v8/app"
+	v7 "github.com/Canto-Network/Canto/v8/app/upgrades/v7"
+	coinswaptypes "github.com/Canto-Network/Canto/v8/x/coinswap/types"
+	onboardingtypes "github.com/Canto-Network/Canto/v8/x/onboarding/types"
 )
 
 type UpgradeTestSuite struct {

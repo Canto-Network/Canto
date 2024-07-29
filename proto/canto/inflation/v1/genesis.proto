@@ -6,7 +6,7 @@ import "amino/amino.proto";
 
 import "canto/inflation/v1/inflation.proto";
 
-option go_package = "github.com/Canto-Network/Canto/v7/x/inflation/types";
+option go_package = "github.com/Canto-Network/Canto/v8/x/inflation/types";
 
 // GenesisState defines the inflation module's genesis state.
 message GenesisState {

@@ -20,10 +20,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 
-	"github.com/Canto-Network/Canto/v7/x/csr/client/cli"
-	"github.com/Canto-Network/Canto/v7/x/csr/keeper"
-	"github.com/Canto-Network/Canto/v7/x/csr/simulation"
-	"github.com/Canto-Network/Canto/v7/x/csr/types"
+	"github.com/Canto-Network/Canto/v8/x/csr/client/cli"
+	"github.com/Canto-Network/Canto/v8/x/csr/keeper"
+	"github.com/Canto-Network/Canto/v8/x/csr/simulation"
+	"github.com/Canto-Network/Canto/v8/x/csr/types"
 )
 
 var (

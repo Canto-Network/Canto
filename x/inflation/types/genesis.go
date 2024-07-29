@@ -3,7 +3,7 @@ package types
 import (
 	fmt "fmt"
 
-	epochstypes "github.com/Canto-Network/Canto/v7/x/epochs/types"
+	epochstypes "github.com/Canto-Network/Canto/v8/x/epochs/types"
 )
 
 // NewGenesisState creates a new GenesisState object

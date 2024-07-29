@@ -11,8 +11,8 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/evmos/ethermint/crypto/ethsecp256k1"
 
-	"github.com/Canto-Network/Canto/v7/testutil"
-	onboardingtypes "github.com/Canto-Network/Canto/v7/x/onboarding/types"
+	"github.com/Canto-Network/Canto/v8/testutil"
+	onboardingtypes "github.com/Canto-Network/Canto/v8/x/onboarding/types"
 )
 
 func (suite *KeeperTestSuite) TestMsgExecutionByProposal() {

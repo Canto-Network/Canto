@@ -53,7 +53,7 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/evmos/ethermint/crypto/hd"
 
-	"github.com/Canto-Network/Canto/v7/app"
+	"github.com/Canto-Network/Canto/v8/app"
 
 	"github.com/evmos/ethermint/server/config"
 	ethermint "github.com/evmos/ethermint/types"

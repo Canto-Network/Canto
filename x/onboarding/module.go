@@ -19,9 +19,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/Canto-Network/Canto/v7/x/onboarding/client/cli"
-	"github.com/Canto-Network/Canto/v7/x/onboarding/keeper"
-	"github.com/Canto-Network/Canto/v7/x/onboarding/types"
+	"github.com/Canto-Network/Canto/v8/x/onboarding/client/cli"
+	"github.com/Canto-Network/Canto/v8/x/onboarding/keeper"
+	"github.com/Canto-Network/Canto/v8/x/onboarding/types"
 )
 
 // type check to ensure the interface is properly implemented
