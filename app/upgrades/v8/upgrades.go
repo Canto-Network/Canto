@@ -39,7 +39,7 @@ func CreateUpgradeHandler(
 		// Leave modules are as-is to avoid running InitGenesis.
 		logger.Debug("running module migrations ...")
 		if updatedVM, err = mm.RunMigrations(ctx, configurator, vm); err != nil {
-			return vm, err
+			return updatedVM, err
 		}
 
 		// ibc-go vX -> v6
