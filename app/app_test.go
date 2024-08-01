@@ -104,7 +104,11 @@ func TestWorkingHash(t *testing.T) {
 
 	tmpDir := fmt.Sprintf("test-%s", time.Now().String())
 	db, err := dbm.NewGoLevelDB("test", tmpDir, nil)
+	require.NoError(t, err)
 	app := NewCanto(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, 0, false, simtestutil.NewAppOptionsWithFlagHome(DefaultNodeHome), baseapp.SetChainID("canto_9000-1"))
+
+	// delete tmpDir
+	defer require.NoError(t, os.RemoveAll(tmpDir))
 
 	pbparams := gdoc.ConsensusParams.ToProto()
 	// Initialize the chain
@@ -127,12 +131,12 @@ func TestWorkingHash(t *testing.T) {
 	require.NoError(t, err)
 
 	storeKeys := app.GetStoreKeys()
-	// deterministicKeys are module keys which has always same working hash whenever run this test. (non deterministic module: staking)
+	// deterministicKeys are module keys which has always same working hash whenever run this test. (non deterministic module: staking, epoch, inflation)
 	deterministicKeys := []string{
 		authtypes.StoreKey, banktypes.StoreKey, capabilitytypes.StoreKey, coinswaptypes.StoreKey,
-		consensustypes.StoreKey, crisistypes.StoreKey, distrtypes.StoreKey, epochstypes.StoreKey,
+		consensustypes.StoreKey, crisistypes.StoreKey, distrtypes.StoreKey,
 		evmtypes.StoreKey, feemarkettypes.StoreKey, govtypes.StoreKey, ibctransfertypes.StoreKey,
-		inflationtypes.StoreKey, paramstypes.StoreKey, slashingtypes.StoreKey, upgradetypes.StoreKey}
+		paramstypes.StoreKey, slashingtypes.StoreKey, upgradetypes.StoreKey}
 	// workingHashWithZeroInitialHeight is the working hash of the IAVL store with initial height 0 with given genesis.
 	// you can get this hash by running the test with iavl v1.1.2 with printing working hash (ref. https://github.com/b-harvest/cosmos-sdk/commit/4f44d6a2fe80ee7fe8c4409b820226e3615c6500)
 	workingHashWithZeroInitialHeight := map[string]string{
@@ -192,9 +196,7 @@ func TestWorkingHash(t *testing.T) {
 			require.True(t, ok)
 			workingHash := hex.EncodeToString(iavlStore.WorkingHash())
 			require.NotEqual(t, workingHashWithZeroInitialHeight[key.Name()], workingHash)
-			require.Equal(t, workingHashWithCorrectInitialHeight[key.Name()], workingHash)
+			require.Equal(t, workingHashWithCorrectInitialHeight[key.Name()], workingHash, key.Name())
 		}
 	}
-	// delete tmpDir
-	require.NoError(t, os.RemoveAll(tmpDir))
 }
