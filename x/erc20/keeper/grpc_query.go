@@ -6,7 +6,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/cosmos/cosmos-sdk/store/prefix"
+	"cosmossdk.io/store/prefix"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	ethermint "github.com/evmos/ethermint/types"
@@ -25,9 +26,9 @@ func (k Keeper) TokenPairs(c context.Context, req *types.QueryTokenPairsRequest)
 	ctx := sdk.UnwrapSDKContext(c)
 
 	var pairs []types.TokenPair
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefixTokenPair)
-
-	pageRes, err := query.Paginate(store, req.Pagination, func(_, value []byte) error {
+	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	prefixStore := prefix.NewStore(store, types.KeyPrefixTokenPair)
+	pageRes, err := query.Paginate(prefixStore, req.Pagination, func(_, value []byte) error {
 		var pair types.TokenPair
 		if err := k.cdc.Unmarshal(value, &pair); err != nil {
 			return err

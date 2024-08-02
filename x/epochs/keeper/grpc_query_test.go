@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/Canto-Network/Canto/v7/x/epochs/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 )
 
@@ -66,36 +65,39 @@ func (suite *KeeperTestSuite) TestEpochInfo() {
 					Identifier:              types.DayEpochID,
 					StartTime:               time.Time{},
 					Duration:                time.Hour * 24,
-					CurrentEpoch:            0,
+					CurrentEpoch:            1,
 					CurrentEpochStartHeight: 1,
 					CurrentEpochStartTime:   time.Time{},
-					EpochCountingStarted:    false,
+					EpochCountingStarted:    true,
 				}
 				day.StartTime = suite.ctx.BlockTime()
+				day.CurrentEpochStartTime = suite.ctx.BlockTime()
 				day.CurrentEpochStartHeight = suite.ctx.BlockHeight()
 
 				week := types.EpochInfo{
 					Identifier:              types.WeekEpochID,
 					StartTime:               time.Time{},
 					Duration:                time.Hour * 24 * 7,
-					CurrentEpoch:            0,
+					CurrentEpoch:            1,
 					CurrentEpochStartHeight: 1,
 					CurrentEpochStartTime:   time.Time{},
-					EpochCountingStarted:    false,
+					EpochCountingStarted:    true,
 				}
 				week.StartTime = suite.ctx.BlockTime()
+				week.CurrentEpochStartTime = suite.ctx.BlockTime()
 				week.CurrentEpochStartHeight = suite.ctx.BlockHeight()
 
 				quarter := types.EpochInfo{
 					Identifier:              "quarter",
 					StartTime:               time.Time{},
 					Duration:                time.Hour * 24 * 7 * 13,
-					CurrentEpoch:            0,
+					CurrentEpoch:            1,
 					CurrentEpochStartHeight: 1,
 					CurrentEpochStartTime:   time.Time{},
-					EpochCountingStarted:    false,
+					EpochCountingStarted:    true,
 				}
 				quarter.StartTime = suite.ctx.BlockTime()
+				quarter.CurrentEpochStartTime = suite.ctx.BlockTime()
 				quarter.CurrentEpochStartHeight = suite.ctx.BlockHeight()
 				suite.app.EpochsKeeper.SetEpochInfo(suite.ctx, quarter)
 				suite.Commit()
@@ -116,7 +118,7 @@ func (suite *KeeperTestSuite) TestEpochInfo() {
 		suite.Run(fmt.Sprintf("Case %s", tc.name), func() {
 			suite.SetupTest() // reset
 
-			ctx := sdk.WrapSDKContext(suite.ctx)
+			ctx := suite.ctx
 			tc.malleate()
 
 			res, err := suite.queryClient.EpochInfos(ctx, req)
@@ -179,10 +181,9 @@ func (suite *KeeperTestSuite) TestCurrentEpoch() {
 		suite.Run(fmt.Sprintf("Case %s", tc.name), func() {
 			suite.SetupTest() // reset
 
-			ctx := sdk.WrapSDKContext(suite.ctx)
 			tc.malleate()
 
-			res, err := suite.queryClient.CurrentEpoch(ctx, req)
+			res, err := suite.queryClient.CurrentEpoch(suite.ctx, req)
 			if tc.expPass {
 				suite.Require().NoError(err)
 				suite.Require().Equal(expRes, res)

@@ -3,6 +3,7 @@ package keeper
 import (
 	"strings"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -20,49 +21,49 @@ func (k Keeper) RegisterCoin(
 	// Check if the conversion is globally enabled
 	params := k.GetParams(ctx)
 	if !params.EnableErc20 {
-		return nil, sdkerrors.Wrap(
+		return nil, errorsmod.Wrap(
 			types.ErrERC20Disabled, "registration is currently disabled by governance",
 		)
 	}
 
 	// Prohibit denominations that contain the evm denom
 	if strings.Contains(coinMetadata.Base, "CANTO") {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrEVMDenom, "cannot register the EVM denomination %s", coinMetadata.Base,
 		)
 	}
 
 	// Check if denomination is already registered
-	if k.IsDenomRegistered(ctx, coinMetadata.Name) {
-		return nil, sdkerrors.Wrapf(
+	if k.IsDenomRegistered(ctx, coinMetadata.Base) {
+		return nil, errorsmod.Wrapf(
 			types.ErrTokenPairAlreadyExists, "coin denomination already registered: %s", coinMetadata.Name,
 		)
 	}
 
 	// Check if the coin exists by ensuring the supply is set
 	if !k.bankKeeper.HasSupply(ctx, coinMetadata.Base) {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			sdkerrors.ErrInvalidCoins, "base denomination '%s' cannot have a supply of 0", coinMetadata.Base,
 		)
 	}
 
 	if err := k.verifyMetadata(ctx, coinMetadata); err != nil {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrInternalTokenPair, "coin metadata is invalid %s", coinMetadata.Name,
 		)
 	}
 
 	addr, err := k.DeployERC20Contract(ctx, coinMetadata)
 	if err != nil {
-		return nil, sdkerrors.Wrap(
+		return nil, errorsmod.Wrap(
 			err, "failed to create wrapped coin denom metadata for ERC20",
 		)
 	}
 
 	pair := types.NewTokenPair(addr, coinMetadata.Base, true, types.OWNER_MODULE)
 	k.SetTokenPair(ctx, pair)
-	k.SetDenomMap(ctx, pair.Denom, pair.GetID())
-	k.SetERC20Map(ctx, common.HexToAddress(pair.Erc20Address), pair.GetID())
+	k.SetTokenPairIdByDenom(ctx, pair.Denom, pair.GetID())
+	k.SetTokenPairIdByERC20Addr(ctx, common.HexToAddress(pair.Erc20Address), pair.GetID())
 
 	return &pair, nil
 }
@@ -76,29 +77,29 @@ func (k Keeper) RegisterERC20(
 	// Check if the conversion is globally enabled
 	params := k.GetParams(ctx)
 	if !params.EnableErc20 {
-		return nil, sdkerrors.Wrap(
+		return nil, errorsmod.Wrap(
 			types.ErrERC20Disabled, "registration is currently disabled by governance",
 		)
 	}
 
 	// Check if ERC20 is already registered
 	if k.IsERC20Registered(ctx, contract) {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrTokenPairAlreadyExists, "token ERC20 contract already registered: %s", contract.String(),
 		)
 	}
 
 	metadata, err := k.CreateCoinMetadata(ctx, contract)
 	if err != nil {
-		return nil, sdkerrors.Wrap(
+		return nil, errorsmod.Wrap(
 			err, "failed to create wrapped coin denom metadata for ERC20",
 		)
 	}
 
 	pair := types.NewTokenPair(contract, metadata.Name, true, types.OWNER_EXTERNAL)
 	k.SetTokenPair(ctx, pair)
-	k.SetDenomMap(ctx, pair.Denom, pair.GetID())
-	k.SetERC20Map(ctx, common.HexToAddress(pair.Erc20Address), pair.GetID())
+	k.SetTokenPairIdByDenom(ctx, pair.Denom, pair.GetID())
+	k.SetTokenPairIdByERC20Addr(ctx, common.HexToAddress(pair.Erc20Address), pair.GetID())
 	return &pair, nil
 }
 
@@ -118,13 +119,13 @@ func (k Keeper) CreateCoinMetadata(
 	// Check if metadata already exists
 	_, found := k.bankKeeper.GetDenomMetaData(ctx, types.CreateDenom(strContract))
 	if found {
-		return nil, sdkerrors.Wrap(
+		return nil, errorsmod.Wrap(
 			types.ErrInternalTokenPair, "denom metadata already registered",
 		)
 	}
 
 	if k.IsDenomRegistered(ctx, types.CreateDenom(strContract)) {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrInternalTokenPair, "coin denomination already registered: %s", erc20Data.Name,
 		)
 	}
@@ -164,7 +165,7 @@ func (k Keeper) CreateCoinMetadata(
 	}
 
 	if err := metadata.Validate(); err != nil {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			err, "ERC20 token data is invalid for contract %s", strContract,
 		)
 	}
@@ -181,14 +182,14 @@ func (k Keeper) ToggleConversion(
 ) (types.TokenPair, error) {
 	id := k.GetTokenPairID(ctx, token)
 	if len(id) == 0 {
-		return types.TokenPair{}, sdkerrors.Wrapf(
+		return types.TokenPair{}, errorsmod.Wrapf(
 			types.ErrTokenPairNotFound, "token '%s' not registered by id", token,
 		)
 	}
 
 	pair, found := k.GetTokenPair(ctx, id)
 	if !found {
-		return types.TokenPair{}, sdkerrors.Wrapf(
+		return types.TokenPair{}, errorsmod.Wrapf(
 			types.ErrTokenPairNotFound, "token '%s' not registered", token,
 		)
 	}

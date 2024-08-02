@@ -8,18 +8,18 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	abci "github.com/cometbft/cometbft/abci/types"
+	"github.com/cometbft/cometbft/crypto/tmhash"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	tmversion "github.com/cometbft/cometbft/proto/tendermint/version"
+	"github.com/cometbft/cometbft/version"
 	"github.com/cosmos/cosmos-sdk/baseapp"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/crypto/tmhash"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
-	tmversion "github.com/tendermint/tendermint/proto/tendermint/version"
-	"github.com/tendermint/tendermint/version"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/evmos/ethermint/crypto/ethsecp256k1"
 	evm "github.com/evmos/ethermint/x/evm/types"
 
 	"github.com/Canto-Network/Canto/v7/app"
@@ -68,11 +68,10 @@ func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 	// init app
 	suite.app = app.Setup(checkTx, nil)
 
-	privCons, err := ethsecp256k1.GenerateKey()
-	require.NoError(t, err)
-	suite.consAddress = sdk.ConsAddress(privCons.PubKey().Address())
+	pubKey := ed25519.GenPrivKey().PubKey()
+	suite.consAddress = sdk.ConsAddress(pubKey.Address())
 	// setup context
-	suite.ctx = suite.app.BaseApp.NewContext(checkTx, tmproto.Header{
+	suite.ctx = suite.app.BaseApp.NewContextLegacy(checkTx, tmproto.Header{
 		Height:          1,
 		ChainID:         "canto_9001-1",
 		Time:            time.Now().UTC(),
@@ -110,22 +109,23 @@ func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 	evmParams.EvmDenom = denomMint
 	suite.app.EvmKeeper.SetParams(suite.ctx, evmParams)
 
-	stakingParams := suite.app.StakingKeeper.GetParams(suite.ctx)
+	stakingParams, err := suite.app.StakingKeeper.GetParams(suite.ctx)
+	require.NoError(t, err)
 	stakingParams.BondDenom = denomMint
 	suite.app.StakingKeeper.SetParams(suite.ctx, stakingParams)
 
 	// Set Validator
 	valAddr := sdk.ValAddress(suite.address.Bytes())
-	validator, err := stakingtypes.NewValidator(valAddr, privCons.PubKey(), stakingtypes.Description{})
+	validator, err := stakingtypes.NewValidator(valAddr.String(), pubKey, stakingtypes.Description{})
 	require.NoError(t, err)
 
 	validator = stakingkeeper.TestingUpdateValidator(suite.app.StakingKeeper, suite.ctx, validator, true)
-	suite.app.StakingKeeper.AfterValidatorCreated(suite.ctx, validator.GetOperator())
+	valbz, err := s.app.StakingKeeper.ValidatorAddressCodec().StringToBytes(validator.GetOperator())
+	s.NoError(err)
+	suite.app.StakingKeeper.Hooks().AfterValidatorCreated(suite.ctx, valbz)
 	err = suite.app.StakingKeeper.SetValidatorByConsAddr(suite.ctx, validator)
 	require.NoError(t, err)
-
-	validators := s.app.StakingKeeper.GetValidators(s.ctx, 1)
-	suite.validator = validators[0]
+	suite.validator = validator
 
 	suite.ethSigner = ethtypes.LatestSignerForChainID(s.app.EvmKeeper.ChainID())
 
@@ -145,16 +145,17 @@ func (suite *KeeperTestSuite) Commit() {
 }
 
 func (suite *KeeperTestSuite) CommitAfter(t time.Duration) {
-	_ = suite.app.Commit()
 	header := suite.ctx.BlockHeader()
-	header.Height += 1
 	header.Time = header.Time.Add(t)
-	suite.app.BeginBlock(abci.RequestBeginBlock{
-		Header: header,
+	suite.app.FinalizeBlock(&abci.RequestFinalizeBlock{
+		Height: header.Height,
+		Time:   header.Time,
 	})
+	suite.app.Commit()
 
 	// update ctx
-	suite.ctx = suite.app.BaseApp.NewContext(false, header)
+	header.Height += 1
+	suite.ctx = suite.app.BaseApp.NewUncachedContext(false, header)
 
 	queryHelper := baseapp.NewQueryServerTestHelper(suite.ctx, suite.app.InterfaceRegistry())
 	evm.RegisterQueryServer(queryHelper, suite.app.EvmKeeper)

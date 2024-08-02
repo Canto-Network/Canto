@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkmath "cosmossdk.io/math"
 )
 
 func TestGenesisValidate(t *testing.T) {
@@ -21,7 +21,7 @@ func TestGenesisValidate(t *testing.T) {
 		},
 		{
 			"custom genesis",
-			NewGenesisState(NewParams(true, sdk.NewInt(10000), []string{"channel-0"})),
+			NewGenesisState(NewParams(true, sdkmath.NewInt(10000), []string{"channel-0"})),
 			false,
 		},
 	}

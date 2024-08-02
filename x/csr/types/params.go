@@ -1,14 +1,14 @@
 package types
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	errorsmod "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
 var (
 	DefaultEnableCSR = false
-	DefaultCSRShares = sdk.NewDecWithPrec(20, 2)
+	DefaultCSRShares = sdkmath.LegacyNewDecWithPrec(20, 2)
 
 	ParamStoreKeyEnableCSR = []byte("EnableCSR")
 	ParamStoreKeyCSRShares = []byte("CSRShares")
@@ -20,7 +20,7 @@ func ParamKeyTable() paramtypes.KeyTable {
 }
 
 // NewParams creates a new Params instance
-func NewParams(enableCSR bool, csrShares sdk.Dec) Params {
+func NewParams(enableCSR bool, csrShares sdkmath.LegacyDec) Params {
 	return Params{
 		EnableCsr: enableCSR,
 		CsrShares: csrShares,
@@ -44,7 +44,7 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 func ValidateEnableCSR(i interface{}) error {
 	_, ok := i.(bool)
 	if !ok {
-		return sdkerrors.Wrapf(ErrInvalidParams, "Params::Validate::ValidateEnableCSR enableCSR must be a bool")
+		return errorsmod.Wrapf(ErrInvalidParams, "Params::Validate::ValidateEnableCSR enableCSR must be a bool")
 	}
 
 	return nil
@@ -52,22 +52,22 @@ func ValidateEnableCSR(i interface{}) error {
 
 // Validates the CSR share dec that is inputted
 func ValidateShares(i interface{}) error {
-	v, ok := i.(sdk.Dec)
+	v, ok := i.(sdkmath.LegacyDec)
 
 	if !ok {
-		return sdkerrors.Wrapf(ErrInvalidParams, "Params::Validate::ValidateShares CSRShares must be of type sdk.Dec")
+		return errorsmod.Wrapf(ErrInvalidParams, "Params::Validate::ValidateShares CSRShares must be of type sdkmath.LegacyDec")
 	}
 
 	if v.IsNil() {
-		return sdkerrors.Wrapf(ErrInvalidParams, "Params::Validate::ValidateShares cannot have entry that is nil for CSRShares")
+		return errorsmod.Wrapf(ErrInvalidParams, "Params::Validate::ValidateShares cannot have entry that is nil for CSRShares")
 	}
 
 	if v.IsNegative() {
-		return sdkerrors.Wrapf(ErrInvalidParams, "Params::Validate::ValidateShares CSRShares cannot be negative")
+		return errorsmod.Wrapf(ErrInvalidParams, "Params::Validate::ValidateShares CSRShares cannot be negative")
 	}
 
-	if v.GT(sdk.OneDec()) {
-		return sdkerrors.Wrapf(ErrInvalidParams, "Params::Validate::ValidateShares CSRShares cannot be greater than 1")
+	if v.GT(sdkmath.LegacyOneDec()) {
+		return errorsmod.Wrapf(ErrInvalidParams, "Params::Validate::ValidateShares CSRShares cannot be greater than 1")
 	}
 
 	return nil

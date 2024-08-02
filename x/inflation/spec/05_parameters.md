@@ -10,14 +10,14 @@ can be modified via governance.
 | Key                      | Type                   | Default Value                                                                 |
 | ------------------------ | ---------------------- | ----------------------------------------------------------------------------- |
 | `MintDenom`              | string                 | `evm.DefaultEVMDenom` // “aevmos”                                             |
-| `ExponentialCalculation` | ExponentialCalculation | `A: sdk.NewDec(int64(300_000_000))`                                           |
-|                          |                        | `R: sdk.NewDecWithPrec(50, 2)`                                                |
-|                          |                        | `C: sdk.NewDec(int64(9_375_000))`                                             |
-|                          |                        | `BondingTarget: sdk.NewDecWithPrec(66, 2)`                                    |
-|                          |                        | `MaxVariance: sdk.ZeroDec()`                                                  |
-| `InflationDistribution`  | InflationDistribution  | `StakingRewards: sdk.NewDecWithPrec(533333334, 9)`  // 0.53 = 40% / (1 - 25%) |
-|                          |                        | `UsageIncentives: sdk.NewDecWithPrec(333333333, 9)` // 0.33 = 25% / (1 - 25%) |
-|                          |                        | `CommunityPool: sdk.NewDecWithPrec(133333333, 9)`  // 0.13 = 10% / (1 - 25%)  |
+| `ExponentialCalculation` | ExponentialCalculation | `A: sdkmath.LegacyNewDec(int64(300_000_000))`                                           |
+|                          |                        | `R: sdkmath.LegacyNewDecWithPrec(50, 2)`                                                |
+|                          |                        | `C: sdkmath.LegacyNewDec(int64(9_375_000))`                                             |
+|                          |                        | `BondingTarget: sdkmath.LegacyNewDecWithPrec(66, 2)`                                    |
+|                          |                        | `MaxVariance: sdkmath.LegacyZeroDec()`                                                  |
+| `InflationDistribution`  | InflationDistribution  | `StakingRewards: sdkmath.LegacyNewDecWithPrec(533333334, 9)`  // 0.53 = 40% / (1 - 25%) |
+|                          |                        | `UsageIncentives: sdkmath.LegacyNewDecWithPrec(333333333, 9)` // 0.33 = 25% / (1 - 25%) |
+|                          |                        | `CommunityPool: sdkmath.LegacyNewDecWithPrec(133333333, 9)`  // 0.13 = 10% / (1 - 25%)  |
 | `EnableInflation`        | bool                   | `true`                                                                        |
 
 ## Mint Denom

@@ -3,9 +3,10 @@ package keeper
 import (
 	"fmt"
 
+	"cosmossdk.io/log"
+	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/Canto-Network/Canto/v7/x/epochs/types"
 )
@@ -13,12 +14,12 @@ import (
 // Keeper of this module maintains collections of epochs and hooks.
 type Keeper struct {
 	cdc      codec.Codec
-	storeKey sdk.StoreKey
+	storeKey storetypes.StoreKey
 	hooks    types.EpochHooks
 }
 
 // NewKeeper returns a new instance of epochs Keeper
-func NewKeeper(cdc codec.Codec, storeKey sdk.StoreKey) *Keeper {
+func NewKeeper(cdc codec.Codec, storeKey storetypes.StoreKey) *Keeper {
 	return &Keeper{
 		cdc:      cdc,
 		storeKey: storeKey,

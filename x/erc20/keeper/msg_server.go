@@ -4,11 +4,14 @@ import (
 	"context"
 	"math/big"
 
-	"github.com/armon/go-metrics"
+	errorsmod "cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/hashicorp/go-metrics"
 
 	"github.com/Canto-Network/Canto/v7/contracts"
 	"github.com/Canto-Network/Canto/v7/x/erc20/types"
@@ -22,6 +25,25 @@ func (k Keeper) ConvertCoin(
 	goCtx context.Context,
 	msg *types.MsgConvertCoin,
 ) (*types.MsgConvertCoinResponse, error) {
+	if err := types.ValidateErc20Denom(msg.Coin.Denom); err != nil {
+		if err := ibctransfertypes.ValidateIBCDenom(msg.Coin.Denom); err != nil {
+			return nil, err
+		}
+	}
+
+	if !msg.Coin.Amount.IsPositive() {
+		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidCoins, "cannot mint a non-positive amount")
+	}
+
+	_, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return nil, errorsmod.Wrap(err, "invalid sender address")
+	}
+
+	if !common.IsHexAddress(msg.Receiver) {
+		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver hex address %s", msg.Receiver)
+	}
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Error checked during msg validation
@@ -64,6 +86,23 @@ func (k Keeper) ConvertERC20(
 	goCtx context.Context,
 	msg *types.MsgConvertERC20,
 ) (*types.MsgConvertERC20Response, error) {
+	if !common.IsHexAddress(msg.ContractAddress) {
+		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid contract hex address '%s'", msg.ContractAddress)
+	}
+
+	if !msg.Amount.IsPositive() {
+		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidCoins, "cannot mint a non-positive amount")
+	}
+
+	_, err := sdk.AccAddressFromBech32(msg.Receiver)
+	if err != nil {
+		return nil, errorsmod.Wrap(err, "invalid receiver address")
+	}
+
+	if !common.IsHexAddress(msg.Sender) {
+		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender hex address %s", msg.Sender)
+	}
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Error checked during msg validation
@@ -118,13 +157,13 @@ func (k Keeper) convertCoinNativeCoin(
 	contract := pair.GetERC20Contract()
 	balanceToken := k.BalanceOf(ctx, erc20, contract, receiver)
 	if balanceToken == nil {
-		return nil, sdkerrors.Wrap(types.ErrEVMCall, "failed to retrieve balance")
+		return nil, errorsmod.Wrap(types.ErrEVMCall, "failed to retrieve balance")
 	}
 
 	// Escrow coins on module account
 	err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, sender, types.ModuleName, coins)
 	if err != nil {
-		return nil, sdkerrors.Wrap(err, "failed to escrow coins")
+		return nil, errorsmod.Wrap(err, "failed to escrow coins")
 	}
 
 	// Mint tokens and send to receiver
@@ -137,12 +176,12 @@ func (k Keeper) convertCoinNativeCoin(
 	tokens := msg.Coin.Amount.BigInt()
 	balanceTokenAfter := k.BalanceOf(ctx, erc20, contract, receiver)
 	if balanceTokenAfter == nil {
-		return nil, sdkerrors.Wrap(types.ErrEVMCall, "failed to retrieve balance")
+		return nil, errorsmod.Wrap(types.ErrEVMCall, "failed to retrieve balance")
 	}
 	expToken := big.NewInt(0).Add(balanceToken, tokens)
 
 	if r := balanceTokenAfter.Cmp(expToken); r != 0 {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrBalanceInvariance,
 			"invalid token balance - expected: %v, actual: %v", expToken, balanceTokenAfter,
 		)
@@ -206,7 +245,7 @@ func (k Keeper) convertERC20NativeCoin(
 	balanceCoin := k.bankKeeper.GetBalance(ctx, receiver, pair.Denom)
 	balanceToken := k.BalanceOf(ctx, erc20, contract, sender)
 	if balanceToken == nil {
-		return nil, sdkerrors.Wrap(types.ErrEVMCall, "failed to retrieve balance")
+		return nil, errorsmod.Wrap(types.ErrEVMCall, "failed to retrieve balance")
 	}
 
 	// Burn escrowed tokens
@@ -225,7 +264,7 @@ func (k Keeper) convertERC20NativeCoin(
 	balanceCoinAfter := k.bankKeeper.GetBalance(ctx, receiver, pair.Denom)
 	expCoin := balanceCoin.Add(coins[0])
 	if ok := balanceCoinAfter.IsEqual(expCoin); !ok {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrBalanceInvariance,
 			"invalid coin balance - expected: %v, actual: %v",
 			expCoin, balanceCoinAfter,
@@ -236,12 +275,12 @@ func (k Keeper) convertERC20NativeCoin(
 	tokens := coins[0].Amount.BigInt()
 	balanceTokenAfter := k.BalanceOf(ctx, erc20, contract, sender)
 	if balanceTokenAfter == nil {
-		return nil, sdkerrors.Wrap(types.ErrEVMCall, "failed to retrieve balance")
+		return nil, errorsmod.Wrap(types.ErrEVMCall, "failed to retrieve balance")
 	}
 
 	expToken := big.NewInt(0).Sub(balanceToken, tokens)
 	if r := balanceTokenAfter.Cmp(expToken); r != 0 {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrBalanceInvariance,
 			"invalid token balance - expected: %v, actual: %v",
 			expToken, balanceTokenAfter,
@@ -308,7 +347,7 @@ func (k Keeper) convertERC20NativeToken(
 	balanceCoin := k.bankKeeper.GetBalance(ctx, receiver, pair.Denom)
 	balanceToken := k.BalanceOf(ctx, erc20, contract, types.ModuleAddress)
 	if balanceToken == nil {
-		return nil, sdkerrors.Wrap(types.ErrEVMCall, "failed to retrieve balance")
+		return nil, errorsmod.Wrap(types.ErrEVMCall, "failed to retrieve balance")
 	}
 
 	// Escrow tokens on module account
@@ -329,20 +368,20 @@ func (k Keeper) convertERC20NativeToken(
 	}
 
 	if !unpackedRet.Value {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "failed to execute transfer")
+		return nil, errorsmod.Wrap(sdkerrors.ErrLogic, "failed to execute transfer")
 	}
 
 	// Check expected escrow balance after transfer execution
 	tokens := coins[0].Amount.BigInt()
 	balanceTokenAfter := k.BalanceOf(ctx, erc20, contract, types.ModuleAddress)
 	if balanceTokenAfter == nil {
-		return nil, sdkerrors.Wrap(types.ErrEVMCall, "failed to retrieve balance")
+		return nil, errorsmod.Wrap(types.ErrEVMCall, "failed to retrieve balance")
 	}
 
 	expToken := big.NewInt(0).Add(balanceToken, tokens)
 
 	if r := balanceTokenAfter.Cmp(expToken); r != 0 {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrBalanceInvariance,
 			"invalid token balance - expected: %v, actual: %v",
 			expToken, balanceTokenAfter,
@@ -364,7 +403,7 @@ func (k Keeper) convertERC20NativeToken(
 	expCoin := balanceCoin.Add(coins[0])
 
 	if ok := balanceCoinAfter.IsEqual(expCoin); !ok {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrBalanceInvariance,
 			"invalid coin balance - expected: %v, actual: %v",
 			expCoin, balanceCoinAfter,
@@ -435,12 +474,12 @@ func (k Keeper) convertCoinNativeERC20(
 	contract := pair.GetERC20Contract()
 	balanceToken := k.BalanceOf(ctx, erc20, contract, receiver)
 	if balanceToken == nil {
-		return nil, sdkerrors.Wrap(types.ErrEVMCall, "failed to retrieve balance")
+		return nil, errorsmod.Wrap(types.ErrEVMCall, "failed to retrieve balance")
 	}
 
 	// Escrow Coins on module account
 	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, sender, types.ModuleName, coins); err != nil {
-		return nil, sdkerrors.Wrap(err, "failed to escrow coins")
+		return nil, errorsmod.Wrap(err, "failed to escrow coins")
 	}
 
 	// Unescrow Tokens and send to receiver
@@ -456,20 +495,20 @@ func (k Keeper) convertCoinNativeERC20(
 	}
 
 	if !unpackedRet.Value {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "failed to execute unescrow tokens from user")
+		return nil, errorsmod.Wrap(sdkerrors.ErrLogic, "failed to execute unescrow tokens from user")
 	}
 
 	// Check expected Receiver balance after transfer execution
 	tokens := msg.Coin.Amount.BigInt()
 	balanceTokenAfter := k.BalanceOf(ctx, erc20, contract, receiver)
 	if balanceTokenAfter == nil {
-		return nil, sdkerrors.Wrap(types.ErrEVMCall, "failed to retrieve balance")
+		return nil, errorsmod.Wrap(types.ErrEVMCall, "failed to retrieve balance")
 	}
 
 	exp := big.NewInt(0).Add(balanceToken, tokens)
 
 	if r := balanceTokenAfter.Cmp(exp); r != 0 {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrBalanceInvariance,
 			"invalid token balance - expected: %v, actual: %v", exp, balanceTokenAfter,
 		)
@@ -478,7 +517,7 @@ func (k Keeper) convertCoinNativeERC20(
 	// Burn escrowed Coins
 	err = k.bankKeeper.BurnCoins(ctx, types.ModuleName, coins)
 	if err != nil {
-		return nil, sdkerrors.Wrap(err, "failed to burn coins")
+		return nil, errorsmod.Wrap(err, "failed to burn coins")
 	}
 
 	// Check for unexpected `Approval` event in logs
@@ -522,4 +561,67 @@ func (k Keeper) convertCoinNativeERC20(
 	)
 
 	return &types.MsgConvertCoinResponse{}, nil
+}
+
+func (k Keeper) UpdateParams(goCtx context.Context, req *types.MsgUpdateParams) (*types.MsgUpdateParamsResponse, error) {
+	if k.GetAuthority() != req.Authority {
+		return nil, errorsmod.Wrapf(govtypes.ErrInvalidSigner, "invalid authority; expected %s, got %s", k.GetAuthority(), req.Authority)
+	}
+
+	if err := req.Params.Validate(); err != nil {
+		return nil, err
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	k.SetParams(ctx, req.Params)
+
+	return &types.MsgUpdateParamsResponse{}, nil
+}
+
+func (k Keeper) RegisterCoinProposal(goCtx context.Context, req *types.MsgRegisterCoin) (*types.MsgRegisterCoinResponse, error) {
+	if k.GetAuthority() != req.Authority {
+		return nil, errorsmod.Wrapf(govtypes.ErrInvalidSigner, "invalid authority; expected %s, got %s", k.GetAuthority(), req.Authority)
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	coinMetadata := req.Metadata
+
+	_, err := k.RegisterCoin(ctx, coinMetadata)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.MsgRegisterCoinResponse{}, nil
+}
+
+func (k Keeper) RegisterERC20Proposal(goCtx context.Context, req *types.MsgRegisterERC20) (*types.MsgRegisterERC20Response, error) {
+	if k.GetAuthority() != req.Authority {
+		return nil, errorsmod.Wrapf(govtypes.ErrInvalidSigner, "invalid authority; expected %s, got %s", k.GetAuthority(), req.Authority)
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	contract := common.HexToAddress(req.Erc20Address)
+
+	_, err := k.RegisterERC20(ctx, contract)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.MsgRegisterERC20Response{}, nil
+}
+
+func (k Keeper) ToggleTokenConversionProposal(goCtx context.Context, req *types.MsgToggleTokenConversion) (*types.MsgToggleTokenConversionResponse, error) {
+	if k.GetAuthority() != req.Authority {
+		return nil, errorsmod.Wrapf(govtypes.ErrInvalidSigner, "invalid authority; expected %s, got %s", k.GetAuthority(), req.Authority)
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	token := req.Token
+
+	_, err := k.ToggleConversion(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.MsgToggleTokenConversionResponse{}, nil
 }

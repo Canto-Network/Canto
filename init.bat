@@ -30,8 +30,8 @@ go build .\cmd\cantod
 @echo clear home folder
 del /s /q %HOME%
 
-cantod config keyring-backend %KEYRING%
-cantod config chain-id %CHAINID%
+cantod config set client chain-id %CHAINID%
+cantod config set client keyring-backend %KEYRING%
 
 cantod keys add %KEY% --keyring-backend %KEYRING% --algo %KEYALGO%
 
@@ -45,10 +45,10 @@ cat %GENESIS% | jq ".app_state[\"gov\"][\"deposit_params\"][\"min_deposit\"][0][
 cat %GENESIS% | jq ".app_state[\"mint\"][\"params\"][\"mint_denom\"]=\"acanto\"" > %TMPGENESIS% && move %TMPGENESIS% %GENESIS%
 
 rem increase block time (?)
-cat %GENESIS% | jq ".consensus_params[\"block\"][\"time_iota_ms\"]=\"30000\"" > %TMPGENESIS% && move %TMPGENESIS% %GENESIS%
+cat %GENESIS% | jq ".consensus[\"params\"][\"block\"][\"time_iota_ms\"]=\"30000\"" > %TMPGENESIS% && move %TMPGENESIS% %GENESIS%
 
 rem gas limit in genesis
-cat %GENESIS% | jq ".consensus_params[\"block\"][\"max_gas\"]=\"10000000\"" > %TMPGENESIS% && move %TMPGENESIS% %GENESIS%
+cat %GENESIS% | jq ".consensus[\"params\"][\"block\"][\"max_gas\"]=\"10000000\"" > %TMPGENESIS% && move %TMPGENESIS% %GENESIS%
 
 rem setup
 sed -i "s/create_empty_blocks = true/create_empty_blocks = false/g" %ETHCONFIG%
@@ -68,4 +68,4 @@ cantod validate-genesis
 
 
 rem Start the node (remove the --pruning=nothing flag if historical queries are not needed)
-cantod start --pruning=nothing %TRACE% --log_level %LOGLEVEL% --minimum-gas-prices=0.0001acanto
+cantod start --pruning=nothing %TRACE% --log_level %LOGLEVEL% --minimum-gas-prices=0.0001acanto --chain-id %CHAINID%

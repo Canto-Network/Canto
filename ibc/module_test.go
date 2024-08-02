@@ -7,12 +7,12 @@ import (
 	"github.com/stretchr/testify/require"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
+	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
 
-	transfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
-	channeltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
-	porttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
-	"github.com/cosmos/ibc-go/v3/modules/core/exported"
+	transfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
+	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
+	porttypes "github.com/cosmos/ibc-go/v8/modules/core/05-port/types"
+	"github.com/cosmos/ibc-go/v8/modules/core/exported"
 )
 
 var _ porttypes.IBCModule = &MockIBCModule{}
@@ -34,9 +34,9 @@ func (m MockIBCModule) OnChanOpenInit(
 	chanCap *capabilitytypes.Capability,
 	counterparty channeltypes.Counterparty,
 	version string,
-) error {
+) (string, error) {
 	args := m.Called()
-	return args.Error(0)
+	return args.String(0), args.Error(1)
 }
 
 // OnChanOpenTry implements the Module interface.
@@ -137,7 +137,7 @@ func (m MockIBCModule) OnTimeoutPacket(
 
 func TestModule(t *testing.T) {
 	mockModule := &MockIBCModule{}
-	mockModule.On("OnChanOpenInit").Return(nil)
+	mockModule.On("OnChanOpenInit").Return("", nil)
 	mockModule.On("OnChanOpenTry").Return("", nil)
 	mockModule.On("OnChanOpenAck").Return(nil)
 	mockModule.On("OnChanOpenConfirm").Return(nil)
@@ -150,7 +150,7 @@ func TestModule(t *testing.T) {
 	module := NewModule(mockModule)
 
 	// mock calls for abstraction
-	err := module.OnChanOpenInit(sdk.Context{}, channeltypes.ORDERED, nil, transfertypes.PortID, "channel-0", &capabilitytypes.Capability{}, channeltypes.Counterparty{}, "")
+	_, err := module.OnChanOpenInit(sdk.Context{}, channeltypes.ORDERED, nil, transfertypes.PortID, "channel-0", &capabilitytypes.Capability{}, channeltypes.Counterparty{}, "")
 	require.NoError(t, err)
 	_, err = module.OnChanOpenTry(sdk.Context{}, channeltypes.ORDERED, nil, transfertypes.PortID, "channel-0", &capabilitytypes.Capability{}, channeltypes.Counterparty{}, "")
 	require.NoError(t, err)

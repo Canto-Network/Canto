@@ -7,25 +7,34 @@ import (
 
 	// this line is used by starport scaffolding # 1
 
-	"github.com/gorilla/mux"
+	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
-	"github.com/Canto-Network/Canto/v7/x/csr/client/cli"
-	"github.com/Canto-Network/Canto/v7/x/csr/keeper"
-	"github.com/Canto-Network/Canto/v7/x/csr/types"
+	"cosmossdk.io/core/appmodule"
+	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	abci "github.com/tendermint/tendermint/abci/types"
+
+	"github.com/Canto-Network/Canto/v7/x/csr/client/cli"
+	"github.com/Canto-Network/Canto/v7/x/csr/keeper"
+	"github.com/Canto-Network/Canto/v7/x/csr/simulation"
+	"github.com/Canto-Network/Canto/v7/x/csr/types"
 )
 
 var (
-	_ module.AppModule      = AppModule{}
-	_ module.AppModuleBasic = AppModuleBasic{}
+	_ module.AppModuleBasic      = AppModuleBasic{}
+	_ module.AppModuleBasic      = AppModule{}
+	_ module.HasServices         = AppModule{}
+	_ module.HasABCIGenesis      = AppModule{}
+	_ module.AppModuleSimulation = AppModule{}
+
+	_ appmodule.AppModule       = AppModule{}
+	_ appmodule.HasBeginBlocker = AppModule{}
 )
 
 // ----------------------------------------------------------------------------
@@ -34,10 +43,10 @@ var (
 
 // AppModuleBasic implements the AppModuleBasic interface for the csr module.
 type AppModuleBasic struct {
-	cdc codec.BinaryCodec
+	cdc codec.Codec
 }
 
-func NewAppModuleBasic(cdc codec.BinaryCodec) AppModuleBasic {
+func NewAppModuleBasic(cdc codec.Codec) AppModuleBasic {
 	return AppModuleBasic{cdc: cdc}
 }
 
@@ -69,10 +78,6 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, config client.TxEncod
 	return genState.Validate()
 }
 
-// RegisterRESTRoutes registers the csr module's REST service handlers.
-func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Router) {
-}
-
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the module.
 func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *runtime.ServeMux) {
 	if err := types.RegisterQueryHandlerClient(context.Background(), mux, types.NewQueryClient(clientCtx)); err != nil {
@@ -102,42 +107,39 @@ type AppModule struct {
 	keeper        keeper.Keeper
 }
 
+func (am AppModule) GenerateGenesisState(input *module.SimulationState) {}
+
+func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {
+	return []simtypes.WeightedOperation{}
+}
+
 func NewAppModule(
+	cdc codec.Codec,
 	keeper keeper.Keeper,
 	acctKeeper authkeeper.AccountKeeper,
 ) AppModule {
 	return AppModule{
-		AppModuleBasic: AppModuleBasic{},
+		AppModuleBasic: NewAppModuleBasic(cdc),
 		keeper:         keeper,
 		accountKeeper:  acctKeeper,
 	}
 }
+
+// IsOnePerModuleType implements the depinject.OnePerModuleType interface.
+func (am AppModule) IsOnePerModuleType() {}
+
+// IsAppModule implements the appmodule.AppModule interface.
+func (am AppModule) IsAppModule() {}
 
 // Name returns the csr module's name.
 func (am AppModule) Name() string {
 	return am.AppModuleBasic.Name()
 }
 
-func (am AppModule) NewHandler() sdk.Handler {
-	return NewHandler(am.keeper)
-}
-
-// Route returns the csr module's message routing key.
-func (am AppModule) Route() sdk.Route {
-	return sdk.NewRoute(types.RouterKey, am.NewHandler())
-}
-
-// QuerierRoute returns the csr module's query routing key.
-func (AppModule) QuerierRoute() string { return types.RouterKey }
-
-// LegacyQuerierHandler returns the csr module's Querier.
-func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
-	return nil
-}
-
 // RegisterServices registers a GRPC query service to respond to the
 // module-specific GRPC queries.
 func (am AppModule) RegisterServices(cfg module.Configurator) {
+	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
 }
 
@@ -166,24 +168,29 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 func (AppModule) ConsensusVersion() uint64 { return 2 }
 
 // BeginBlock executes all ABCI BeginBlock logic respective to the csr module.
-func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
+func (am AppModule) BeginBlock(ctx context.Context) error {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	// check in begin block whether the Turnstile has been deployed, if not, deploy it and set it to state
-	if _, found := am.keeper.GetTurnstile(ctx); !found {
-		if am.keeper.GetParams(ctx).EnableCsr { // only deploy if csr is enabled
+	if _, found := am.keeper.GetTurnstile(sdkCtx); !found {
+		if am.keeper.GetParams(sdkCtx).EnableCsr { // only deploy if csr is enabled
 			// deploy turnstile
-			turnstile, err := am.keeper.DeployTurnstile(ctx)
+			turnstile, err := am.keeper.DeployTurnstile(sdkCtx)
 			// panic on errors, (Turnstile existence is invariant)
 			if err != nil {
 				panic(err)
 			}
 			// set the Turnstile address to state
-			am.keeper.SetTurnstile(ctx, turnstile)
+			am.keeper.SetTurnstile(sdkCtx, turnstile)
 		}
 	}
+	return nil
 }
 
-// EndBlock executes all ABCI EndBlock logic respective to the csr module. It
-// returns no validator updates.
-func (am AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-	return []abci.ValidatorUpdate{}
+// ProposalMsgs returns msgs used for governance proposals for simulations.
+func (AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.WeightedProposalMsg {
+	return simulation.ProposalMsgs()
+}
+
+func (am AppModule) RegisterStoreDecoder(sdr simtypes.StoreDecoderRegistry) {
+	sdr[types.ModuleName] = simulation.NewDecodeStore(am.cdc)
 }

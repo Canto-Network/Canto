@@ -11,6 +11,8 @@ message Params { option (gogoproto.goproto_stringer) = false; }
 
 // Define this object so that the govshuttle.pb.go file is generate, implements
 // govtypes.Content
+// Deprecated: This legacy proposal is deprecated in favor of Msg-based gov
+// proposals, see MsgLendingMarketProposal.
 message LendingMarketProposal {
   option (gogoproto.equal) = false;
   option (cosmos_proto.implements_interface) =
@@ -25,6 +27,8 @@ message LendingMarketProposal {
 }
 
 // treasury proposal type,
+// Deprecated: This legacy proposal is deprecated in favor of Msg-based gov
+// proposals, see MsgTreasuryProposal.
 message TreasuryProposal {
   option (gogoproto.equal) = false;
   option (cosmos_proto.implements_interface) =

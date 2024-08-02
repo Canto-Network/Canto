@@ -3,11 +3,11 @@ package ibctesting
 import (
 	"time"
 
-	connectiontypes "github.com/cosmos/ibc-go/v3/modules/core/03-connection/types"
-	channeltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
-	"github.com/cosmos/ibc-go/v3/modules/core/exported"
-	ibctmtypes "github.com/cosmos/ibc-go/v3/modules/light-clients/07-tendermint/types"
-	"github.com/cosmos/ibc-go/v3/testing/mock"
+	connectiontypes "github.com/cosmos/ibc-go/v8/modules/core/03-connection/types"
+	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
+	"github.com/cosmos/ibc-go/v8/modules/core/exported"
+	ibctm "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
+	"github.com/cosmos/ibc-go/v8/testing/mock"
 )
 
 type ClientConfig interface {
@@ -15,26 +15,22 @@ type ClientConfig interface {
 }
 
 type TendermintConfig struct {
-	TrustLevel                   ibctmtypes.Fraction
-	TrustingPeriod               time.Duration
-	UnbondingPeriod              time.Duration
-	MaxClockDrift                time.Duration
-	AllowUpdateAfterExpiry       bool
-	AllowUpdateAfterMisbehaviour bool
+	TrustLevel      ibctm.Fraction
+	TrustingPeriod  time.Duration
+	UnbondingPeriod time.Duration
+	MaxClockDrift   time.Duration
 }
 
 func NewTendermintConfig() *TendermintConfig {
 	return &TendermintConfig{
-		TrustLevel:                   DefaultTrustLevel,
-		TrustingPeriod:               TrustingPeriod,
-		UnbondingPeriod:              UnbondingPeriod,
-		MaxClockDrift:                MaxClockDrift,
-		AllowUpdateAfterExpiry:       false,
-		AllowUpdateAfterMisbehaviour: false,
+		TrustLevel:      DefaultTrustLevel,
+		TrustingPeriod:  TrustingPeriod,
+		UnbondingPeriod: UnbondingPeriod,
+		MaxClockDrift:   MaxClockDrift,
 	}
 }
 
-func (tmcfg *TendermintConfig) GetClientType() string {
+func (*TendermintConfig) GetClientType() string {
 	return exported.Tendermint
 }
 
@@ -51,9 +47,10 @@ func NewConnectionConfig() *ConnectionConfig {
 }
 
 type ChannelConfig struct {
-	PortID  string
-	Version string
-	Order   channeltypes.Order
+	PortID          string
+	Version         string
+	Order           channeltypes.Order
+	ProposedUpgrade channeltypes.Upgrade
 }
 
 func NewChannelConfig() *ChannelConfig {

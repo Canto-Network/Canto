@@ -3,9 +3,10 @@ package keeper
 import (
 	"math/big"
 
+	errorsmod "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	"github.com/Canto-Network/Canto/v7/contracts"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
 
@@ -15,15 +16,15 @@ import (
 )
 
 // method for appending govshuttle proposal types to the govshuttle Map contract
-func (k *Keeper) AppendLendingMarketProposal(ctx sdk.Context, lm *types.LendingMarketProposal) (*types.LendingMarketProposal, error) {
+func (k *Keeper) AppendLendingMarketProposal(ctx sdk.Context, lm *types.MsgLendingMarketProposal) (*types.MsgLendingMarketProposal, error) {
 	m := lm.GetMetadata()
 	var err error
 	if m.GetPropId() == 0 {
-		m.PropId, err = k.govKeeper.GetProposalID(ctx)
+		m.PropId, err = k.govKeeper.ProposalID.Peek(ctx)
 	}
 
 	if err != nil {
-		return nil, sdkerrors.Wrap(err, "Error obtaining Proposal ID")
+		return nil, errorsmod.Wrap(err, "Error obtaining Proposal ID")
 	}
 
 	//if this is the first govshuttle proposal, deploy the map contract as well
@@ -32,32 +33,31 @@ func (k *Keeper) AppendLendingMarketProposal(ctx sdk.Context, lm *types.LendingM
 	if !found {
 		addr, err = k.DeployMapContract(ctx, lm)
 		if err != nil {
-			return &types.LendingMarketProposal{}, err
+			return nil, err
 		}
 		// set the port address in state
 		k.SetPort(ctx, addr)
 	}
 
 	_, err = k.erc20Keeper.CallEVM(ctx, contracts.ProposalStoreContract.ABI, types.ModuleAddress, addr, true,
-		"AddProposal", sdk.NewIntFromUint64(m.GetPropId()).BigInt(), lm.GetTitle(), lm.GetDescription(), ToAddress(m.GetAccount()),
+		"AddProposal", sdkmath.NewIntFromUint64(m.GetPropId()).BigInt(), lm.GetTitle(), lm.GetDescription(), ToAddress(m.GetAccount()),
 		ToBigInt(m.GetValues()), m.GetSignatures(), ToBytes(m.GetCalldatas()))
 
 	if err != nil {
-		return nil, sdkerrors.Wrap(err, "Error in EVM Call")
+		return nil, errorsmod.Wrap(err, "Error in EVM Call")
 	}
 
 	return lm, nil
 }
 
-func (k Keeper) DeployMapContract(ctx sdk.Context, lm *types.LendingMarketProposal) (common.Address, error) {
-
+func (k Keeper) DeployMapContract(ctx sdk.Context, lm *types.MsgLendingMarketProposal) (common.Address, error) {
 	m := lm.GetMetadata()
 
-	ctorArgs, err := contracts.ProposalStoreContract.ABI.Pack("", sdk.NewIntFromUint64(m.GetPropId()).BigInt(), lm.GetTitle(), lm.GetDescription(), ToAddress(m.GetAccount()),
+	ctorArgs, err := contracts.ProposalStoreContract.ABI.Pack("", sdkmath.NewIntFromUint64(m.GetPropId()).BigInt(), lm.GetTitle(), lm.GetDescription(), ToAddress(m.GetAccount()),
 		ToBigInt(m.GetValues()), m.GetSignatures(), ToBytes(m.GetCalldatas())) //Call empty constructor of Proposal-Store
 
 	if err != nil {
-		return common.Address{}, sdkerrors.Wrapf(erc20types.ErrABIPack, "Contract deployment failure: %s", err.Error())
+		return common.Address{}, errorsmod.Wrapf(erc20types.ErrABIPack, "Contract deployment failure: %s", err.Error())
 	}
 
 	data := make([]byte, len(contracts.ProposalStoreContract.Bin)+len(ctorArgs))
@@ -67,14 +67,14 @@ func (k Keeper) DeployMapContract(ctx sdk.Context, lm *types.LendingMarketPropos
 	nonce, err := k.accKeeper.GetSequence(ctx, types.ModuleAddress.Bytes())
 
 	if err != nil {
-		return common.Address{}, sdkerrors.Wrap(err, "Error obtaining account nonce")
+		return common.Address{}, errorsmod.Wrap(err, "Error obtaining account nonce")
 	}
 
 	contractAddr := crypto.CreateAddress(types.ModuleAddress, nonce)
 	_, err = k.erc20Keeper.CallEVMWithData(ctx, types.ModuleAddress, nil, data, true)
 
 	if err != nil {
-		return common.Address{}, sdkerrors.Wrap(err, "Failed to deploy contract")
+		return common.Address{}, errorsmod.Wrap(err, "Failed to deploy contract")
 	}
 
 	return contractAddr, nil
@@ -115,7 +115,7 @@ func ToBigInt(ints []uint64) []*big.Int {
 	arr := make([]*big.Int, len(ints))
 
 	for i, a := range ints {
-		arr[i] = sdk.NewIntFromUint64(a).BigInt()
+		arr[i] = sdkmath.NewIntFromUint64(a).BigInt()
 	}
 
 	return arr

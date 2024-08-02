@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/Canto-Network/Canto/v7/x/inflation/types"
@@ -85,54 +86,59 @@ func (k Keeper) AllocateExponentialInflation(
 func (k Keeper) GetProportions(
 	ctx sdk.Context,
 	coin sdk.Coin,
-	distribution sdk.Dec,
+	distribution sdkmath.LegacyDec,
 ) sdk.Coin {
 	return sdk.NewCoin(
 		coin.Denom,
-		coin.Amount.ToDec().Mul(distribution).TruncateInt(),
+		coin.Amount.ToLegacyDec().Mul(distribution).TruncateInt(),
 	)
 }
 
 // BondedRatio the fraction of the staking tokens which are currently bonded
 // It doesn't consider team allocation for inflation
-func (k Keeper) BondedRatio(ctx sdk.Context) sdk.Dec {
-	stakeSupply := k.stakingKeeper.StakingTokenSupply(ctx)
+func (k Keeper) BondedRatio(ctx sdk.Context) sdkmath.LegacyDec {
+	stakeSupply, err := k.stakingKeeper.StakingTokenSupply(ctx)
 
-	if !stakeSupply.IsPositive() {
-		return sdk.ZeroDec()
+	if err != nil || !stakeSupply.IsPositive() {
+		return sdkmath.LegacyZeroDec()
 	}
 
-	return k.stakingKeeper.TotalBondedTokens(ctx).ToDec().QuoInt(stakeSupply)
+	totalBonded, err := k.stakingKeeper.TotalBondedTokens(ctx)
+	if err != nil {
+		return sdkmath.LegacyZeroDec()
+	}
+
+	return totalBonded.ToLegacyDec().QuoInt(stakeSupply)
 }
 
 // GetCirculatingSupply returns the bank supply of the mintDenom
-func (k Keeper) GetCirculatingSupply(ctx sdk.Context) sdk.Dec {
+func (k Keeper) GetCirculatingSupply(ctx sdk.Context) sdkmath.LegacyDec {
 	mintDenom := k.GetParams(ctx).MintDenom
 
-	circulatingSupply := k.bankKeeper.GetSupply(ctx, mintDenom).Amount.ToDec()
+	circulatingSupply := k.bankKeeper.GetSupply(ctx, mintDenom).Amount.ToLegacyDec()
 
 	return circulatingSupply
 }
 
 // GetInflationRate returns the inflation rate for the current period.
-func (k Keeper) GetInflationRate(ctx sdk.Context) sdk.Dec {
+func (k Keeper) GetInflationRate(ctx sdk.Context) sdkmath.LegacyDec {
 	epochMintProvision, _ := k.GetEpochMintProvision(ctx)
 	if epochMintProvision.IsZero() {
-		return sdk.ZeroDec()
+		return sdkmath.LegacyZeroDec()
 	}
 
 	epp := k.GetEpochsPerPeriod(ctx)
 	if epp == 0 {
-		return sdk.ZeroDec()
+		return sdkmath.LegacyZeroDec()
 	}
 
-	epochsPerPeriod := sdk.NewDec(epp)
+	epochsPerPeriod := sdkmath.LegacyNewDec(epp)
 
 	circulatingSupply := k.GetCirculatingSupply(ctx)
 	if circulatingSupply.IsZero() {
-		return sdk.ZeroDec()
+		return sdkmath.LegacyZeroDec()
 	}
 
 	// EpochMintProvision * 365 / circulatingSupply * 100
-	return epochMintProvision.Mul(epochsPerPeriod).Quo(circulatingSupply).Mul(sdk.NewDec(100))
+	return epochMintProvision.Mul(epochsPerPeriod).Quo(circulatingSupply).Mul(sdkmath.LegacyNewDec(100))
 }

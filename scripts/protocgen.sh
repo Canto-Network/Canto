@@ -1,53 +1,34 @@
 #!/usr/bin/env bash
 
+# How to run manually:
+# docker build --pull --rm -f "contrib/devtools/Dockerfile" -t cosmossdk-proto:latest "contrib/devtools"
+# docker run --rm -v $(pwd):/workspace --workdir /workspace cosmossdk-proto sh ./scripts/protocgen.sh
 
-set -eo pipefail
+echo "Formatting protobuf files"
+find ./ -name "*.proto" -exec clang-format -i {} \;
 
+set -e
 
-protoc_gen_gocosmos() {
-  if ! grep "github.com/gogo/protobuf => github.com/regen-network/protobuf" go.mod &>/dev/null ; then
-    echo -e "\tPlease run this command from somewhere inside the cosmos-sdk folder."
-    return 1
-  fi
-
-  go get github.com/regen-network/cosmos-proto/protoc-gen-gocosmos@latest 2>/dev/null
-}
-
-protoc_gen_doc() {
-  go get github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc 2>/dev/null
-}
-
-echo "1"
-
-protoc_gen_gocosmos
-protoc_gen_doc
-
-echo "2"
-
-proto_dirs=$(find ./proto -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
+echo "Generating gogo proto code"
+cd proto
+proto_dirs=$(find ./canto -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
 for dir in $proto_dirs; do
-  buf protoc \
-    -I "proto" \
-    -I "third_party/proto" \
-    --gocosmos_out=plugins=interfacetype+grpc,\
-Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types:. \
-    --grpc-gateway_out=logtostderr=true,allow_colon_final_segments=true:. \
-  $(find "${dir}" -maxdepth 1 -name '*.proto')
-
+  for file in $(find "${dir}" -maxdepth 1 -name '*.proto'); do
+    # this regex checks if a proto file has its go_package set to Canto/...
+    # gogo proto files SHOULD ONLY be generated if this is false
+    # we don't want gogo proto to run for proto files which are natively built for google.golang.org/protobuf
+    if grep -q "option go_package.*Canto" "$file"; then
+      buf generate --template buf.gen.gogo.yaml $file
+    fi
+  done
 done
 
-echo "3"
-
-# command to generate docs using protoc-gen-doc
-# TODO: migrate to `buf build`
-# buf alpha protoc \
-# -I "proto" \
-# -I "third_party/proto" \
-# --doc_out=./docs/protocol \
-# --doc_opt=./docs/protodoc-markdown.tmpl,proto-docs.md \
-# $(find "$(pwd)/proto" -maxdepth 5 -name '*.proto')
-
+cd ..
 
 # move proto files to the right places
-cp -r github.com/Canto-Network/Canto/v7/x/* x/
+cp -r github.com/Canto-Network/Canto/v7/* ./
 rm -rf github.com
+
+go mod tidy
+
+./scripts/protocgen-pulsar.sh

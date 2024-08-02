@@ -1,11 +1,13 @@
 package ibc
 
 import (
+	errorsmod "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	transfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
-	channeltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
+	transfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
+	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 
 	canto "github.com/Canto-Network/Canto/v7/types"
 )
@@ -24,21 +26,21 @@ func GetTransferSenderRecipient(packet channeltypes.Packet) (
 	// unmarshal packet data to obtain the sender and recipient
 	var data transfertypes.FungibleTokenPacketData
 	if err := transfertypes.ModuleCdc.UnmarshalJSON(packet.GetData(), &data); err != nil {
-		return nil, nil, "", "", sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "cannot unmarshal ICS-20 transfer packet data")
+		return nil, nil, "", "", errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "cannot unmarshal ICS-20 transfer packet data")
 	}
 
 	// validate the sender bech32 address from the counterparty chain
 	// and change the bech32 human readable prefix (HRP) of the sender to `canto`
 	sender, err = canto.GetcantoAddressFromBech32(data.Sender)
 	if err != nil {
-		return nil, nil, "", "", sdkerrors.Wrap(err, "invalid sender")
+		return nil, nil, "", "", errorsmod.Wrap(err, "invalid sender")
 	}
 
 	// validate the recipient bech32 address from the counterparty chain
 	// and change the bech32 human readable prefix (HRP) of the recipient to `canto`
 	recipient, err = canto.GetcantoAddressFromBech32(data.Receiver)
 	if err != nil {
-		return nil, nil, "", "", sdkerrors.Wrap(err, "invalid recipient")
+		return nil, nil, "", "", errorsmod.Wrap(err, "invalid recipient")
 	}
 
 	return sender, recipient, data.Sender, data.Receiver, nil
@@ -49,15 +51,15 @@ func GetTransferAmount(packet channeltypes.Packet) (string, error) {
 	// unmarshal packet data to obtain the sender and recipient
 	var data transfertypes.FungibleTokenPacketData
 	if err := transfertypes.ModuleCdc.UnmarshalJSON(packet.GetData(), &data); err != nil {
-		return "", sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "cannot unmarshal ICS-20 transfer packet data")
+		return "", errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "cannot unmarshal ICS-20 transfer packet data")
 	}
 
 	if data.Amount == "" {
-		return "", sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "empty amount")
+		return "", errorsmod.Wrapf(sdkerrors.ErrInvalidCoins, "empty amount")
 	}
 
-	if _, ok := sdk.NewIntFromString(data.Amount); !ok {
-		return "", sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid amount")
+	if _, ok := sdkmath.NewIntFromString(data.Amount); !ok {
+		return "", errorsmod.Wrapf(sdkerrors.ErrInvalidCoins, "invalid amount")
 	}
 
 	return data.Amount, nil
@@ -70,7 +72,7 @@ func GetTransferAmount(packet channeltypes.Packet) (string, error) {
 // prefix path from the destination chain to the denom.
 func GetReceivedCoin(srcPort, srcChannel, dstPort, dstChannel, rawDenom, rawAmt string) sdk.Coin {
 	// NOTE: Denom and amount are already validated
-	amount, _ := sdk.NewIntFromString(rawAmt)
+	amount, _ := sdkmath.NewIntFromString(rawAmt)
 
 	if transfertypes.ReceiverChainIsSource(srcPort, srcChannel, rawDenom) {
 		// remove prefix added by sender chain

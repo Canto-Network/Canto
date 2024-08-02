@@ -1,8 +1,8 @@
 package keeper_test
 
 import (
+	sdkmath "cosmossdk.io/math"
 	_ "github.com/Canto-Network/Canto/v7/x/csr/keeper"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // params test suite
@@ -11,5 +11,5 @@ func (suite *KeeperTestSuite) TestParams() {
 	// CSR is disabled by default
 	suite.Require().False(params.EnableCsr)
 	// Default CSRShares are 20%
-	suite.Require().Equal(params.CsrShares, sdk.NewDecWithPrec(20, 2))
+	suite.Require().Equal(params.CsrShares, sdkmath.LegacyNewDecWithPrec(20, 2))
 }

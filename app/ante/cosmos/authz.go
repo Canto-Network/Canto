@@ -71,7 +71,10 @@ func (ald AuthzLimiterDecorator) checkDisabledMsgs(msgs []sdk.Msg, isAuthzInnerM
 				return err
 			}
 		case *authz.MsgGrant:
-			authorization := msg.GetAuthorization()
+			authorization, err := msg.GetAuthorization()
+			if err != nil {
+				return err
+			}
 
 			url := authorization.MsgTypeURL()
 			if ald.isDisabledMsg(url) {

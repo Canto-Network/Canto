@@ -3,36 +3,40 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/cosmos/cosmos-sdk/store/prefix"
+	"cosmossdk.io/core/store"
+	"cosmossdk.io/store/prefix"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/tendermint/tendermint/libs/log"
 
+	"cosmossdk.io/log"
 	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
 type (
 	Keeper struct {
-		storeKey   sdk.StoreKey
-		cdc        codec.BinaryCodec
-		paramstore paramtypes.Subspace
+		storeService store.KVStoreService
+		cdc          codec.BinaryCodec
+		paramstore   paramtypes.Subspace
 
 		accKeeper   types.AccountKeeper
 		erc20Keeper types.ERC20Keeper
-		govKeeper   types.GovKeeper
+		govKeeper   *govkeeper.Keeper
+		authority   string
 	}
 )
 
 func NewKeeper(
-	storeKey sdk.StoreKey,
+	storeService store.KVStoreService,
 	cdc codec.BinaryCodec,
 	ps paramtypes.Subspace,
-
 	ak types.AccountKeeper,
 	ek types.ERC20Keeper,
-	gk types.GovKeeper,
+	gk *govkeeper.Keeper,
+	authority string,
 
 ) Keeper {
 	// set KeyTable if it has not already been set
@@ -41,14 +45,19 @@ func NewKeeper(
 	}
 
 	return Keeper{
-
-		cdc:         cdc,
-		storeKey:    storeKey,
-		paramstore:  ps,
-		accKeeper:   ak,
-		erc20Keeper: ek,
-		govKeeper:   gk,
+		cdc:          cdc,
+		storeService: storeService,
+		paramstore:   ps,
+		accKeeper:    ak,
+		erc20Keeper:  ek,
+		govKeeper:    gk,
+		authority:    authority,
 	}
+}
+
+// GetAuthority returns the x/govshuttle module's authority.
+func (k Keeper) GetAuthority() string {
+	return k.authority
 }
 
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
@@ -57,8 +66,9 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 
 // retrieve the port address from state
 func (k Keeper) GetPort(ctx sdk.Context) (common.Address, bool) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.PortKey)
-	bz := store.Get(types.PortKey)
+	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	prefixStore := prefix.NewStore(store, types.PortKey)
+	bz := prefixStore.Get(types.PortKey)
 	// if not found return false
 	if len(bz) == 0 {
 		return common.Address{}, false
@@ -68,6 +78,7 @@ func (k Keeper) GetPort(ctx sdk.Context) (common.Address, bool) {
 
 // commit the address of the current govShuttle mapcontract to state (Port.sol)
 func (k Keeper) SetPort(ctx sdk.Context, portAddr common.Address) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.PortKey)
-	store.Set(types.PortKey, portAddr.Bytes())
+	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	prefixStore := prefix.NewStore(store, types.PortKey)
+	prefixStore.Set(types.PortKey, portAddr.Bytes())
 }

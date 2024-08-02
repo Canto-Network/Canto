@@ -1,7 +1,7 @@
 package types
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkmath "cosmossdk.io/math"
 
 	ethermint "github.com/evmos/ethermint/types"
 )
@@ -11,8 +11,8 @@ func CalculateEpochMintProvision(
 	params Params,
 	period uint64,
 	epochsPerPeriod int64,
-	bondedRatio sdk.Dec,
-) sdk.Dec {
+	bondedRatio sdkmath.LegacyDec,
+) sdkmath.LegacyDec {
 	x := period                                              // period
 	a := params.ExponentialCalculation.A                     // initial value
 	r := params.ExponentialCalculation.R                     // reduction factor
@@ -21,7 +21,7 @@ func CalculateEpochMintProvision(
 	maxVariance := params.ExponentialCalculation.MaxVariance // max percentage that inflation can be increased by
 
 	// exponentialDecay := a * (1 - r) ^ x + c
-	decay := sdk.OneDec().Sub(r)
+	decay := sdkmath.LegacyOneDec().Sub(r)
 	exponentialDecay := a.Mul(decay.Power(x)).Add(c)
 
 	// bondingIncentive doesn't increase beyond bonding target (0 < b < bonding_target)
@@ -31,17 +31,17 @@ func CalculateEpochMintProvision(
 
 	// bondingIncentive = 1 + max_variance - bondingRatio * (max_variance / bonding_target)
 	sub := bondedRatio.Mul(maxVariance.Quo(bTarget))
-	bondingIncentive := sdk.OneDec().Add(maxVariance).Sub(sub)
+	bondingIncentive := sdkmath.LegacyOneDec().Add(maxVariance).Sub(sub)
 
 	// periodProvision = exponentialDecay * bondingIncentive
 	periodProvision := exponentialDecay.Mul(bondingIncentive)
 
 	// epochProvision = periodProvision / epochsPerPeriod
-	epochProvision := periodProvision.Quo(sdk.NewDec(epochsPerPeriod))
+	epochProvision := periodProvision.Quo(sdkmath.LegacyNewDec(epochsPerPeriod))
 
 	// Multiply epochMintProvision with power reduction (10^18 for evmos) as the
 	// calculation is based on `evmos` and the issued tokens need to be given in
 	// `aevmos`
-	epochProvision = epochProvision.Mul(ethermint.PowerReduction.ToDec())
+	epochProvision = epochProvision.Mul(ethermint.PowerReduction.ToLegacyDec())
 	return epochProvision
 }

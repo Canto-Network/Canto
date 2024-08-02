@@ -3,7 +3,7 @@ package types
 import (
 	"testing"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkmath "cosmossdk.io/math"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/stretchr/testify/suite"
 )
@@ -22,16 +22,16 @@ func (suite *ParamsTestSuite) TestParamKeyTable() {
 
 func (suite *ParamsTestSuite) TestParamsValidate() {
 	validExponentialCalculation := ExponentialCalculation{
-		A:             sdk.NewDec(int64(16_304_348)),
-		R:             sdk.NewDecWithPrec(35, 2),
-		C:             sdk.ZeroDec(),
-		BondingTarget: sdk.NewDecWithPrec(66, 2),
-		MaxVariance:   sdk.ZeroDec(),
+		A:             sdkmath.LegacyNewDec(int64(16_304_348)),
+		R:             sdkmath.LegacyNewDecWithPrec(35, 2),
+		C:             sdkmath.LegacyZeroDec(),
+		BondingTarget: sdkmath.LegacyNewDecWithPrec(66, 2),
+		MaxVariance:   sdkmath.LegacyZeroDec(),
 	}
 
 	validInflationDistribution := InflationDistribution{
-		StakingRewards: sdk.NewDecWithPrec(1000000, 6),
-		CommunityPool:  sdk.ZeroDec(),
+		StakingRewards: sdkmath.LegacyNewDecWithPrec(1000000, 6),
+		CommunityPool:  sdkmath.LegacyZeroDec(),
 	}
 
 	testCases := []struct {
@@ -89,11 +89,11 @@ func (suite *ParamsTestSuite) TestParamsValidate() {
 			Params{
 				MintDenom: "acanto",
 				ExponentialCalculation: ExponentialCalculation{
-					A:             sdk.NewDec(int64(-1)),
-					R:             sdk.NewDecWithPrec(5, 1),
-					C:             sdk.NewDec(int64(9_375_000)),
-					BondingTarget: sdk.NewDecWithPrec(50, 2),
-					MaxVariance:   sdk.NewDecWithPrec(20, 2),
+					A:             sdkmath.LegacyNewDec(int64(-1)),
+					R:             sdkmath.LegacyNewDecWithPrec(5, 1),
+					C:             sdkmath.LegacyNewDec(int64(9_375_000)),
+					BondingTarget: sdkmath.LegacyNewDecWithPrec(50, 2),
+					MaxVariance:   sdkmath.LegacyNewDecWithPrec(20, 2),
 				},
 				InflationDistribution: validInflationDistribution,
 				EnableInflation:       true,
@@ -105,11 +105,11 @@ func (suite *ParamsTestSuite) TestParamsValidate() {
 			Params{
 				MintDenom: "acanto",
 				ExponentialCalculation: ExponentialCalculation{
-					A:             sdk.NewDec(int64(300_000_000)),
-					R:             sdk.NewDecWithPrec(5, 0),
-					C:             sdk.NewDec(int64(9_375_000)),
-					BondingTarget: sdk.NewDecWithPrec(50, 2),
-					MaxVariance:   sdk.NewDecWithPrec(20, 2),
+					A:             sdkmath.LegacyNewDec(int64(300_000_000)),
+					R:             sdkmath.LegacyNewDecWithPrec(5, 0),
+					C:             sdkmath.LegacyNewDec(int64(9_375_000)),
+					BondingTarget: sdkmath.LegacyNewDecWithPrec(50, 2),
+					MaxVariance:   sdkmath.LegacyNewDecWithPrec(20, 2),
 				},
 				InflationDistribution: validInflationDistribution,
 				EnableInflation:       true,
@@ -121,11 +121,11 @@ func (suite *ParamsTestSuite) TestParamsValidate() {
 			Params{
 				MintDenom: "acanto",
 				ExponentialCalculation: ExponentialCalculation{
-					A:             sdk.NewDec(int64(300_000_000)),
-					R:             sdk.NewDecWithPrec(-5, 1),
-					C:             sdk.NewDec(int64(9_375_000)),
-					BondingTarget: sdk.NewDecWithPrec(50, 2),
-					MaxVariance:   sdk.NewDecWithPrec(20, 2),
+					A:             sdkmath.LegacyNewDec(int64(300_000_000)),
+					R:             sdkmath.LegacyNewDecWithPrec(-5, 1),
+					C:             sdkmath.LegacyNewDec(int64(9_375_000)),
+					BondingTarget: sdkmath.LegacyNewDecWithPrec(50, 2),
+					MaxVariance:   sdkmath.LegacyNewDecWithPrec(20, 2),
 				},
 				InflationDistribution: validInflationDistribution,
 				EnableInflation:       true,
@@ -137,11 +137,11 @@ func (suite *ParamsTestSuite) TestParamsValidate() {
 			Params{
 				MintDenom: "acanto",
 				ExponentialCalculation: ExponentialCalculation{
-					A:             sdk.NewDec(int64(300_000_000)),
-					R:             sdk.NewDecWithPrec(5, 1),
-					C:             sdk.NewDec(int64(-9_375_000)),
-					BondingTarget: sdk.NewDecWithPrec(50, 2),
-					MaxVariance:   sdk.NewDecWithPrec(20, 2),
+					A:             sdkmath.LegacyNewDec(int64(300_000_000)),
+					R:             sdkmath.LegacyNewDecWithPrec(5, 1),
+					C:             sdkmath.LegacyNewDec(int64(-9_375_000)),
+					BondingTarget: sdkmath.LegacyNewDecWithPrec(50, 2),
+					MaxVariance:   sdkmath.LegacyNewDecWithPrec(20, 2),
 				},
 				InflationDistribution: validInflationDistribution,
 				EnableInflation:       true,
@@ -153,11 +153,11 @@ func (suite *ParamsTestSuite) TestParamsValidate() {
 			Params{
 				MintDenom: "acanto",
 				ExponentialCalculation: ExponentialCalculation{
-					A:             sdk.NewDec(int64(300_000_000)),
-					R:             sdk.NewDecWithPrec(5, 1),
-					C:             sdk.NewDec(int64(9_375_000)),
-					BondingTarget: sdk.NewDecWithPrec(50, 1),
-					MaxVariance:   sdk.NewDecWithPrec(20, 2),
+					A:             sdkmath.LegacyNewDec(int64(300_000_000)),
+					R:             sdkmath.LegacyNewDecWithPrec(5, 1),
+					C:             sdkmath.LegacyNewDec(int64(9_375_000)),
+					BondingTarget: sdkmath.LegacyNewDecWithPrec(50, 1),
+					MaxVariance:   sdkmath.LegacyNewDecWithPrec(20, 2),
 				},
 				InflationDistribution: validInflationDistribution,
 				EnableInflation:       true,
@@ -169,11 +169,11 @@ func (suite *ParamsTestSuite) TestParamsValidate() {
 			Params{
 				MintDenom: "acanto",
 				ExponentialCalculation: ExponentialCalculation{
-					A:             sdk.NewDec(int64(300_000_000)),
-					R:             sdk.NewDecWithPrec(5, 1),
-					C:             sdk.NewDec(int64(9_375_000)),
-					BondingTarget: sdk.NewDecWithPrec(50, 2).Neg(),
-					MaxVariance:   sdk.NewDecWithPrec(20, 2),
+					A:             sdkmath.LegacyNewDec(int64(300_000_000)),
+					R:             sdkmath.LegacyNewDecWithPrec(5, 1),
+					C:             sdkmath.LegacyNewDec(int64(9_375_000)),
+					BondingTarget: sdkmath.LegacyNewDecWithPrec(50, 2).Neg(),
+					MaxVariance:   sdkmath.LegacyNewDecWithPrec(20, 2),
 				},
 				InflationDistribution: validInflationDistribution,
 				EnableInflation:       true,
@@ -185,11 +185,11 @@ func (suite *ParamsTestSuite) TestParamsValidate() {
 			Params{
 				MintDenom: "acanto",
 				ExponentialCalculation: ExponentialCalculation{
-					A:             sdk.NewDec(int64(300_000_000)),
-					R:             sdk.NewDecWithPrec(5, 1),
-					C:             sdk.NewDec(int64(9_375_000)),
-					BondingTarget: sdk.NewDecWithPrec(50, 2),
-					MaxVariance:   sdk.NewDecWithPrec(20, 2).Neg(),
+					A:             sdkmath.LegacyNewDec(int64(300_000_000)),
+					R:             sdkmath.LegacyNewDecWithPrec(5, 1),
+					C:             sdkmath.LegacyNewDec(int64(9_375_000)),
+					BondingTarget: sdkmath.LegacyNewDecWithPrec(50, 2),
+					MaxVariance:   sdkmath.LegacyNewDecWithPrec(20, 2).Neg(),
 				},
 				InflationDistribution: validInflationDistribution,
 				EnableInflation:       true,
@@ -202,8 +202,8 @@ func (suite *ParamsTestSuite) TestParamsValidate() {
 				MintDenom:              "acanto",
 				ExponentialCalculation: validExponentialCalculation,
 				InflationDistribution: InflationDistribution{
-					StakingRewards: sdk.OneDec().Neg(),
-					CommunityPool:  sdk.NewDecWithPrec(133333, 6),
+					StakingRewards: sdkmath.LegacyOneDec().Neg(),
+					CommunityPool:  sdkmath.LegacyNewDecWithPrec(133333, 6),
 				},
 				EnableInflation: true,
 			},
@@ -215,8 +215,8 @@ func (suite *ParamsTestSuite) TestParamsValidate() {
 				MintDenom:              "acanto",
 				ExponentialCalculation: validExponentialCalculation,
 				InflationDistribution: InflationDistribution{
-					StakingRewards: sdk.NewDecWithPrec(533334, 6),
-					CommunityPool:  sdk.NewDecWithPrec(133333, 6),
+					StakingRewards: sdkmath.LegacyNewDecWithPrec(533334, 6),
+					CommunityPool:  sdkmath.LegacyNewDecWithPrec(133333, 6),
 				},
 				EnableInflation: true,
 			},
@@ -228,8 +228,8 @@ func (suite *ParamsTestSuite) TestParamsValidate() {
 				MintDenom:              "acanto",
 				ExponentialCalculation: validExponentialCalculation,
 				InflationDistribution: InflationDistribution{
-					StakingRewards: sdk.NewDecWithPrec(533334, 6),
-					CommunityPool:  sdk.OneDec().Neg(),
+					StakingRewards: sdkmath.LegacyNewDecWithPrec(533334, 6),
+					CommunityPool:  sdkmath.LegacyOneDec().Neg(),
 				},
 				EnableInflation: true,
 			},
@@ -241,8 +241,8 @@ func (suite *ParamsTestSuite) TestParamsValidate() {
 				MintDenom:              "acanto",
 				ExponentialCalculation: validExponentialCalculation,
 				InflationDistribution: InflationDistribution{
-					StakingRewards: sdk.NewDecWithPrec(533333, 6),
-					CommunityPool:  sdk.NewDecWithPrec(133333, 6),
+					StakingRewards: sdkmath.LegacyNewDecWithPrec(533333, 6),
+					CommunityPool:  sdkmath.LegacyNewDecWithPrec(133333, 6),
 				},
 				EnableInflation: true,
 			},

@@ -2,6 +2,7 @@
 package keeper
 
 import (
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/Canto-Network/Canto/v7/x/coinswap/types"
@@ -14,7 +15,7 @@ func (k Keeper) DeductPoolCreationFee(ctx sdk.Context, creator sdk.AccAddress) e
 
 	// compute community tax and burned coin
 	communityTaxCoin := sdk.NewCoin(poolCreationFee.Denom,
-		sdk.NewDecFromInt(poolCreationFee.Amount).Mul(params.TaxRate).TruncateInt())
+		sdkmath.LegacyNewDecFromInt(poolCreationFee.Amount).Mul(params.TaxRate).TruncateInt())
 	burnedCoins := sdk.NewCoins(poolCreationFee.Sub(communityTaxCoin))
 
 	// send all fees to module account

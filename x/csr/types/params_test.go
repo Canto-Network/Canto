@@ -3,7 +3,7 @@ package types
 import (
 	"testing"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkmath "cosmossdk.io/math"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/stretchr/testify/require"
 )
@@ -19,7 +19,7 @@ func TestParamSetPairs(t *testing.T) {
 }
 
 func TestParamsValidate(t *testing.T) {
-	csrShares := sdk.NewDecWithPrec(50, 2)
+	csrShares := sdkmath.LegacyNewDecWithPrec(50, 2)
 
 	testCases := []struct {
 		name   string
@@ -39,12 +39,12 @@ func TestParamsValidate(t *testing.T) {
 		},
 		{
 			"Testing all goes to csrShares - pass",
-			Params{true, sdk.NewDecFromInt(sdk.NewInt(1))},
+			Params{true, sdkmath.LegacyNewDecFromInt(sdkmath.NewInt(1))},
 			true,
 		},
 		{
 			"Testing nothing goes to csrShares - pass",
-			Params{true, sdk.NewDecFromInt(sdk.NewInt(0))},
+			Params{true, sdkmath.LegacyNewDecFromInt(sdkmath.NewInt(0))},
 			true,
 		},
 		{
@@ -54,17 +54,17 @@ func TestParamsValidate(t *testing.T) {
 		},
 		{
 			"Testing CSR shares going over 100% - fail",
-			Params{true, sdk.NewDecFromInt(sdk.NewInt(2))},
+			Params{true, sdkmath.LegacyNewDecFromInt(sdkmath.NewInt(2))},
 			false,
 		},
 		{
 			"Testing CSR shares below 0 - fail",
-			Params{true, sdk.NewDecFromInt(sdk.NewInt(-1))},
+			Params{true, sdkmath.LegacyNewDecFromInt(sdkmath.NewInt(-1))},
 			false,
 		},
 		{
 			"Testing CSR shares below 0 - fail",
-			Params{true, sdk.NewDecFromInt(sdk.NewInt(-1))},
+			Params{true, sdkmath.LegacyNewDecFromInt(sdkmath.NewInt(-1))},
 			false,
 		},
 	}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
@@ -43,15 +44,15 @@ func DefaultParams() Params {
 	return Params{
 		MintDenom: "acanto",
 		ExponentialCalculation: ExponentialCalculation{
-			A:             sdk.NewDec(int64(16_304_348)),
-			R:             sdk.NewDecWithPrec(35, 2), // 35%
-			C:             sdk.ZeroDec(),
-			BondingTarget: sdk.NewDecWithPrec(80, 2), // not relevant; max variance is 0
-			MaxVariance:   sdk.ZeroDec(),             // 0%
+			A:             sdkmath.LegacyNewDec(int64(16_304_348)),
+			R:             sdkmath.LegacyNewDecWithPrec(35, 2), // 35%
+			C:             sdkmath.LegacyZeroDec(),
+			BondingTarget: sdkmath.LegacyNewDecWithPrec(80, 2), // not relevant; max variance is 0
+			MaxVariance:   sdkmath.LegacyZeroDec(),             // 0%
 		},
 		InflationDistribution: InflationDistribution{
-			StakingRewards: sdk.NewDecWithPrec(1000000000, 9), // 0.53 = 40% / (1 - 25%)
-			CommunityPool:  sdk.ZeroDec(),                     // 0.13 = 10% / (1 - 25%)
+			StakingRewards: sdkmath.LegacyNewDecWithPrec(1000000000, 9), // 0.53 = 40% / (1 - 25%)
+			CommunityPool:  sdkmath.LegacyZeroDec(),                     // 0.13 = 10% / (1 - 25%)
 		},
 		EnableInflation: false,
 	}
@@ -95,7 +96,7 @@ func validateExponentialCalculation(i interface{}) error {
 	}
 
 	// validate reduction factor
-	if v.R.GT(sdk.NewDec(1)) {
+	if v.R.GT(sdkmath.LegacyNewDec(1)) {
 		return fmt.Errorf("reduction factor cannot be greater than 1")
 	}
 
@@ -109,7 +110,7 @@ func validateExponentialCalculation(i interface{}) error {
 	}
 
 	// validate bonded target
-	if v.BondingTarget.GT(sdk.NewDec(1)) {
+	if v.BondingTarget.GT(sdkmath.LegacyNewDec(1)) {
 		return fmt.Errorf("bonded target cannot be greater than 1")
 	}
 
@@ -140,7 +141,7 @@ func validateInflationDistribution(i interface{}) error {
 	}
 
 	totalProportions := v.StakingRewards.Add(v.CommunityPool)
-	if !totalProportions.Equal(sdk.NewDec(1)) {
+	if !totalProportions.Equal(sdkmath.LegacyNewDec(1)) {
 		return errors.New("total distributions ratio should be 1")
 	}
 

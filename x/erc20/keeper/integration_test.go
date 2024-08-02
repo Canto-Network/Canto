@@ -1,6 +1,8 @@
 package keeper_test
 
 import (
+	"context"
+	"fmt"
 	"math/big"
 
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -10,16 +12,17 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/evmos/ethermint/crypto/ethsecp256k1"
 	"github.com/evmos/ethermint/encoding"
 	ethermint "github.com/evmos/ethermint/types"
 
-	"github.com/Canto-Network/Canto/v7/app"
 	"github.com/Canto-Network/Canto/v7/testutil"
+	"github.com/Canto-Network/Canto/v7/x/erc20"
 	"github.com/Canto-Network/Canto/v7/x/erc20/types"
 
+	sdkmath "cosmossdk.io/math"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
-	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 var _ = Describe("Performing EVM transactions", Ordered, func() {
@@ -79,7 +82,7 @@ var _ = Describe("Performing EVM transactions", Ordered, func() {
 })
 
 var _ = Describe("ERC20: Converting", Ordered, func() {
-	amt := sdk.NewInt(100)
+	amt := sdkmath.NewInt(100)
 	priv, _ := ethsecp256k1.GenerateKey()
 	addrBz := priv.PubKey().Address().Bytes()
 	accAddr := sdk.AccAddress(addrBz)
@@ -87,8 +90,9 @@ var _ = Describe("ERC20: Converting", Ordered, func() {
 	moduleAcc := s.app.AccountKeeper.GetModuleAccount(s.ctx, types.ModuleName).GetAddress()
 
 	var (
-		pair *types.TokenPair
-		coin sdk.Coin
+		pair      *types.TokenPair
+		tokenPair types.TokenPair
+		coin      sdk.Coin
 	)
 
 	BeforeEach(func() {
@@ -99,8 +103,6 @@ var _ = Describe("ERC20: Converting", Ordered, func() {
 		BeforeEach(func() {
 			_, pair = s.setupRegisterCoin()
 			coin = sdk.NewCoin(pair.Denom, amt)
-
-			// denom := s.app.ClaimsKeeper.GetParams(s.ctx).ClaimsDenom
 			denom := "acanto"
 
 			err := testutil.FundAccount(s.app.BankKeeper, s.ctx, accAddr, sdk.NewCoins(sdk.NewCoin(denom, sdk.TokensFromConsensusPower(100, ethermint.PowerReduction))))
@@ -158,13 +160,11 @@ var _ = Describe("ERC20: Converting", Ordered, func() {
 		BeforeEach(func() {
 			contract := s.setupRegisterERC20Pair(contractMinterBurner)
 			id := s.app.Erc20Keeper.GetTokenPairID(s.ctx, contract.String())
-			*pair, _ = s.app.Erc20Keeper.GetTokenPair(s.ctx, id)
-			coin = sdk.NewCoin(pair.Denom, amt)
-
-			// denom := s.app.ClaimsKeeper.GetParams(s.ctx).ClaimsDenom
+			tokenPair, _ = s.app.Erc20Keeper.GetTokenPair(s.ctx, id)
+			coin = sdk.NewCoin(tokenPair.Denom, amt)
 			denom := "acanto" //use default denom for claimsDenom
 
-			err := testutil.FundAccount(s.app.BankKeeper, s.ctx, accAddr, sdk.NewCoins(sdk.NewCoin(denom, sdk.NewInt(1000))))
+			err := testutil.FundAccount(s.app.BankKeeper, s.ctx, accAddr, sdk.NewCoins(sdk.NewCoin(denom, sdkmath.NewIntWithDecimal(1, 17))))
 			s.Require().NoError(err)
 
 			_ = s.MintERC20Token(contract, s.address, addr, big.NewInt(amt.Int64()))
@@ -173,46 +173,46 @@ var _ = Describe("ERC20: Converting", Ordered, func() {
 
 		Describe("an ERC20 token into a Cosmos coin", func() {
 			BeforeEach(func() {
-				convertERC20(priv, amt, pair.GetERC20Contract())
+				convertERC20(priv, amt, tokenPair.GetERC20Contract())
 			})
 
 			It("should decrease tokens on the sender account", func() {
-				balanceERC20 := s.BalanceOf(pair.GetERC20Contract(), addr).(*big.Int)
+				balanceERC20 := s.BalanceOf(tokenPair.GetERC20Contract(), addr).(*big.Int)
 				Expect(balanceERC20.Int64()).To(Equal(int64(0)))
 			})
 
 			It("should escrow tokens on the module account", func() {
 				moduleAddr := common.BytesToAddress(moduleAcc.Bytes())
-				balanceERC20 := s.BalanceOf(pair.GetERC20Contract(), moduleAddr).(*big.Int)
+				balanceERC20 := s.BalanceOf(tokenPair.GetERC20Contract(), moduleAddr).(*big.Int)
 				Expect(balanceERC20.Int64()).To(Equal(amt.Int64()))
 			})
 
 			It("should send coins to the recevier account", func() {
-				balanceCoin := s.app.BankKeeper.GetBalance(s.ctx, accAddr, pair.Denom)
+				balanceCoin := s.app.BankKeeper.GetBalance(s.ctx, accAddr, tokenPair.Denom)
 				Expect(balanceCoin).To(Equal(coin))
 			})
 		})
 
 		Describe("a Cosmos coin into an ERC20 token", func() {
 			BeforeEach(func() {
-				convertERC20(priv, amt, pair.GetERC20Contract())
+				convertERC20(priv, amt, tokenPair.GetERC20Contract())
 				s.Commit()
 				convertCoin(priv, coin)
 			})
 
 			It("should increase tokens on the sender account", func() {
-				balanceERC20 := s.BalanceOf(pair.GetERC20Contract(), addr).(*big.Int)
+				balanceERC20 := s.BalanceOf(tokenPair.GetERC20Contract(), addr).(*big.Int)
 				Expect(balanceERC20.Int64()).To(Equal(amt.Int64()))
 			})
 
 			It("should unescrow tokens on the module account", func() {
 				moduleAddr := common.BytesToAddress(moduleAcc.Bytes())
-				balanceERC20 := s.BalanceOf(pair.GetERC20Contract(), moduleAddr).(*big.Int)
+				balanceERC20 := s.BalanceOf(tokenPair.GetERC20Contract(), moduleAddr).(*big.Int)
 				Expect(balanceERC20.Int64()).To(Equal(int64(0)))
 			})
 
 			It("should burn coins to the recevier account", func() {
-				balanceCoin := s.app.BankKeeper.GetBalance(s.ctx, accAddr, pair.Denom)
+				balanceCoin := s.app.BankKeeper.GetBalance(s.ctx, accAddr, tokenPair.Denom)
 				Expect(balanceCoin.IsZero()).To(BeTrue())
 			})
 		})
@@ -223,28 +223,30 @@ func convertCoin(priv *ethsecp256k1.PrivKey, coin sdk.Coin) {
 	addrBz := priv.PubKey().Address().Bytes()
 
 	convertCoinMsg := types.NewMsgConvertCoin(coin, common.BytesToAddress(addrBz), sdk.AccAddress(addrBz))
-	res := deliverTx(priv, convertCoinMsg)
-	Expect(res.IsOK()).To(BeTrue(), "failed to convert coin: %s", res.Log)
+	_, err := finalizeBlock(priv, convertCoinMsg)
+	s.Require().NoError(err)
 }
 
-func convertERC20(priv *ethsecp256k1.PrivKey, amt sdk.Int, contract common.Address) {
+func convertERC20(priv *ethsecp256k1.PrivKey, amt sdkmath.Int, contract common.Address) {
 	addrBz := priv.PubKey().Address().Bytes()
 
 	convertERC20Msg := types.NewMsgConvertERC20(amt, sdk.AccAddress(addrBz), contract, common.BytesToAddress(addrBz))
-	res := deliverTx(priv, convertERC20Msg)
-	Expect(res.IsOK()).To(BeTrue(), "failed to convert ERC20: %s", res.Log)
+	_, err := finalizeBlock(priv, convertERC20Msg)
+	s.Require().NoError(err)
 }
 
-func deliverTx(priv *ethsecp256k1.PrivKey, msgs ...sdk.Msg) abci.ResponseDeliverTx {
-	encodingConfig := encoding.MakeConfig(app.ModuleBasics)
+func finalizeBlock(priv *ethsecp256k1.PrivKey, msgs ...sdk.Msg) (*abci.ResponseFinalizeBlock, error) {
+	txConfig := s.app.TxConfig()
+	encodingConfig := encoding.MakeTestEncodingConfig(erc20.AppModule{})
+
 	accountAddress := sdk.AccAddress(priv.PubKey().Address().Bytes())
 	// denom := s.app.ClaimsKeeper.GetParams(s.ctx).ClaimsDenom
 	denom := "acanto"
 
 	txBuilder := encodingConfig.TxConfig.NewTxBuilder()
 
-	txBuilder.SetGasLimit(100_000_000)
-	txBuilder.SetFeeAmount(sdk.Coins{{Denom: denom, Amount: sdk.NewInt(1)}})
+	txBuilder.SetGasLimit(10_000_000)
+	txBuilder.SetFeeAmount(sdk.Coins{{Denom: denom, Amount: sdkmath.NewIntWithDecimal(1, 16)}})
 	err := txBuilder.SetMsgs(msgs...)
 	s.Require().NoError(err)
 
@@ -256,7 +258,7 @@ func deliverTx(priv *ethsecp256k1.PrivKey, msgs ...sdk.Msg) abci.ResponseDeliver
 	sigV2 := signing.SignatureV2{
 		PubKey: priv.PubKey(),
 		Data: &signing.SingleSignatureData{
-			SignMode:  encodingConfig.TxConfig.SignModeHandler().DefaultMode(),
+			SignMode:  signing.SignMode(encodingConfig.TxConfig.SignModeHandler().DefaultMode()),
 			Signature: nil,
 		},
 		Sequence: seq,
@@ -273,9 +275,11 @@ func deliverTx(priv *ethsecp256k1.PrivKey, msgs ...sdk.Msg) abci.ResponseDeliver
 		ChainID:       s.ctx.ChainID(),
 		AccountNumber: accNumber,
 		Sequence:      seq,
+		PubKey:        priv.PubKey(),
 	}
 	sigV2, err = tx.SignWithPrivKey(
-		encodingConfig.TxConfig.SignModeHandler().DefaultMode(), signerData,
+		context.TODO(),
+		signing.SignMode(encodingConfig.TxConfig.SignModeHandler().DefaultMode()), signerData,
 		txBuilder, priv, encodingConfig.TxConfig,
 		seq,
 	)
@@ -285,11 +289,18 @@ func deliverTx(priv *ethsecp256k1.PrivKey, msgs ...sdk.Msg) abci.ResponseDeliver
 	err = txBuilder.SetSignatures(sigsV2...)
 	s.Require().NoError(err)
 
-	// bz are bytes to be broadcasted over the network
-	bz, err := encodingConfig.TxConfig.TxEncoder()(txBuilder.GetTx())
+	bz, err := txConfig.TxEncoder()(txBuilder.GetTx())
 	s.Require().NoError(err)
 
-	req := abci.RequestDeliverTx{Tx: bz}
-	res := s.app.BaseApp.DeliverTx(req)
-	return res
+	test, err := txConfig.TxJSONEncoder()(txBuilder.GetTx())
+	s.Require().NoError(err)
+	fmt.Println(string(test))
+
+	res, err := s.app.FinalizeBlock(&abci.RequestFinalizeBlock{
+		Height:          s.app.LastBlockHeight() + 1,
+		Txs:             [][]byte{bz},
+		ProposerAddress: s.consAddress.Bytes(),
+	})
+
+	return res, err
 }

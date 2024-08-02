@@ -2,6 +2,7 @@ syntax = "proto3";
 package canto.csr.v1;
 
 import "gogoproto/gogo.proto";
+import "cosmos_proto/cosmos.proto";
 
 option go_package = "github.com/Canto-Network/Canto/v7/x/csr/types";
 
@@ -16,7 +17,8 @@ message CSR {
   uint64 txs = 3;
   // The cumulative revenue for this CSR NFT -> represented as a sdk.Int
   string revenue = 4 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (cosmos_proto.scalar) = "cosmos.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.nullable) = false
   ];
 }

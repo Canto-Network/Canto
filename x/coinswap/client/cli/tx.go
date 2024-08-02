@@ -7,6 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -50,12 +51,12 @@ func GetAddLiquidityCmd() *cobra.Command {
 				return fmt.Errorf("invalid coins: %w", err)
 			}
 
-			standardCoinAmt, ok := sdk.NewIntFromString(args[1])
+			standardCoinAmt, ok := sdkmath.NewIntFromString(args[1])
 			if !ok {
 				return fmt.Errorf("invalid standard coin amount: %s", args[1])
 			}
 
-			minLiquidity, ok := sdk.NewIntFromString(args[2])
+			minLiquidity, ok := sdkmath.NewIntFromString(args[2])
 			if !ok {
 				return fmt.Errorf("invalid minimum liquidity: %s", args[2])
 			}
@@ -89,7 +90,7 @@ func GetRemoveLiquidityCmd() *cobra.Command {
 				return err
 			}
 
-			minOutputCoin, ok := sdk.NewIntFromString(args[0])
+			minOutputCoin, ok := sdkmath.NewIntFromString(args[0])
 			if !ok {
 				return fmt.Errorf("invalid output coin amount: %s", args[1])
 			}
@@ -99,7 +100,7 @@ func GetRemoveLiquidityCmd() *cobra.Command {
 				return fmt.Errorf("invalid liquidity coin: %w", err)
 			}
 
-			minOutputStandardCoin, ok := sdk.NewIntFromString(args[2])
+			minOutputStandardCoin, ok := sdkmath.NewIntFromString(args[2])
 			if !ok {
 				return fmt.Errorf("invalid output standard coin amount: %s", args[2])
 			}

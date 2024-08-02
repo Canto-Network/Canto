@@ -11,9 +11,16 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	sdkmath "cosmossdk.io/math"
+	abci "github.com/cometbft/cometbft/abci/types"
+	"github.com/cometbft/cometbft/crypto/tmhash"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	tmversion "github.com/cometbft/cometbft/proto/tendermint/version"
+	"github.com/cometbft/cometbft/version"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -25,12 +32,8 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/crypto/tmhash"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
-	tmversion "github.com/tendermint/tendermint/proto/tendermint/version"
-	"github.com/tendermint/tendermint/version"
 
+	tmjson "github.com/cometbft/cometbft/libs/json"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
@@ -43,7 +46,6 @@ import (
 	evm "github.com/evmos/ethermint/x/evm/types"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
-	tmjson "github.com/tendermint/tendermint/libs/json"
 
 	"github.com/Canto-Network/Canto/v7/app"
 	"github.com/Canto-Network/Canto/v7/contracts"
@@ -63,6 +65,7 @@ type KeeperTestSuite struct {
 	ethSigner        ethtypes.Signer
 	signer           keyring.Signer
 	mintFeeCollector bool
+	validator        stakingtypes.Validator
 }
 
 var s *KeeperTestSuite
@@ -87,9 +90,8 @@ func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 	suite.signer = tests.NewSigner(priv)
 
 	// consensus key
-	priv, err = ethsecp256k1.GenerateKey()
-	require.NoError(t, err)
-	suite.consAddress = sdk.ConsAddress(priv.PubKey().Address())
+	pubKey := ed25519.GenPrivKey().PubKey()
+	suite.consAddress = sdk.ConsAddress(pubKey.Address())
 
 	// setup feemarketGenesis params
 	feemarketGenesis := feemarkettypes.DefaultGenesisState()
@@ -101,8 +103,8 @@ func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 
 	if suite.mintFeeCollector {
 		// mint some coin to fee collector
-		coins := sdk.NewCoins(sdk.NewCoin(evm.DefaultEVMDenom, sdk.NewInt(int64(params.TxGas)-1)))
-		genesisState := app.ModuleBasics.DefaultGenesis(suite.app.AppCodec())
+		coins := sdk.NewCoins(sdk.NewCoin(evm.DefaultEVMDenom, sdkmath.NewInt(int64(params.TxGas)-1)))
+		genesisState := app.NewDefaultGenesisState()
 		balances := []banktypes.Balance{
 			{
 				Address: suite.app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName).String(),
@@ -110,7 +112,7 @@ func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 			},
 		}
 		// update total supply
-		bankGenesis := banktypes.NewGenesisState(banktypes.DefaultGenesisState().Params, balances, sdk.NewCoins(sdk.NewCoin(evm.DefaultEVMDenom, sdk.NewInt((int64(params.TxGas)-1)))), []banktypes.Metadata{})
+		bankGenesis := banktypes.NewGenesisState(banktypes.DefaultGenesisState().Params, balances, sdk.NewCoins(sdk.NewCoin(evm.DefaultEVMDenom, sdkmath.NewInt((int64(params.TxGas)-1)))), []banktypes.Metadata{}, []banktypes.SendEnabled{})
 		bz := suite.app.AppCodec().MustMarshalJSON(bankGenesis)
 		require.NotNil(t, bz)
 		genesisState[banktypes.ModuleName] = suite.app.AppCodec().MustMarshalJSON(bankGenesis)
@@ -121,7 +123,7 @@ func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 
 		// Initialize the chain
 		suite.app.InitChain(
-			abci.RequestInitChain{
+			&abci.RequestInitChain{
 				ChainId:         "canto_9001-1",
 				Validators:      []abci.ValidatorUpdate{},
 				ConsensusParams: app.DefaultConsensusParams,
@@ -130,7 +132,7 @@ func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 		)
 	}
 
-	suite.ctx = suite.app.BaseApp.NewContext(checkTx, tmproto.Header{
+	suite.ctx = suite.app.BaseApp.NewContextLegacy(checkTx, tmproto.Header{
 		Height:          1,
 		ChainID:         "canto_9001-1",
 		Time:            time.Now().UTC(),
@@ -163,21 +165,28 @@ func (suite *KeeperTestSuite) DoSetupTest(t require.TestingT) {
 	types.RegisterQueryServer(queryHelper, suite.app.Erc20Keeper)
 	suite.queryClient = types.NewQueryClient(queryHelper)
 
+	accNum := suite.app.AccountKeeper.NextAccountNumber(suite.ctx)
 	acc := &ethermint.EthAccount{
-		BaseAccount: authtypes.NewBaseAccount(sdk.AccAddress(suite.address.Bytes()), nil, 0, 0),
+		BaseAccount: authtypes.NewBaseAccount(sdk.AccAddress(suite.address.Bytes()), nil, accNum, 0),
 		CodeHash:    common.BytesToHash(crypto.Keccak256(nil)).String(),
 	}
 
 	suite.app.AccountKeeper.SetAccount(suite.ctx, acc)
 
+	// Set Validator
 	valAddr := sdk.ValAddress(suite.address.Bytes())
-	validator, err := stakingtypes.NewValidator(valAddr, priv.PubKey(), stakingtypes.Description{})
+	validator, err := stakingtypes.NewValidator(valAddr.String(), pubKey, stakingtypes.Description{})
 	require.NoError(t, err)
+
+	valbz, err := s.app.StakingKeeper.ValidatorAddressCodec().StringToBytes(validator.GetOperator())
+	s.NoError(err)
+	suite.app.StakingKeeper.SetValidator(suite.ctx, validator)
+	suite.app.StakingKeeper.Hooks().AfterValidatorCreated(suite.ctx, valbz)
 	err = suite.app.StakingKeeper.SetValidatorByConsAddr(suite.ctx, validator)
 	require.NoError(t, err)
-	suite.app.StakingKeeper.SetValidator(suite.ctx, validator)
+	suite.validator = validator
 
-	encodingConfig := encoding.MakeConfig(app.ModuleBasics)
+	encodingConfig := encoding.MakeTestEncodingConfig()
 	suite.clientCtx = client.Context{}.WithTxConfig(encodingConfig.TxConfig)
 	suite.ethSigner = ethtypes.LatestSignerForChainID(suite.app.EvmKeeper.ChainID())
 }
@@ -187,7 +196,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 }
 
 func (suite *KeeperTestSuite) StateDB() *statedb.StateDB {
-	return statedb.New(suite.ctx, suite.app.EvmKeeper, statedb.NewEmptyTxConfig(common.BytesToHash(suite.ctx.HeaderHash().Bytes())))
+	return statedb.New(suite.ctx, suite.app.EvmKeeper, statedb.NewEmptyTxConfig(common.BytesToHash(suite.ctx.HeaderHash())))
 }
 
 func (suite *KeeperTestSuite) MintFeeCollector(coins sdk.Coins) {
@@ -199,7 +208,6 @@ func (suite *KeeperTestSuite) MintFeeCollector(coins sdk.Coins) {
 
 // DeployContract deploys the ERC20MinterBurnerDecimalsContract.
 func (suite *KeeperTestSuite) DeployContract(name, symbol string, decimals uint8) (common.Address, error) {
-	ctx := sdk.WrapSDKContext(suite.ctx)
 	chainID := suite.app.EvmKeeper.ChainID()
 
 	ctorArgs, err := contracts.ERC20MinterBurnerDecimalsContract.ABI.Pack("", name, symbol, decimals)
@@ -216,7 +224,7 @@ func (suite *KeeperTestSuite) DeployContract(name, symbol string, decimals uint8
 		return common.Address{}, err
 	}
 
-	res, err := suite.queryClientEvm.EstimateGas(ctx, &evm.EthCallRequest{
+	res, err := suite.queryClientEvm.EstimateGas(suite.ctx, &evm.EthCallRequest{
 		Args:   args,
 		GasCap: uint64(config.DefaultGasCap),
 	})
@@ -244,7 +252,7 @@ func (suite *KeeperTestSuite) DeployContract(name, symbol string, decimals uint8
 		return common.Address{}, err
 	}
 
-	rsp, err := suite.app.EvmKeeper.EthereumTx(ctx, erc20DeployTx)
+	rsp, err := suite.app.EvmKeeper.EthereumTx(suite.ctx, erc20DeployTx)
 	if err != nil {
 		return common.Address{}, err
 	}
@@ -254,7 +262,6 @@ func (suite *KeeperTestSuite) DeployContract(name, symbol string, decimals uint8
 }
 
 func (suite *KeeperTestSuite) DeployContractMaliciousDelayed(name string, symbol string) common.Address {
-	ctx := sdk.WrapSDKContext(suite.ctx)
 	chainID := suite.app.EvmKeeper.ChainID()
 
 	ctorArgs, err := contracts.ERC20MaliciousDelayedContract.ABI.Pack("", big.NewInt(1000000000000000000))
@@ -267,7 +274,7 @@ func (suite *KeeperTestSuite) DeployContractMaliciousDelayed(name string, symbol
 	})
 	suite.Require().NoError(err)
 
-	res, err := suite.queryClientEvm.EstimateGas(ctx, &evm.EthCallRequest{
+	res, err := suite.queryClientEvm.EstimateGas(suite.ctx, &evm.EthCallRequest{
 		Args:   args,
 		GasCap: uint64(config.DefaultGasCap),
 	})
@@ -290,14 +297,13 @@ func (suite *KeeperTestSuite) DeployContractMaliciousDelayed(name string, symbol
 	erc20DeployTx.From = suite.address.Hex()
 	err = erc20DeployTx.Sign(ethtypes.LatestSignerForChainID(chainID), suite.signer)
 	suite.Require().NoError(err)
-	rsp, err := suite.app.EvmKeeper.EthereumTx(ctx, erc20DeployTx)
+	rsp, err := suite.app.EvmKeeper.EthereumTx(suite.ctx, erc20DeployTx)
 	suite.Require().NoError(err)
 	suite.Require().Empty(rsp.VmError)
 	return crypto.CreateAddress(suite.address, nonce)
 }
 
 func (suite *KeeperTestSuite) DeployContractDirectBalanceManipulation(name string, symbol string) common.Address {
-	ctx := sdk.WrapSDKContext(suite.ctx)
 	chainID := suite.app.EvmKeeper.ChainID()
 
 	ctorArgs, err := contracts.ERC20DirectBalanceManipulationContract.ABI.Pack("", big.NewInt(1000000000000000000))
@@ -310,7 +316,7 @@ func (suite *KeeperTestSuite) DeployContractDirectBalanceManipulation(name strin
 	})
 	suite.Require().NoError(err)
 
-	res, err := suite.queryClientEvm.EstimateGas(ctx, &evm.EthCallRequest{
+	res, err := suite.queryClientEvm.EstimateGas(suite.ctx, &evm.EthCallRequest{
 		Args:   args,
 		GasCap: uint64(config.DefaultGasCap),
 	})
@@ -333,22 +339,35 @@ func (suite *KeeperTestSuite) DeployContractDirectBalanceManipulation(name strin
 	erc20DeployTx.From = suite.address.Hex()
 	err = erc20DeployTx.Sign(ethtypes.LatestSignerForChainID(chainID), suite.signer)
 	suite.Require().NoError(err)
-	rsp, err := suite.app.EvmKeeper.EthereumTx(ctx, erc20DeployTx)
+	rsp, err := suite.app.EvmKeeper.EthereumTx(suite.ctx, erc20DeployTx)
 	suite.Require().NoError(err)
 	suite.Require().Empty(rsp.VmError)
 	return crypto.CreateAddress(suite.address, nonce)
 }
 
+// Commit commits and starts a new block with an updated context.
 func (suite *KeeperTestSuite) Commit() {
-	_ = suite.app.Commit()
+	suite.CommitAfter(time.Second * 0)
+}
+
+func (suite *KeeperTestSuite) CommitAfter(t time.Duration) {
 	header := suite.ctx.BlockHeader()
+	suite.app.FinalizeBlock(&abci.RequestFinalizeBlock{
+		Height: header.Height,
+	})
+
+	suite.app.Commit()
+
 	header.Height += 1
-	suite.app.BeginBlock(abci.RequestBeginBlock{
-		Header: header,
+	header.Time = header.Time.Add(t)
+	suite.app.FinalizeBlock(&abci.RequestFinalizeBlock{
+		Height:          header.Height,
+		Time:            header.Time,
+		ProposerAddress: suite.consAddress,
 	})
 
 	// update ctx
-	suite.ctx = suite.app.BaseApp.NewContext(false, header)
+	suite.ctx = suite.app.BaseApp.NewContextLegacy(false, header)
 
 	queryHelper := baseapp.NewQueryServerTestHelper(suite.ctx, suite.app.InterfaceRegistry())
 	evm.RegisterQueryServer(queryHelper, suite.app.EvmKeeper)
@@ -380,12 +399,11 @@ func (suite *KeeperTestSuite) GrantERC20Token(contractAddr, from, to common.Addr
 }
 
 func (suite *KeeperTestSuite) sendTx(contractAddr, from common.Address, transferData []byte) *evm.MsgEthereumTx {
-	ctx := sdk.WrapSDKContext(suite.ctx)
 	chainID := suite.app.EvmKeeper.ChainID()
 
 	args, err := json.Marshal(&evm.TransactionArgs{To: &contractAddr, From: &from, Data: (*hexutil.Bytes)(&transferData)})
 	suite.Require().NoError(err)
-	res, err := suite.queryClientEvm.EstimateGas(ctx, &evm.EthCallRequest{
+	res, err := suite.queryClientEvm.EstimateGas(suite.ctx, &evm.EthCallRequest{
 		Args:   args,
 		GasCap: uint64(config.DefaultGasCap),
 	})
@@ -394,7 +412,7 @@ func (suite *KeeperTestSuite) sendTx(contractAddr, from common.Address, transfer
 	nonce := suite.app.EvmKeeper.GetNonce(suite.ctx, suite.address)
 
 	// Mint the max gas to the FeeCollector to ensure balance in case of refund
-	suite.MintFeeCollector(sdk.NewCoins(sdk.NewCoin(evm.DefaultEVMDenom, sdk.NewInt(suite.app.FeeMarketKeeper.GetBaseFee(suite.ctx).Int64()*int64(res.Gas)))))
+	suite.MintFeeCollector(sdk.NewCoins(sdk.NewCoin(evm.DefaultEVMDenom, sdkmath.NewInt(suite.app.FeeMarketKeeper.GetBaseFee(suite.ctx).Int64()*int64(res.Gas)))))
 
 	ercTransferTx := evm.NewTx(
 		chainID,
@@ -412,7 +430,7 @@ func (suite *KeeperTestSuite) sendTx(contractAddr, from common.Address, transfer
 	ercTransferTx.From = suite.address.Hex()
 	err = ercTransferTx.Sign(ethtypes.LatestSignerForChainID(chainID), suite.signer)
 	suite.Require().NoError(err)
-	rsp, err := suite.app.EvmKeeper.EthereumTx(ctx, ercTransferTx)
+	rsp, err := suite.app.EvmKeeper.EthereumTx(suite.ctx, ercTransferTx)
 	suite.Require().NoError(err)
 	suite.Require().Empty(rsp.VmError)
 	return ercTransferTx
@@ -460,6 +478,26 @@ type MockEVMKeeper struct {
 	mock.Mock
 }
 
+func (m *MockEVMKeeper) SetParams(ctx sdk.Context, params evmtypes.Params) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockEVMKeeper) ChainID() *big.Int {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockEVMKeeper) GetNonce(ctx sdk.Context, addr common.Address) uint64 {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockEVMKeeper) EthereumTx(goCtx context.Context, msg *evmtypes.MsgEthereumTx) (*evmtypes.MsgEthereumTxResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (m *MockEVMKeeper) GetParams(ctx sdk.Context) evmtypes.Params {
 	args := m.Called(mock.Anything)
 	return args.Get(0).(evmtypes.Params)
@@ -496,27 +534,47 @@ type MockBankKeeper struct {
 	mock.Mock
 }
 
-func (b *MockBankKeeper) SendCoinsFromModuleToAccount(ctx sdk.Context, senderModule string, recipientAddr sdk.AccAddress, amt sdk.Coins) error {
+func (b *MockBankKeeper) SendCoinsFromModuleToModule(ctx context.Context, senderModule, recipientModule string, amt sdk.Coins) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (b *MockBankKeeper) SpendableCoins(ctx context.Context, addr sdk.AccAddress) sdk.Coins {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (b *MockBankKeeper) GetParams(ctx context.Context) banktypes.Params {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (b *MockBankKeeper) SetParams(ctx context.Context, params banktypes.Params) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (b *MockBankKeeper) SendCoinsFromModuleToAccount(ctx context.Context, senderModule string, recipientAddr sdk.AccAddress, amt sdk.Coins) error {
 	args := b.Called(mock.Anything, mock.Anything, mock.Anything, mock.Anything)
 	return args.Error(0)
 }
 
-func (b *MockBankKeeper) SendCoinsFromAccountToModule(ctx sdk.Context, senderAddr sdk.AccAddress, recipientModule string, amt sdk.Coins) error {
+func (b *MockBankKeeper) SendCoinsFromAccountToModule(ctx context.Context, senderAddr sdk.AccAddress, recipientModule string, amt sdk.Coins) error {
 	args := b.Called(mock.Anything, mock.Anything, mock.Anything, mock.Anything)
 	return args.Error(0)
 }
 
-func (b *MockBankKeeper) MintCoins(ctx sdk.Context, moduleName string, amt sdk.Coins) error {
+func (b *MockBankKeeper) MintCoins(ctx context.Context, moduleName string, amt sdk.Coins) error {
 	args := b.Called(mock.Anything, mock.Anything, mock.Anything)
 	return args.Error(0)
 }
 
-func (b *MockBankKeeper) BurnCoins(ctx sdk.Context, moduleName string, amt sdk.Coins) error {
+func (b *MockBankKeeper) BurnCoins(ctx context.Context, moduleName string, amt sdk.Coins) error {
 	args := b.Called(mock.Anything, mock.Anything, mock.Anything)
 	return args.Error(0)
 }
 
-func (b *MockBankKeeper) IsSendEnabledCoin(ctx sdk.Context, coin sdk.Coin) bool {
+func (b *MockBankKeeper) IsSendEnabledCoin(ctx context.Context, coin sdk.Coin) bool {
 	args := b.Called(mock.Anything, mock.Anything)
 	return args.Bool(0)
 }
@@ -526,20 +584,20 @@ func (b *MockBankKeeper) BlockedAddr(addr sdk.AccAddress) bool {
 	return args.Bool(0)
 }
 
-func (b *MockBankKeeper) GetDenomMetaData(ctx sdk.Context, denom string) (banktypes.Metadata, bool) {
+func (b *MockBankKeeper) GetDenomMetaData(ctx context.Context, denom string) (banktypes.Metadata, bool) {
 	args := b.Called(mock.Anything, mock.Anything)
 	return args.Get(0).(banktypes.Metadata), args.Bool(1)
 }
 
-func (b *MockBankKeeper) SetDenomMetaData(ctx sdk.Context, denomMetaData banktypes.Metadata) {
+func (b *MockBankKeeper) SetDenomMetaData(ctx context.Context, denomMetaData banktypes.Metadata) {
 }
 
-func (b *MockBankKeeper) HasSupply(ctx sdk.Context, denom string) bool {
+func (b *MockBankKeeper) HasSupply(ctx context.Context, denom string) bool {
 	args := b.Called(mock.Anything, mock.Anything)
 	return args.Bool(0)
 }
 
-func (b *MockBankKeeper) GetBalance(ctx sdk.Context, addr sdk.AccAddress, denom string) sdk.Coin {
+func (b *MockBankKeeper) GetBalance(ctx context.Context, addr sdk.AccAddress, denom string) sdk.Coin {
 	args := b.Called(mock.Anything, mock.Anything)
 	return args.Get(0).(sdk.Coin)
 }

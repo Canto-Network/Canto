@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strings"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	ibctransfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
+	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	ethermint "github.com/evmos/ethermint/types"
 )
 
@@ -30,9 +30,6 @@ func init() {
 	govtypes.RegisterProposalType(ProposalTypeRegisterCoin)
 	govtypes.RegisterProposalType(ProposalTypeRegisterERC20)
 	govtypes.RegisterProposalType(ProposalTypeToggleTokenConversion)
-	govtypes.RegisterProposalTypeCodec(&RegisterCoinProposal{}, "erc20/RegisterCoinProposal")
-	govtypes.RegisterProposalTypeCodec(&RegisterERC20Proposal{}, "erc20/RegisterERC20Proposal")
-	govtypes.RegisterProposalTypeCodec(&ToggleTokenConversionProposal{}, "erc20/ToggleTokenConversionProposal")
 }
 
 // CreateDenomDescription generates a string with the coin description
@@ -98,18 +95,6 @@ func validateIBCVoucherMetadata(metadata banktypes.Metadata) error {
 	return nil
 }
 
-// ValidateErc20Denom checks if a denom is a valid erc20/
-// denomination
-func ValidateErc20Denom(denom string) error {
-	denomSplit := strings.SplitN(denom, "/", 2)
-
-	if len(denomSplit) != 2 || denomSplit[0] != ModuleName {
-		return fmt.Errorf("invalid denom. %s denomination should be prefixed with the format 'erc20/", denom)
-	}
-
-	return ethermint.ValidateAddress(denomSplit[1])
-}
-
 // NewRegisterERC20Proposal returns new instance of RegisterERC20Proposal
 func NewRegisterERC20Proposal(title, description, erc20Addr string) govtypes.Content {
 	return &RegisterERC20Proposal{
@@ -130,7 +115,8 @@ func (*RegisterERC20Proposal) ProposalType() string {
 // ValidateBasic performs a stateless check of the proposal fields
 func (rtbp *RegisterERC20Proposal) ValidateBasic() error {
 	if err := ethermint.ValidateAddress(rtbp.Erc20Address); err != nil {
-		return sdkerrors.Wrap(err, "ERC20 address")
+		return errorsmod.Wrap(err, "ERC20 address")
+
 	}
 	return govtypes.ValidateAbstract(rtbp)
 }

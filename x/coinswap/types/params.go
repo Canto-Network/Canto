@@ -5,6 +5,7 @@ import (
 
 	"gopkg.in/yaml.v2"
 
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
@@ -24,19 +25,19 @@ var (
 	KeyMaxStandardCoinPerPool = []byte("MaxStandardCoinPerPool") // max standard coin amount per pool
 	KeyMaxSwapAmount          = []byte("MaxSwapAmount")          // whitelisted denoms
 
-	DefaultFee                    = sdk.NewDecWithPrec(0, 0)
+	DefaultFee                    = sdkmath.LegacyNewDecWithPrec(0, 0)
 	DefaultPoolCreationFee        = sdk.NewInt64Coin(sdk.DefaultBondDenom, 0)
-	DefaultTaxRate                = sdk.NewDecWithPrec(0, 0)
-	DefaultMaxStandardCoinPerPool = sdk.NewIntWithDecimal(10000, 18)
+	DefaultTaxRate                = sdkmath.LegacyNewDecWithPrec(0, 0)
+	DefaultMaxStandardCoinPerPool = sdkmath.NewIntWithDecimal(10000, 18)
 	DefaultMaxSwapAmount          = sdk.NewCoins(
-		sdk.NewCoin(UsdcIBCDenom, sdk.NewIntWithDecimal(10, 6)),
-		sdk.NewCoin(UsdtIBCDenom, sdk.NewIntWithDecimal(10, 6)),
-		sdk.NewCoin(EthIBCDenom, sdk.NewIntWithDecimal(1, 16)),
+		sdk.NewCoin(UsdcIBCDenom, sdkmath.NewIntWithDecimal(10, 6)),
+		sdk.NewCoin(UsdtIBCDenom, sdkmath.NewIntWithDecimal(10, 6)),
+		sdk.NewCoin(EthIBCDenom, sdkmath.NewIntWithDecimal(1, 16)),
 	)
 )
 
 // NewParams is the coinswap params constructor
-func NewParams(fee, taxRate sdk.Dec, poolCreationFee sdk.Coin, maxStandardCoinPerPool sdk.Int, maxSwapAmount sdk.Coins) Params {
+func NewParams(fee, taxRate sdkmath.LegacyDec, poolCreationFee sdk.Coin, maxStandardCoinPerPool sdkmath.Int, maxSwapAmount sdk.Coins) Params {
 	return Params{
 		Fee:                    fee,
 		TaxRate:                taxRate,
@@ -81,19 +82,19 @@ func (p Params) String() string {
 
 // Validate returns err if Params is invalid
 func (p Params) Validate() error {
-	if p.Fee.IsNegative() || !p.Fee.LT(sdk.OneDec()) {
+	if p.Fee.IsNegative() || !p.Fee.LT(sdkmath.LegacyOneDec()) {
 		return fmt.Errorf("fee must be positive and less than 1: %s", p.Fee.String())
 	}
 	return nil
 }
 
 func validateFee(i interface{}) error {
-	v, ok := i.(sdk.Dec)
+	v, ok := i.(sdkmath.LegacyDec)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
 
-	if v.IsNegative() || !v.LT(sdk.OneDec()) {
+	if v.IsNegative() || !v.LT(sdkmath.LegacyOneDec()) {
 		return fmt.Errorf("fee must be positive and less than 1: %s", v.String())
 	}
 
@@ -113,19 +114,19 @@ func validatePoolCreationFee(i interface{}) error {
 }
 
 func validateTaxRate(i interface{}) error {
-	v, ok := i.(sdk.Dec)
+	v, ok := i.(sdkmath.LegacyDec)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
 
-	if v.IsNegative() || !v.LT(sdk.OneDec()) {
+	if v.IsNegative() || !v.LT(sdkmath.LegacyOneDec()) {
 		return fmt.Errorf("fee must be positive and less than 1: %s", v.String())
 	}
 	return nil
 }
 
 func validateMaxStandardCoinPerPool(i interface{}) error {
-	v, ok := i.(sdk.Int)
+	v, ok := i.(sdkmath.Int)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
@@ -152,7 +153,7 @@ func validateMaxSwapAmount(i interface{}) error {
 			return err
 		}
 
-		if coin.Amount.LT(sdk.ZeroInt()) {
+		if coin.Amount.LT(sdkmath.ZeroInt()) {
 			return fmt.Errorf("coin amount must be positive")
 		}
 	}

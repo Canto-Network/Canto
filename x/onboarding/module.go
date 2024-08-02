@@ -4,14 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math/rand"
 
-	"github.com/gorilla/mux"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
-	abci "github.com/tendermint/tendermint/abci/types"
+	abci "github.com/cometbft/cometbft/abci/types"
 
+	"cosmossdk.io/core/appmodule"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -26,9 +26,12 @@ import (
 
 // type check to ensure the interface is properly implemented
 var (
-	_ module.AppModule           = AppModule{}
-	_ module.AppModuleBasic      = AppModuleBasic{}
-	_ module.AppModuleSimulation = AppModule{}
+	_ module.AppModuleBasic = AppModuleBasic{}
+	_ module.AppModuleBasic = AppModule{}
+	_ module.HasServices    = AppModule{}
+	_ module.HasABCIGenesis = AppModule{}
+
+	_ appmodule.AppModule = AppModule{}
 )
 
 // app module Basics object
@@ -39,7 +42,9 @@ func (AppModuleBasic) Name() string {
 }
 
 // RegisterLegacyAminoCodec performs a no-op as the onboarding doesn't support Amino encoding
-func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {}
+func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
+	types.RegisterLegacyAminoCodec(cdc)
+}
 
 // ConsensusVersion returns the consensus state-breaking version for the module.
 func (AppModuleBasic) ConsensusVersion() uint64 {
@@ -49,6 +54,7 @@ func (AppModuleBasic) ConsensusVersion() uint64 {
 // RegisterInterfaces registers interfaces and implementations of the onboarding
 // module.
 func (AppModuleBasic) RegisterInterfaces(interfaceRegistry codectypes.InterfaceRegistry) {
+	types.RegisterInterfaces(interfaceRegistry)
 }
 
 // DefaultGenesis returns default genesis state as raw bytes for the onboarding
@@ -66,10 +72,6 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, config client.TxEncod
 	return genesisState.Validate()
 }
 
-// RegisterRESTRoutes performs a no-op as the onboarding module doesn't expose REST
-// endpoints
-func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Router) {}
-
 func (AppModuleBasic) RegisterGRPCGatewayRoutes(c client.Context, serveMux *runtime.ServeMux) {
 	if err := types.RegisterQueryHandlerClient(context.Background(), serveMux, types.NewQueryClient(c)); err != nil {
 		panic(err)
@@ -77,7 +79,9 @@ func (AppModuleBasic) RegisterGRPCGatewayRoutes(c client.Context, serveMux *runt
 }
 
 // GetTxCmd returns the root tx command for the onboarding module.
-func (AppModuleBasic) GetTxCmd() *cobra.Command { return nil }
+func (AppModuleBasic) GetTxCmd() *cobra.Command {
+	return cli.GetTxCmd()
+}
 
 // GetQueryCmd returns no root query command for the onboarding module.
 func (AppModuleBasic) GetQueryCmd() *cobra.Command {
@@ -99,6 +103,12 @@ func NewAppModule(
 	}
 }
 
+// IsOnePerModuleType implements the depinject.OnePerModuleType interface.
+func (am AppModule) IsOnePerModuleType() {}
+
+// IsAppModule implements the appmodule.AppModule interface.
+func (am AppModule) IsAppModule() {}
+
 func (AppModule) Name() string {
 	return types.ModuleName
 }
@@ -106,31 +116,13 @@ func (AppModule) Name() string {
 func (AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {}
 
 // NewHandler returns nil onboarding module doesn't expose tx gRPC endpoints
-func (AppModule) NewHandler() sdk.Handler {
-	return nil
-}
-
-func (am AppModule) Route() sdk.Route {
-	return sdk.NewRoute(types.RouterKey, am.NewHandler())
-}
-
-func (AppModule) QuerierRoute() string {
-	return ""
-}
-
-func (AppModule) LegacyQuerierHandler(amino *codec.LegacyAmino) sdk.Querier {
+func (AppModule) NewHandler() baseapp.MsgServiceHandler {
 	return nil
 }
 
 func (am AppModule) RegisterServices(cfg module.Configurator) {
+	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
-}
-
-func (AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {
-}
-
-func (AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-	return []abci.ValidatorUpdate{}
 }
 
 func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, data json.RawMessage) []abci.ValidatorUpdate {
@@ -153,11 +145,7 @@ func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedP
 	return []simtypes.WeightedProposalContent{}
 }
 
-func (AppModule) RandomizedParams(_ *rand.Rand) []simtypes.ParamChange {
-	return []simtypes.ParamChange{}
-}
-
-func (AppModule) RegisterStoreDecoder(_ sdk.StoreDecoderRegistry) {
+func (AppModule) RegisterStoreDecoder(_ simtypes.StoreDecoderRegistry) {
 }
 
 func (AppModule) WeightedOperations(_ module.SimulationState) []simtypes.WeightedOperation {

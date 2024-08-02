@@ -1,10 +1,12 @@
 package v4
 
 import (
+	"context"
+
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	shuttleKeeper "github.com/Canto-Network/Canto/v7/x/govshuttle/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	"github.com/ethereum/go-ethereum/common"
 )
 
@@ -14,11 +16,12 @@ func CreateUpgradeHandler(
 	configurator module.Configurator,
 	shuttlekeeper shuttleKeeper.Keeper,
 ) upgradetypes.UpgradeHandler {
-	return func(ctx sdk.Context, _ upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
-		logger := ctx.Logger().With("upgrading to v4.0.0", UpgradeName)
+	return func(ctx context.Context, _ upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
+		sdkCtx := sdk.UnwrapSDKContext(ctx)
+		logger := sdkCtx.Logger().With("upgrading to v4.0.0", UpgradeName)
 
 		// update address of map contract in keeper state
-		shuttlekeeper.SetPort(ctx, common.BytesToAddress(portAddr))
+		shuttlekeeper.SetPort(sdkCtx, common.BytesToAddress(portAddr))
 		// Leave modules are as-is to avoid running InitGenesis.
 		logger.Debug("running module migrations ...")
 		return mm.RunMigrations(ctx, configurator, vm)

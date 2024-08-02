@@ -10,10 +10,10 @@ Params is a module-wide configuration structure that stores system parameters an
 
 ```go
 type Params struct {
-    Fee                    sdk.Dec
+    Fee                    sdkmath.LegacyDec
     PoolCreationFee        sdk.Coin  
-    TaxRate                sdk.Dec 
-    MaxStandardCoinPerPool sdk.Int   
+    TaxRate                sdkmath.LegacyDec
+    MaxStandardCoinPerPool sdkmath.Int   
     MaxSwapAmount          sdk.Coins 
 }
 ```

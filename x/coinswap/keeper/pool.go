@@ -3,21 +3,24 @@ package keeper
 import (
 	"fmt"
 
-	gogotypes "github.com/gogo/protobuf/types"
+	gogoprototypes "github.com/cosmos/gogoproto/types"
 
+	errorsmod "cosmossdk.io/errors"
+	storetypes "cosmossdk.io/store/types"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/Canto-Network/Canto/v7/x/coinswap/types"
 )
 
 // CreatePool create a liquidity that saves relevant information about popular pool tokens
 func (k Keeper) CreatePool(ctx sdk.Context, counterpartyDenom string) types.Pool {
+	standardDenom, _ := k.GetStandardDenom(ctx)
 	sequence := k.getSequence(ctx)
 	lptDenom := types.GetLptDenom(sequence)
 	pool := &types.Pool{
 		Id:                types.GetPoolId(counterpartyDenom),
-		StandardDenom:     k.GetStandardDenom(ctx),
+		StandardDenom:     standardDenom,
 		CounterpartyDenom: counterpartyDenom,
 		EscrowAddress:     types.GetReservePoolAddr(lptDenom).String(),
 		LptDenom:          lptDenom,
@@ -29,8 +32,8 @@ func (k Keeper) CreatePool(ctx sdk.Context, counterpartyDenom string) types.Pool
 
 // GetPool return the liquidity pool by the specified anotherCoinDenom
 func (k Keeper) GetPool(ctx sdk.Context, poolId string) (types.Pool, bool) {
-	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(types.GetPoolKey(poolId))
+	store := k.storeService.OpenKVStore(ctx)
+	bz, _ := store.Get(types.GetPoolKey(poolId))
 	if bz == nil {
 		return types.Pool{}, false
 	}
@@ -42,8 +45,8 @@ func (k Keeper) GetPool(ctx sdk.Context, poolId string) (types.Pool, bool) {
 
 // GetAllPools return all the liquidity pools
 func (k Keeper) GetAllPools(ctx sdk.Context) (pools []types.Pool) {
-	store := ctx.KVStore(k.storeKey)
-	iterator := sdk.KVStorePrefixIterator(store, []byte(types.KeyPool))
+	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	iterator := storetypes.KVStorePrefixIterator(store, []byte(types.KeyPool))
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var pool types.Pool
@@ -55,13 +58,13 @@ func (k Keeper) GetAllPools(ctx sdk.Context) (pools []types.Pool) {
 
 // GetPoolByLptDenom return the liquidity pool by the specified anotherCoinDenom
 func (k Keeper) GetPoolByLptDenom(ctx sdk.Context, lptDenom string) (types.Pool, bool) {
-	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(types.GetLptDenomKey(lptDenom))
+	store := k.storeService.OpenKVStore(ctx)
+	bz, _ := store.Get(types.GetLptDenomKey(lptDenom))
 	if bz == nil {
 		return types.Pool{}, false
 	}
 
-	poolId := &gogotypes.StringValue{}
+	poolId := &gogoprototypes.StringValue{}
 	k.cdc.MustUnmarshal(bz, poolId)
 	return k.GetPool(ctx, poolId.Value)
 }
@@ -74,7 +77,7 @@ func (k Keeper) GetPoolBalances(ctx sdk.Context, escrowAddress string) (coins sd
 	}
 	acc := k.ak.GetAccount(ctx, address)
 	if acc == nil {
-		return nil, sdkerrors.Wrap(types.ErrReservePoolNotExists, escrowAddress)
+		return nil, errorsmod.Wrap(types.ErrReservePoolNotExists, escrowAddress)
 	}
 	return k.bk.GetAllBalances(ctx, acc.GetAddress()), nil
 }
@@ -83,7 +86,7 @@ func (k Keeper) GetPoolBalancesByLptDenom(ctx sdk.Context, lptDenom string) (coi
 	address := types.GetReservePoolAddr(lptDenom)
 	acc := k.ak.GetAccount(ctx, address)
 	if acc == nil {
-		return nil, sdkerrors.Wrap(types.ErrReservePoolNotExists, address.String())
+		return nil, errorsmod.Wrap(types.ErrReservePoolNotExists, address.String())
 	}
 	return k.bk.GetAllBalances(ctx, acc.GetAddress()), nil
 }
@@ -94,9 +97,9 @@ func (k Keeper) GetLptDenomFromDenoms(ctx sdk.Context, denom1, denom2 string) (s
 		return "", types.ErrEqualDenom
 	}
 
-	standardDenom := k.GetStandardDenom(ctx)
+	standardDenom, _ := k.GetStandardDenom(ctx)
 	if denom1 != standardDenom && denom2 != standardDenom {
-		return "", sdkerrors.Wrap(types.ErrNotContainStandardDenom, fmt.Sprintf("standard denom: %s, denom1: %s, denom2: %s", standardDenom, denom1, denom2))
+		return "", errorsmod.Wrap(types.ErrNotContainStandardDenom, fmt.Sprintf("standard denom: %s, denom1: %s, denom2: %s", standardDenom, denom1, denom2))
 	}
 
 	counterpartyDenom := denom1
@@ -106,7 +109,7 @@ func (k Keeper) GetLptDenomFromDenoms(ctx sdk.Context, denom1, denom2 string) (s
 	poolId := types.GetPoolId(counterpartyDenom)
 	pool, has := k.GetPool(ctx, poolId)
 	if !has {
-		return "", sdkerrors.Wrapf(types.ErrReservePoolNotExists, "liquidity pool token: %s", counterpartyDenom)
+		return "", errorsmod.Wrapf(types.ErrReservePoolNotExists, "liquidity pool token: %s", counterpartyDenom)
 	}
 	return pool.LptDenom, nil
 }
@@ -119,7 +122,7 @@ func (k Keeper) ValidatePool(ctx sdk.Context, lptDenom string) error {
 
 	pool, has := k.GetPoolByLptDenom(ctx, lptDenom)
 	if !has {
-		return sdkerrors.Wrapf(types.ErrReservePoolNotExists, "liquidity pool token: %s", lptDenom)
+		return errorsmod.Wrapf(types.ErrReservePoolNotExists, "liquidity pool token: %s", lptDenom)
 	}
 
 	_, err := k.GetPoolBalances(ctx, pool.EscrowAddress)
@@ -130,20 +133,20 @@ func (k Keeper) ValidatePool(ctx sdk.Context, lptDenom string) error {
 }
 
 func (k Keeper) setPool(ctx sdk.Context, pool *types.Pool) {
-	store := ctx.KVStore(k.storeKey)
+	store := k.storeService.OpenKVStore(ctx)
 	bz := k.cdc.MustMarshal(pool)
 	store.Set(types.GetPoolKey(pool.Id), bz)
 
 	// save by lpt denom
-	poolId := &gogotypes.StringValue{Value: pool.Id}
+	poolId := &gogoprototypes.StringValue{Value: pool.Id}
 	poolIdBz := k.cdc.MustMarshal(poolId)
 	store.Set(types.GetLptDenomKey(pool.LptDenom), poolIdBz)
 }
 
 // getSequence gets the next pool sequence from the store.
 func (k Keeper) getSequence(ctx sdk.Context) uint64 {
-	store := ctx.KVStore(k.storeKey)
-	bz := store.Get([]byte(types.KeyNextPoolSequence))
+	store := k.storeService.OpenKVStore(ctx)
+	bz, _ := store.Get([]byte(types.KeyNextPoolSequence))
 	if bz == nil {
 		return 1
 	}
@@ -152,7 +155,7 @@ func (k Keeper) getSequence(ctx sdk.Context) uint64 {
 
 // setSequence sets the next pool sequence to the store.
 func (k Keeper) setSequence(ctx sdk.Context, sequence uint64) {
-	store := ctx.KVStore(k.storeKey)
+	store := k.storeService.OpenKVStore(ctx)
 	bz := sdk.Uint64ToBigEndian(sequence)
 	store.Set([]byte(types.KeyNextPoolSequence), bz)
 }

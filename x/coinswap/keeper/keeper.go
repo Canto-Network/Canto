@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"strconv"
 
-	gogotypes "github.com/gogo/protobuf/types"
+	gogoprototypes "github.com/cosmos/gogoproto/types"
 
-	"github.com/tendermint/tendermint/libs/log"
-
+	"cosmossdk.io/core/store"
+	errorsmod "cosmossdk.io/errors"
+	"cosmossdk.io/log"
+	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
 	"github.com/Canto-Network/Canto/v7/x/coinswap/types"
@@ -19,12 +20,16 @@ import (
 // Keeper of the coinswap store
 type Keeper struct {
 	cdc              codec.BinaryCodec
-	storeKey         sdk.StoreKey
+	storeService     store.KVStoreService
 	bk               types.BankKeeper
 	ak               types.AccountKeeper
 	paramSpace       paramstypes.Subspace
 	feeCollectorName string
 	blockedAddrs     map[string]bool
+
+	// the address capable of executing a MsgUpdateParams message. Typically, this
+	// should be the x/gov module account.
+	authority string
 }
 
 // NewKeeper returns a coinswap keeper. It handles:
@@ -33,12 +38,13 @@ type Keeper struct {
 // - sending to and from ModuleAccounts
 func NewKeeper(
 	cdc codec.BinaryCodec,
-	key sdk.StoreKey,
+	storeService store.KVStoreService,
 	paramSpace paramstypes.Subspace,
 	bk types.BankKeeper,
 	ak types.AccountKeeper,
 	blockedAddrs map[string]bool,
 	feeCollectorName string,
+	authority string,
 ) Keeper {
 	// ensure coinswap module account is set
 	if addr := ak.GetModuleAddress(types.ModuleName); addr == nil {
@@ -51,31 +57,40 @@ func NewKeeper(
 	}
 
 	return Keeper{
-		storeKey:         key,
+		storeService:     storeService,
 		bk:               bk,
 		ak:               ak,
 		cdc:              cdc,
 		paramSpace:       paramSpace,
 		blockedAddrs:     blockedAddrs,
 		feeCollectorName: feeCollectorName,
+		authority:        authority,
 	}
+}
+
+// GetAuthority returns the x/coinswap module's authority.
+func (k Keeper) GetAuthority() string {
+	return k.authority
 }
 
 // Logger returns a module-specific logger.
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
-	return ctx.Logger().With("module", types.ModuleName)
+	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
 // Swap execute swap order in specified pool
 func (k Keeper) Swap(ctx sdk.Context, msg *types.MsgSwapOrder) error {
-	var amount sdk.Int
+	var amount sdkmath.Int
 	var err error
 
-	standardDenom := k.GetStandardDenom(ctx)
-	isDoubleSwap := (msg.Input.Coin.Denom != standardDenom) && (msg.Output.Coin.Denom != standardDenom)
+	standardDenom, err := k.GetStandardDenom(ctx)
+	if err != nil {
+		return err
+	}
 
+	isDoubleSwap := (msg.Input.Coin.Denom != standardDenom) && (msg.Output.Coin.Denom != standardDenom)
 	if isDoubleSwap {
-		return sdkerrors.Wrapf(types.ErrNotContainStandardDenom, "unsupported swap: standard coin must be in either Input or Output")
+		return errorsmod.Wrapf(types.ErrNotContainStandardDenom, "unsupported swap: standard coin must be in either Input or Output")
 	}
 	if msg.IsBuyOrder {
 		amount, err = k.TradeInputForExactOutput(ctx, msg.Input, msg.Output)
@@ -102,20 +117,22 @@ func (k Keeper) Swap(ctx sdk.Context, msg *types.MsgSwapOrder) error {
 
 // AddLiquidity adds liquidity to the specified pool
 func (k Keeper) AddLiquidity(ctx sdk.Context, msg *types.MsgAddLiquidity) (sdk.Coin, error) {
-	standardDenom := k.GetStandardDenom(ctx)
+	standardDenom, err := k.GetStandardDenom(ctx)
+	if err != nil {
+		return sdk.Coin{}, err
+	}
 	if standardDenom == msg.MaxToken.Denom {
-		return sdk.Coin{}, sdkerrors.Wrapf(types.ErrInvalidDenom,
+		return sdk.Coin{}, errorsmod.Wrapf(types.ErrInvalidDenom,
 			"MaxToken: %s should not be StandardDenom", msg.MaxToken.String())
 	}
 
 	params := k.GetParams(ctx)
-
 	if !params.MaxSwapAmount.AmountOf(msg.MaxToken.Denom).IsPositive() {
-		return sdk.Coin{}, sdkerrors.Wrapf(types.ErrInvalidDenom,
+		return sdk.Coin{}, errorsmod.Wrapf(types.ErrInvalidDenom,
 			"MaxToken %s is not registered in max swap amount", msg.MaxToken.Denom)
 	}
 
-	var mintLiquidityAmt sdk.Int
+	var mintLiquidityAmt sdkmath.Int
 	var depositToken sdk.Coin
 	var standardCoin = sdk.NewCoin(standardDenom, msg.ExactStandardAmt)
 
@@ -138,11 +155,11 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg *types.MsgAddLiquidity) (sdk.C
 		mintLiquidityAmt = msg.ExactStandardAmt
 
 		if mintLiquidityAmt.GT(params.MaxStandardCoinPerPool) {
-			return sdk.Coin{}, sdkerrors.Wrap(types.ErrMaxedStandardDenom, fmt.Sprintf("liquidity amount not met, max standard coin amount: no bigger than %s, actual: %s", params.MaxStandardCoinPerPool.String(), mintLiquidityAmt.String()))
+			return sdk.Coin{}, errorsmod.Wrap(types.ErrMaxedStandardDenom, fmt.Sprintf("liquidity amount not met, max standard coin amount: no bigger than %s, actual: %s", params.MaxStandardCoinPerPool.String(), mintLiquidityAmt.String()))
 		}
 
 		if mintLiquidityAmt.LT(msg.MinLiquidity) {
-			return sdk.Coin{}, sdkerrors.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("liquidity amount not met, user expected: no less than %s, actual: %s", msg.MinLiquidity.String(), mintLiquidityAmt.String()))
+			return sdk.Coin{}, errorsmod.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("liquidity amount not met, user expected: no less than %s, actual: %s", msg.MinLiquidity.String(), mintLiquidityAmt.String()))
 		}
 
 		depositToken = sdk.NewCoin(msg.MaxToken.Denom, msg.MaxToken.Amount)
@@ -157,37 +174,37 @@ func (k Keeper) AddLiquidity(ctx sdk.Context, msg *types.MsgAddLiquidity) (sdk.C
 		tokenReserveAmt := balances.AmountOf(msg.MaxToken.Denom)
 		liquidity := k.bk.GetSupply(ctx, pool.LptDenom).Amount
 
-		if liquidity.Equal(sdk.ZeroInt()) {
+		if liquidity.Equal(sdkmath.ZeroInt()) {
 			// pool exists, but it is empty
 			// same with initial liquidity provide
 			mintLiquidityAmt = msg.ExactStandardAmt
 
 			if mintLiquidityAmt.GT(params.MaxStandardCoinPerPool) {
-				return sdk.Coin{}, sdkerrors.Wrap(types.ErrMaxedStandardDenom, fmt.Sprintf("liquidity amount not met, max standard coin amount: no bigger than %s, actual: %s", params.MaxStandardCoinPerPool.String(), mintLiquidityAmt.String()))
+				return sdk.Coin{}, errorsmod.Wrap(types.ErrMaxedStandardDenom, fmt.Sprintf("liquidity amount not met, max standard coin amount: no bigger than %s, actual: %s", params.MaxStandardCoinPerPool.String(), mintLiquidityAmt.String()))
 			}
 
 			if mintLiquidityAmt.LT(msg.MinLiquidity) {
-				return sdk.Coin{}, sdkerrors.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("liquidity amount not met, user expected: no less than %s, actual: %s", msg.MinLiquidity.String(), mintLiquidityAmt.String()))
+				return sdk.Coin{}, errorsmod.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("liquidity amount not met, user expected: no less than %s, actual: %s", msg.MinLiquidity.String(), mintLiquidityAmt.String()))
 			}
 
 			depositToken = sdk.NewCoin(msg.MaxToken.Denom, msg.MaxToken.Amount)
 
 		} else {
 			if standardReserveAmt.GTE(params.MaxStandardCoinPerPool) {
-				return sdk.Coin{}, sdkerrors.Wrap(types.ErrMaxedStandardDenom, fmt.Sprintf("pool standard coin is maxed out: %s", params.MaxStandardCoinPerPool.String()))
+				return sdk.Coin{}, errorsmod.Wrap(types.ErrMaxedStandardDenom, fmt.Sprintf("pool standard coin is maxed out: %s", params.MaxStandardCoinPerPool.String()))
 			}
 
-			maxStandardInputAmt := sdk.MinInt(msg.ExactStandardAmt, params.MaxStandardCoinPerPool.Sub(standardReserveAmt))
+			maxStandardInputAmt := sdkmath.MinInt(msg.ExactStandardAmt, params.MaxStandardCoinPerPool.Sub(standardReserveAmt))
 			mintLiquidityAmt = (liquidity.Mul(maxStandardInputAmt)).Quo(standardReserveAmt)
 			if mintLiquidityAmt.LT(msg.MinLiquidity) {
-				return sdk.Coin{}, sdkerrors.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("liquidity amount not met, user expected: no less than %s, actual: %s", msg.MinLiquidity.String(), mintLiquidityAmt.String()))
+				return sdk.Coin{}, errorsmod.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("liquidity amount not met, user expected: no less than %s, actual: %s", msg.MinLiquidity.String(), mintLiquidityAmt.String()))
 			}
 
 			depositAmt := (tokenReserveAmt.Mul(maxStandardInputAmt)).Quo(standardReserveAmt).AddRaw(1)
 			depositToken = sdk.NewCoin(msg.MaxToken.Denom, depositAmt)
 			standardCoin = sdk.NewCoin(standardDenom, maxStandardInputAmt)
 			if depositAmt.GT(msg.MaxToken.Amount) {
-				return sdk.Coin{}, sdkerrors.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("token amount not met, user expected: no more than %s, actual: %s", msg.MaxToken.String(), depositToken.String()))
+				return sdk.Coin{}, errorsmod.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("token amount not met, user expected: no more than %s, actual: %s", msg.MaxToken.String(), depositToken.String()))
 			}
 		}
 	}
@@ -212,7 +229,7 @@ func (k Keeper) addLiquidity(ctx sdk.Context,
 	reservePoolAddress sdk.AccAddress,
 	standardCoin, token sdk.Coin,
 	lptDenom string,
-	mintLiquidityAmt sdk.Int,
+	mintLiquidityAmt sdkmath.Int,
 ) (sdk.Coin, error) {
 	depositedTokens := sdk.NewCoins(standardCoin, token)
 	// transfer deposited token into coinswaps Account
@@ -234,11 +251,14 @@ func (k Keeper) addLiquidity(ctx sdk.Context,
 
 // RemoveLiquidity removes liquidity from the specified pool
 func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg *types.MsgRemoveLiquidity) (sdk.Coins, error) {
-	standardDenom := k.GetStandardDenom(ctx)
+	standardDenom, err := k.GetStandardDenom(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	pool, exists := k.GetPoolByLptDenom(ctx, msg.WithdrawLiquidity.Denom)
 	if !exists {
-		return nil, sdkerrors.Wrapf(types.ErrReservePoolNotExists, "liquidity pool token: %s", msg.WithdrawLiquidity.Denom)
+		return nil, errorsmod.Wrapf(types.ErrReservePoolNotExists, "liquidity pool token: %s", msg.WithdrawLiquidity.Denom)
 	}
 
 	balances, err := k.GetPoolBalances(ctx, pool.EscrowAddress)
@@ -253,13 +273,13 @@ func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg *types.MsgRemoveLiquidity) 
 	tokenReserveAmt := balances.AmountOf(minTokenDenom)
 	liquidityReserve := k.bk.GetSupply(ctx, lptDenom).Amount
 	if standardReserveAmt.LT(msg.MinStandardAmt) {
-		return nil, sdkerrors.Wrap(types.ErrInsufficientFunds, fmt.Sprintf("insufficient %s funds, user expected: %s, actual: %s", standardDenom, msg.MinStandardAmt.String(), standardReserveAmt.String()))
+		return nil, errorsmod.Wrap(types.ErrInsufficientFunds, fmt.Sprintf("insufficient %s funds, user expected: %s, actual: %s", standardDenom, msg.MinStandardAmt.String(), standardReserveAmt.String()))
 	}
 	if tokenReserveAmt.LT(msg.MinToken) {
-		return nil, sdkerrors.Wrap(types.ErrInsufficientFunds, fmt.Sprintf("insufficient %s funds, user expected: %s, actual: %s", minTokenDenom, msg.MinToken.String(), tokenReserveAmt.String()))
+		return nil, errorsmod.Wrap(types.ErrInsufficientFunds, fmt.Sprintf("insufficient %s funds, user expected: %s, actual: %s", minTokenDenom, msg.MinToken.String(), tokenReserveAmt.String()))
 	}
 	if liquidityReserve.LT(msg.WithdrawLiquidity.Amount) {
-		return nil, sdkerrors.Wrap(types.ErrInsufficientFunds, fmt.Sprintf("insufficient %s funds, user expected: %s, actual: %s", lptDenom, msg.WithdrawLiquidity.Amount.String(), liquidityReserve.String()))
+		return nil, errorsmod.Wrap(types.ErrInsufficientFunds, fmt.Sprintf("insufficient %s funds, user expected: %s, actual: %s", lptDenom, msg.WithdrawLiquidity.Amount.String(), liquidityReserve.String()))
 	}
 
 	// calculate amount of UNI to be burned for sender
@@ -272,10 +292,10 @@ func (k Keeper) RemoveLiquidity(ctx sdk.Context, msg *types.MsgRemoveLiquidity) 
 	deductUniCoin := msg.WithdrawLiquidity
 
 	if standardWithdrawCoin.Amount.LT(msg.MinStandardAmt) {
-		return nil, sdkerrors.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("iris amount not met, user expected: no less than %s, actual: %s", sdk.NewCoin(standardDenom, msg.MinStandardAmt).String(), standardWithdrawCoin.String()))
+		return nil, errorsmod.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("standard coin amount not met, user expected: no less than %s, actual: %s", sdk.NewCoin(standardDenom, msg.MinStandardAmt).String(), standardWithdrawCoin.String()))
 	}
 	if tokenWithdrawCoin.Amount.LT(msg.MinToken) {
-		return nil, sdkerrors.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("token amount not met, user expected: no less than %s, actual: %s", sdk.NewCoin(minTokenDenom, msg.MinToken).String(), tokenWithdrawCoin.String()))
+		return nil, errorsmod.Wrap(types.ErrConstraintNotMet, fmt.Sprintf("token amount not met, user expected: no less than %s, actual: %s", sdk.NewCoin(minTokenDenom, msg.MinToken).String(), tokenWithdrawCoin.String()))
 	}
 
 	ctx.EventManager().EmitEvent(
@@ -330,19 +350,26 @@ func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
 }
 
 // SetStandardDenom sets the standard denom for the coinswap module.
-func (k Keeper) SetStandardDenom(ctx sdk.Context, denom string) {
-	store := ctx.KVStore(k.storeKey)
-	denomWrap := gogotypes.StringValue{Value: denom}
+func (k Keeper) SetStandardDenom(ctx sdk.Context, denom string) error {
+	store := k.storeService.OpenKVStore(ctx)
+	denomWrap := gogoprototypes.StringValue{Value: denom}
 	bz := k.cdc.MustMarshal(&denomWrap)
-	store.Set(types.KeyStandardDenom, bz)
+	err := store.Set(types.KeyStandardDenom, bz)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // GetStandardDenom returns the standard denom of the coinswap module.
-func (k Keeper) GetStandardDenom(ctx sdk.Context) string {
-	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(types.KeyStandardDenom)
+func (k Keeper) GetStandardDenom(ctx sdk.Context) (string, error) {
+	store := k.storeService.OpenKVStore(ctx)
+	bz, err := store.Get(types.KeyStandardDenom)
+	if len(bz) == 0 {
+		return "", err
+	}
 
-	var denomWrap = gogotypes.StringValue{}
+	var denomWrap = gogoprototypes.StringValue{}
 	k.cdc.MustUnmarshal(bz, &denomWrap)
-	return denomWrap.Value
+	return denomWrap.Value, nil
 }
