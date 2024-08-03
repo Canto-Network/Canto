@@ -22,9 +22,9 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	evm "github.com/evmos/ethermint/x/evm/types"
 
-	"github.com/Canto-Network/Canto/v7/app"
-	epochstypes "github.com/Canto-Network/Canto/v7/x/epochs/types"
-	"github.com/Canto-Network/Canto/v7/x/inflation/types"
+	"github.com/Canto-Network/Canto/v8/app"
+	epochstypes "github.com/Canto-Network/Canto/v8/x/epochs/types"
+	"github.com/Canto-Network/Canto/v8/x/inflation/types"
 
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"

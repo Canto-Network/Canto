@@ -26,7 +26,7 @@ done
 cd ..
 
 # move proto files to the right places
-cp -r github.com/Canto-Network/Canto/v7/* ./
+cp -r github.com/Canto-Network/Canto/v8/* ./
 rm -rf github.com
 
 go mod tidy

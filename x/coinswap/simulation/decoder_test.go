@@ -7,9 +7,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 
-	module "github.com/Canto-Network/Canto/v7/x/coinswap"
-	"github.com/Canto-Network/Canto/v7/x/coinswap/simulation"
-	"github.com/Canto-Network/Canto/v7/x/coinswap/types"
+	module "github.com/Canto-Network/Canto/v8/x/coinswap"
+	"github.com/Canto-Network/Canto/v8/x/coinswap/simulation"
+	"github.com/Canto-Network/Canto/v8/x/coinswap/types"
 	"github.com/cosmos/cosmos-sdk/types/kv"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 )

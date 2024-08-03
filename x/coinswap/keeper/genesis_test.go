@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/Canto-Network/Canto/v7/x/coinswap/types"
+	"github.com/Canto-Network/Canto/v8/x/coinswap/types"
 )
 
 func TestGenesisSuite(t *testing.T) {

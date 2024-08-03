@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	sdkmath "cosmossdk.io/math"
-	"github.com/Canto-Network/Canto/v7/x/inflation/simulation"
-	"github.com/Canto-Network/Canto/v7/x/inflation/types"
+	"github.com/Canto-Network/Canto/v8/x/inflation/simulation"
+	"github.com/Canto-Network/Canto/v8/x/inflation/types"
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/address"

@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	sdkmath "cosmossdk.io/math"
-	erc20v1 "github.com/Canto-Network/Canto/v7/api/canto/erc20/v1"
+	erc20v1 "github.com/Canto-Network/Canto/v8/api/canto/erc20/v1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	ethermint "github.com/evmos/ethermint/types"
 	protov2 "google.golang.org/protobuf/proto"

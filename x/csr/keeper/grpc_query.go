@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"cosmossdk.io/store/prefix"
-	"github.com/Canto-Network/Canto/v7/x/csr/types"
+	"github.com/Canto-Network/Canto/v8/x/csr/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"

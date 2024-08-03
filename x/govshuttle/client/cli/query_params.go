@@ -3,7 +3,7 @@ package cli
 import (
 	"context"
 
-	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
+	"github.com/Canto-Network/Canto/v8/x/govshuttle/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/spf13/cobra"

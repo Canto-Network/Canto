@@ -7,7 +7,7 @@ import "cosmos/base/query/v1beta1/pagination.proto";
 import "canto/csr/v1/params.proto";
 import "canto/csr/v1/csr.proto";
 
-option go_package = "github.com/Canto-Network/Canto/v7/x/csr/types";
+option go_package = "github.com/Canto-Network/Canto/v8/x/csr/types";
 
 // Query defines the gRPC querier service.
 service Query {

@@ -43,7 +43,7 @@ import (
 	ethermint "github.com/evmos/ethermint/types"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 
-	"github.com/Canto-Network/Canto/v7/ibc/testing/simapp"
+	"github.com/Canto-Network/Canto/v8/ibc/testing/simapp"
 )
 
 var MaxAccounts = 10

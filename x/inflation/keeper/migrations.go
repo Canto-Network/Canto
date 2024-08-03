@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	v2 "github.com/Canto-Network/Canto/v7/x/inflation/migrations/v2"
+	v2 "github.com/Canto-Network/Canto/v8/x/inflation/migrations/v2"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 )

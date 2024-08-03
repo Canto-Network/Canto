@@ -4,8 +4,8 @@ import (
 	"math"
 
 	sdkmath "cosmossdk.io/math"
-	"github.com/Canto-Network/Canto/v7/testutil"
-	"github.com/Canto-Network/Canto/v7/x/coinswap/types"
+	"github.com/Canto-Network/Canto/v8/testutil"
+	"github.com/Canto-Network/Canto/v8/x/coinswap/types"
 	"github.com/cometbft/cometbft/crypto/tmhash"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"

@@ -20,10 +20,10 @@ import (
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 
-	"github.com/Canto-Network/Canto/v7/x/inflation/client/cli"
-	"github.com/Canto-Network/Canto/v7/x/inflation/keeper"
-	"github.com/Canto-Network/Canto/v7/x/inflation/simulation"
-	"github.com/Canto-Network/Canto/v7/x/inflation/types"
+	"github.com/Canto-Network/Canto/v8/x/inflation/client/cli"
+	"github.com/Canto-Network/Canto/v8/x/inflation/keeper"
+	"github.com/Canto-Network/Canto/v8/x/inflation/simulation"
+	"github.com/Canto-Network/Canto/v8/x/inflation/types"
 )
 
 // type check to ensure the interface is properly implemented

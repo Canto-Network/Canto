@@ -6,7 +6,7 @@ import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "canto/epochs/v1/genesis.proto";
 
-option go_package = "github.com/Canto-Network/Canto/v7/x/epochs/types";
+option go_package = "github.com/Canto-Network/Canto/v8/x/epochs/types";
 
 // Query defines the gRPC querier service.
 service Query {

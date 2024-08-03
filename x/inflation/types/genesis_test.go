@@ -3,7 +3,7 @@ package types
 import (
 	"testing"
 
-	epochstypes "github.com/Canto-Network/Canto/v7/x/epochs/types"
+	epochstypes "github.com/Canto-Network/Canto/v8/x/epochs/types"
 	"github.com/stretchr/testify/suite"
 )
 

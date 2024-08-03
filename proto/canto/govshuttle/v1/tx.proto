@@ -7,7 +7,7 @@ import "cosmos_proto/cosmos.proto";
 import "amino/amino.proto";
 import "canto/govshuttle/v1/govshuttle.proto";
 
-option go_package = "github.com/Canto-Network/Canto/v7/x/govshuttle/types";
+option go_package = "github.com/Canto-Network/Canto/v8/x/govshuttle/types";
 
 // Msg defines the Msg service.
 service Msg {

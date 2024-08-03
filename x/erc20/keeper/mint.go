@@ -2,11 +2,11 @@ package keeper
 
 import (
 	errorsmod "cosmossdk.io/errors"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
-	"github.com/Canto-Network/Canto/v7/x/erc20/types"
+	"github.com/Canto-Network/Canto/v8/x/erc20/types"
 )
 
 // MintingEnabled checks that:

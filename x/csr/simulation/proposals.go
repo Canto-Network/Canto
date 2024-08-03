@@ -3,7 +3,7 @@ package simulation
 import (
 	"math/rand"
 
-	"github.com/Canto-Network/Canto/v7/x/csr/types"
+	"github.com/Canto-Network/Canto/v8/x/csr/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/address"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"

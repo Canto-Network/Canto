@@ -20,9 +20,9 @@ import (
 	"github.com/evmos/ethermint/server/config"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 
-	"github.com/Canto-Network/Canto/v7/contracts"
-	"github.com/Canto-Network/Canto/v7/testutil"
-	govshuttletypes "github.com/Canto-Network/Canto/v7/x/govshuttle/types"
+	"github.com/Canto-Network/Canto/v8/contracts"
+	"github.com/Canto-Network/Canto/v8/testutil"
+	govshuttletypes "github.com/Canto-Network/Canto/v8/x/govshuttle/types"
 )
 
 type ProposalResult struct {

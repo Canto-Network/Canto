@@ -10,7 +10,7 @@ import (
 
 	"cosmossdk.io/core/address"
 	"cosmossdk.io/core/appmodule"
-	"github.com/Canto-Network/Canto/v7/x/erc20/simulation"
+	"github.com/Canto-Network/Canto/v8/x/erc20/simulation"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -20,9 +20,9 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 
-	"github.com/Canto-Network/Canto/v7/x/erc20/client/cli"
-	"github.com/Canto-Network/Canto/v7/x/erc20/keeper"
-	"github.com/Canto-Network/Canto/v7/x/erc20/types"
+	"github.com/Canto-Network/Canto/v8/x/erc20/client/cli"
+	"github.com/Canto-Network/Canto/v8/x/erc20/keeper"
+	"github.com/Canto-Network/Canto/v8/x/erc20/types"
 )
 
 // type check to ensure the interface is properly implemented

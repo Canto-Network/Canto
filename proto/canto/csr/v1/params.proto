@@ -5,7 +5,7 @@ import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";
 import "amino/amino.proto";
 
-option go_package = "github.com/Canto-Network/Canto/v7/x/csr/types";
+option go_package = "github.com/Canto-Network/Canto/v8/x/csr/types";
 
 // Params holds parameters for the csr module
 message Params {

@@ -18,8 +18,8 @@ import (
 	abci "github.com/cometbft/cometbft/abci/types"
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
-	chain "github.com/Canto-Network/Canto/v7/app"
-	v8 "github.com/Canto-Network/Canto/v7/app/upgrades/v8"
+	chain "github.com/Canto-Network/Canto/v8/app"
+	v8 "github.com/Canto-Network/Canto/v8/app/upgrades/v8"
 )
 
 type UpgradeTestSuite struct {

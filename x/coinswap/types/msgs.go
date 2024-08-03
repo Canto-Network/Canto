@@ -5,7 +5,7 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	"cosmossdk.io/x/tx/signing"
-	coinswapv1 "github.com/Canto-Network/Canto/v7/api/canto/coinswap/v1"
+	coinswapv1 "github.com/Canto-Network/Canto/v8/api/canto/coinswap/v1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	protov2 "google.golang.org/protobuf/proto"
 )

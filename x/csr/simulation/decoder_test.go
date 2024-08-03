@@ -4,16 +4,16 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/Canto-Network/Canto/v7/x/csr/keeper"
+	"github.com/Canto-Network/Canto/v8/x/csr/keeper"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	"github.com/evmos/ethermint/tests"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cosmos/cosmos-sdk/types/kv"
 
-	"github.com/Canto-Network/Canto/v7/x/csr"
-	"github.com/Canto-Network/Canto/v7/x/csr/simulation"
-	"github.com/Canto-Network/Canto/v7/x/csr/types"
+	"github.com/Canto-Network/Canto/v8/x/csr"
+	"github.com/Canto-Network/Canto/v8/x/csr/simulation"
+	"github.com/Canto-Network/Canto/v8/x/csr/types"
 )
 
 func TestCsrStore(t *testing.T) {

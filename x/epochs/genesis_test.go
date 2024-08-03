@@ -8,9 +8,9 @@ import (
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 	"github.com/stretchr/testify/require"
 
-	simapp "github.com/Canto-Network/Canto/v7/app"
-	"github.com/Canto-Network/Canto/v7/x/epochs"
-	"github.com/Canto-Network/Canto/v7/x/epochs/types"
+	simapp "github.com/Canto-Network/Canto/v8/app"
+	"github.com/Canto-Network/Canto/v8/x/epochs"
+	"github.com/Canto-Network/Canto/v8/x/epochs/types"
 )
 
 func TestEpochsExportGenesis(t *testing.T) {

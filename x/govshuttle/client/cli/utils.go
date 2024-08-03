@@ -14,7 +14,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/gov/client/cli"
 	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 
-	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
+	"github.com/Canto-Network/Canto/v8/x/govshuttle/types"
 )
 
 // PARSING METADATA ACCORDING TO PROPOSAL STRUCT IN GOVTYPES TYPE IN govshuttle

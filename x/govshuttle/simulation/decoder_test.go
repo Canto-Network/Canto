@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/Canto-Network/Canto/v7/x/govshuttle"
+	"github.com/Canto-Network/Canto/v8/x/govshuttle"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	"github.com/evmos/ethermint/tests"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cosmos/cosmos-sdk/types/kv"
 
-	"github.com/Canto-Network/Canto/v7/x/govshuttle/simulation"
-	"github.com/Canto-Network/Canto/v7/x/govshuttle/types"
+	"github.com/Canto-Network/Canto/v8/x/govshuttle/simulation"
+	"github.com/Canto-Network/Canto/v8/x/govshuttle/types"
 )
 
 func TestGovShuttleStore(t *testing.T) {

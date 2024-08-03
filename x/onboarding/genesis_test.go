@@ -18,9 +18,9 @@ import (
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/Canto-Network/Canto/v7/app"
-	"github.com/Canto-Network/Canto/v7/x/onboarding"
-	"github.com/Canto-Network/Canto/v7/x/onboarding/types"
+	"github.com/Canto-Network/Canto/v8/app"
+	"github.com/Canto-Network/Canto/v8/x/onboarding"
+	"github.com/Canto-Network/Canto/v8/x/onboarding/types"
 )
 
 type GenesisTestSuite struct {

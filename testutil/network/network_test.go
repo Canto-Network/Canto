@@ -14,7 +14,7 @@ import (
 	"github.com/evmos/ethermint/server/config"
 	"github.com/evmos/ethermint/testutil/network"
 
-	cantonetwork "github.com/Canto-Network/Canto/v7/testutil/network"
+	cantonetwork "github.com/Canto-Network/Canto/v8/testutil/network"
 )
 
 type IntegrationTestSuite struct {

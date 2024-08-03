@@ -38,10 +38,10 @@ import (
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 
-	"github.com/Canto-Network/Canto/v7/types"
-	coinswaptypes "github.com/Canto-Network/Canto/v7/x/coinswap/types"
-	epochstypes "github.com/Canto-Network/Canto/v7/x/epochs/types"
-	inflationtypes "github.com/Canto-Network/Canto/v7/x/inflation/types"
+	"github.com/Canto-Network/Canto/v8/types"
+	coinswaptypes "github.com/Canto-Network/Canto/v8/x/coinswap/types"
+	epochstypes "github.com/Canto-Network/Canto/v8/x/epochs/types"
+	inflationtypes "github.com/Canto-Network/Canto/v8/x/inflation/types"
 )
 
 func TestCantoExport(t *testing.T) {

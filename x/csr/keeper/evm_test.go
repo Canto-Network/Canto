@@ -6,9 +6,9 @@ import (
 	"log"
 	"math/big"
 
-	"github.com/Canto-Network/Canto/v7/contracts"
-	_ "github.com/Canto-Network/Canto/v7/x/csr/keeper"
-	"github.com/Canto-Network/Canto/v7/x/erc20/types"
+	"github.com/Canto-Network/Canto/v8/contracts"
+	_ "github.com/Canto-Network/Canto/v8/x/csr/keeper"
+	"github.com/Canto-Network/Canto/v8/x/erc20/types"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"

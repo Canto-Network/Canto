@@ -3,8 +3,8 @@ package onboarding
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/Canto-Network/Canto/v7/x/onboarding/keeper"
-	"github.com/Canto-Network/Canto/v7/x/onboarding/types"
+	"github.com/Canto-Network/Canto/v8/x/onboarding/keeper"
+	"github.com/Canto-Network/Canto/v8/x/onboarding/types"
 )
 
 // InitGenesis import module genesis

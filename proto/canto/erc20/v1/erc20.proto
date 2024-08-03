@@ -4,7 +4,7 @@ package canto.erc20.v1;
 import "gogoproto/gogo.proto";
 import "cosmos/bank/v1beta1/bank.proto";
 
-option go_package = "github.com/Canto-Network/Canto/v7/x/erc20/types";
+option go_package = "github.com/Canto-Network/Canto/v8/x/erc20/types";
 
 // Owner enumerates the ownership of a ERC20 contract.
 enum Owner {

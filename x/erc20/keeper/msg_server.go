@@ -13,8 +13,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hashicorp/go-metrics"
 
-	"github.com/Canto-Network/Canto/v7/contracts"
-	"github.com/Canto-Network/Canto/v7/x/erc20/types"
+	"github.com/Canto-Network/Canto/v8/contracts"
+	"github.com/Canto-Network/Canto/v8/x/erc20/types"
 )
 
 var _ types.MsgServer = &Keeper{}

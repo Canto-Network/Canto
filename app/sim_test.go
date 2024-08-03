@@ -11,7 +11,7 @@ import (
 	"testing"
 
 	upgradetypes "cosmossdk.io/x/upgrade/types"
-	"github.com/Canto-Network/Canto/v7/types"
+	"github.com/Canto-Network/Canto/v8/types"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 
@@ -36,8 +36,8 @@ import (
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	cantoconfig "github.com/Canto-Network/Canto/v7/cmd/config"
-	epochstypes "github.com/Canto-Network/Canto/v7/x/epochs/types"
+	cantoconfig "github.com/Canto-Network/Canto/v8/cmd/config"
+	epochstypes "github.com/Canto-Network/Canto/v8/x/epochs/types"
 )
 
 var FlagEnableStreamingValue bool
