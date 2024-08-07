@@ -100,3 +100,7 @@ func (k Keeper) WriteAcknowledgement(ctx sdk.Context, channelCap *capabilitytype
 func (k Keeper) GetAppVersion(ctx sdk.Context, portID, channelID string) (string, bool) {
 	return k.ics4Wrapper.GetAppVersion(ctx, portID, channelID)
 }
+
+func (k *Keeper) SetErc20Keeper(ek types.Erc20Keeper) {
+	k.erc20Keeper = ek
+}

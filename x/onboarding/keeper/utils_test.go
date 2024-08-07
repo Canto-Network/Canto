@@ -1,6 +1,15 @@
 package keeper_test
 
 import (
+	"context"
+	"math/big"
+
+	errorsmod "cosmossdk.io/errors"
+	erc20keeper "github.com/Canto-Network/Canto/v8/x/erc20/keeper"
+	erc20types "github.com/Canto-Network/Canto/v8/x/erc20/types"
+	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/common"
+	evmtypes "github.com/evmos/ethermint/x/evm/types"
 	"github.com/stretchr/testify/mock"
 
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
@@ -48,4 +57,53 @@ func (m *MockTransferKeeper) SendTransfer(
 	}
 
 	return args.Error(0)
+}
+
+type MockErc20Keeper struct {
+	mock.Mock
+	erc20keeper erc20keeper.Keeper
+	bankKeeper  bankkeeper.Keeper
+}
+
+func NewMockErc20Keeper(ek erc20keeper.Keeper, bk bankkeeper.Keeper) *MockErc20Keeper {
+	return &MockErc20Keeper{erc20keeper: ek, bankKeeper: bk}
+}
+
+func (m *MockErc20Keeper) ConvertCoin(
+	goCtx context.Context,
+	msg *erc20types.MsgConvertCoin,
+) (*erc20types.MsgConvertCoinResponse, error) {
+	sender, _ := sdk.AccAddressFromBech32(msg.Sender)
+
+	coins := sdk.Coins{msg.Coin}
+	err := m.bankKeeper.SendCoinsFromAccountToModule(goCtx, sender, types.ModuleName, coins)
+	if err != nil {
+		return nil, errorsmod.Wrap(err, "failed to escrow coins")
+	}
+	argsMock := m.Called(goCtx, msg)
+	return nil, argsMock.Error(1)
+}
+
+func (m *MockErc20Keeper) GetTokenPairID(ctx sdk.Context, token string) []byte {
+	return m.erc20keeper.GetTokenPairID(ctx, token)
+}
+
+func (m *MockErc20Keeper) GetTokenPair(ctx sdk.Context, id []byte) (erc20types.TokenPair, bool) {
+	return m.erc20keeper.GetTokenPair(ctx, id)
+}
+
+func (m *MockErc20Keeper) BalanceOf(ctx sdk.Context, abi abi.ABI, contract, account common.Address) *big.Int {
+	return m.erc20keeper.BalanceOf(ctx, abi, contract, account)
+}
+
+func (m *MockErc20Keeper) CallEVM(
+	ctx sdk.Context,
+	abi abi.ABI,
+	from, contract common.Address,
+	commit bool,
+	method string,
+	args ...interface{},
+) (*evmtypes.MsgEthereumTxResponse, error) {
+	argsMock := m.Called(ctx, abi, from, contract, commit, method, args)
+	return nil, argsMock.Error(1)
 }

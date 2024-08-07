@@ -339,6 +339,25 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 			sdk.NewCoin(uusdcIbcdenom, sdkmath.NewInt(20998399)),
 			sdkmath.NewInt(0),
 		},
+		{
+			"convert fail due to evm call failure - cached context is discarded (escrow occured during convert coin is reverted)",
+			func() {
+				cantoChannel = "channel-0"
+				transferAmount = sdkmath.NewIntWithDecimal(25, 6)
+				transfer := transfertypes.NewFungibleTokenPacketData(denom, transferAmount.String(), secpAddrCosmos, ethsecpAddrcanto, "")
+				bz := transfertypes.ModuleCdc.MustMarshalJSON(&transfer)
+				packet = channeltypes.NewPacket(bz, 100, transfertypes.PortID, sourceChannel, transfertypes.PortID, cantoChannel, timeoutHeight, 0)
+				mockErc20Keeper := NewMockErc20Keeper(suite.app.Erc20Keeper, suite.app.BankKeeper)
+				suite.app.OnboardingKeeper.SetErc20Keeper(mockErc20Keeper)
+				mockErc20Keeper.On("ConvertCoin", mock.Anything, mock.Anything).Return(nil, fmt.Errorf("Call EVM Failed"))
+
+			},
+			true,
+			sdk.NewCoins(sdk.NewCoin("acanto", sdkmath.ZeroInt())),
+			sdk.NewCoin("acanto", sdkmath.NewIntWithDecimal(4, 18)),
+			sdk.NewCoin(uusdcIbcdenom, sdkmath.NewInt(20998399)),
+			sdkmath.ZeroInt(),
+		},
 	}
 	for _, tc := range testCases {
 		suite.Run(fmt.Sprintf("Case %s", tc.name), func() {
@@ -381,8 +400,6 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 			suite.Require().NotNil(usdtPair)
 			suite.app.Erc20Keeper.SetTokenPair(suite.ctx, *usdtPair)
 
-			tc.malleate()
-
 			// Set Denom Trace
 			denomTrace := transfertypes.DenomTrace{
 				Path:      path,
@@ -415,6 +432,8 @@ func (suite *KeeperTestSuite) TestOnRecvPacket() {
 			sp, found := suite.app.ParamsKeeper.GetSubspace(types.ModuleName)
 			suite.Require().True(found)
 			suite.app.OnboardingKeeper = keeper.NewKeeper(sp, suite.app.AccountKeeper, suite.app.BankKeeper, suite.app.IBCKeeper.ChannelKeeper, mockTransferKeeper, suite.app.CoinswapKeeper, suite.app.Erc20Keeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
+
+			tc.malleate()
 
 			// Fund receiver account with canto, IBC vouchers
 			testutil.FundAccount(suite.app.BankKeeper, suite.ctx, ethsecpAddr, tc.receiverBalance)

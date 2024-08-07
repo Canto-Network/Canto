@@ -134,9 +134,14 @@ func (k Keeper) OnRecvPacket(
 	// the ICS20 packet data
 
 	// Use MsgConvertCoin to convert the Cosmos Coin to an ERC20
-	if _, err = k.erc20Keeper.ConvertCoin(ctx, convertMsg); err != nil {
+	// Use cached context to revert the state if the conversion fails
+
+	cacheCtx, writeCache := ctx.CacheContext()
+	if _, err = k.erc20Keeper.ConvertCoin(cacheCtx, convertMsg); err != nil {
 		logger.Error("failed to convert coins", "error", err)
-		return ack
+		convertCoin = sdk.NewCoin(transferredCoin.Denom, sdkmath.ZeroInt())
+	} else {
+		writeCache()
 	}
 
 	logger.Info(
