@@ -174,6 +174,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	if err != nil {
 		panic(err)
 	}
+	rootCmd.PersistentFlags().Set(flags.FlagChainID, "canto_7700-1")
 
 	// add rosetta
 	rootCmd.AddCommand(rosettacmd.RosettaCommand(encodingConfig.InterfaceRegistry, encodingConfig.Codec))

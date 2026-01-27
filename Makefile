@@ -1,4 +1,3 @@
-#!/usr/bin/make -f
 
 ###
 # Find OS and Go environment
@@ -136,6 +135,9 @@ BUILD_TARGETS := build install
 build: BUILD_ARGS=-o $(BUILDDIR)/
 build-linux:
 	GOOS=linux GOARCH=amd64 LEDGER_ENABLED=false $(MAKE) build
+
+build-static: go.sum $(BUILDDIR)/
+	CGO_ENABLED=1 CC=musl-gcc go build -tags "netgo osusergo static_build" -ldflags '$(ldflags) -w -s -linkmode external -extldflags "-static"' -o $(BUILDDIR)/$(canto_BINARY) ./cmd/cantod
 
 $(BUILD_TARGETS): go.sum $(BUILDDIR)/
 	go $@ $(BUILD_FLAGS) $(BUILD_ARGS) ./...
